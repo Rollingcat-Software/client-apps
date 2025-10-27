@@ -1,0 +1,19 @@
+{
+    "logs": [
+        {
+            "outputFile": "com.fivucsas.mobile.android.androidApp-mergeDebugResources-59:/values-port/values-port.xml",
+            "map": [
+                {
+                    "source": "C:\\Users\\ahabg\\.gradle\\caches\\8.14.3\\transforms\\e0e95ee11951e6c9ebbf23e9e5c5427b\\transformed\\appcompat-1.6.1\\res\\values-port\\values-port.xml",
+                    "from": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "55",
+                        "endColumns": "55",
+                        "endOffsets": "106"
+                    }
+                }
+            ]
+        }
+    ]
+}

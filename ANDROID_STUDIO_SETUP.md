@@ -1,6 +1,7 @@
 # 🎨 Android Studio Setup for Flutter Cross-Platform Development
 
-Yes! **Android Studio is the BEST IDE for Flutter development.** You can build cross-platform apps (Android & iOS) from Android Studio.
+Yes! **Android Studio is the BEST IDE for Flutter development.** You can build cross-platform apps (
+Android & iOS) from Android Studio.
 
 ## ✅ Why Android Studio is Perfect for Flutter
 
@@ -110,6 +111,7 @@ Since you already have the mobile-app folder:
 4. Click **OK**
 
 **First time setup:**
+
 ```bash
 # In Android Studio Terminal (Alt+F12)
 flutter create --org com.fivucsas --project-name fivucsas_mobile .
@@ -148,11 +150,11 @@ flutter pub get
 ### Run on Physical Android Device
 
 1. **Enable Developer Options** on your phone:
-   - Go to Settings → About Phone
-   - Tap "Build Number" 7 times
-   
+    - Go to Settings → About Phone
+    - Tap "Build Number" 7 times
+
 2. **Enable USB Debugging**:
-   - Settings → Developer Options → USB Debugging
+    - Settings → Developer Options → USB Debugging
 
 3. **Connect** phone via USB
 
@@ -221,6 +223,7 @@ sudo gem install cocoapods
 **What it does:** Updates UI instantly without restarting app
 
 **How to use:**
+
 - **Save file** → Auto hot reload (if enabled)
 - **Click** Hot Reload button (⚡)
 - **Press** `Ctrl+S` (or `Cmd+S` on Mac)
@@ -240,6 +243,7 @@ Text('Hello FIVUCSAS')
 **When to use:** State changes, dependency injection changes
 
 **How to use:**
+
 - **Click** Hot Restart button (🔄)
 - **Terminal:** Press `R`
 
@@ -248,6 +252,7 @@ Text('Hello FIVUCSAS')
 **What it does:** Visual debugging of widget tree
 
 **How to use:**
+
 1. **Run app** in Debug mode
 2. **View → Tool Windows → Flutter Inspector**
 3. Explore widget tree, layout issues
@@ -257,6 +262,7 @@ Text('Hello FIVUCSAS')
 **Access:** Tools → Device Manager
 
 **Features:**
+
 - Create/delete emulators
 - Quick boot emulators
 - Wipe emulator data
@@ -267,6 +273,7 @@ Text('Hello FIVUCSAS')
 **Access:** View → Tool Windows → Logcat
 
 **Filter logs:**
+
 ```
 flutter:   # Flutter logs only
 package:com.fivucsas.mobile  # Your app only
@@ -275,6 +282,7 @@ package:com.fivucsas.mobile  # Your app only
 ### 6. Dart Analysis (✅ Code Quality)
 
 **Real-time features:**
+
 - Syntax errors
 - Type checking
 - Quick fixes (Alt+Enter)
@@ -283,6 +291,7 @@ package:com.fivucsas.mobile  # Your app only
 ### 7. Debugger (🐛 Debug Your App)
 
 **Breakpoints:**
+
 - Click left margin to add breakpoint
 - Run in Debug mode (🐛)
 - Step through code (F8, F7)
@@ -291,28 +300,28 @@ package:com.fivucsas.mobile  # Your app only
 
 ### Essential Shortcuts
 
-| Action | Windows/Linux | macOS |
-|--------|--------------|-------|
-| Run | Shift+F10 | Control+R |
-| Debug | Shift+F9 | Control+D |
-| Hot Reload | Ctrl+S | Cmd+S |
-| Hot Restart | Ctrl+Shift+\ | Cmd+Shift+\ |
-| Format Code | Ctrl+Alt+L | Cmd+Option+L |
-| Quick Fix | Alt+Enter | Option+Enter |
-| Find File | Ctrl+Shift+N | Cmd+Shift+O |
-| Search Everywhere | Shift Shift | Shift Shift |
-| Terminal | Alt+F12 | Option+F12 |
-| Build | Ctrl+F9 | Cmd+F9 |
+| Action            | Windows/Linux | macOS        |
+|-------------------|---------------|--------------|
+| Run               | Shift+F10     | Control+R    |
+| Debug             | Shift+F9      | Control+D    |
+| Hot Reload        | Ctrl+S        | Cmd+S        |
+| Hot Restart       | Ctrl+Shift+\  | Cmd+Shift+\  |
+| Format Code       | Ctrl+Alt+L    | Cmd+Option+L |
+| Quick Fix         | Alt+Enter     | Option+Enter |
+| Find File         | Ctrl+Shift+N  | Cmd+Shift+O  |
+| Search Everywhere | Shift Shift   | Shift Shift  |
+| Terminal          | Alt+F12       | Option+F12   |
+| Build             | Ctrl+F9       | Cmd+F9       |
 
 ### Flutter-Specific Shortcuts
 
-| Action | Shortcut |
-|--------|----------|
-| Extract Widget | Ctrl+Alt+W |
-| Wrap with Widget | Alt+Enter → Wrap |
-| Remove Widget | Alt+Enter → Remove |
-| Go to Definition | Ctrl+B or Ctrl+Click |
-| Show Documentation | Ctrl+Q |
+| Action             | Shortcut             |
+|--------------------|----------------------|
+| Extract Widget     | Ctrl+Alt+W           |
+| Wrap with Widget   | Alt+Enter → Wrap     |
+| Remove Widget      | Alt+Enter → Remove   |
+| Go to Definition   | Ctrl+B or Ctrl+Click |
+| Show Documentation | Ctrl+Q               |
 
 ## 🎯 Project Structure in Android Studio
 
@@ -401,6 +410,7 @@ dev_dependencies:
 ```
 
 **After editing, click "Pub get" in the banner** or run:
+
 ```bash
 flutter pub get
 ```
@@ -471,14 +481,15 @@ flutter pub run build_runner build --delete-conflicting-outputs
 3. App will pause at breakpoint
 4. **Inspect variables** in Debug window
 5. **Step through code:**
-   - F8: Step over
-   - F7: Step into
-   - Shift+F8: Step out
-   - F9: Resume
+    - F8: Step over
+    - F7: Step into
+    - Shift+F8: Step out
+    - F9: Resume
 
 ### Debug Console
 
 View real-time logs:
+
 - **Flutter:** Tab shows print() statements
 - **Logcat:** Tab shows all Android logs
 - **Console:** Shows build output
@@ -488,6 +499,7 @@ View real-time logs:
 **Access:** When running, click "Open DevTools" in Run window
 
 **Features:**
+
 - Widget inspector
 - Performance profiler
 - Memory profiler
@@ -562,12 +574,12 @@ Type these shortcuts and press Tab:
 
 ### Common Git Operations
 
-| Action | Shortcut | Menu |
-|--------|----------|------|
-| Commit | Ctrl+K | VCS → Commit |
-| Push | Ctrl+Shift+K | VCS → Git → Push |
-| Pull | Ctrl+T | VCS → Update Project |
-| Branches | - | VCS → Git → Branches |
+| Action   | Shortcut     | Menu                 |
+|----------|--------------|----------------------|
+| Commit   | Ctrl+K       | VCS → Commit         |
+| Push     | Ctrl+Shift+K | VCS → Git → Push     |
+| Pull     | Ctrl+T       | VCS → Update Project |
+| Branches | -            | VCS → Git → Branches |
 
 ## ✅ Quick Start Checklist
 
@@ -589,35 +601,45 @@ Use this when setting up:
 ## 🎓 Learning Resources
 
 ### Android Studio
+
 - [Android Studio User Guide](https://developer.android.com/studio/intro)
 - [Keyboard Shortcuts](https://developer.android.com/studio/intro/keyboard-shortcuts)
 
 ### Flutter in Android Studio
+
 - [Flutter Setup](https://docs.flutter.dev/get-started/editor?tab=androidstudio)
 - [Debugging Flutter Apps](https://docs.flutter.dev/testing/debugging)
 
 ## 🆘 Common Issues
 
 ### Issue: "Flutter SDK not found"
+
 **Solution:**
+
 1. File → Settings → Languages & Frameworks → Flutter
 2. Set Flutter SDK path: `C:\src\flutter`
 3. Click Apply
 
 ### Issue: "Android licenses not accepted"
+
 **Solution:**
+
 ```bash
 flutter doctor --android-licenses
 ```
 
 ### Issue: "Emulator won't start"
+
 **Solution:**
+
 1. Tools → Device Manager
 2. Wipe emulator data
 3. Cold boot
 
 ### Issue: "Hot reload not working"
+
 **Solution:**
+
 1. Check "Enable hot reload on save"
 2. File → Settings → Languages & Frameworks → Flutter
 3. Enable hot reload checkbox
@@ -637,6 +659,7 @@ Android Studio is **perfect** for Flutter cross-platform development! You get:
 ---
 
 **Next Steps:**
+
 1. Open Android Studio
 2. Open `mobile-app` folder
 3. Run `flutter create .`

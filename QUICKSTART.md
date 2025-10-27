@@ -5,9 +5,9 @@ This guide will help you initialize and set up the Flutter mobile app in this fo
 ## Prerequisites
 
 1. **Install Flutter SDK**
-   - Download from: https://docs.flutter.dev/get-started/install/windows
-   - Extract to `C:\src\flutter`
-   - Add to PATH: `C:\src\flutter\bin`
+    - Download from: https://docs.flutter.dev/get-started/install/windows
+    - Extract to `C:\src\flutter`
+    - Add to PATH: `C:\src\flutter\bin`
 
 2. **Verify Installation**
    ```bash
@@ -113,6 +113,7 @@ flutter:
 ```
 
 Then run:
+
 ```bash
 flutter pub get
 ```
@@ -120,6 +121,7 @@ flutter pub get
 ### 3. Create Project Structure
 
 **Windows PowerShell:**
+
 ```powershell
 # Navigate to lib directory
 cd lib
@@ -175,6 +177,7 @@ cd ..
 ```
 
 **Or use CMD:**
+
 ```cmd
 cd lib
 mkdir core\constants core\theme core\utils core\errors core\network core\config
@@ -260,10 +263,10 @@ mobile-app/
 
 1. Follow the detailed implementation guide in `../FLUTTER_APP_GUIDE.md`
 2. Start implementing features one by one:
-   - Core configuration
-   - Authentication feature
-   - Biometric feature
-   - UI components
+    - Core configuration
+    - Authentication feature
+    - Biometric feature
+    - UI components
 
 ## Useful Commands
 
@@ -326,6 +329,7 @@ ENVIRONMENT=development
 6. Click Finish
 
 Then run:
+
 ```bash
 flutter emulators
 flutter emulators --launch <emulator-id>
@@ -348,19 +352,25 @@ flutter run
 ## Troubleshooting
 
 ### Issue: Flutter command not found
+
 **Solution:** Add Flutter to PATH
+
 ```powershell
 $env:Path += ";C:\src\flutter\bin"
 ```
 
 ### Issue: Android licenses not accepted
+
 **Solution:**
+
 ```bash
 flutter doctor --android-licenses
 ```
 
 ### Issue: Gradle build errors
+
 **Solution:**
+
 ```bash
 cd android
 .\gradlew clean
@@ -370,7 +380,9 @@ flutter pub get
 ```
 
 ### Issue: iOS build errors
+
 **Solution:**
+
 ```bash
 cd ios
 pod deintegrate

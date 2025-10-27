@@ -24,6 +24,7 @@ This folder is ready to become a Flutter cross-platform mobile application with:
 4. **Follow** [ANDROID_STUDIO_SETUP.md](ANDROID_STUDIO_SETUP.md) for complete guide
 
 **Advantages:**
+
 - ✅ Visual interface
 - ✅ Built-in emulator
 - ✅ Hot reload UI button
@@ -41,6 +42,7 @@ setup.bat
 ```
 
 This will:
+
 - Check Flutter installation
 - Initialize the Flutter project
 - Create the project structure
@@ -75,12 +77,14 @@ flutter run
 Before starting, make sure you have:
 
 ### Required
+
 - [ ] **Flutter SDK 3.24+** - [Install Guide](https://docs.flutter.dev/get-started/install/windows)
 - [ ] **Dart SDK 3.5+** (comes with Flutter)
 - [ ] **Android Studio** with Android SDK
 - [ ] **Git**
 
 ### Optional (but recommended)
+
 - [ ] **Android Studio** (Recommended! Best for Flutter) ⭐
 - [ ] **Visual Studio Code** with Flutter extension (Alternative)
 - [ ] **Xcode** (macOS only, for iOS development)
@@ -155,18 +159,21 @@ This app follows **Clean Architecture** with:
 ## 📱 Features to Implement
 
 ### Phase 1: Core Features
+
 - [ ] User authentication (login/register)
 - [ ] JWT token management
 - [ ] Profile management
 - [ ] App navigation
 
 ### Phase 2: Biometric Features
+
 - [ ] Camera integration
 - [ ] Face detection with ML Kit
 - [ ] Biometric enrollment
 - [ ] Liveness detection (Biometric Puzzle)
 
 ### Phase 3: Advanced Features
+
 - [ ] Offline support
 - [ ] Push notifications
 - [ ] QR code scanning
@@ -217,6 +224,7 @@ flutter run
 ### 4. Hot Reload
 
 While app is running:
+
 - Press `r` for hot reload
 - Press `R` for hot restart
 - Press `q` to quit
@@ -259,7 +267,9 @@ flutter build ipa --release
 ## 🐛 Common Issues & Solutions
 
 ### Issue: "Flutter command not found"
+
 **Solution:** Add Flutter to PATH
+
 ```bash
 # Windows
 set PATH=%PATH%;C:\src\flutter\bin
@@ -268,22 +278,28 @@ set PATH=%PATH%;C:\src\flutter\bin
 ```
 
 ### Issue: "Android licenses not accepted"
+
 **Solution:**
+
 ```bash
 flutter doctor --android-licenses
 ```
 
 ### Issue: "Unable to connect to API"
+
 **Solutions:**
+
 1. Check backend is running
 2. Check firewall settings
 3. Use correct IP address:
-   - Android Emulator: `10.0.2.2`
-   - iOS Simulator: `localhost`
-   - Physical device: Your computer's IP
+    - Android Emulator: `10.0.2.2`
+    - iOS Simulator: `localhost`
+    - Physical device: Your computer's IP
 
 ### Issue: Build errors after adding dependencies
+
 **Solution:**
+
 ```bash
 flutter clean
 flutter pub get
@@ -293,25 +309,28 @@ flutter run
 ## 📖 Learning Resources
 
 ### Flutter Basics
+
 - [Flutter Documentation](https://docs.flutter.dev/)
 - [Dart Language Tour](https://dart.dev/guides/language/language-tour)
 - [Flutter Widget Catalog](https://docs.flutter.dev/development/ui/widgets)
 
 ### Architecture & Patterns
+
 - [BLoC Pattern](https://bloclibrary.dev/)
 - [Clean Architecture](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html)
 - [Flutter Best Practices](https://docs.flutter.dev/development/ui/layout/best-practices)
 
 ### ML & Camera
+
 - [ML Kit Face Detection](https://developers.google.com/ml-kit/vision/face-detection)
 - [Camera Plugin](https://pub.dev/packages/camera)
 
 ## 🆘 Need Help?
 
 1. **Check documentation:**
-   - QUICKSTART.md - Setup help
-   - README.md - Feature documentation
-   - FLUTTER_APP_GUIDE.md - Implementation guide
+    - QUICKSTART.md - Setup help
+    - README.md - Feature documentation
+    - FLUTTER_APP_GUIDE.md - Implementation guide
 
 2. **Common commands:**
    ```bash
@@ -322,8 +341,8 @@ flutter run
    ```
 
 3. **Project documentation:**
-   - Main README: `../README.md`
-   - Implementation guide: `../IMPLEMENTATION_GUIDE.md`
+    - Main README: `../README.md`
+    - Implementation guide: `../IMPLEMENTATION_GUIDE.md`
 
 ## 🎯 Next Steps
 

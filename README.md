@@ -8,9 +8,14 @@
 
 ## Overview
 
-The **FIVUCSAS Mobile App** is a cross-platform Flutter application that serves as the end-user interface for the FIVUCSAS (Face and Identity Verification Using Cloud-based SaaS) platform. This app enables users to enroll their biometric data, perform the "Biometric Puzzle" liveness detection, and authenticate themselves for both physical and digital access control.
+The **FIVUCSAS Mobile App** is a cross-platform Flutter application that serves as the end-user
+interface for the FIVUCSAS (Face and Identity Verification Using Cloud-based SaaS) platform. This
+app enables users to enroll their biometric data, perform the "Biometric Puzzle" liveness detection,
+and authenticate themselves for both physical and digital access control.
 
-Built for both Android and iOS, this application leverages device cameras and processing power to perform real-time facial landmark detection and liveness verification before sending data to backend services.
+Built for both Android and iOS, this application leverages device cameras and processing power to
+perform real-time facial landmark detection and liveness verification before sending data to backend
+services.
 
 ## Table of Contents
 
@@ -32,6 +37,7 @@ Built for both Android and iOS, this application leverages device cameras and pr
 ## Features
 
 ### Core Functionality
+
 - **User Registration & Authentication**: Email/password registration with JWT authentication
 - **Biometric Enrollment**: Capture and enroll face biometric data
 - **Liveness Detection**: On-device "Biometric Puzzle" implementation using MediaPipe
@@ -41,6 +47,7 @@ Built for both Android and iOS, this application leverages device cameras and pr
 - **Multi-Tenant Support**: Support for multiple organizations/tenants
 
 ### Advanced Features
+
 - **Real-Time Camera Processing**: Live video stream analysis with OpenCV
 - **Facial Landmark Detection**: 468 facial landmarks using Google MediaPipe
 - **Offline Support**: Cache user data for offline access
@@ -64,7 +71,8 @@ Built for both Android and iOS, this application leverages device cameras and pr
 
 ## Architecture
 
-The app follows **Clean Architecture** principles with **BLoC** (Business Logic Component) pattern for state management.
+The app follows **Clean Architecture** principles with **BLoC** (Business Logic Component) pattern
+for state management.
 
 ```
 mobile-app/
@@ -146,15 +154,18 @@ mobile-app/
 ## Technology Stack
 
 ### Core Framework
+
 - **Flutter 3.24+**: Cross-platform UI framework
 - **Dart 3.5+**: Programming language
 
 ### State Management & Architecture
+
 - **flutter_bloc**: BLoC pattern implementation
 - **get_it**: Dependency injection
 - **equatable**: Value equality
 
 ### Networking & Data
+
 - **dio**: HTTP client
 - **retrofit**: Type-safe API client
 - **hive**: Local database
@@ -162,12 +173,14 @@ mobile-app/
 - **cached_network_image**: Image caching
 
 ### Biometric & Camera
+
 - **camera**: Camera access
 - **google_mlkit_face_detection**: Face detection
 - **opencv_dart**: Image processing (alternative to native OpenCV)
 - **image**: Image manipulation
 
 ### UI & UX
+
 - **flutter_svg**: SVG rendering
 - **lottie**: Animations
 - **shimmer**: Loading effects
@@ -175,11 +188,13 @@ mobile-app/
 - **cached_network_image**: Image caching
 
 ### Security
+
 - **flutter_secure_storage**: Secure token storage
 - **encrypt**: Data encryption
 - **local_auth**: Biometric authentication (fallback)
 
 ### Utilities
+
 - **intl**: Internationalization
 - **qr_code_scanner**: QR code scanning
 - **permission_handler**: Permissions management
@@ -201,6 +216,7 @@ mobile-app/
 ### 1. Install Flutter
 
 Follow the official Flutter installation guide for your platform:
+
 - **Windows**: https://docs.flutter.dev/get-started/install/windows
 - **macOS**: https://docs.flutter.dev/get-started/install/macos
 - **Linux**: https://docs.flutter.dev/get-started/install/linux
@@ -393,6 +409,7 @@ flutter build ipa --release
 ### Configuration for Release
 
 **Android** (`android/app/build.gradle`):
+
 ```gradle
 android {
     compileSdkVersion 34
@@ -425,6 +442,7 @@ android {
 ```
 
 **iOS** (`ios/Runner/Info.plist`):
+
 ```xml
 <key>NSCameraUsageDescription</key>
 <string>We need camera access for facial recognition</string>
@@ -672,10 +690,10 @@ void main() {
    ```
 
 2. **Make changes following guidelines**
-   - Use Clean Architecture
-   - Follow BLoC pattern
-   - Write tests
-   - Update documentation
+    - Use Clean Architecture
+    - Follow BLoC pattern
+    - Write tests
+    - Update documentation
 
 3. **Run tests and linting**
    ```bash
@@ -702,12 +720,14 @@ void main() {
 ### Common Issues
 
 #### Camera Permission Denied
+
 ```dart
 // Request permissions
 await Permission.camera.request();
 ```
 
 #### Build Errors on iOS
+
 ```bash
 cd ios
 pod deintegrate
@@ -719,6 +739,7 @@ flutter run
 ```
 
 #### Android Build Issues
+
 ```bash
 flutter clean
 cd android
