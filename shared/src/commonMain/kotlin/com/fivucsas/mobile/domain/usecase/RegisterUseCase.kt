@@ -3,7 +3,17 @@ package com.fivucsas.mobile.domain.usecase
 import com.fivucsas.mobile.domain.model.AuthToken
 import com.fivucsas.mobile.domain.model.User
 import com.fivucsas.mobile.domain.repository.AuthRepository
+import com.fivucsas.mobile.domain.validation.EmailValidator
+import com.fivucsas.mobile.domain.validation.NameValidator
+import com.fivucsas.mobile.domain.validation.PasswordValidator
+import com.fivucsas.mobile.domain.validation.ValidationResult
+import com.fivucsas.mobile.domain.validation.combineValidations
 
+/**
+ * Register Use Case
+ * Implements business logic for user registration
+ * Follows Single Responsibility Principle
+ */
 class RegisterUseCase(private val authRepository: AuthRepository) {
 
     suspend operator fun invoke(
@@ -12,19 +22,20 @@ class RegisterUseCase(private val authRepository: AuthRepository) {
         firstName: String,
         lastName: String
     ): Result<Pair<User, AuthToken>> {
-        if (email.isBlank()) {
-            return Result.failure(Exception("Email cannot be empty"))
-        }
-        if (password.length < 8) {
-            return Result.failure(Exception("Password must be at least 8 characters"))
-        }
-        if (firstName.isBlank()) {
-            return Result.failure(Exception("First name cannot be empty"))
-        }
-        if (lastName.isBlank()) {
-            return Result.failure(Exception("Last name cannot be empty"))
+        // Validate all inputs
+        val validations = listOf(
+            EmailValidator.validate(email),
+            PasswordValidator.validate(password),
+            NameValidator.validate(firstName, "First name"),
+            NameValidator.validate(lastName, "Last name")
+        )
+
+        val combinedValidation = validations.combineValidations()
+        if (combinedValidation is ValidationResult.Invalid) {
+            return Result.failure(Exception(combinedValidation.error.message))
         }
 
+        // Delegate to repository
         return authRepository.register(email, password, firstName, lastName)
     }
 }

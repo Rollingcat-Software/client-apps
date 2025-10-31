@@ -16,3 +16,4 @@ dependencyResolutionManagement {
 rootProject.name = "FIVUCSAS-Mobile"
 include(":androidApp")
 include(":shared")
+include(":desktopApp")

@@ -1,0 +1,21 @@
+# FIVUCSAS Desktop Icon Placeholder
+
+This file is a placeholder for the desktop application icon.
+
+## Icon Requirements:
+
+- **Format:** PNG
+- **Size:** 512x512 pixels minimum
+- **Transparency:** Supported
+- **Design:** FIVUCSAS logo (fingerprint/face icon)
+
+## Actual Icon:
+
+Replace this text file with an actual PNG icon named `icon.png`.
+
+You can create an icon using:
+1. Design tools (Figma, Adobe Illustrator)
+2. Icon generators
+3. AI image generation
+
+Recommended icon: A modern fingerprint or face scan symbol in blue/purple gradient.
