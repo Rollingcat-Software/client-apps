@@ -1,5 +1,8 @@
 package com.fivucsas.desktop.ui.kiosk
 
+import com.fivucsas.shared.domain.model.EnrollmentData
+import com.fivucsas.shared.presentation.viewmodel.KioskViewModel
+import com.fivucsas.shared.presentation.state.KioskScreen
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -36,7 +39,6 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
@@ -45,6 +47,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import org.koin.compose.koinInject
 
 /**
  * Kiosk Mode UI
@@ -87,57 +90,11 @@ private object KioskDimens {
     val CameraPreviewHeight = 400.dp
 }
 
-/**
- * Kiosk ViewModel - Manages all kiosk state
- * Implements Single Responsibility Principle
- */
-class KioskViewModel {
-    private val _currentScreen = MutableStateFlow(KioskScreen.WELCOME)
-    val currentScreen: StateFlow<KioskScreen> = _currentScreen.asStateFlow()
+// KioskViewModel now imported from shared module
+// ✅ Removed local definition - using com.fivucsas.shared.presentation.viewmodel.KioskViewModel
 
-    private val _enrollmentData = MutableStateFlow(EnrollmentData())
-    val enrollmentData: StateFlow<EnrollmentData> = _enrollmentData.asStateFlow()
-
-    fun navigateToWelcome() {
-        _currentScreen.value = KioskScreen.WELCOME
-    }
-
-    fun navigateToEnroll() {
-        _currentScreen.value = KioskScreen.ENROLL
-    }
-
-    fun navigateToVerify() {
-        _currentScreen.value = KioskScreen.VERIFY
-    }
-
-    fun updateFullName(name: String) {
-        _enrollmentData.update { it.copy(fullName = name) }
-    }
-
-    fun updateEmail(email: String) {
-        _enrollmentData.update { it.copy(email = email) }
-    }
-
-    fun updateIdNumber(id: String) {
-        _enrollmentData.update { it.copy(idNumber = id) }
-    }
-
-    fun validateEnrollment(): Boolean {
-        val data = _enrollmentData.value
-        return data.fullName.isNotBlank() &&
-                data.email.isNotBlank() &&
-                data.idNumber.isNotBlank()
-    }
-}
-
-/**
- * Enrollment data model
- */
-data class EnrollmentData(
-    val fullName: String = "",
-    val email: String = "",
-    val idNumber: String = ""
-)
+// EnrollmentData now imported from shared module
+// ✅ Removed local definition - using com.fivucsas.shared.domain.model.EnrollmentData
 
 /**
  * Main Kiosk Mode composable - Pure presentation
@@ -146,9 +103,10 @@ data class EnrollmentData(
 @Composable
 fun KioskMode(
     onBack: () -> Unit,
-    viewModel: KioskViewModel = remember { KioskViewModel() }
+    viewModel: KioskViewModel = koinInject()
 ) {
-    val currentScreen by viewModel.currentScreen.collectAsState()
+    val uiState by viewModel.uiState.collectAsState()
+    val currentScreen = uiState.currentScreen
 
     Scaffold(
         topBar = {
@@ -342,7 +300,9 @@ fun EnrollScreen(
                 EnrollmentActions(
                     onBack = onBack,
                     onEnroll = { /* TODO: Implement */ },
-                    isValid = viewModel.validateEnrollment()
+                    isValid = enrollmentData.fullName.isNotBlank() && 
+                              enrollmentData.email.isNotBlank() && 
+                              enrollmentData.idNumber.isNotBlank()
                 )
             }
         }
@@ -641,11 +601,5 @@ private fun VerificationActions(
     }
 }
 
-/**
- * Kiosk screen navigation enum
- */
-enum class KioskScreen {
-    WELCOME,
-    ENROLL,
-    VERIFY
-}
+// KioskScreen now imported from shared module
+// ✅ Removed local definition - using com.fivucsas.shared.presentation.state.KioskScreen

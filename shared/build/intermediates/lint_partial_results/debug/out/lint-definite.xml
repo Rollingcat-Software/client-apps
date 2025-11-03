@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<incidents format="6" by="lint 8.2.2" type="incidents">
+
+    <incident
+        id="GradleDependency"
+        severity="warning"
+        message="A newer version of org.jetbrains.kotlinx:kotlinx-serialization-json than 1.6.0 is available: 1.7.3">
+        <fix-replace
+            description="Change to 1.7.3"
+            family="Update versions"
+            oldString="1.6.0"
+            replacement="1.7.3"/>
+        <location
+            file="${:shared*projectDir}/build.gradle.kts"
+            line="52"
+            column="33"
+            startOffset="1386"
+            endLine="52"
+            endColumn="87"
+            endOffset="1440"/>
+    </incident>
+
+    <incident
+        id="GradleDependency"
+        severity="warning"
+        message="A newer version of org.jetbrains.kotlinx:kotlinx-coroutines-core than 1.7.3 is available: 1.10.2">
+        <fix-replace
+            description="Change to 1.10.2"
+            family="Update versions"
+            oldString="1.7.3"
+            replacement="1.10.2"/>
+        <location
+            file="${:shared*projectDir}/build.gradle.kts"
+            line="55"
+            column="33"
+            startOffset="1506"
+            endLine="55"
+            endColumn="84"
+            endOffset="1557"/>
+    </incident>
+
+    <incident
+        id="GradleDependency"
+        severity="warning"
+        message="A newer version of org.jetbrains.kotlinx:kotlinx-datetime than 0.4.1 is available: 0.6.1">
+        <fix-replace
+            description="Change to 0.6.1"
+            family="Update versions"
+            oldString="0.4.1"
+            replacement="0.6.1"/>
+        <location
+            file="${:shared*projectDir}/build.gradle.kts"
+            line="58"
+            column="33"
+            startOffset="1621"
+            endLine="58"
+            endColumn="77"
+            endOffset="1665"/>
+    </incident>
+
+    <incident
+        id="GradleDependency"
+        severity="warning"
+        message="A newer version of io.insert-koin:koin-core than 3.5.0 is available: 4.0.0">
+        <fix-replace
+            description="Change to 4.0.0"
+            family="Update versions"
+            oldString="3.5.0"
+            replacement="4.0.0"/>
+        <location
+            file="${:shared*projectDir}/build.gradle.kts"
+            line="64"
+            column="33"
+            startOffset="1890"
+            endLine="64"
+            endColumn="63"
+            endOffset="1920"/>
+    </incident>
+
+    <incident
+        id="GradleDependency"
+        severity="warning"
+        message="A newer version of io.insert-koin:koin-compose than 1.1.0 is available: 4.0.0">
+        <fix-replace
+            description="Change to 4.0.0"
+            family="Update versions"
+            oldString="1.1.0"
+            replacement="4.0.0"/>
+        <location
+            file="${:shared*projectDir}/build.gradle.kts"
+            line="65"
+            column="33"
+            startOffset="1955"
+            endLine="65"
+            endColumn="66"
+            endOffset="1988"/>
+    </incident>
+
+    <incident
+        id="GradleDependency"
+        severity="warning"
+        message="A newer version of androidx.lifecycle:lifecycle-viewmodel than 2.6.2 is available: 2.9.4">
+        <fix-replace
+            description="Change to 2.9.4"
+            family="Update versions"
+            oldString="2.6.2"
+            replacement="2.9.4"/>
+        <location
+            file="${:shared*projectDir}/build.gradle.kts"
+            line="74"
+            column="33"
+            startOffset="2224"
+            endLine="74"
+            endColumn="77"
+            endOffset="2268"/>
+    </incident>
+
+    <incident
+        id="GradleDependency"
+        severity="warning"
+        message="A newer version of androidx.lifecycle:lifecycle-viewmodel-ktx than 2.6.2 is available: 2.9.4">
+        <fix-replace
+            description="Change to 2.9.4"
+            family="Update versions"
+            oldString="2.6.2"
+            replacement="2.9.4"/>
+        <location
+            file="${:shared*projectDir}/build.gradle.kts"
+            line="75"
+            column="33"
+            startOffset="2303"
+            endLine="75"
+            endColumn="81"
+            endOffset="2351"/>
+    </incident>
+
+    <incident
+        id="GradleDependency"
+        severity="warning"
+        message="A newer version of androidx.security:security-crypto than 1.1.0-alpha06 is available: 1.1.0">
+        <fix-replace
+            description="Change to 1.1.0"
+            family="Update versions"
+            oldString="1.1.0-alpha06"
+            replacement="1.1.0"/>
+        <location
+            file="${:shared*projectDir}/build.gradle.kts"
+            line="78"
+            column="33"
+            startOffset="2423"
+            endLine="78"
+            endColumn="80"
+            endOffset="2470"/>
+    </incident>
+
+    <incident
+        id="GradleDependency"
+        severity="warning"
+        message="A newer version of androidx.activity:activity-compose than 1.8.1 is available: 1.11.0">
+        <fix-replace
+            description="Change to 1.11.0"
+            family="Update versions"
+            oldString="1.8.1"
+            replacement="1.11.0"/>
+        <location
+            file="${:shared*projectDir}/build.gradle.kts"
+            line="79"
+            column="33"
+            startOffset="2505"
+            endLine="79"
+            endColumn="73"
+            endOffset="2545"/>
+    </incident>
+
+    <incident
+        id="GradleDependency"
+        severity="warning"
+        message="A newer version of io.insert-koin:koin-android than 3.5.0 is available: 4.0.0">
+        <fix-replace
+            description="Change to 4.0.0"
+            family="Update versions"
+            oldString="3.5.0"
+            replacement="4.0.0"/>
+        <location
+            file="${:shared*projectDir}/build.gradle.kts"
+            line="82"
+            column="33"
+            startOffset="2617"
+            endLine="82"
+            endColumn="66"
+            endOffset="2650"/>
+    </incident>
+
+</incidents>

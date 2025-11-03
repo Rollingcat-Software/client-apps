@@ -1,0 +1,36 @@
+> Task :shared:checkKotlinGradlePluginConfigurationErrors
+> Task :desktopApp:checkKotlinGradlePluginConfigurationErrors
+> Task :shared:generateComposeResClass UP-TO-DATE
+> Task :desktopApp:generateComposeResClass UP-TO-DATE
+> Task :shared:compileKotlinDesktop UP-TO-DATE
+> Task :shared:desktopProcessResources NO-SOURCE
+> Task :shared:desktopMainClasses UP-TO-DATE
+> Task :shared:desktopJar UP-TO-DATE
+
+> Task :desktopApp:compileKotlin FAILED
+e: file:///C:/Users/ahabg/OneDrive/Belgeler/GitHub/FIVUCSAS/mobile-app/desktopApp/src/desktopMain/kotlin/com/fivucsas/desktop/ViewModelFactory.kt:59:13 Cannot find a parameter with this name: searchUsersUseCase
+e: file:///C:/Users/ahabg/OneDrive/Belgeler/GitHub/FIVUCSAS/mobile-app/desktopApp/src/desktopMain/kotlin/com/fivucsas/desktop/ViewModelFactory.kt:61:13 No value passed for parameter 'updateUserUseCase'
+
+[Incubating] Problems report is available at: file:///C:/Users/ahabg/OneDrive/Belgeler/GitHub/FIVUCSAS/mobile-app/build/reports/problems/problems-report.html
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':desktopApp:compileKotlin'.
+> A failure occurred while executing org.jetbrains.kotlin.compilerRunner.GradleCompilerRunnerWithWorkers$GradleKotlinCompilerWorkAction
+   > Compilation error. See log for more details
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights.
+> Get more help at https://help.gradle.org.
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/8.14.3/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD FAILED in 3s
+7 actionable tasks: 3 executed, 4 up-to-date

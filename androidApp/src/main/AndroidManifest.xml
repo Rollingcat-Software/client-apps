@@ -17,6 +17,7 @@
         android:required="false" />
 
     <application
+        android:name=".FIVUCSASApplication"
         android:allowBackup="true"
         android:label="FIVUCSAS"
         android:supportsRtl="true"

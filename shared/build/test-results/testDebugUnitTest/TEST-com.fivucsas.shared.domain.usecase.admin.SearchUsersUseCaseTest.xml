@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.fivucsas.shared.domain.usecase.admin.SearchUsersUseCaseTest" tests="6" skipped="0" failures="0" errors="0" timestamp="2025-11-03T15:52:41.888Z" hostname="MORDECAI" time="0.168">
+  <properties/>
+  <testcase name="invoke should return empty list for no matches" classname="com.fivucsas.shared.domain.usecase.admin.SearchUsersUseCaseTest" time="0.159"/>
+  <testcase name="invoke should return matching users by email" classname="com.fivucsas.shared.domain.usecase.admin.SearchUsersUseCaseTest" time="0.001"/>
+  <testcase name="invoke should be case insensitive" classname="com.fivucsas.shared.domain.usecase.admin.SearchUsersUseCaseTest" time="0.001"/>
+  <testcase name="invoke should handle empty query" classname="com.fivucsas.shared.domain.usecase.admin.SearchUsersUseCaseTest" time="0.002"/>
+  <testcase name="invoke should return matching users by first name" classname="com.fivucsas.shared.domain.usecase.admin.SearchUsersUseCaseTest" time="0.002"/>
+  <testcase name="invoke should return matching users by last name" classname="com.fivucsas.shared.domain.usecase.admin.SearchUsersUseCaseTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

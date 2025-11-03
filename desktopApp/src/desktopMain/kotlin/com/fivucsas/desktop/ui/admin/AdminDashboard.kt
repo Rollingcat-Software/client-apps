@@ -1,5 +1,10 @@
 package com.fivucsas.desktop.ui.admin
 
+import com.fivucsas.shared.domain.model.User
+import com.fivucsas.shared.domain.model.UserStatus
+import com.fivucsas.shared.domain.model.Statistics
+import com.fivucsas.shared.presentation.viewmodel.AdminViewModel
+import com.fivucsas.shared.presentation.state.AdminTab
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -58,6 +63,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import org.koin.compose.koinInject
 
 /**
  * Admin Dashboard
@@ -101,101 +107,11 @@ private object AdminDimens {
     val StatCardHeight = 100.dp
 }
 
-/**
- * Admin ViewModel - Manages admin dashboard state
- * Implements Single Responsibility Principle
- */
-class AdminViewModel {
-    private val _selectedTab = MutableStateFlow(AdminTab.USERS)
-    val selectedTab: StateFlow<AdminTab> = _selectedTab.asStateFlow()
+// AdminViewModel now imported from shared module
+// ✅ Removed local definition - using com.fivucsas.shared.presentation.viewmodel.AdminViewModel
 
-    private val _searchQuery = MutableStateFlow("")
-    val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()
-
-    private val _users = MutableStateFlow<List<User>>(emptyList())
-    val users: StateFlow<List<User>> = _users.asStateFlow()
-
-    private val _statistics = MutableStateFlow(Statistics())
-    val statistics: StateFlow<Statistics> = _statistics.asStateFlow()
-
-    private val _isLoading = MutableStateFlow(false)
-    val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
-
-    init {
-        loadSampleData()
-    }
-
-    fun selectTab(tab: AdminTab) {
-        _selectedTab.value = tab
-    }
-
-    fun updateSearchQuery(query: String) {
-        _searchQuery.value = query
-    }
-
-    fun deleteUser(userId: String) {
-        _users.update { currentUsers ->
-            currentUsers.filterNot { it.id == userId }
-        }
-        updateStatistics()
-    }
-
-    fun addUser(user: User) {
-        _users.update { it + user }
-        updateStatistics()
-    }
-
-    private fun loadSampleData() {
-        _users.value = sampleUsers
-        updateStatistics()
-    }
-
-    private fun updateStatistics() {
-        _statistics.value = Statistics(
-            totalUsers = _users.value.size,
-            verificationsToday = 89,
-            successRate = 94.2,
-            failedAttempts = 12
-        )
-    }
-
-    fun getFilteredUsers(): List<User> {
-        val query = _searchQuery.value.lowercase()
-        if (query.isBlank()) return _users.value
-
-        return _users.value.filter {
-            it.name.lowercase().contains(query) ||
-                    it.email.lowercase().contains(query) ||
-                    it.idNumber.contains(query)
-        }
-    }
-}
-
-/**
- * User data model
- */
-data class User(
-    val id: String,
-    val name: String,
-    val email: String,
-    val idNumber: String,
-    val status: UserStatus
-)
-
-enum class UserStatus {
-    ACTIVE,
-    INACTIVE
-}
-
-/**
- * Statistics data model
- */
-data class Statistics(
-    val totalUsers: Int = 0,
-    val verificationsToday: Int = 0,
-    val successRate: Double = 0.0,
-    val failedAttempts: Int = 0
-)
+// User, UserStatus, and Statistics now imported from shared module
+// ✅ Removed local definitions - using com.fivucsas.shared.domain.model.*
 
 /**
  * Main Admin Dashboard composable - Pure presentation
@@ -204,9 +120,10 @@ data class Statistics(
 @Composable
 fun AdminDashboard(
     onBack: () -> Unit,
-    viewModel: AdminViewModel = remember { AdminViewModel() }
+    viewModel: AdminViewModel = koinInject()
 ) {
-    val selectedTab by viewModel.selectedTab.collectAsState()
+    val uiState by viewModel.uiState.collectAsState()
+    val selectedTab = uiState.selectedTab
 
     Scaffold(
         topBar = {
@@ -313,8 +230,7 @@ private fun AdminNavigationRail(
 fun UsersTab(
     viewModel: AdminViewModel
 ) {
-    val searchQuery by viewModel.searchQuery.collectAsState()
-    val filteredUsers = remember(searchQuery) { viewModel.getFilteredUsers() }
+    val uiState by viewModel.uiState.collectAsState()
 
     Column(
         modifier = Modifier.fillMaxSize().padding(AdminDimens.SpacingLarge)
@@ -326,7 +242,7 @@ fun UsersTab(
         Spacer(modifier = Modifier.height(AdminDimens.SpacingLarge))
 
         UsersSearchBar(
-            searchQuery = searchQuery,
+            searchQuery = uiState.searchQuery,
             onSearchQueryChange = viewModel::updateSearchQuery,
             onFilter = { /* TODO: Implement filter */ },
             onExport = { /* TODO: Implement export */ }
@@ -335,7 +251,7 @@ fun UsersTab(
         Spacer(modifier = Modifier.height(AdminDimens.SpacingLarge))
 
         UsersTable(
-            users = filteredUsers,
+            users = uiState.filteredUsers,
             onEdit = { /* TODO: Implement edit */ },
             onDelete = viewModel::deleteUser
         )
@@ -564,7 +480,8 @@ private fun UserRow(
 fun AnalyticsTab(
     viewModel: AdminViewModel
 ) {
-    val statistics by viewModel.statistics.collectAsState()
+    val uiState by viewModel.uiState.collectAsState()
+    val statistics = uiState.statistics
 
     Column(
         modifier = Modifier.fillMaxSize().padding(AdminDimens.SpacingLarge)
@@ -791,15 +708,8 @@ private fun PlaceholderCard(
     }
 }
 
-/**
- * Admin tab enum
- */
-enum class AdminTab {
-    USERS,
-    ANALYTICS,
-    SECURITY,
-    SETTINGS
-}
+// AdminTab now imported from shared module
+// ✅ Removed local definition - using com.fivucsas.shared.presentation.state.AdminTab
 
 /**
  * Sample data for demonstration

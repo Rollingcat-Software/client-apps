@@ -59,6 +59,25 @@ kotlin {
 
                 // Multiplatform Settings (SharedPreferences)
                 implementation("com.russhwolf:multiplatform-settings:1.1.0")
+
+                // Koin for Dependency Injection
+                implementation("io.insert-koin:koin-core:3.5.0")
+                implementation("io.insert-koin:koin-compose:1.1.0")
+            }
+        }
+
+        val commonTest by getting {
+            dependencies {
+                implementation(kotlin("test"))
+                
+                // Coroutines Test
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
+                
+                // Turbine (for Flow testing)
+                implementation("app.cash.turbine:turbine:1.0.0")
+                
+                // MockK (for mocking) - Note: Common MockK doesn't exist, we'll use expect/actual pattern
+                // For now, we'll create our own test doubles
             }
         }
 
@@ -73,6 +92,9 @@ kotlin {
                 // Android specific
                 implementation("androidx.security:security-crypto:1.1.0-alpha06")
                 implementation("androidx.activity:activity-compose:1.8.1")
+
+                // Koin for Android
+                implementation("io.insert-koin:koin-android:3.5.0")
             }
         }
 

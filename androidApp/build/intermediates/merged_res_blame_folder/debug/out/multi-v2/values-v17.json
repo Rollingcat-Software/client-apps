@@ -4,7 +4,7 @@
             "outputFile": "com.fivucsas.mobile.android.androidApp-mergeDebugResources-60:/values-v17/values-v17.xml",
             "map": [
                 {
-                    "source": "C:\\Users\\ahabg\\.gradle\\caches\\8.14.3\\transforms\\594ae8ffd852369230d71788e667250d\\transformed\\appcompat-1.6.1\\res\\values-v17\\values-v17.xml",
+                    "source": "C:\\Users\\ahabg\\.gradle\\caches\\8.14.3\\transforms\\27ac394ae843f24a7ecf545bf7a8df49\\transformed\\appcompat-1.6.1\\res\\values-v17\\values-v17.xml",
                     "from": {
                         "startLines": "2,5,9,12,15,18,22,25,29,33,37,40,43,46,50,53,57",
                         "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",

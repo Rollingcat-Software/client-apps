@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.fivucsas.shared.data.repository.UserRepositoryImplTest" tests="8" skipped="0" failures="0" errors="0" timestamp="2025-11-03T15:52:42.058Z" hostname="MORDECAI" time="0.021">
+  <properties/>
+  <testcase name="searchUsers should filter by name" classname="com.fivucsas.shared.data.repository.UserRepositoryImplTest" time="0.005"/>
+  <testcase name="searchUsers should filter by email" classname="com.fivucsas.shared.data.repository.UserRepositoryImplTest" time="0.001"/>
+  <testcase name="searchUsers should return empty list for no matches" classname="com.fivucsas.shared.data.repository.UserRepositoryImplTest" time="0.002"/>
+  <testcase name="getStatistics should return valid statistics" classname="com.fivucsas.shared.data.repository.UserRepositoryImplTest" time="0.002"/>
+  <testcase name="getUserById should return success when ID exists" classname="com.fivucsas.shared.data.repository.UserRepositoryImplTest" time="0.003"/>
+  <testcase name="getUserById should return failure when ID does not exist" classname="com.fivucsas.shared.data.repository.UserRepositoryImplTest" time="0.005"/>
+  <testcase name="searchUsers should be case insensitive" classname="com.fivucsas.shared.data.repository.UserRepositoryImplTest" time="0.002"/>
+  <testcase name="getUsers should return success with mock data" classname="com.fivucsas.shared.data.repository.UserRepositoryImplTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

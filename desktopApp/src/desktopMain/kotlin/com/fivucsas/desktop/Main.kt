@@ -35,9 +35,11 @@ import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import com.fivucsas.desktop.ui.admin.AdminDashboard
 import com.fivucsas.desktop.ui.kiosk.KioskMode
+import com.fivucsas.shared.di.getAppModules
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import org.koin.core.context.startKoin
 
 /**
  * FIVUCSAS Desktop Application
@@ -97,10 +99,16 @@ class AppStateManager {
 /**
  * Main entry point with proper separation of concerns
  */
-fun main() = application {
-    // State management separated from UI
-    val stateManager = remember { AppStateManager() }
-    val currentMode by stateManager.currentMode.collectAsState()
+fun main() {
+    // Initialize Koin dependency injection
+    startKoin {
+        modules(getAppModules())
+    }
+    
+    application {
+        // State management separated from UI
+        val stateManager = remember { AppStateManager() }
+        val currentMode by stateManager.currentMode.collectAsState()
 
     Window(
         onCloseRequest = ::exitApplication,
@@ -121,12 +129,13 @@ fun main() = application {
         }
     }
 
-    // System tray - disabled for now (requires icon resource)
-    // TODO: Add icon.png and enable system tray
-    // AppSystemTray(
-    //     onNavigate = stateManager::navigateTo,
-    //     onExit = ::exitApplication
-    // )
+        // System tray - disabled for now (requires icon resource)
+        // TODO: Add icon.png and enable system tray
+        // AppSystemTray(
+        //     onNavigate = stateManager::navigateTo,
+        //     onExit = ::exitApplication
+        // )
+    }
 }
 
 /**

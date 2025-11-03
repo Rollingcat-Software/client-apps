@@ -4,7 +4,7 @@
             "outputFile": "com.fivucsas.mobile.android.androidApp-mergeDebugResources-60:/values-v16/values-v16.xml",
             "map": [
                 {
-                    "source": "C:\\Users\\ahabg\\.gradle\\caches\\8.14.3\\transforms\\594ae8ffd852369230d71788e667250d\\transformed\\appcompat-1.6.1\\res\\values-v16\\values-v16.xml",
+                    "source": "C:\\Users\\ahabg\\.gradle\\caches\\8.14.3\\transforms\\27ac394ae843f24a7ecf545bf7a8df49\\transformed\\appcompat-1.6.1\\res\\values-v16\\values-v16.xml",
                     "from": {
                         "startLines": "2",
                         "startColumns": "4",
@@ -23,7 +23,7 @@
                     }
                 },
                 {
-                    "source": "C:\\Users\\ahabg\\.gradle\\caches\\8.14.3\\transforms\\196cfdff1e216c51f986c0ebd563d327\\transformed\\core-1.12.0\\res\\values-v16\\values-v16.xml",
+                    "source": "C:\\Users\\ahabg\\.gradle\\caches\\8.14.3\\transforms\\bd4145c7282a469f6b1a59a69f0f700d\\transformed\\core-1.12.0\\res\\values-v16\\values-v16.xml",
                     "from": {
                         "startLines": "2",
                         "startColumns": "4",

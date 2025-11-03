@@ -33,6 +33,10 @@ dependencies {
 
     // Coroutines
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.7.3")
+
+    // Koin for Desktop
+    implementation("io.insert-koin:koin-core:3.5.0")
+    implementation("io.insert-koin:koin-compose:1.1.0")
 }
 
 compose.desktop {

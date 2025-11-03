@@ -4,7 +4,7 @@
             "outputFile": "com.fivucsas.mobile.android.androidApp-mergeDebugResources-60:/values-night-v8/values-night-v8.xml",
             "map": [
                 {
-                    "source": "C:\\Users\\ahabg\\.gradle\\caches\\8.14.3\\transforms\\594ae8ffd852369230d71788e667250d\\transformed\\appcompat-1.6.1\\res\\values-night-v8\\values-night-v8.xml",
+                    "source": "C:\\Users\\ahabg\\.gradle\\caches\\8.14.3\\transforms\\27ac394ae843f24a7ecf545bf7a8df49\\transformed\\appcompat-1.6.1\\res\\values-night-v8\\values-night-v8.xml",
                     "from": {
                         "startLines": "2,3,4,5,6,7,8,9",
                         "startColumns": "4,4,4,4,4,4,4,4",
