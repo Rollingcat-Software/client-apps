@@ -1,7 +1,10 @@
 package com.fivucsas.desktop
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -9,12 +12,16 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AdminPanelSettings
 import androidx.compose.material.icons.filled.Fingerprint
 import androidx.compose.material.icons.filled.TouchApp
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -27,8 +34,15 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shadow
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowPlacement
 import androidx.compose.ui.window.application
@@ -189,29 +203,37 @@ private fun ApplicationScope.AppSystemTray(
 */
 
 /**
- * Launcher Screen - Pure presentation component
- * Follows Dependency Inversion Principle (depends on callbacks, not concrete implementations)
+ * Launcher Screen - Modern gradient design with elevated cards
  */
 @Composable
 fun LauncherScreen(
     onKioskSelected: () -> Unit,
     onAdminSelected: () -> Unit
 ) {
-    Surface(
-        modifier = Modifier.fillMaxSize(),
-        color = MaterialTheme.colorScheme.background
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(
+                brush = Brush.verticalGradient(
+                    colors = listOf(
+                        Color(0xFF0D47A1),
+                        Color(0xFF1976D2),
+                        Color(0xFF42A5F5)
+                    )
+                )
+            )
     ) {
         Column(
             modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            // Logo section
+            // Modern Logo
             AppLogo()
 
             Spacer(modifier = Modifier.height(Dimens.SpacingXXLarge))
 
-            // Mode selection cards
+            // Modern Mode Cards
             ModeSelectionCards(
                 onKioskSelected = onKioskSelected,
                 onAdminSelected = onAdminSelected
@@ -226,29 +248,56 @@ fun LauncherScreen(
 }
 
 /**
- * App Logo Component - Reusable, follows Single Responsibility
+ * App Logo Component - Modern circular design
  */
 @Composable
 private fun AppLogo() {
-    Icon(
-        imageVector = Icons.Default.Fingerprint,
-        contentDescription = "FIVUCSAS Logo",
-        modifier = Modifier.size(Dimens.IconSize),
-        tint = MaterialTheme.colorScheme.primary
-    )
+    // Elevated circular logo card
+    Card(
+        modifier = Modifier.size(140.dp),
+        shape = CircleShape,
+        elevation = CardDefaults.cardElevation(defaultElevation = 12.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = Color.White
+        )
+    ) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                imageVector = Icons.Default.Fingerprint,
+                contentDescription = "FIVUCSAS Logo",
+                modifier = Modifier.size(80.dp),
+                tint = Color(0xFF1976D2)
+            )
+        }
+    }
 
     Spacer(modifier = Modifier.height(Dimens.SpacingXLarge))
 
     Text(
         text = AppConfig.APP_NAME,
-        style = MaterialTheme.typography.displayLarge,
-        color = MaterialTheme.colorScheme.primary
+        style = MaterialTheme.typography.displayLarge.copy(
+            fontWeight = FontWeight.Bold,
+            fontSize = 64.sp,
+            color = Color.White,
+            shadow = Shadow(
+                color = Color.Black.copy(alpha = 0.3f),
+                offset = Offset(4f, 4f),
+                blurRadius = 12f
+            )
+        )
     )
+
+    Spacer(modifier = Modifier.height(Dimens.SpacingMedium))
 
     Text(
         text = AppConfig.APP_DESCRIPTION,
-        style = MaterialTheme.typography.titleMedium,
-        color = MaterialTheme.colorScheme.onSurfaceVariant
+        style = MaterialTheme.typography.titleLarge.copy(
+            color = Color.White.copy(alpha = 0.9f),
+            fontWeight = FontWeight.Medium
+        )
     )
 }
 
@@ -280,20 +329,21 @@ private fun ModeSelectionCards(
 }
 
 /**
- * App Footer Component - Reusable
+ * App Footer Component - Subtle white text
  */
 @Composable
 private fun AppFooter() {
     Text(
         text = AppConfig.COPYRIGHT,
-        style = MaterialTheme.typography.bodySmall,
-        color = MaterialTheme.colorScheme.onSurfaceVariant
+        style = MaterialTheme.typography.bodyMedium.copy(
+            color = Color.White.copy(alpha = 0.7f),
+            fontWeight = FontWeight.Normal
+        )
     )
 }
 
 /**
- * Mode Card Component - Follows Interface Segregation Principle
- * Only exposes necessary parameters
+ * Mode Card Component - Modern gradient design with shadow
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -307,38 +357,70 @@ fun ModeCard(
     Card(
         onClick = onClick,
         modifier = modifier
-            .width(Dimens.CardWidth)
-            .height(Dimens.CardHeight),
-        elevation = CardDefaults.cardElevation(defaultElevation = Dimens.ElevationMedium)
+            .width(350.dp)
+            .height(280.dp)
+            .shadow(16.dp, RoundedCornerShape(24.dp)),
+        shape = RoundedCornerShape(24.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = Color.White
+        )
     ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(Dimens.SpacingLarge),
+                .padding(Dimens.SpacingXLarge),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            Icon(
-                imageVector = icon,
-                contentDescription = title,
-                modifier = Modifier.size(Dimens.IconSizeMedium),
-                tint = MaterialTheme.colorScheme.primary
-            )
+            // Gradient icon background
+            Card(
+                modifier = Modifier.size(100.dp),
+                shape = CircleShape,
+                colors = CardDefaults.cardColors(
+                    containerColor = Color.Transparent
+                )
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(
+                            brush = Brush.linearGradient(
+                                colors = if (title.contains("Kiosk")) {
+                                    listOf(Color(0xFF1976D2), Color(0xFF1565C0))
+                                } else {
+                                    listOf(Color(0xFF00ACC1), Color(0xFF0097A7))
+                                }
+                            )
+                        ),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = icon,
+                        contentDescription = title,
+                        modifier = Modifier.size(50.dp),
+                        tint = Color.White
+                    )
+                }
+            }
 
-            Spacer(modifier = Modifier.height(Dimens.SpacingMedium))
+            Spacer(modifier = Modifier.height(Dimens.SpacingLarge))
 
             Text(
                 text = title,
-                style = MaterialTheme.typography.headlineSmall,
-                color = MaterialTheme.colorScheme.onSurface
+                style = MaterialTheme.typography.headlineMedium.copy(
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFF212121)
+                )
             )
 
             Spacer(modifier = Modifier.height(Dimens.SpacingSmall))
 
             Text(
                 text = description,
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                style = MaterialTheme.typography.bodyLarge.copy(
+                    color = Color(0xFF757575),
+                    fontWeight = FontWeight.Normal
+                ),
                 textAlign = TextAlign.Center
             )
         }

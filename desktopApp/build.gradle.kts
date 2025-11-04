@@ -37,6 +37,9 @@ dependencies {
     // Koin for Desktop
     implementation("io.insert-koin:koin-core:3.5.0")
     implementation("io.insert-koin:koin-compose:1.1.0")
+    
+    // Webcam capture - JavaCV
+    implementation("org.bytedeco:javacv-platform:1.5.10")
 }
 
 compose.desktop {

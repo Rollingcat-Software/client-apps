@@ -3,50 +3,34 @@ package com.fivucsas.desktop.ui.kiosk
 import com.fivucsas.shared.domain.model.EnrollmentData
 import com.fivucsas.shared.presentation.viewmodel.KioskViewModel
 import com.fivucsas.shared.presentation.state.KioskScreen
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import com.fivucsas.shared.presentation.state.VerificationResult
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Face
-import androidx.compose.material.icons.filled.HourglassEmpty
-import androidx.compose.material.icons.filled.PersonAdd
-import androidx.compose.material.icons.filled.VerifiedUser
-import androidx.compose.material.icons.filled.Videocam
-import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shadow
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.sp
 import org.koin.compose.koinInject
 
 /**
@@ -155,26 +139,181 @@ private fun KioskContent(
 }
 
 /**
- * Welcome Screen - Pure presentation component
+ * Welcome Screen - Modern gradient design with elevated buttons
  */
 @Composable
 fun WelcomeScreen(
     onEnroll: () -> Unit,
     onVerify: () -> Unit
 ) {
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(
+                brush = Brush.verticalGradient(
+                    colors = listOf(
+                        Color(0xFFE3F2FD),
+                        Color(0xFFFAFAFA)
+                    )
+                )
+            )
     ) {
-        WelcomeLogo()
-
-        Spacer(modifier = Modifier.height(KioskDimens.SpacingXXLarge))
-
-        ActionButtons(
-            onEnroll = onEnroll,
-            onVerify = onVerify
-        )
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(48.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            // Animated Logo
+            Card(
+                modifier = Modifier.size(120.dp),
+                shape = CircleShape,
+                elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = Color(0xFF1976D2)
+                )
+            ) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Face,
+                        contentDescription = "Logo",
+                        modifier = Modifier.size(64.dp),
+                        tint = Color.White
+                    )
+                }
+            }
+            
+            Spacer(modifier = Modifier.height(32.dp))
+            
+            // Title with shadow effect
+            Text(
+                text = "FIVUCSAS",
+                style = MaterialTheme.typography.displayLarge.copy(
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 56.sp,
+                    color = Color(0xFF1976D2),
+                    shadow = Shadow(
+                        color = Color.Black.copy(alpha = 0.1f),
+                        offset = Offset(4f, 4f),
+                        blurRadius = 8f
+                    )
+                )
+            )
+            
+            Text(
+                text = "Secure Identity Verification System",
+                style = MaterialTheme.typography.titleLarge.copy(
+                    color = Color(0xFF757575),
+                    fontWeight = FontWeight.Medium
+                ),
+                textAlign = TextAlign.Center
+            )
+            
+            Spacer(modifier = Modifier.height(64.dp))
+            
+            // Modern Gradient Buttons
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(24.dp)
+            ) {
+                // Enroll Button
+                Button(
+                    onClick = onEnroll,
+                    modifier = Modifier
+                        .width(200.dp)
+                        .height(64.dp)
+                        .shadow(8.dp, RoundedCornerShape(32.dp)),
+                    shape = RoundedCornerShape(32.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.Transparent
+                    ),
+                    contentPadding = PaddingValues(0.dp)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(
+                                brush = Brush.linearGradient(
+                                    colors = listOf(
+                                        Color(0xFF1976D2),
+                                        Color(0xFF1565C0)
+                                    )
+                                )
+                            ),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Row(
+                            horizontalArrangement = Arrangement.Center,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                Icons.Default.PersonAdd,
+                                contentDescription = null,
+                                tint = Color.White,
+                                modifier = Modifier.size(24.dp)
+                            )
+                            Spacer(Modifier.width(8.dp))
+                            Text(
+                                "New Enrollment",
+                                color = Color.White,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 16.sp
+                            )
+                        }
+                    }
+                }
+                
+                // Verify Button
+                Button(
+                    onClick = onVerify,
+                    modifier = Modifier
+                        .width(200.dp)
+                        .height(64.dp)
+                        .shadow(8.dp, RoundedCornerShape(32.dp)),
+                    shape = RoundedCornerShape(32.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.Transparent
+                    ),
+                    contentPadding = PaddingValues(0.dp)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(
+                                brush = Brush.linearGradient(
+                                    colors = listOf(
+                                        Color(0xFF00ACC1),
+                                        Color(0xFF0097A7)
+                                    )
+                                )
+                            ),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Row(
+                            horizontalArrangement = Arrangement.Center,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                Icons.Default.VerifiedUser,
+                                contentDescription = null,
+                                tint = Color.White,
+                                modifier = Modifier.size(24.dp)
+                            )
+                            Spacer(Modifier.width(8.dp))
+                            Text(
+                                "Verify Identity",
+                                color = Color.White,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 16.sp
+                            )
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -182,11 +321,11 @@ fun WelcomeScreen(
  * Welcome logo component - Extracted for reusability
  */
 @Composable
-private fun WelcomeLogo() {
+private fun WelcomeLogo(iconSize: Dp = KioskDimens.IconSize) {
     Icon(
         imageVector = Icons.Default.Face,
         contentDescription = "Face Icon",
-        modifier = Modifier.size(KioskDimens.IconSize),
+        modifier = Modifier.size(iconSize),
         tint = MaterialTheme.colorScheme.primary
     )
 
@@ -205,44 +344,69 @@ private fun WelcomeLogo() {
 }
 
 /**
- * Action buttons component - Extracted for reusability
+ * Action buttons component - Responsive layout
  */
 @Composable
 private fun ActionButtons(
     onEnroll: () -> Unit,
-    onVerify: () -> Unit
+    onVerify: () -> Unit,
+    isVertical: Boolean = false,
+    buttonSize: Dp = KioskDimens.ButtonHeight
 ) {
-    Row(
-        horizontalArrangement = Arrangement.spacedBy(KioskDimens.SpacingLarge)
-    ) {
-        ActionButton(
-            text = KioskConfig.ENROLL_BUTTON,
-            icon = Icons.Default.PersonAdd,
-            onClick = onEnroll
-        )
+    if (isVertical) {
+        Column(
+            verticalArrangement = Arrangement.spacedBy(KioskDimens.SpacingMedium)
+        ) {
+            ActionButton(
+                text = KioskConfig.ENROLL_BUTTON,
+                icon = Icons.Default.PersonAdd,
+                onClick = onEnroll,
+                buttonHeight = buttonSize
+            )
 
-        ActionButton(
-            text = KioskConfig.VERIFY_BUTTON,
-            icon = Icons.Default.VerifiedUser,
-            onClick = onVerify
-        )
+            ActionButton(
+                text = KioskConfig.VERIFY_BUTTON,
+                icon = Icons.Default.VerifiedUser,
+                onClick = onVerify,
+                buttonHeight = buttonSize
+            )
+        }
+    } else {
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(KioskDimens.SpacingLarge)
+        ) {
+            ActionButton(
+                text = KioskConfig.ENROLL_BUTTON,
+                icon = Icons.Default.PersonAdd,
+                onClick = onEnroll,
+                buttonHeight = buttonSize
+            )
+
+            ActionButton(
+                text = KioskConfig.VERIFY_BUTTON,
+                icon = Icons.Default.VerifiedUser,
+                onClick = onVerify,
+                buttonHeight = buttonSize
+            )
+        }
     }
 }
 
 /**
- * Reusable action button component
+ * Reusable action button component - Responsive
  */
 @Composable
 private fun ActionButton(
     text: String,
     icon: androidx.compose.ui.graphics.vector.ImageVector,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    buttonHeight: Dp = KioskDimens.ButtonHeight
 ) {
     Button(
         onClick = onClick,
         modifier = Modifier.size(
             width = KioskDimens.ButtonWidth,
-            height = KioskDimens.ButtonHeight
+            height = buttonHeight
         )
     ) {
         Column(
@@ -260,7 +424,7 @@ private fun ActionButton(
 }
 
 /**
- * Enrollment Screen - With proper state management
+ * Enrollment Screen - With proper state management and responsive layout
  */
 @Composable
 fun EnrollScreen(
@@ -268,42 +432,97 @@ fun EnrollScreen(
     onBack: () -> Unit
 ) {
     val enrollmentData by viewModel.enrollmentData.collectAsState()
+    val uiState by viewModel.uiState.collectAsState()
 
-    Column(
-        modifier = Modifier.fillMaxSize().padding(KioskDimens.SpacingXLarge),
-        horizontalAlignment = Alignment.CenterHorizontally
+    androidx.compose.foundation.layout.BoxWithConstraints(
+        modifier = Modifier.fillMaxSize()
     ) {
-        Text(
-            text = KioskConfig.ENROLL_TITLE,
-            style = MaterialTheme.typography.displaySmall
-        )
-
-        Spacer(modifier = Modifier.height(KioskDimens.SpacingXLarge))
-
-        Card(
-            modifier = Modifier.fillMaxWidth(0.8f)
+        val sizes = com.fivucsas.desktop.ui.theme.getResponsiveSizes(maxWidth)
+        
+        androidx.compose.foundation.lazy.LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = androidx.compose.foundation.layout.PaddingValues(
+                horizontal = sizes.horizontalPadding,
+                vertical = sizes.verticalPadding
+            ),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Column(modifier = Modifier.padding(KioskDimens.SpacingXLarge)) {
-                EnrollmentForm(
-                    enrollmentData = enrollmentData,
-                    onFullNameChange = viewModel::updateFullName,
-                    onEmailChange = viewModel::updateEmail,
-                    onIdNumberChange = viewModel::updateIdNumber
+            item {
+                Text(
+                    text = KioskConfig.ENROLL_TITLE,
+                    style = MaterialTheme.typography.displaySmall
                 )
+                Spacer(modifier = Modifier.height(sizes.spacing))
+            }
 
-                Spacer(modifier = Modifier.height(KioskDimens.SpacingXLarge))
+            item {
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth(sizes.cardWidth)
+                        .shadow(8.dp, RoundedCornerShape(16.dp)),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = Color.White
+                    )
+                ) {
+                    Column(modifier = Modifier.padding(sizes.spacing)) {
+                        if (uiState.isLoading) {
+                            LoadingIndicator()
+                        } else {
+                            EnrollmentForm(
+                                enrollmentData = enrollmentData,
+                                onFullNameChange = viewModel::updateFullName,
+                                onEmailChange = viewModel::updateEmail,
+                                onIdNumberChange = viewModel::updateIdNumber
+                            )
 
-                BiometricCaptureSection()
+                            Spacer(modifier = Modifier.height(sizes.spacing))
 
-                Spacer(modifier = Modifier.height(KioskDimens.SpacingXLarge))
+                            if (uiState.showCamera) {
+                                CameraSection(
+                                    onCapture = { imageBytes ->
+                                        viewModel.setCapturedImage(imageBytes)
+                                    },
+                                    onClose = viewModel::closeCamera
+                                )
+                            } else if (uiState.capturedImage != null) {
+                                CapturedImagePreview(
+                                    onRetake = viewModel::openCamera
+                                )
+                            } else {
+                                BiometricCaptureSection()
+                            }
 
-                EnrollmentActions(
-                    onBack = onBack,
-                    onEnroll = { /* TODO: Implement */ },
-                    isValid = enrollmentData.fullName.isNotBlank() && 
-                              enrollmentData.email.isNotBlank() && 
-                              enrollmentData.idNumber.isNotBlank()
-                )
+                            Spacer(modifier = Modifier.height(sizes.spacing))
+
+                            uiState.successMessage?.let { message ->
+                                SuccessMessage(message)
+                                Spacer(modifier = Modifier.height(KioskDimens.SpacingMedium))
+                            }
+
+                            uiState.errorMessage?.let { message ->
+                                ErrorMessage(message)
+                                Spacer(modifier = Modifier.height(KioskDimens.SpacingMedium))
+                            }
+
+                            EnrollmentActions(
+                                onBack = onBack,
+                                onEnroll = {
+                                    if (uiState.capturedImage == null) {
+                                        viewModel.openCamera()
+                                    } else {
+                                        viewModel.submitEnrollment()
+                                    }
+                                },
+                                isValid = enrollmentData.fullName.isNotBlank() && 
+                                          enrollmentData.email.isNotBlank() && 
+                                          enrollmentData.idNumber.isNotBlank(),
+                                hasImage = uiState.capturedImage != null,
+                                buttonText = if (uiState.capturedImage == null) "Capture Photo" else "Submit Enrollment"
+                            )
+                        }
+                    }
+                }
             }
         }
     }
@@ -355,7 +574,7 @@ private fun EnrollmentForm(
 }
 
 /**
- * Validated text field component - Reusable with validation
+ * Validated text field component - Modern design with icons
  */
 @Composable
 private fun ValidatedTextField(
@@ -365,18 +584,42 @@ private fun ValidatedTextField(
     isRequired: Boolean = false,
     keyboardType: KeyboardType = KeyboardType.Text
 ) {
+    val icon = when (label) {
+        "Full Name" -> Icons.Default.Person
+        "Email" -> Icons.Default.Email
+        "ID Number" -> Icons.Default.Badge
+        else -> null
+    }
+    
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
         label = { Text(label + if (isRequired) " *" else "") },
-        modifier = Modifier.fillMaxWidth(),
+        leadingIcon = if (icon != null) {
+            { Icon(icon, contentDescription = null) }
+        } else null,
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(64.dp),
+        shape = RoundedCornerShape(12.dp),
+        colors = OutlinedTextFieldDefaults.colors(
+            focusedBorderColor = Color(0xFF1976D2),
+            unfocusedBorderColor = Color.Gray.copy(alpha = 0.3f),
+            focusedContainerColor = Color.White,
+            unfocusedContainerColor = Color(0xFFFAFAFA),
+            focusedLabelColor = Color(0xFF1976D2),
+            unfocusedLabelColor = Color.Gray,
+            focusedLeadingIconColor = Color(0xFF1976D2),
+            unfocusedLeadingIconColor = Color.Gray
+        ),
         keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
         isError = isRequired && value.isBlank(),
         supportingText = {
             if (isRequired && value.isBlank()) {
-                Text("This field is required")
+                Text("This field is required", color = Color(0xFFF44336))
             }
-        }
+        },
+        singleLine = true
     )
 }
 
@@ -412,14 +655,8 @@ private fun BiometricCaptureSection() {
             )
             Spacer(modifier = Modifier.height(KioskDimens.SpacingMedium))
             Text(
-                "Camera Preview (To be implemented)",
+                "Click button below to capture photo",
                 style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-            Spacer(modifier = Modifier.height(KioskDimens.SpacingSmall))
-            Text(
-                "Face detection, biometric puzzle, and enrollment",
-                style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
@@ -427,13 +664,15 @@ private fun BiometricCaptureSection() {
 }
 
 /**
- * Enrollment action buttons
+ * Enrollment action buttons - Modern Gradient Submit Button
  */
 @Composable
 private fun EnrollmentActions(
     onBack: () -> Unit,
     onEnroll: () -> Unit,
-    isValid: Boolean
+    isValid: Boolean,
+    hasImage: Boolean = false,
+    buttonText: String = "Start Enrollment"
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -441,58 +680,918 @@ private fun EnrollmentActions(
     ) {
         OutlinedButton(
             onClick = onBack,
-            modifier = Modifier.weight(1f)
+            modifier = Modifier
+                .weight(1f)
+                .height(56.dp),
+            shape = RoundedCornerShape(28.dp)
         ) {
-            Text("Cancel")
+            Text("Cancel", fontWeight = FontWeight.SemiBold)
         }
 
         Button(
             onClick = onEnroll,
-            modifier = Modifier.weight(1f),
-            enabled = isValid
+            modifier = Modifier
+                .weight(1f)
+                .height(56.dp)
+                .shadow(8.dp, RoundedCornerShape(28.dp)),
+            enabled = isValid,
+            shape = RoundedCornerShape(28.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color.Transparent
+            ),
+            contentPadding = PaddingValues(0.dp)
         ) {
-            Text("Start Enrollment")
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(
+                        brush = if (isValid) {
+                            Brush.linearGradient(
+                                colors = listOf(
+                                    Color(0xFF1976D2),
+                                    Color(0xFF1565C0)
+                                )
+                            )
+                        } else {
+                            Brush.linearGradient(
+                                colors = listOf(
+                                    Color(0xFFBDBDBD),
+                                    Color(0xFF9E9E9E)
+                                )
+                            )
+                        }
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        Icons.Default.Check,
+                        null,
+                        tint = Color.White,
+                        modifier = Modifier.size(24.dp)
+                    )
+                    Spacer(Modifier.width(8.dp))
+                    Text(
+                        buttonText,
+                        color = Color.White,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 16.sp
+                    )
+                }
+            }
         }
     }
 }
 
 /**
- * Verification Screen - Biometric puzzle challenge
+ * Loading indicator component - Modern spinner
  */
 @Composable
-fun VerifyScreen(
-    onBack: () -> Unit
+private fun LoadingIndicator() {
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        CircularProgressIndicator(
+            modifier = Modifier.size(48.dp),
+            color = Color(0xFF1976D2),
+            strokeWidth = 4.dp
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        Text(
+            "Processing...",
+            style = MaterialTheme.typography.titleMedium.copy(
+                color = Color(0xFF757575),
+                fontWeight = FontWeight.Medium
+            )
+        )
+    }
+}
+
+/**
+ * Success message component - Modern gradient design
+ */
+@Composable
+private fun SuccessMessage(message: String) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .shadow(4.dp, RoundedCornerShape(12.dp)),
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = Color(0xFF4CAF50)
+        )
+    ) {
+        Row(
+            modifier = Modifier.padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            Icon(
+                Icons.Default.CheckCircle,
+                contentDescription = null,
+                tint = Color.White,
+                modifier = Modifier.size(32.dp)
+            )
+            Text(
+                message,
+                color = Color.White,
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 16.sp
+            )
+        }
+    }
+}
+
+/**
+ * Error message component - Prominent error display
+ */
+@Composable
+private fun ErrorMessage(message: String) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .shadow(4.dp, RoundedCornerShape(12.dp)),
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = Color(0xFFF44336)
+        )
+    ) {
+        Row(
+            modifier = Modifier.padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            Icon(
+                Icons.Default.Error,
+                contentDescription = null,
+                tint = Color.White,
+                modifier = Modifier.size(32.dp)
+            )
+            Column {
+                Text(
+                    "Error",
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 16.sp
+                )
+                Text(
+                    message,
+                    color = Color.White.copy(alpha = 0.9f),
+                    fontSize = 14.sp
+                )
+            }
+        }
+    }
+}
+
+/**
+ * Camera section for capturing photo - With REAL CAMERA
+ */
+@Composable
+private fun CameraSection(
+    onCapture: (ByteArray) -> Unit,
+    onClose: () -> Unit
+) {
+    val cameraService = remember { com.fivucsas.desktop.data.DesktopCameraService() }
+    
+    com.fivucsas.desktop.ui.components.CameraPreview(
+        cameraService = cameraService,
+        onCapture = { imageBytes ->
+            onCapture(imageBytes)  // Pass real image bytes
+        },
+        onClose = onClose
+    )
+}
+
+/**
+ * Captured image preview
+ */
+@Composable
+private fun CapturedImagePreview(
+    onRetake: () -> Unit
 ) {
     Column(
-        modifier = Modifier.fillMaxSize().padding(KioskDimens.SpacingXLarge),
+        modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = KioskConfig.VERIFY_TITLE,
-            style = MaterialTheme.typography.displaySmall
+            "Step 2: Photo Captured",
+            style = MaterialTheme.typography.titleLarge
         )
 
-        Spacer(modifier = Modifier.height(KioskDimens.SpacingXLarge))
+        Spacer(modifier = Modifier.height(KioskDimens.SpacingMedium))
 
         Card(
-            modifier = Modifier.fillMaxWidth(0.8f)
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.primaryContainer
+            )
         ) {
-            Column(modifier = Modifier.padding(KioskDimens.SpacingXLarge)) {
-                VerificationHeader()
-
-                Spacer(modifier = Modifier.height(KioskDimens.SpacingLarge))
-
-                BiometricCaptureSection()
-
-                Spacer(modifier = Modifier.height(KioskDimens.SpacingLarge))
-
-                PuzzleInstructions()
-
-                Spacer(modifier = Modifier.height(KioskDimens.SpacingXLarge))
-
-                VerificationActions(onBack = onBack)
+            Column(
+                modifier = Modifier.fillMaxWidth().padding(KioskDimens.SpacingMedium),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Icon(
+                    Icons.Default.Check,
+                    contentDescription = "Captured",
+                    modifier = Modifier.size(KioskDimens.IconMedium),
+                    tint = MaterialTheme.colorScheme.primary
+                )
+                Spacer(modifier = Modifier.height(KioskDimens.SpacingSmall))
+                Text(
+                    "Photo captured successfully!",
+                    style = MaterialTheme.typography.titleMedium
+                )
+                Spacer(modifier = Modifier.height(KioskDimens.SpacingSmall))
+                OutlinedButton(onClick = onRetake) {
+                    Text("Retake Photo")
+                }
             }
         }
+    }
+}
+
+/**
+ * Verification Screen - Modern Beautiful Design
+ */
+@Composable
+fun VerifyScreen(
+    onBack: () -> Unit,
+    viewModel: KioskViewModel = koinInject()
+) {
+    val uiState by viewModel.uiState.collectAsState()
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(
+                brush = Brush.verticalGradient(
+                    colors = listOf(
+                        Color(0xFFE3F2FD),
+                        Color(0xFFFFFFFF)
+                    )
+                )
+            )
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(48.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            // Modern Header with Back Button
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                IconButton(
+                    onClick = onBack,
+                    modifier = Modifier.size(48.dp)
+                ) {
+                    Icon(
+                        Icons.Default.ArrowBack,
+                        contentDescription = "Back",
+                        tint = Color(0xFF1976D2),
+                        modifier = Modifier.size(28.dp)
+                    )
+                }
+                Spacer(Modifier.width(16.dp))
+                Text(
+                    text = "Identity Verification",
+                    style = MaterialTheme.typography.headlineLarge.copy(
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFF1976D2)
+                    )
+                )
+            }
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+            // Main Content Card
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth(0.85f)
+                    .shadow(16.dp, RoundedCornerShape(24.dp)),
+                shape = RoundedCornerShape(24.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = Color.White
+                )
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(48.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    if (uiState.isLoading) {
+                        // Modern Loading State
+                        ModernLoadingIndicator()
+                    } else if (uiState.verificationResult != null) {
+                        // Beautiful Result Display
+                        BeautifulVerificationResult(
+                            result = uiState.verificationResult!!,
+                            onDone = onBack,
+                            onTryAgain = {
+                                viewModel.closeCamera()
+                                viewModel.openCamera()
+                            }
+                        )
+                    } else {
+                        // Verification Process
+                        if (uiState.showCamera) {
+                            CameraSection(
+                                onCapture = { imageBytes ->
+                                    viewModel.setCapturedImage(imageBytes)
+                                },
+                                onClose = viewModel::closeCamera
+                            )
+                        } else if (uiState.capturedImage != null) {
+                            // Photo Captured - Show Verify Button
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Icon(
+                                    Icons.Default.CheckCircle,
+                                    contentDescription = "Captured",
+                                    modifier = Modifier.size(80.dp),
+                                    tint = Color(0xFF4CAF50)
+                                )
+                                Spacer(Modifier.height(24.dp))
+                                Text(
+                                    "Photo Captured Successfully!",
+                                    style = MaterialTheme.typography.headlineMedium.copy(
+                                        fontWeight = FontWeight.Bold,
+                                        color = Color(0xFF212121)
+                                    )
+                                )
+                                Spacer(Modifier.height(16.dp))
+                                Text(
+                                    "Ready to verify your identity",
+                                    style = MaterialTheme.typography.bodyLarge.copy(
+                                        color = Color(0xFF757575)
+                                    )
+                                )
+                                Spacer(Modifier.height(32.dp))
+                                
+                                Row(
+                                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                                ) {
+                                    OutlinedButton(
+                                        onClick = viewModel::openCamera,
+                                        modifier = Modifier
+                                            .width(160.dp)
+                                            .height(56.dp),
+                                        shape = RoundedCornerShape(28.dp)
+                                    ) {
+                                        Icon(Icons.Default.Refresh, null, Modifier.size(20.dp))
+                                        Spacer(Modifier.width(8.dp))
+                                        Text("Retake")
+                                    }
+                                    
+                                    Button(
+                                        onClick = { viewModel.verifyWithCapturedImage() },
+                                        modifier = Modifier
+                                            .width(200.dp)
+                                            .height(56.dp)
+                                            .shadow(8.dp, RoundedCornerShape(28.dp)),
+                                        shape = RoundedCornerShape(28.dp),
+                                        colors = ButtonDefaults.buttonColors(
+                                            containerColor = Color.Transparent
+                                        ),
+                                        contentPadding = PaddingValues(0.dp)
+                                    ) {
+                                        Box(
+                                            modifier = Modifier
+                                                .fillMaxSize()
+                                                .background(
+                                                    brush = Brush.linearGradient(
+                                                        colors = listOf(
+                                                            Color(0xFF00ACC1),
+                                                            Color(0xFF0097A7)
+                                                        )
+                                                    )
+                                                ),
+                                            contentAlignment = Alignment.Center
+                                        ) {
+                                            Row(
+                                                verticalAlignment = Alignment.CenterVertically
+                                            ) {
+                                                Icon(
+                                                    Icons.Default.VerifiedUser,
+                                                    null,
+                                                    tint = Color.White,
+                                                    modifier = Modifier.size(24.dp)
+                                                )
+                                                Spacer(Modifier.width(8.dp))
+                                                Text(
+                                                    "Verify Now",
+                                                    color = Color.White,
+                                                    fontWeight = FontWeight.Bold,
+                                                    fontSize = 16.sp
+                                                )
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        } else {
+                            // Initial State - Start Verification
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Card(
+                                    modifier = Modifier.size(120.dp),
+                                    shape = CircleShape,
+                                    colors = CardDefaults.cardColors(
+                                        containerColor = Color.Transparent
+                                    )
+                                ) {
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxSize()
+                                            .background(
+                                                brush = Brush.linearGradient(
+                                                    colors = listOf(
+                                                        Color(0xFF00ACC1),
+                                                        Color(0xFF0097A7)
+                                                    )
+                                                )
+                                            ),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Icon(
+                                            Icons.Default.Videocam,
+                                            contentDescription = null,
+                                            modifier = Modifier.size(60.dp),
+                                            tint = Color.White
+                                        )
+                                    }
+                                }
+                                
+                                Spacer(Modifier.height(32.dp))
+                                
+                                Text(
+                                    "Capture Your Face",
+                                    style = MaterialTheme.typography.headlineMedium.copy(
+                                        fontWeight = FontWeight.Bold,
+                                        color = Color(0xFF212121)
+                                    )
+                                )
+                                
+                                Spacer(Modifier.height(16.dp))
+                                
+                                Text(
+                                    "Position your face in front of the camera",
+                                    style = MaterialTheme.typography.bodyLarge.copy(
+                                        color = Color(0xFF757575)
+                                    ),
+                                    textAlign = TextAlign.Center
+                                )
+                                
+                                Spacer(Modifier.height(8.dp))
+                                
+                                Text(
+                                    "Make sure you are in a well-lit area",
+                                    style = MaterialTheme.typography.bodyMedium.copy(
+                                        color = Color(0xFF9E9E9E)
+                                    ),
+                                    textAlign = TextAlign.Center
+                                )
+                                
+                                Spacer(Modifier.height(48.dp))
+                                
+                                Button(
+                                    onClick = viewModel::openCamera,
+                                    modifier = Modifier
+                                        .width(250.dp)
+                                        .height(64.dp)
+                                        .shadow(12.dp, RoundedCornerShape(32.dp)),
+                                    shape = RoundedCornerShape(32.dp),
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = Color.Transparent
+                                    ),
+                                    contentPadding = PaddingValues(0.dp)
+                                ) {
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxSize()
+                                            .background(
+                                                brush = Brush.linearGradient(
+                                                    colors = listOf(
+                                                        Color(0xFF00ACC1),
+                                                        Color(0xFF0097A7)
+                                                    )
+                                                )
+                                            ),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Row(
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            Icon(
+                                                Icons.Default.CameraAlt,
+                                                null,
+                                                tint = Color.White,
+                                                modifier = Modifier.size(28.dp)
+                                            )
+                                            Spacer(Modifier.width(12.dp))
+                                            Text(
+                                                "Start Verification",
+                                                color = Color.White,
+                                                fontWeight = FontWeight.Bold,
+                                                fontSize = 18.sp
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        
+                        // Error Message
+                        uiState.errorMessage?.let { message ->
+                            Spacer(Modifier.height(24.dp))
+                            ErrorMessage(message)
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+/**
+ * Beautiful Verification Result Display - Modern Success/Failure Cards
+ */
+@Composable
+private fun BeautifulVerificationResult(
+    result: VerificationResult,
+    onDone: () -> Unit,
+    onTryAgain: () -> Unit
+) {
+    val isSuccess = result.isVerified
+    val backgroundColor = if (isSuccess) Color(0xFF4CAF50) else Color(0xFFF44336)
+    val accentColor = if (isSuccess) Color(0xFF66BB6A) else Color(0xFFEF5350)
+    
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        // Animated Icon Circle
+        Card(
+            modifier = Modifier.size(140.dp),
+            shape = CircleShape,
+            colors = CardDefaults.cardColors(
+                containerColor = Color.Transparent
+            )
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(
+                        brush = Brush.radialGradient(
+                            colors = listOf(
+                                backgroundColor,
+                                accentColor
+                            )
+                        )
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = if (isSuccess) Icons.Default.VerifiedUser else Icons.Default.Warning,
+                    contentDescription = null,
+                    modifier = Modifier.size(80.dp),
+                    tint = Color.White
+                )
+            }
+        }
+        
+        Spacer(Modifier.height(32.dp))
+        
+        // Result Title
+        Text(
+            text = if (isSuccess) "✅ Verified!" else "❌ Verification Failed",
+            style = MaterialTheme.typography.displaySmall.copy(
+                fontWeight = FontWeight.Bold,
+                color = backgroundColor
+            )
+        )
+        
+        Spacer(Modifier.height(24.dp))
+        
+        if (isSuccess) {
+            // Success Details Card
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .shadow(8.dp, RoundedCornerShape(16.dp)),
+                shape = RoundedCornerShape(16.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = Color(0xFFF1F8E9)
+                )
+            ) {
+                Column(
+                    modifier = Modifier.padding(24.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        "Welcome Back!",
+                        style = MaterialTheme.typography.headlineSmall.copy(
+                            fontWeight = FontWeight.Bold,
+                            color = Color(0xFF33691E)
+                        )
+                    )
+                    
+                    Spacer(Modifier.height(16.dp))
+                    
+                    // User Name
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Icon(
+                            Icons.Default.Person,
+                            null,
+                            tint = Color(0xFF689F38),
+                            modifier = Modifier.size(24.dp)
+                        )
+                        Text(
+                            result.userName,
+                            style = MaterialTheme.typography.titleLarge.copy(
+                                fontWeight = FontWeight.SemiBold,
+                                color = Color(0xFF212121)
+                            )
+                        )
+                    }
+                    
+                    Spacer(Modifier.height(16.dp))
+                    
+                    // Confidence Score
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Icon(
+                            Icons.Default.TrendingUp,
+                            null,
+                            tint = Color(0xFF689F38),
+                            modifier = Modifier.size(24.dp)
+                        )
+                        Text(
+                            "Confidence: ${(result.confidence * 100).toInt()}%",
+                            style = MaterialTheme.typography.titleMedium.copy(
+                                fontWeight = FontWeight.Medium,
+                                color = Color(0xFF424242)
+                            )
+                        )
+                    }
+                    
+                    // Progress Bar for Confidence
+                    Spacer(Modifier.height(12.dp))
+                    LinearProgressIndicator(
+                        progress = result.confidence,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(8.dp)
+                            .clip(RoundedCornerShape(4.dp)),
+                        color = Color(0xFF4CAF50),
+                        trackColor = Color(0xFFDCEDC8)
+                    )
+                    
+                    Spacer(Modifier.height(16.dp))
+                    
+                    // Message
+                    Text(
+                        result.message,
+                        style = MaterialTheme.typography.bodyLarge.copy(
+                            color = Color(0xFF616161),
+                            textAlign = TextAlign.Center
+                        )
+                    )
+                }
+            }
+            
+            Spacer(Modifier.height(32.dp))
+            
+            // Success Action Button
+            Button(
+                onClick = onDone,
+                modifier = Modifier
+                    .width(240.dp)
+                    .height(60.dp)
+                    .shadow(8.dp, RoundedCornerShape(30.dp)),
+                shape = RoundedCornerShape(30.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color.Transparent
+                ),
+                contentPadding = PaddingValues(0.dp)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(
+                            brush = Brush.linearGradient(
+                                colors = listOf(
+                                    Color(0xFF4CAF50),
+                                    Color(0xFF66BB6A)
+                                )
+                            )
+                        ),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            Icons.Default.Check,
+                            null,
+                            tint = Color.White,
+                            modifier = Modifier.size(28.dp)
+                        )
+                        Spacer(Modifier.width(12.dp))
+                        Text(
+                            "Done",
+                            color = Color.White,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 18.sp
+                        )
+                    }
+                }
+            }
+        } else {
+            // Failure Details Card
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .shadow(8.dp, RoundedCornerShape(16.dp)),
+                shape = RoundedCornerShape(16.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = Color(0xFFFFEBEE)
+                )
+            ) {
+                Column(
+                    modifier = Modifier.padding(24.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        "Unable to Verify",
+                        style = MaterialTheme.typography.headlineSmall.copy(
+                            fontWeight = FontWeight.Bold,
+                            color = Color(0xFFC62828)
+                        )
+                    )
+                    
+                    Spacer(Modifier.height(16.dp))
+                    
+                    // Reason
+                    Text(
+                        result.message,
+                        style = MaterialTheme.typography.bodyLarge.copy(
+                            color = Color(0xFF616161),
+                            textAlign = TextAlign.Center
+                        )
+                    )
+                    
+                    Spacer(Modifier.height(16.dp))
+                    
+                    // Confidence Score (if any)
+                    if (result.confidence > 0) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Icon(
+                                Icons.Default.Info,
+                                null,
+                                tint = Color(0xFFE53935),
+                                modifier = Modifier.size(24.dp)
+                            )
+                            Text(
+                                "Match: ${(result.confidence * 100).toInt()}%",
+                                style = MaterialTheme.typography.titleMedium.copy(
+                                    fontWeight = FontWeight.Medium,
+                                    color = Color(0xFF424242)
+                                )
+                            )
+                        }
+                        
+                        Spacer(Modifier.height(12.dp))
+                        LinearProgressIndicator(
+                            progress = result.confidence,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(8.dp)
+                                .clip(RoundedCornerShape(4.dp)),
+                            color = Color(0xFFF44336),
+                            trackColor = Color(0xFFFFCDD2)
+                        )
+                    }
+                }
+            }
+            
+            Spacer(Modifier.height(32.dp))
+            
+            // Failure Action Buttons
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                OutlinedButton(
+                    onClick = onDone,
+                    modifier = Modifier
+                        .width(160.dp)
+                        .height(56.dp),
+                    shape = RoundedCornerShape(28.dp),
+                    border = BorderStroke(2.dp, Color(0xFF757575))
+                ) {
+                    Icon(Icons.Default.Close, null, Modifier.size(20.dp))
+                    Spacer(Modifier.width(8.dp))
+                    Text(
+                        "Cancel",
+                        fontWeight = FontWeight.SemiBold
+                    )
+                }
+                
+                Button(
+                    onClick = onTryAgain,
+                    modifier = Modifier
+                        .width(180.dp)
+                        .height(56.dp)
+                        .shadow(8.dp, RoundedCornerShape(28.dp)),
+                    shape = RoundedCornerShape(28.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.Transparent
+                    ),
+                    contentPadding = PaddingValues(0.dp)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(
+                                brush = Brush.linearGradient(
+                                    colors = listOf(
+                                        Color(0xFFF44336),
+                                        Color(0xFFEF5350)
+                                    )
+                                )
+                            ),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                Icons.Default.Refresh,
+                                null,
+                                tint = Color.White,
+                                modifier = Modifier.size(24.dp)
+                            )
+                            Spacer(Modifier.width(8.dp))
+                            Text(
+                                "Try Again",
+                                color = Color.White,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 16.sp
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+/**
+ * Modern Loading Indicator for Verification
+ */
+@Composable
+private fun ModernLoadingIndicator() {
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        CircularProgressIndicator(
+            modifier = Modifier.size(80.dp),
+            color = Color(0xFF00ACC1),
+            strokeWidth = 6.dp
+        )
+        Spacer(modifier = Modifier.height(32.dp))
+        Text(
+            "Verifying Identity...",
+            style = MaterialTheme.typography.headlineMedium.copy(
+                fontWeight = FontWeight.Bold,
+                color = Color(0xFF1976D2)
+            )
+        )
+        Spacer(modifier = Modifier.height(12.dp))
+        Text(
+            "Please wait while we process your biometric data",
+            style = MaterialTheme.typography.bodyLarge.copy(
+                color = Color(0xFF757575)
+            ),
+            textAlign = TextAlign.Center
+        )
     }
 }
 
@@ -579,7 +1678,10 @@ private fun PuzzleStep(
  */
 @Composable
 private fun VerificationActions(
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    onVerify: () -> Unit,
+    hasImage: Boolean,
+    buttonText: String
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -593,10 +1695,59 @@ private fun VerificationActions(
         }
 
         Button(
-            onClick = { /* TODO: Implement verification */ },
+            onClick = onVerify,
             modifier = Modifier.weight(1f)
         ) {
-            Text("Start Verification")
+            Text(buttonText)
+        }
+    }
+}
+
+/**
+ * Verification result card
+ */
+@Composable
+private fun VerificationResultCard(result: VerificationResult) {
+    Card(
+        colors = CardDefaults.cardColors(
+            containerColor = if (result.isVerified)
+                MaterialTheme.colorScheme.primaryContainer
+            else
+                MaterialTheme.colorScheme.errorContainer
+        )
+    ) {
+        Column(
+            modifier = Modifier.fillMaxWidth().padding(KioskDimens.SpacingLarge),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Icon(
+                imageVector = if (result.isVerified) Icons.Default.Check else Icons.Default.Warning,
+                contentDescription = if (result.isVerified) "Verified" else "Not Verified",
+                modifier = Modifier.size(KioskDimens.IconMedium),
+                tint = if (result.isVerified)
+                    MaterialTheme.colorScheme.primary
+                else
+                    MaterialTheme.colorScheme.error
+            )
+            
+            Spacer(modifier = Modifier.height(KioskDimens.SpacingMedium))
+            
+            Text(
+                text = if (result.isVerified) "✅ Verified" else "❌ Not Verified",
+                style = MaterialTheme.typography.headlineSmall
+            )
+            
+            Spacer(modifier = Modifier.height(KioskDimens.SpacingSmall))
+            
+            Text(
+                text = "User: ${result.userName}",
+                style = MaterialTheme.typography.titleMedium
+            )
+            
+            Text(
+                text = "Confidence: ${result.confidence.toInt()}%",
+                style = MaterialTheme.typography.bodyLarge
+            )
         }
     }
 }

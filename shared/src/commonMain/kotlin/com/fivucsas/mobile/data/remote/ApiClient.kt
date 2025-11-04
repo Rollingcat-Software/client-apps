@@ -22,7 +22,7 @@ import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 
 class ApiClient(
-    private val baseUrl: String = "http://10.0.2.2:8080/api/v1", // Android emulator localhost
+    private val baseUrl: String = "http://localhost:8080/api/v1", // Desktop/iOS: localhost, Android: 10.0.2.2
     private val tokenProvider: () -> String?
 ) {
     private val httpClient = HttpClient {
