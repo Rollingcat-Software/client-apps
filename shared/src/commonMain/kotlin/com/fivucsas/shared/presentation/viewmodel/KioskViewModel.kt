@@ -1,5 +1,6 @@
 package com.fivucsas.shared.presentation.viewmodel
 
+import com.fivucsas.shared.config.AnimationConfig
 import com.fivucsas.shared.domain.model.EnrollmentData
 import com.fivucsas.shared.domain.usecase.enrollment.EnrollUserUseCase
 import com.fivucsas.shared.domain.usecase.verification.CheckLivenessUseCase
@@ -115,14 +116,14 @@ class KioskViewModel(
             showCamera = false,
             successMessage = "📸 Photo captured successfully!"
         ) }
-        
+
         // Auto-clear success message
         viewModelScope.launch {
-            kotlinx.coroutines.delay(2000)
+            kotlinx.coroutines.delay(AnimationConfig.TOAST_DISPLAY_DURATION)
             _uiState.update { it.copy(successMessage = null) }
         }
     }
-    
+
     fun captureImage() {
         // Mock camera capture - generate random image data
         val mockImage = ByteArray(2048) { Random.nextInt(256).toByte() }
@@ -132,14 +133,14 @@ class KioskViewModel(
             showCamera = false,
             successMessage = "📸 Photo captured successfully!"
         ) }
-        
+
         // Auto-clear success message
         viewModelScope.launch {
-            kotlinx.coroutines.delay(2000)
+            kotlinx.coroutines.delay(AnimationConfig.TOAST_DISPLAY_DURATION)
             _uiState.update { it.copy(successMessage = null) }
         }
     }
-    
+
     // ENROLLMENT SUBMISSION
     fun submitEnrollment() {
         viewModelScope.launch {
@@ -181,9 +182,9 @@ class KioskViewModel(
                                        "✓ Connected to live backend",
                         errorMessage = null
                     ) }
-                    
+
                     // Navigate back after 3 seconds
-                    kotlinx.coroutines.delay(3000)
+                    kotlinx.coroutines.delay(AnimationConfig.DELAY_SCREEN_TRANSITION)
                     navigateToWelcome()
                 } else {
                     // Show error but continue with mock data
@@ -196,11 +197,11 @@ class KioskViewModel(
                                        "⚠️ Backend unavailable - using local data",
                         errorMessage = null
                     ) }
-                    
-                    kotlinx.coroutines.delay(3000)
+
+                    kotlinx.coroutines.delay(AnimationConfig.DELAY_SCREEN_TRANSITION)
                     navigateToWelcome()
                 }
-                
+
             } catch (e: Exception) {
                 _uiState.update { it.copy(
                     isLoading = false,
@@ -234,8 +235,8 @@ class KioskViewModel(
             
             try {
                 // Simulate API processing
-                kotlinx.coroutines.delay(2000)
-                
+                kotlinx.coroutines.delay(AnimationConfig.DELAY_VERIFICATION)
+
                 // Mock verification result
                 val isVerified = Random.nextFloat() > 0.3f // 70% success rate
                 val confidence = if (isVerified) {
@@ -275,10 +276,11 @@ class KioskViewModel(
                         "⚠️ Using mock data (server not connected)"
                     } else null
                 ) }
-                
+
+
                 // Auto-clear after 5 seconds if successful
                 if (isVerified) {
-                    kotlinx.coroutines.delay(5000)
+                    kotlinx.coroutines.delay(AnimationConfig.DELAY_AUTO_DISMISS_LONG)
                     navigateToWelcome()
                 }
                 

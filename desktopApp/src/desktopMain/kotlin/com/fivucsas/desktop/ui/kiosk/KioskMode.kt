@@ -22,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.Dp
+import com.fivucsas.shared.config.UIDimens
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
@@ -60,19 +61,7 @@ private object KioskConfig {
     const val VERIFY_BUTTON = "Identity Verification"
 }
 
-private object KioskDimens {
-    val IconSize = 120.dp
-    val IconMedium = 64.dp
-    val IconSmall = 32.dp
-    val SpacingSmall = 8.dp
-    val SpacingMedium = 16.dp
-    val SpacingLarge = 24.dp
-    val SpacingXLarge = 32.dp
-    val SpacingXXLarge = 64.dp
-    val ButtonWidth = 250.dp
-    val ButtonHeight = 80.dp
-    val CameraPreviewHeight = 400.dp
-}
+// Local KioskDimens removed - now using shared UIDimens from com.fivucsas.shared.config
 
 // KioskViewModel now imported from shared module
 // ✅ Removed local definition - using com.fivucsas.shared.presentation.viewmodel.KioskViewModel
@@ -321,7 +310,7 @@ fun WelcomeScreen(
  * Welcome logo component - Extracted for reusability
  */
 @Composable
-private fun WelcomeLogo(iconSize: Dp = KioskDimens.IconSize) {
+private fun WelcomeLogo(iconSize: Dp = UIDimens.KioskIconSize) {
     Icon(
         imageVector = Icons.Default.Face,
         contentDescription = "Face Icon",
@@ -329,7 +318,7 @@ private fun WelcomeLogo(iconSize: Dp = KioskDimens.IconSize) {
         tint = MaterialTheme.colorScheme.primary
     )
 
-    Spacer(modifier = Modifier.height(KioskDimens.SpacingXLarge))
+    Spacer(modifier = Modifier.height(UIDimens.SpacingXLarge))
 
     Text(
         text = KioskConfig.WELCOME_TITLE,
@@ -351,11 +340,11 @@ private fun ActionButtons(
     onEnroll: () -> Unit,
     onVerify: () -> Unit,
     isVertical: Boolean = false,
-    buttonSize: Dp = KioskDimens.ButtonHeight
+    buttonSize: Dp = UIDimens.ButtonHeightKiosk
 ) {
     if (isVertical) {
         Column(
-            verticalArrangement = Arrangement.spacedBy(KioskDimens.SpacingMedium)
+            verticalArrangement = Arrangement.spacedBy(UIDimens.SpacingMedium)
         ) {
             ActionButton(
                 text = KioskConfig.ENROLL_BUTTON,
@@ -373,7 +362,7 @@ private fun ActionButtons(
         }
     } else {
         Row(
-            horizontalArrangement = Arrangement.spacedBy(KioskDimens.SpacingLarge)
+            horizontalArrangement = Arrangement.spacedBy(UIDimens.SpacingLarge)
         ) {
             ActionButton(
                 text = KioskConfig.ENROLL_BUTTON,
@@ -400,12 +389,12 @@ private fun ActionButton(
     text: String,
     icon: androidx.compose.ui.graphics.vector.ImageVector,
     onClick: () -> Unit,
-    buttonHeight: Dp = KioskDimens.ButtonHeight
+    buttonHeight: Dp = UIDimens.ButtonHeightKiosk
 ) {
     Button(
         onClick = onClick,
         modifier = Modifier.size(
-            width = KioskDimens.ButtonWidth,
+            width = UIDimens.ButtonWidthKiosk,
             height = buttonHeight
         )
     ) {
@@ -415,9 +404,9 @@ private fun ActionButton(
             Icon(
                 imageVector = icon,
                 contentDescription = text,
-                modifier = Modifier.size(KioskDimens.IconSmall)
+                modifier = Modifier.size(UIDimens.IconMedium)
             )
-            Spacer(modifier = Modifier.height(KioskDimens.SpacingSmall))
+            Spacer(modifier = Modifier.height(UIDimens.SpacingSmall))
             Text(text = text, style = MaterialTheme.typography.titleMedium)
         }
     }
@@ -497,12 +486,12 @@ fun EnrollScreen(
 
                             uiState.successMessage?.let { message ->
                                 SuccessMessage(message)
-                                Spacer(modifier = Modifier.height(KioskDimens.SpacingMedium))
+                                Spacer(modifier = Modifier.height(UIDimens.SpacingMedium))
                             }
 
                             uiState.errorMessage?.let { message ->
                                 ErrorMessage(message)
-                                Spacer(modifier = Modifier.height(KioskDimens.SpacingMedium))
+                                Spacer(modifier = Modifier.height(UIDimens.SpacingMedium))
                             }
 
                             EnrollmentActions(
@@ -543,7 +532,7 @@ private fun EnrollmentForm(
         style = MaterialTheme.typography.titleLarge
     )
 
-    Spacer(modifier = Modifier.height(KioskDimens.SpacingLarge))
+    Spacer(modifier = Modifier.height(UIDimens.SpacingLarge))
 
     ValidatedTextField(
         value = enrollmentData.fullName,
@@ -552,7 +541,7 @@ private fun EnrollmentForm(
         isRequired = true
     )
 
-    Spacer(modifier = Modifier.height(KioskDimens.SpacingMedium))
+    Spacer(modifier = Modifier.height(UIDimens.SpacingMedium))
 
     ValidatedTextField(
         value = enrollmentData.email,
@@ -562,7 +551,7 @@ private fun EnrollmentForm(
         keyboardType = KeyboardType.Email
     )
 
-    Spacer(modifier = Modifier.height(KioskDimens.SpacingMedium))
+    Spacer(modifier = Modifier.height(UIDimens.SpacingMedium))
 
     ValidatedTextField(
         value = enrollmentData.idNumber,
@@ -633,12 +622,12 @@ private fun BiometricCaptureSection() {
         style = MaterialTheme.typography.titleLarge
     )
 
-    Spacer(modifier = Modifier.height(KioskDimens.SpacingMedium))
+    Spacer(modifier = Modifier.height(UIDimens.SpacingMedium))
 
     Surface(
         modifier = Modifier
             .fillMaxWidth()
-            .height(KioskDimens.CameraPreviewHeight),
+            .height(UIDimens.CameraPreviewHeight),
         color = MaterialTheme.colorScheme.surfaceVariant,
         shape = MaterialTheme.shapes.medium
     ) {
@@ -650,10 +639,10 @@ private fun BiometricCaptureSection() {
             Icon(
                 imageVector = Icons.Default.Videocam,
                 contentDescription = "Camera",
-                modifier = Modifier.size(KioskDimens.IconMedium),
+                modifier = Modifier.size(UIDimens.IconXLarge),
                 tint = MaterialTheme.colorScheme.onSurfaceVariant
             )
-            Spacer(modifier = Modifier.height(KioskDimens.SpacingMedium))
+            Spacer(modifier = Modifier.height(UIDimens.SpacingMedium))
             Text(
                 "Click button below to capture photo",
                 style = MaterialTheme.typography.titleMedium,
@@ -676,7 +665,7 @@ private fun EnrollmentActions(
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(KioskDimens.SpacingMedium)
+        horizontalArrangement = Arrangement.spacedBy(UIDimens.SpacingMedium)
     ) {
         OutlinedButton(
             onClick = onBack,
@@ -882,7 +871,7 @@ private fun CapturedImagePreview(
             style = MaterialTheme.typography.titleLarge
         )
 
-        Spacer(modifier = Modifier.height(KioskDimens.SpacingMedium))
+        Spacer(modifier = Modifier.height(UIDimens.SpacingMedium))
 
         Card(
             colors = CardDefaults.cardColors(
@@ -890,21 +879,21 @@ private fun CapturedImagePreview(
             )
         ) {
             Column(
-                modifier = Modifier.fillMaxWidth().padding(KioskDimens.SpacingMedium),
+                modifier = Modifier.fillMaxWidth().padding(UIDimens.SpacingMedium),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Icon(
                     Icons.Default.Check,
                     contentDescription = "Captured",
-                    modifier = Modifier.size(KioskDimens.IconMedium),
+                    modifier = Modifier.size(UIDimens.IconXLarge),
                     tint = MaterialTheme.colorScheme.primary
                 )
-                Spacer(modifier = Modifier.height(KioskDimens.SpacingSmall))
+                Spacer(modifier = Modifier.height(UIDimens.SpacingSmall))
                 Text(
                     "Photo captured successfully!",
                     style = MaterialTheme.typography.titleMedium
                 )
-                Spacer(modifier = Modifier.height(KioskDimens.SpacingSmall))
+                Spacer(modifier = Modifier.height(UIDimens.SpacingSmall))
                 OutlinedButton(onClick = onRetake) {
                     Text("Retake Photo")
                 }
@@ -1605,7 +1594,7 @@ private fun VerificationHeader() {
         style = MaterialTheme.typography.titleLarge
     )
 
-    Spacer(modifier = Modifier.height(KioskDimens.SpacingMedium))
+    Spacer(modifier = Modifier.height(UIDimens.SpacingMedium))
 
     Text(
         "Complete the following actions to verify your identity:",
@@ -1623,20 +1612,20 @@ private fun PuzzleInstructions() {
             containerColor = MaterialTheme.colorScheme.primaryContainer
         )
     ) {
-        Column(modifier = Modifier.padding(KioskDimens.SpacingMedium)) {
+        Column(modifier = Modifier.padding(UIDimens.SpacingMedium)) {
             PuzzleStep(
                 number = 1,
                 description = "Smile",
                 isComplete = true
             )
-            Spacer(modifier = Modifier.height(KioskDimens.SpacingSmall))
+            Spacer(modifier = Modifier.height(UIDimens.SpacingSmall))
 
             PuzzleStep(
                 number = 2,
                 description = "Blink both eyes",
                 isComplete = false
             )
-            Spacer(modifier = Modifier.height(KioskDimens.SpacingSmall))
+            Spacer(modifier = Modifier.height(UIDimens.SpacingSmall))
 
             PuzzleStep(
                 number = 3,
@@ -1665,7 +1654,7 @@ private fun PuzzleStep(
             else
                 MaterialTheme.colorScheme.outline
         )
-        Spacer(modifier = Modifier.width(KioskDimens.SpacingSmall))
+        Spacer(modifier = Modifier.width(UIDimens.SpacingSmall))
         Text(
             "$number. $description",
             style = MaterialTheme.typography.titleMedium
@@ -1685,7 +1674,7 @@ private fun VerificationActions(
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(KioskDimens.SpacingMedium)
+        horizontalArrangement = Arrangement.spacedBy(UIDimens.SpacingMedium)
     ) {
         OutlinedButton(
             onClick = onBack,
@@ -1717,27 +1706,27 @@ private fun VerificationResultCard(result: VerificationResult) {
         )
     ) {
         Column(
-            modifier = Modifier.fillMaxWidth().padding(KioskDimens.SpacingLarge),
+            modifier = Modifier.fillMaxWidth().padding(UIDimens.SpacingLarge),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Icon(
                 imageVector = if (result.isVerified) Icons.Default.Check else Icons.Default.Warning,
                 contentDescription = if (result.isVerified) "Verified" else "Not Verified",
-                modifier = Modifier.size(KioskDimens.IconMedium),
+                modifier = Modifier.size(UIDimens.IconXLarge),
                 tint = if (result.isVerified)
                     MaterialTheme.colorScheme.primary
                 else
                     MaterialTheme.colorScheme.error
             )
             
-            Spacer(modifier = Modifier.height(KioskDimens.SpacingMedium))
+            Spacer(modifier = Modifier.height(UIDimens.SpacingMedium))
             
             Text(
                 text = if (result.isVerified) "✅ Verified" else "❌ Not Verified",
                 style = MaterialTheme.typography.headlineSmall
             )
             
-            Spacer(modifier = Modifier.height(KioskDimens.SpacingSmall))
+            Spacer(modifier = Modifier.height(UIDimens.SpacingSmall))
             
             Text(
                 text = "User: ${result.userName}",
