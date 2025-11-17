@@ -1,5 +1,6 @@
 package com.fivucsas.shared.presentation.viewmodel
 
+import com.fivucsas.shared.config.AnimationConfig
 import com.fivucsas.shared.domain.model.Statistics
 import com.fivucsas.shared.domain.model.User
 import com.fivucsas.shared.domain.model.UserStatus
@@ -90,7 +91,7 @@ class AdminViewModel(
             
             try {
                 // Simulate API call delay
-                kotlinx.coroutines.delay(800)
+                kotlinx.coroutines.delay(AnimationConfig.DELAY_API_SIMULATION)
                 
                 // Try to call use case (will use mock data from repository)
                 val result = getUsersUseCase()
@@ -103,9 +104,9 @@ class AdminViewModel(
                         filteredUsers = users,
                         successMessage = "✅ Loaded ${users.size} users\n⚠️ Using mock data (server not connected)"
                     ) }
-                    
+
                     // Auto-clear success message
-                    kotlinx.coroutines.delay(2000)
+                    kotlinx.coroutines.delay(AnimationConfig.TOAST_DISPLAY_DURATION)
                     _uiState.update { it.copy(successMessage = null) }
                 } else {
                     throw result.exceptionOrNull() ?: Exception("Unknown error")
@@ -128,7 +129,7 @@ class AdminViewModel(
     fun loadStatistics() {
         viewModelScope.launch {
             try {
-                kotlinx.coroutines.delay(500)
+                kotlinx.coroutines.delay(AnimationConfig.DELAY_API_SIMULATION_SHORT)
                 
                 val result = getStatisticsUseCase()
                 
@@ -187,8 +188,8 @@ class AdminViewModel(
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
             
             try {
-                kotlinx.coroutines.delay(500)
-                
+                kotlinx.coroutines.delay(AnimationConfig.DELAY_API_SIMULATION_SHORT)
+
                 // Add to local list
                 val currentUsers = _uiState.value.users.toMutableList()
                 currentUsers.add(user)
@@ -200,11 +201,11 @@ class AdminViewModel(
                     showAddUserDialog = false,
                     successMessage = "✅ User added: ${user.name}\n⚠️ Using mock data (server not connected)"
                 ) }
-                
+
                 // Auto-clear message
-                kotlinx.coroutines.delay(2000)
+                kotlinx.coroutines.delay(AnimationConfig.TOAST_DISPLAY_DURATION)
                 _uiState.update { it.copy(successMessage = null) }
-                
+
                 // Refresh statistics
                 loadStatistics()
                 
@@ -221,10 +222,10 @@ class AdminViewModel(
     fun updateUser(user: User) {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
-            
+
             try {
-                kotlinx.coroutines.delay(500)
-                
+                kotlinx.coroutines.delay(AnimationConfig.DELAY_API_SIMULATION_SHORT)
+
                 // Try API call
                 val result = updateUserUseCase(user.id, user)
                 
@@ -248,8 +249,8 @@ class AdminViewModel(
                         editingUser = null,
                         successMessage = "✅ User updated: ${user.name}\n⚠️ Using mock data"
                     ) }
-                    
-                    kotlinx.coroutines.delay(2000)
+
+                    kotlinx.coroutines.delay(AnimationConfig.TOAST_DISPLAY_DURATION)
                     _uiState.update { it.copy(successMessage = null) }
                 }
                 
@@ -282,8 +283,8 @@ class AdminViewModel(
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
             
             try {
-                kotlinx.coroutines.delay(500)
-                
+                kotlinx.coroutines.delay(AnimationConfig.DELAY_API_SIMULATION_SHORT)
+
                 // Try API call
                 val result = deleteUserUseCase(userId)
                 
@@ -303,10 +304,10 @@ class AdminViewModel(
                         userToDelete = null,
                         successMessage = "✅ User deleted: ${userToDelete?.name ?: "Unknown"}\n⚠️ Using mock data"
                     ) }
-                    
-                    kotlinx.coroutines.delay(2000)
+
+                    kotlinx.coroutines.delay(AnimationConfig.TOAST_DISPLAY_DURATION)
                     _uiState.update { it.copy(successMessage = null) }
-                    
+
                     // Refresh statistics
                     loadStatistics()
                 }

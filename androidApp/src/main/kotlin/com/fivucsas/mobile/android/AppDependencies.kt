@@ -1,20 +1,20 @@
 package com.fivucsas.mobile.android
 
 import android.content.Context
-import com.fivucsas.mobile.data.local.TokenStorage
-import com.fivucsas.mobile.data.remote.ApiClient
-import com.fivucsas.mobile.data.repository.AuthRepositoryImpl
-import com.fivucsas.mobile.data.repository.BiometricRepositoryImpl
-import com.fivucsas.mobile.domain.repository.AuthRepository
-import com.fivucsas.mobile.domain.repository.BiometricRepository
-import com.fivucsas.mobile.domain.usecase.EnrollFaceUseCase
-import com.fivucsas.mobile.domain.usecase.LoginUseCase
-import com.fivucsas.mobile.domain.usecase.RegisterUseCase
-import com.fivucsas.mobile.domain.usecase.VerifyFaceUseCase
-import com.fivucsas.mobile.platform.AndroidTokenStorage
-import com.fivucsas.mobile.presentation.biometric.BiometricViewModel
-import com.fivucsas.mobile.presentation.login.LoginViewModel
-import com.fivucsas.mobile.presentation.register.RegisterViewModel
+import com.fivucsas.shared.data.local.TokenStorage
+import com.fivucsas.shared.data.remote.ApiClient
+import com.fivucsas.shared.data.repository.AuthRepositoryImpl
+import com.fivucsas.shared.data.repository.BiometricRepositoryImpl
+import com.fivucsas.shared.domain.repository.AuthRepository
+import com.fivucsas.shared.domain.repository.BiometricRepository
+import com.fivucsas.shared.domain.usecase.enrollment.EnrollUserUseCase
+import com.fivucsas.shared.domain.usecase.auth.LoginUseCase
+import com.fivucsas.shared.domain.usecase.auth.RegisterUseCase
+import com.fivucsas.shared.domain.usecase.verification.VerifyUserUseCase
+import com.fivucsas.shared.platform.AndroidTokenStorage
+import com.fivucsas.shared.presentation.viewmodel.auth.BiometricViewModel
+import com.fivucsas.shared.presentation.viewmodel.auth.LoginViewModel
+import com.fivucsas.shared.presentation.viewmodel.auth.RegisterViewModel
 
 // Simple dependency injection for MVP
 class AppDependencies(context: Context) {

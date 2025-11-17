@@ -60,6 +60,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.background
+import com.fivucsas.shared.config.UIDimens
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
@@ -117,17 +118,7 @@ private object AdminConfig {
     const val EXPORT = "Export"
 }
 
-private object AdminDimens {
-    val IconSize = 64.dp
-    val IconMedium = 48.dp
-    val IconSmall = 20.dp
-    val SpacingSmall = 8.dp
-    val SpacingMedium = 16.dp
-    val SpacingLarge = 24.dp
-    val SpacingXLarge = 32.dp
-    val CardHeight = 400.dp
-    val StatCardHeight = 100.dp
-}
+// Local AdminDimens removed - now using shared UIDimens from com.fivucsas.shared.config
 
 // AdminViewModel now imported from shared module
 // ✅ Removed local definition - using com.fivucsas.shared.presentation.viewmodel.AdminViewModel
@@ -212,7 +203,7 @@ private fun AdminNavigationRail(
     NavigationRail(
         modifier = Modifier.fillMaxHeight()
     ) {
-        Spacer(modifier = Modifier.height(AdminDimens.SpacingMedium))
+        Spacer(modifier = Modifier.height(UIDimens.SpacingMedium))
 
         NavigationRailItem(
             icon = { Icon(Icons.Default.People, contentDescription = "Users") },
@@ -256,13 +247,13 @@ fun UsersTab(
     var selectedUser by remember { mutableStateOf<User?>(null) }
 
     Column(
-        modifier = Modifier.fillMaxSize().padding(AdminDimens.SpacingLarge)
+        modifier = Modifier.fillMaxSize().padding(UIDimens.SpacingLarge)
     ) {
         UsersHeader(
             onAddUser = { /* TODO: Implement add user dialog */ }
         )
 
-        Spacer(modifier = Modifier.height(AdminDimens.SpacingLarge))
+        Spacer(modifier = Modifier.height(UIDimens.SpacingLarge))
 
         UsersSearchBar(
             searchQuery = uiState.searchQuery,
@@ -271,7 +262,7 @@ fun UsersTab(
             onExport = { /* TODO: Implement export */ }
         )
 
-        Spacer(modifier = Modifier.height(AdminDimens.SpacingLarge))
+        Spacer(modifier = Modifier.height(UIDimens.SpacingLarge))
 
         // 📊 Statistics Cards
         UserStatisticsCards(
@@ -281,7 +272,7 @@ fun UsersTab(
             pendingUsers = uiState.users.count { it.status == UserStatus.PENDING }
         )
 
-        Spacer(modifier = Modifier.height(AdminDimens.SpacingLarge))
+        Spacer(modifier = Modifier.height(UIDimens.SpacingLarge))
 
         UsersTable(
             users = uiState.filteredUsers,
@@ -333,9 +324,9 @@ private fun UsersHeader(
             Icon(
                 Icons.Default.Add,
                 contentDescription = null,
-                modifier = Modifier.size(AdminDimens.IconSmall)
+                modifier = Modifier.size(UIDimens.IconSmall)
             )
-            Spacer(modifier = Modifier.width(AdminDimens.SpacingSmall))
+            Spacer(modifier = Modifier.width(UIDimens.SpacingSmall))
             Text(AdminConfig.ADD_USER)
         }
     }
@@ -353,7 +344,7 @@ private fun UsersSearchBar(
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(AdminDimens.SpacingMedium)
+        horizontalArrangement = Arrangement.spacedBy(UIDimens.SpacingMedium)
     ) {
         OutlinedTextField(
             value = searchQuery,
@@ -368,9 +359,9 @@ private fun UsersSearchBar(
             Icon(
                 Icons.Default.FilterList,
                 contentDescription = null,
-                modifier = Modifier.size(AdminDimens.IconSmall)
+                modifier = Modifier.size(UIDimens.IconSmall)
             )
-            Spacer(modifier = Modifier.width(AdminDimens.SpacingSmall))
+            Spacer(modifier = Modifier.width(UIDimens.SpacingSmall))
             Text(AdminConfig.FILTERS)
         }
 
@@ -378,9 +369,9 @@ private fun UsersSearchBar(
             Icon(
                 Icons.Default.Download,
                 contentDescription = null,
-                modifier = Modifier.size(AdminDimens.IconSmall)
+                modifier = Modifier.size(UIDimens.IconSmall)
             )
-            Spacer(modifier = Modifier.width(AdminDimens.SpacingSmall))
+            Spacer(modifier = Modifier.width(UIDimens.SpacingSmall))
             Text(AdminConfig.EXPORT)
         }
     }
@@ -398,7 +389,7 @@ private fun UserStatisticsCards(
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(AdminDimens.SpacingMedium)
+        horizontalArrangement = Arrangement.spacedBy(UIDimens.SpacingMedium)
     ) {
         // Total Users Card - Blue gradient
         StatisticCard(
@@ -473,7 +464,7 @@ private fun StatisticCard(
         modifier = modifier
             .height(AdminDimens.StatCardHeight)
             .shadow(
-                elevation = 4.dp,
+                elevation = UIDimens.CardElevation,
                 shape = RoundedCornerShape(12.dp)
             )
     ) {
@@ -481,7 +472,7 @@ private fun StatisticCard(
             modifier = Modifier
                 .fillMaxSize()
                 .background(gradient)
-                .padding(AdminDimens.SpacingMedium)
+                .padding(UIDimens.SpacingMedium)
         ) {
             Column(
                 modifier = Modifier.fillMaxSize(),
@@ -555,8 +546,8 @@ private fun UsersTableHeader() {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(AdminDimens.SpacingMedium),
-            horizontalArrangement = Arrangement.spacedBy(AdminDimens.SpacingMedium)
+                .padding(UIDimens.SpacingMedium),
+            horizontalArrangement = Arrangement.spacedBy(UIDimens.SpacingMedium)
         ) {
             Text(
                 "Name",
@@ -599,8 +590,8 @@ private fun UserRow(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(AdminDimens.SpacingMedium),
-        horizontalArrangement = Arrangement.spacedBy(AdminDimens.SpacingMedium),
+            .padding(UIDimens.SpacingMedium),
+        horizontalArrangement = Arrangement.spacedBy(UIDimens.SpacingMedium),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(user.name, modifier = Modifier.weight(0.25f))
@@ -630,7 +621,7 @@ private fun UserRow(
 
         Row(
             modifier = Modifier.weight(0.1f),
-            horizontalArrangement = Arrangement.spacedBy(AdminDimens.SpacingSmall)
+            horizontalArrangement = Arrangement.spacedBy(UIDimens.SpacingSmall)
         ) {
             IconButton(onClick = onEdit) {
                 Icon(
@@ -661,7 +652,7 @@ fun AnalyticsTab(
     val statistics = uiState.statistics
 
     Column(
-        modifier = Modifier.fillMaxSize().padding(AdminDimens.SpacingLarge)
+        modifier = Modifier.fillMaxSize().padding(UIDimens.SpacingLarge)
     ) {
         // Header
         Text(
@@ -674,16 +665,16 @@ fun AnalyticsTab(
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
 
-        Spacer(modifier = Modifier.height(AdminDimens.SpacingXLarge))
+        Spacer(modifier = Modifier.height(UIDimens.SpacingXLarge))
 
         StatisticsCards(statistics = statistics)
 
-        Spacer(modifier = Modifier.height(AdminDimens.SpacingLarge))
+        Spacer(modifier = Modifier.height(UIDimens.SpacingLarge))
 
         // Charts Section
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(AdminDimens.SpacingMedium)
+            horizontalArrangement = Arrangement.spacedBy(UIDimens.SpacingMedium)
         ) {
             // Verification Trends Chart
             VerificationTrendsChart(modifier = Modifier.weight(1f))
@@ -692,7 +683,7 @@ fun AnalyticsTab(
             SuccessRateChart(modifier = Modifier.weight(1f))
         }
 
-        Spacer(modifier = Modifier.height(AdminDimens.SpacingMedium))
+        Spacer(modifier = Modifier.height(UIDimens.SpacingMedium))
 
         // Recent Verifications
         RecentVerificationsCard()
@@ -733,7 +724,7 @@ private fun StatisticsCards(
 
     Row(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(AdminDimens.SpacingMedium)
+        horizontalArrangement = Arrangement.spacedBy(UIDimens.SpacingMedium)
     ) {
         statCards.forEach { data ->
             StatCard(
@@ -763,14 +754,14 @@ fun StatCard(
 ) {
     Card(modifier = modifier) {
         Row(
-            modifier = Modifier.padding(AdminDimens.SpacingMedium),
-            horizontalArrangement = Arrangement.spacedBy(AdminDimens.SpacingMedium),
+            modifier = Modifier.padding(UIDimens.SpacingMedium),
+            horizontalArrangement = Arrangement.spacedBy(UIDimens.SpacingMedium),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
                 imageVector = data.icon,
                 contentDescription = data.title,
-                modifier = Modifier.size(AdminDimens.IconMedium),
+                modifier = Modifier.size(UIDimens.IconLarge),
                 tint = MaterialTheme.colorScheme.primary
             )
 
@@ -800,7 +791,7 @@ private fun VerificationTrendsChart(modifier: Modifier = Modifier) {
         shape = RoundedCornerShape(16.dp)
     ) {
         Column(
-            modifier = Modifier.fillMaxSize().padding(AdminDimens.SpacingLarge)
+            modifier = Modifier.fillMaxSize().padding(UIDimens.SpacingLarge)
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -826,7 +817,7 @@ private fun VerificationTrendsChart(modifier: Modifier = Modifier) {
                 )
             }
 
-            Spacer(modifier = Modifier.height(AdminDimens.SpacingMedium))
+            Spacer(modifier = Modifier.height(UIDimens.SpacingMedium))
 
             // Beautiful bar chart
             val dailyData = listOf(45, 68, 52, 78, 85, 72, 90)
@@ -887,7 +878,7 @@ private fun SuccessRateChart(modifier: Modifier = Modifier) {
         shape = RoundedCornerShape(16.dp)
     ) {
         Column(
-            modifier = Modifier.fillMaxSize().padding(AdminDimens.SpacingLarge),
+            modifier = Modifier.fillMaxSize().padding(UIDimens.SpacingLarge),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Row(
@@ -997,7 +988,7 @@ private fun RecentVerificationsCard() {
         shape = RoundedCornerShape(16.dp)
     ) {
         Column(
-            modifier = Modifier.fillMaxWidth().padding(AdminDimens.SpacingLarge)
+            modifier = Modifier.fillMaxWidth().padding(UIDimens.SpacingLarge)
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -1017,7 +1008,7 @@ private fun RecentVerificationsCard() {
                 )
             }
 
-            Spacer(modifier = Modifier.height(AdminDimens.SpacingMedium))
+            Spacer(modifier = Modifier.height(UIDimens.SpacingMedium))
 
             // Recent items
             val recentVerifications = listOf(
@@ -1030,7 +1021,7 @@ private fun RecentVerificationsCard() {
 
             recentVerifications.forEach { (name, time, success) ->
                 Row(
-                    modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+                    modifier = Modifier.fillMaxWidth().padding(vertical = UIDimens.SpacingSmall),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -1080,7 +1071,7 @@ private fun RecentVerificationsCard() {
 @Composable
 fun SecurityTab() {
     Column(
-        modifier = Modifier.fillMaxSize().padding(AdminDimens.SpacingLarge)
+        modifier = Modifier.fillMaxSize().padding(UIDimens.SpacingLarge)
     ) {
         // Header
         Text(
@@ -1093,12 +1084,12 @@ fun SecurityTab() {
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
 
-        Spacer(modifier = Modifier.height(AdminDimens.SpacingLarge))
+        Spacer(modifier = Modifier.height(UIDimens.SpacingLarge))
 
         // Security Alerts Row
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(AdminDimens.SpacingMedium)
+            horizontalArrangement = Arrangement.spacedBy(UIDimens.SpacingMedium)
         ) {
             SecurityAlertCard(
                 title = "Security Alerts",
@@ -1123,7 +1114,7 @@ fun SecurityTab() {
             )
         }
 
-        Spacer(modifier = Modifier.height(AdminDimens.SpacingLarge))
+        Spacer(modifier = Modifier.height(UIDimens.SpacingLarge))
 
         // Audit Logs Timeline
         AuditLogsTimeline()
@@ -1156,7 +1147,7 @@ private fun SecurityAlertCard(
                         )
                     )
                 )
-                .padding(AdminDimens.SpacingLarge)
+                .padding(UIDimens.SpacingLarge)
         ) {
             Column(
                 modifier = Modifier.fillMaxSize(),
@@ -1196,7 +1187,7 @@ private fun AuditLogsTimeline() {
         shape = RoundedCornerShape(16.dp)
     ) {
         Column(
-            modifier = Modifier.fillMaxSize().padding(AdminDimens.SpacingLarge)
+            modifier = Modifier.fillMaxSize().padding(UIDimens.SpacingLarge)
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -1229,12 +1220,12 @@ private fun AuditLogsTimeline() {
                 }
             }
 
-            Spacer(modifier = Modifier.height(AdminDimens.SpacingLarge))
+            Spacer(modifier = Modifier.height(UIDimens.SpacingLarge))
 
             // Timeline items
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.spacedBy(AdminDimens.SpacingMedium)
+                verticalArrangement = Arrangement.spacedBy(UIDimens.SpacingMedium)
             ) {
                 val auditLogs = listOf(
                     AuditLogItem("Admin Login", "admin@fivucsas.com", "5 mins ago", "success"),
@@ -1351,7 +1342,7 @@ fun SettingsTab() {
     var selectedSettingsSection by remember { mutableStateOf(SettingsSection.PROFILE) }
     
     Column(
-        modifier = Modifier.fillMaxSize().padding(AdminDimens.SpacingLarge)
+        modifier = Modifier.fillMaxSize().padding(UIDimens.SpacingLarge)
     ) {
         // Header
         Text(
@@ -1364,11 +1355,11 @@ fun SettingsTab() {
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
 
-        Spacer(modifier = Modifier.height(AdminDimens.SpacingXLarge))
+        Spacer(modifier = Modifier.height(UIDimens.SpacingXLarge))
 
         Row(
             modifier = Modifier.fillMaxSize(),
-            horizontalArrangement = Arrangement.spacedBy(AdminDimens.SpacingLarge)
+            horizontalArrangement = Arrangement.spacedBy(UIDimens.SpacingLarge)
         ) {
             // Settings Navigation
             SettingsNavigation(
@@ -1383,7 +1374,7 @@ fun SettingsTab() {
                 shape = RoundedCornerShape(16.dp)
             ) {
                 Column(
-                    modifier = Modifier.fillMaxSize().padding(AdminDimens.SpacingLarge)
+                    modifier = Modifier.fillMaxSize().padding(UIDimens.SpacingLarge)
                 ) {
                     when (selectedSettingsSection) {
                         SettingsSection.PROFILE -> ProfileSettings()
@@ -1422,7 +1413,7 @@ private fun SettingsNavigation(
 ) {
     Column(
         modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(AdminDimens.SpacingSmall)
+        verticalArrangement = Arrangement.spacedBy(UIDimens.SpacingSmall)
     ) {
         SettingsSection.values().forEach { section ->
             SettingsNavigationItem(
@@ -1448,11 +1439,11 @@ private fun SettingsNavigationItem(
         shape = RoundedCornerShape(12.dp),
         color = if (isSelected) MaterialTheme.colorScheme.primaryContainer 
                 else MaterialTheme.colorScheme.surface,
-        tonalElevation = if (isSelected) 2.dp else 0.dp
+        tonalElevation = if (isSelected) UIDimens.ElevationLow else 0.dp
     ) {
         Row(
-            modifier = Modifier.padding(AdminDimens.SpacingMedium),
-            horizontalArrangement = Arrangement.spacedBy(AdminDimens.SpacingMedium),
+            modifier = Modifier.padding(UIDimens.SpacingMedium),
+            horizontalArrangement = Arrangement.spacedBy(UIDimens.SpacingMedium),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
@@ -1483,7 +1474,7 @@ private fun ProfileSettings() {
     
     Column(
         modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.spacedBy(AdminDimens.SpacingLarge)
+        verticalArrangement = Arrangement.spacedBy(UIDimens.SpacingLarge)
     ) {
         Text(
             "Profile Settings",
@@ -1494,7 +1485,7 @@ private fun ProfileSettings() {
         // Profile Picture
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(AdminDimens.SpacingLarge)
+            horizontalArrangement = Arrangement.spacedBy(UIDimens.SpacingLarge)
         ) {
             Box(
                 modifier = Modifier
@@ -1565,7 +1556,7 @@ private fun ProfileSettings() {
             OutlinedButton(onClick = { }) {
                 Text("Cancel")
             }
-            Spacer(Modifier.width(AdminDimens.SpacingMedium))
+            Spacer(Modifier.width(UIDimens.SpacingMedium))
             Button(onClick = { }) {
                 Text("Save Changes")
             }
@@ -1586,7 +1577,7 @@ private fun SecuritySettings() {
     
     Column(
         modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.spacedBy(AdminDimens.SpacingLarge)
+        verticalArrangement = Arrangement.spacedBy(UIDimens.SpacingLarge)
     ) {
         Text(
             "Security Settings",
@@ -1600,8 +1591,8 @@ private fun SecuritySettings() {
             shape = RoundedCornerShape(12.dp)
         ) {
             Column(
-                modifier = Modifier.padding(AdminDimens.SpacingLarge),
-                verticalArrangement = Arrangement.spacedBy(AdminDimens.SpacingMedium)
+                modifier = Modifier.padding(UIDimens.SpacingLarge),
+                verticalArrangement = Arrangement.spacedBy(UIDimens.SpacingMedium)
             ) {
                 Text(
                     "Change Password",
@@ -1648,7 +1639,7 @@ private fun SecuritySettings() {
             shape = RoundedCornerShape(12.dp)
         ) {
             Row(
-                modifier = Modifier.padding(AdminDimens.SpacingLarge).fillMaxWidth(),
+                modifier = Modifier.padding(UIDimens.SpacingLarge).fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -1677,8 +1668,8 @@ private fun SecuritySettings() {
             shape = RoundedCornerShape(12.dp)
         ) {
             Column(
-                modifier = Modifier.padding(AdminDimens.SpacingLarge),
-                verticalArrangement = Arrangement.spacedBy(AdminDimens.SpacingMedium)
+                modifier = Modifier.padding(UIDimens.SpacingLarge),
+                verticalArrangement = Arrangement.spacedBy(UIDimens.SpacingMedium)
             ) {
                 Text(
                     "Session Timeout",
@@ -1719,7 +1710,7 @@ private fun BiometricSettings() {
     
     Column(
         modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.spacedBy(AdminDimens.SpacingLarge)
+        verticalArrangement = Arrangement.spacedBy(UIDimens.SpacingLarge)
     ) {
         Text(
             "Biometric Settings",
@@ -1733,8 +1724,8 @@ private fun BiometricSettings() {
             shape = RoundedCornerShape(12.dp)
         ) {
             Column(
-                modifier = Modifier.padding(AdminDimens.SpacingLarge),
-                verticalArrangement = Arrangement.spacedBy(AdminDimens.SpacingMedium)
+                modifier = Modifier.padding(UIDimens.SpacingLarge),
+                verticalArrangement = Arrangement.spacedBy(UIDimens.SpacingMedium)
             ) {
                 Text(
                     "Face Match Threshold",
@@ -1767,8 +1758,8 @@ private fun BiometricSettings() {
             shape = RoundedCornerShape(12.dp)
         ) {
             Column(
-                modifier = Modifier.padding(AdminDimens.SpacingLarge),
-                verticalArrangement = Arrangement.spacedBy(AdminDimens.SpacingMedium)
+                modifier = Modifier.padding(UIDimens.SpacingLarge),
+                verticalArrangement = Arrangement.spacedBy(UIDimens.SpacingMedium)
             ) {
                 Text(
                     "Liveness Detection Threshold",
@@ -1801,8 +1792,8 @@ private fun BiometricSettings() {
             shape = RoundedCornerShape(12.dp)
         ) {
             Column(
-                modifier = Modifier.padding(AdminDimens.SpacingLarge),
-                verticalArrangement = Arrangement.spacedBy(AdminDimens.SpacingMedium)
+                modifier = Modifier.padding(UIDimens.SpacingLarge),
+                verticalArrangement = Arrangement.spacedBy(UIDimens.SpacingMedium)
             ) {
                 Text(
                     "Image Quality Threshold",
@@ -1828,8 +1819,8 @@ private fun BiometricSettings() {
             shape = RoundedCornerShape(12.dp)
         ) {
             Column(
-                modifier = Modifier.padding(AdminDimens.SpacingLarge),
-                verticalArrangement = Arrangement.spacedBy(AdminDimens.SpacingMedium)
+                modifier = Modifier.padding(UIDimens.SpacingLarge),
+                verticalArrangement = Arrangement.spacedBy(UIDimens.SpacingMedium)
             ) {
                 Text(
                     "Maximum Retry Attempts",
@@ -1859,7 +1850,7 @@ private fun BiometricSettings() {
             OutlinedButton(onClick = { }) {
                 Text("Reset to Defaults")
             }
-            Spacer(Modifier.width(AdminDimens.SpacingMedium))
+            Spacer(Modifier.width(UIDimens.SpacingMedium))
             Button(onClick = { }) {
                 Text("Save Settings")
             }
@@ -1880,7 +1871,7 @@ private fun SystemSettings() {
     
     Column(
         modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.spacedBy(AdminDimens.SpacingLarge)
+        verticalArrangement = Arrangement.spacedBy(UIDimens.SpacingLarge)
     ) {
         Text(
             "System Settings",
@@ -1894,8 +1885,8 @@ private fun SystemSettings() {
             shape = RoundedCornerShape(12.dp)
         ) {
             Column(
-                modifier = Modifier.padding(AdminDimens.SpacingLarge),
-                verticalArrangement = Arrangement.spacedBy(AdminDimens.SpacingMedium)
+                modifier = Modifier.padding(UIDimens.SpacingLarge),
+                verticalArrangement = Arrangement.spacedBy(UIDimens.SpacingMedium)
             ) {
                 Text(
                     "API Configuration",
@@ -1925,8 +1916,8 @@ private fun SystemSettings() {
             shape = RoundedCornerShape(12.dp)
         ) {
             Column(
-                modifier = Modifier.padding(AdminDimens.SpacingLarge),
-                verticalArrangement = Arrangement.spacedBy(AdminDimens.SpacingMedium)
+                modifier = Modifier.padding(UIDimens.SpacingLarge),
+                verticalArrangement = Arrangement.spacedBy(UIDimens.SpacingMedium)
             ) {
                 Text(
                     "Logging Configuration",
@@ -1971,8 +1962,8 @@ private fun SystemSettings() {
             shape = RoundedCornerShape(12.dp)
         ) {
             Column(
-                modifier = Modifier.padding(AdminDimens.SpacingLarge),
-                verticalArrangement = Arrangement.spacedBy(AdminDimens.SpacingMedium)
+                modifier = Modifier.padding(UIDimens.SpacingLarge),
+                verticalArrangement = Arrangement.spacedBy(UIDimens.SpacingMedium)
             ) {
                 Text(
                     "Performance Configuration",
@@ -2020,7 +2011,7 @@ private fun NotificationSettings() {
     
     Column(
         modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.spacedBy(AdminDimens.SpacingLarge)
+        verticalArrangement = Arrangement.spacedBy(UIDimens.SpacingLarge)
     ) {
         Text(
             "Notification Settings",
@@ -2033,8 +2024,8 @@ private fun NotificationSettings() {
             shape = RoundedCornerShape(12.dp)
         ) {
             Column(
-                modifier = Modifier.padding(AdminDimens.SpacingLarge),
-                verticalArrangement = Arrangement.spacedBy(AdminDimens.SpacingLarge)
+                modifier = Modifier.padding(UIDimens.SpacingLarge),
+                verticalArrangement = Arrangement.spacedBy(UIDimens.SpacingLarge)
             ) {
                 Text(
                     "Email Notifications",
@@ -2156,7 +2147,7 @@ private fun AppearanceSettings() {
     
     Column(
         modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.spacedBy(AdminDimens.SpacingLarge)
+        verticalArrangement = Arrangement.spacedBy(UIDimens.SpacingLarge)
     ) {
         Text(
             "Appearance Settings",
@@ -2169,8 +2160,8 @@ private fun AppearanceSettings() {
             shape = RoundedCornerShape(12.dp)
         ) {
             Column(
-                modifier = Modifier.padding(AdminDimens.SpacingLarge),
-                verticalArrangement = Arrangement.spacedBy(AdminDimens.SpacingLarge)
+                modifier = Modifier.padding(UIDimens.SpacingLarge),
+                verticalArrangement = Arrangement.spacedBy(UIDimens.SpacingLarge)
             ) {
                 Text(
                     "Theme",
@@ -2208,8 +2199,8 @@ private fun AppearanceSettings() {
             shape = RoundedCornerShape(12.dp)
         ) {
             Column(
-                modifier = Modifier.padding(AdminDimens.SpacingLarge),
-                verticalArrangement = Arrangement.spacedBy(AdminDimens.SpacingLarge)
+                modifier = Modifier.padding(UIDimens.SpacingLarge),
+                verticalArrangement = Arrangement.spacedBy(UIDimens.SpacingLarge)
             ) {
                 Text(
                     "Display Options",
@@ -2265,22 +2256,22 @@ private fun PlaceholderCard(
 ) {
     Card(modifier = Modifier.fillMaxSize()) {
         Column(
-            modifier = Modifier.fillMaxSize().padding(AdminDimens.SpacingLarge),
+            modifier = Modifier.fillMaxSize().padding(UIDimens.SpacingLarge),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
             Icon(
                 icon,
                 contentDescription = title,
-                modifier = Modifier.size(AdminDimens.IconSize),
+                modifier = Modifier.size(UIDimens.IconXLarge),
                 tint = MaterialTheme.colorScheme.primary
             )
-            Spacer(modifier = Modifier.height(AdminDimens.SpacingMedium))
+            Spacer(modifier = Modifier.height(UIDimens.SpacingMedium))
             Text(
                 title,
                 style = MaterialTheme.typography.titleLarge
             )
-            Spacer(modifier = Modifier.height(AdminDimens.SpacingSmall))
+            Spacer(modifier = Modifier.height(UIDimens.SpacingSmall))
             Text(
                 description,
                 style = MaterialTheme.typography.bodyMedium,
