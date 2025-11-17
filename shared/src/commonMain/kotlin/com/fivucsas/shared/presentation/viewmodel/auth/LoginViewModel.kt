@@ -1,7 +1,7 @@
-package com.fivucsas.mobile.presentation.login
+package com.fivucsas.shared.presentation.viewmodel.auth
 
-import com.fivucsas.mobile.domain.model.User
-import com.fivucsas.mobile.domain.usecase.LoginUseCase
+import com.fivucsas.shared.domain.model.User
+import com.fivucsas.shared.domain.usecase.auth.LoginUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

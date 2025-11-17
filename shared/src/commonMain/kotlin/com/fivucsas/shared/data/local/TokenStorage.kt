@@ -1,4 +1,4 @@
-package com.fivucsas.mobile.data.local
+package com.fivucsas.shared.data.local
 
 interface TokenStorage {
     fun saveToken(token: String)

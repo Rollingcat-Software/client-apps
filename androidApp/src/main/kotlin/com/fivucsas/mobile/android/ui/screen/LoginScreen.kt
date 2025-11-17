@@ -26,8 +26,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
-import com.fivucsas.mobile.domain.model.User
-import com.fivucsas.mobile.presentation.login.LoginViewModel
+import com.fivucsas.shared.domain.model.User
+import com.fivucsas.shared.presentation.viewmodel.auth.LoginViewModel
 import kotlinx.coroutines.launch
 
 @Composable

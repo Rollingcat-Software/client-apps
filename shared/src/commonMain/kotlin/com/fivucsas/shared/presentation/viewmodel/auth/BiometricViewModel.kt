@@ -1,8 +1,8 @@
-package com.fivucsas.mobile.presentation.biometric
+package com.fivucsas.shared.presentation.viewmodel.auth
 
-import com.fivucsas.mobile.domain.model.BiometricResult
-import com.fivucsas.mobile.domain.usecase.EnrollFaceUseCase
-import com.fivucsas.mobile.domain.usecase.VerifyFaceUseCase
+import com.fivucsas.shared.domain.model.BiometricData
+import com.fivucsas.shared.domain.usecase.enrollment.EnrollUserUseCase
+import com.fivucsas.shared.domain.usecase.verification.VerifyUserUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

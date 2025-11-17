@@ -1,10 +1,10 @@
-package com.fivucsas.mobile.platform
+package com.fivucsas.shared.platform
 
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
-import com.fivucsas.mobile.data.local.TokenStorage
+import com.fivucsas.shared.data.local.TokenStorage
 
 class AndroidTokenStorage(context: Context) : TokenStorage {
 
