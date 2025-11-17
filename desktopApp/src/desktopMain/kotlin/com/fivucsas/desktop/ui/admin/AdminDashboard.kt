@@ -83,7 +83,9 @@ import androidx.compose.material.icons.filled.Badge
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.Fingerprint
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.shape.CircleShape
 
 /**
  * Admin Dashboard
@@ -1346,21 +1348,909 @@ private fun AuditLogRow(
  */
 @Composable
 fun SettingsTab() {
+    var selectedSettingsSection by remember { mutableStateOf(SettingsSection.PROFILE) }
+    
     Column(
         modifier = Modifier.fillMaxSize().padding(AdminDimens.SpacingLarge)
     ) {
+        // Header
         Text(
             AdminConfig.SETTINGS_TITLE,
             style = MaterialTheme.typography.displaySmall
         )
-
-        Spacer(modifier = Modifier.height(AdminDimens.SpacingLarge))
-
-        PlaceholderCard(
-            icon = Icons.Default.Settings,
-            title = "System Configuration",
-            description = "Biometric thresholds, detection settings, API configurations, and system parameters"
+        Text(
+            "Configure system and user preferences",
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
         )
+
+        Spacer(modifier = Modifier.height(AdminDimens.SpacingXLarge))
+
+        Row(
+            modifier = Modifier.fillMaxSize(),
+            horizontalArrangement = Arrangement.spacedBy(AdminDimens.SpacingLarge)
+        ) {
+            // Settings Navigation
+            SettingsNavigation(
+                selectedSection = selectedSettingsSection,
+                onSectionSelected = { selectedSettingsSection = it },
+                modifier = Modifier.width(200.dp)
+            )
+
+            // Settings Content
+            Card(
+                modifier = Modifier.weight(1f).fillMaxHeight(),
+                shape = RoundedCornerShape(16.dp)
+            ) {
+                Column(
+                    modifier = Modifier.fillMaxSize().padding(AdminDimens.SpacingLarge)
+                ) {
+                    when (selectedSettingsSection) {
+                        SettingsSection.PROFILE -> ProfileSettings()
+                        SettingsSection.SECURITY -> SecuritySettings()
+                        SettingsSection.BIOMETRIC -> BiometricSettings()
+                        SettingsSection.SYSTEM -> SystemSettings()
+                        SettingsSection.NOTIFICATIONS -> NotificationSettings()
+                        SettingsSection.APPEARANCE -> AppearanceSettings()
+                    }
+                }
+            }
+        }
+    }
+}
+
+/**
+ * Settings Sections Enum
+ */
+enum class SettingsSection(val title: String, val icon: androidx.compose.ui.graphics.vector.ImageVector) {
+    PROFILE("Profile", Icons.Default.Person),
+    SECURITY("Security", Icons.Default.Security),
+    BIOMETRIC("Biometric", Icons.Default.Fingerprint),
+    SYSTEM("System", Icons.Default.Settings),
+    NOTIFICATIONS("Notifications", Icons.Default.Email),
+    APPEARANCE("Appearance", Icons.Default.Edit)
+}
+
+/**
+ * Settings Navigation Component
+ */
+@Composable
+private fun SettingsNavigation(
+    selectedSection: SettingsSection,
+    onSectionSelected: (SettingsSection) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(AdminDimens.SpacingSmall)
+    ) {
+        SettingsSection.values().forEach { section ->
+            SettingsNavigationItem(
+                section = section,
+                isSelected = selectedSection == section,
+                onClick = { onSectionSelected(section) }
+            )
+        }
+    }
+}
+
+/**
+ * Settings Navigation Item
+ */
+@Composable
+private fun SettingsNavigationItem(
+    section: SettingsSection,
+    isSelected: Boolean,
+    onClick: () -> Unit
+) {
+    Surface(
+        modifier = Modifier.fillMaxWidth().clickable(onClick = onClick),
+        shape = RoundedCornerShape(12.dp),
+        color = if (isSelected) MaterialTheme.colorScheme.primaryContainer 
+                else MaterialTheme.colorScheme.surface,
+        tonalElevation = if (isSelected) 2.dp else 0.dp
+    ) {
+        Row(
+            modifier = Modifier.padding(AdminDimens.SpacingMedium),
+            horizontalArrangement = Arrangement.spacedBy(AdminDimens.SpacingMedium),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                section.icon,
+                contentDescription = null,
+                tint = if (isSelected) MaterialTheme.colorScheme.primary
+                       else MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Text(
+                section.title,
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                color = if (isSelected) MaterialTheme.colorScheme.primary
+                        else MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+    }
+}
+
+/**
+ * Profile Settings
+ */
+@Composable
+private fun ProfileSettings() {
+    var fullName by remember { mutableStateOf("Admin User") }
+    var email by remember { mutableStateOf("admin@fivucsas.com") }
+    var role by remember { mutableStateOf("System Administrator") }
+    
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.spacedBy(AdminDimens.SpacingLarge)
+    ) {
+        Text(
+            "Profile Settings",
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.Bold
+        )
+
+        // Profile Picture
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(AdminDimens.SpacingLarge)
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(80.dp)
+                    .background(
+                        brush = Brush.verticalGradient(
+                            colors = listOf(Color(0xFF2196F3), Color(0xFF1976D2))
+                        ),
+                        shape = CircleShape
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    "AU",
+                    style = MaterialTheme.typography.headlineMedium,
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+            Column {
+                Button(onClick = { }) {
+                    Icon(Icons.Default.Edit, contentDescription = null, modifier = Modifier.size(16.dp))
+                    Spacer(Modifier.width(8.dp))
+                    Text("Change Photo")
+                }
+                Spacer(Modifier.height(8.dp))
+                OutlinedButton(onClick = { }) {
+                    Text("Remove")
+                }
+            }
+        }
+
+        Divider()
+
+        // Profile Information
+        OutlinedTextField(
+            value = fullName,
+            onValueChange = { fullName = it },
+            label = { Text("Full Name") },
+            leadingIcon = { Icon(Icons.Default.Person, contentDescription = null) },
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        OutlinedTextField(
+            value = email,
+            onValueChange = { email = it },
+            label = { Text("Email Address") },
+            leadingIcon = { Icon(Icons.Default.Email, contentDescription = null) },
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        OutlinedTextField(
+            value = role,
+            onValueChange = { },
+            label = { Text("Role") },
+            leadingIcon = { Icon(Icons.Default.Badge, contentDescription = null) },
+            enabled = false,
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        Spacer(Modifier.weight(1f))
+
+        // Save Button
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.End
+        ) {
+            OutlinedButton(onClick = { }) {
+                Text("Cancel")
+            }
+            Spacer(Modifier.width(AdminDimens.SpacingMedium))
+            Button(onClick = { }) {
+                Text("Save Changes")
+            }
+        }
+    }
+}
+
+/**
+ * Security Settings
+ */
+@Composable
+private fun SecuritySettings() {
+    var currentPassword by remember { mutableStateOf("") }
+    var newPassword by remember { mutableStateOf("") }
+    var confirmPassword by remember { mutableStateOf("") }
+    var twoFactorEnabled by remember { mutableStateOf(false) }
+    var sessionTimeout by remember { mutableStateOf(30) }
+    
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.spacedBy(AdminDimens.SpacingLarge)
+    ) {
+        Text(
+            "Security Settings",
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.Bold
+        )
+
+        // Password Change
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(12.dp)
+        ) {
+            Column(
+                modifier = Modifier.padding(AdminDimens.SpacingLarge),
+                verticalArrangement = Arrangement.spacedBy(AdminDimens.SpacingMedium)
+            ) {
+                Text(
+                    "Change Password",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
+                )
+                
+                OutlinedTextField(
+                    value = currentPassword,
+                    onValueChange = { currentPassword = it },
+                    label = { Text("Current Password") },
+                    leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null) },
+                    modifier = Modifier.fillMaxWidth()
+                )
+                
+                OutlinedTextField(
+                    value = newPassword,
+                    onValueChange = { newPassword = it },
+                    label = { Text("New Password") },
+                    leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null) },
+                    modifier = Modifier.fillMaxWidth()
+                )
+                
+                OutlinedTextField(
+                    value = confirmPassword,
+                    onValueChange = { confirmPassword = it },
+                    label = { Text("Confirm New Password") },
+                    leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null) },
+                    modifier = Modifier.fillMaxWidth()
+                )
+                
+                Button(
+                    onClick = { },
+                    modifier = Modifier.align(Alignment.End)
+                ) {
+                    Text("Update Password")
+                }
+            }
+        }
+
+        // Two-Factor Authentication
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(12.dp)
+        ) {
+            Row(
+                modifier = Modifier.padding(AdminDimens.SpacingLarge).fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        "Two-Factor Authentication",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        "Add an extra layer of security to your account",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+                androidx.compose.material3.Switch(
+                    checked = twoFactorEnabled,
+                    onCheckedChange = { twoFactorEnabled = it }
+                )
+            }
+        }
+
+        // Session Timeout
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(12.dp)
+        ) {
+            Column(
+                modifier = Modifier.padding(AdminDimens.SpacingLarge),
+                verticalArrangement = Arrangement.spacedBy(AdminDimens.SpacingMedium)
+            ) {
+                Text(
+                    "Session Timeout",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    "Automatically log out after: $sessionTimeout minutes",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                androidx.compose.material3.Slider(
+                    value = sessionTimeout.toFloat(),
+                    onValueChange = { sessionTimeout = it.toInt() },
+                    valueRange = 5f..120f,
+                    steps = 23
+                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text("5 min", style = MaterialTheme.typography.bodySmall)
+                    Text("120 min", style = MaterialTheme.typography.bodySmall)
+                }
+            }
+        }
+    }
+}
+
+/**
+ * Biometric Settings
+ */
+@Composable
+private fun BiometricSettings() {
+    var faceMatchThreshold by remember { mutableStateOf(0.6f) }
+    var livenessThreshold by remember { mutableStateOf(0.75f) }
+    var qualityThreshold by remember { mutableStateOf(0.5f) }
+    var maxRetries by remember { mutableStateOf(3) }
+    
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.spacedBy(AdminDimens.SpacingLarge)
+    ) {
+        Text(
+            "Biometric Settings",
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.Bold
+        )
+
+        // Face Match Threshold
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(12.dp)
+        ) {
+            Column(
+                modifier = Modifier.padding(AdminDimens.SpacingLarge),
+                verticalArrangement = Arrangement.spacedBy(AdminDimens.SpacingMedium)
+            ) {
+                Text(
+                    "Face Match Threshold",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    "Minimum similarity score required for face verification: ${String.format("%.2f", faceMatchThreshold)}",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                androidx.compose.material3.Slider(
+                    value = faceMatchThreshold,
+                    onValueChange = { faceMatchThreshold = it },
+                    valueRange = 0.3f..0.9f,
+                    steps = 11
+                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text("Less Strict (0.3)", style = MaterialTheme.typography.bodySmall)
+                    Text("More Strict (0.9)", style = MaterialTheme.typography.bodySmall)
+                }
+            }
+        }
+
+        // Liveness Detection Threshold
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(12.dp)
+        ) {
+            Column(
+                modifier = Modifier.padding(AdminDimens.SpacingLarge),
+                verticalArrangement = Arrangement.spacedBy(AdminDimens.SpacingMedium)
+            ) {
+                Text(
+                    "Liveness Detection Threshold",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    "Minimum score to pass anti-spoofing check: ${String.format("%.2f", livenessThreshold)}",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                androidx.compose.material3.Slider(
+                    value = livenessThreshold,
+                    onValueChange = { livenessThreshold = it },
+                    valueRange = 0.5f..1.0f,
+                    steps = 9
+                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text("Less Strict (0.5)", style = MaterialTheme.typography.bodySmall)
+                    Text("Most Strict (1.0)", style = MaterialTheme.typography.bodySmall)
+                }
+            }
+        }
+
+        // Image Quality Threshold
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(12.dp)
+        ) {
+            Column(
+                modifier = Modifier.padding(AdminDimens.SpacingLarge),
+                verticalArrangement = Arrangement.spacedBy(AdminDimens.SpacingMedium)
+            ) {
+                Text(
+                    "Image Quality Threshold",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    "Minimum image quality for enrollment: ${String.format("%.2f", qualityThreshold)}",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                androidx.compose.material3.Slider(
+                    value = qualityThreshold,
+                    onValueChange = { qualityThreshold = it },
+                    valueRange = 0.3f..0.8f,
+                    steps = 9
+                )
+            }
+        }
+
+        // Max Retry Attempts
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(12.dp)
+        ) {
+            Column(
+                modifier = Modifier.padding(AdminDimens.SpacingLarge),
+                verticalArrangement = Arrangement.spacedBy(AdminDimens.SpacingMedium)
+            ) {
+                Text(
+                    "Maximum Retry Attempts",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    "Number of retries allowed for failed verification: $maxRetries",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                androidx.compose.material3.Slider(
+                    value = maxRetries.toFloat(),
+                    onValueChange = { maxRetries = it.toInt() },
+                    valueRange = 1f..5f,
+                    steps = 3
+                )
+            }
+        }
+
+        Spacer(Modifier.weight(1f))
+
+        // Save Button
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.End
+        ) {
+            OutlinedButton(onClick = { }) {
+                Text("Reset to Defaults")
+            }
+            Spacer(Modifier.width(AdminDimens.SpacingMedium))
+            Button(onClick = { }) {
+                Text("Save Settings")
+            }
+        }
+    }
+}
+
+/**
+ * System Settings
+ */
+@Composable
+private fun SystemSettings() {
+    var apiUrl by remember { mutableStateOf("http://localhost:8080") }
+    var biometricServiceUrl by remember { mutableStateOf("http://localhost:8001") }
+    var enableLogging by remember { mutableStateOf(true) }
+    var logLevel by remember { mutableStateOf("INFO") }
+    var maxConcurrentJobs by remember { mutableStateOf(10) }
+    
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.spacedBy(AdminDimens.SpacingLarge)
+    ) {
+        Text(
+            "System Settings",
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.Bold
+        )
+
+        // API Configuration
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(12.dp)
+        ) {
+            Column(
+                modifier = Modifier.padding(AdminDimens.SpacingLarge),
+                verticalArrangement = Arrangement.spacedBy(AdminDimens.SpacingMedium)
+            ) {
+                Text(
+                    "API Configuration",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
+                )
+                
+                OutlinedTextField(
+                    value = apiUrl,
+                    onValueChange = { apiUrl = it },
+                    label = { Text("Identity Core API URL") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+                
+                OutlinedTextField(
+                    value = biometricServiceUrl,
+                    onValueChange = { biometricServiceUrl = it },
+                    label = { Text("Biometric Processor URL") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+        }
+
+        // Logging Configuration
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(12.dp)
+        ) {
+            Column(
+                modifier = Modifier.padding(AdminDimens.SpacingLarge),
+                verticalArrangement = Arrangement.spacedBy(AdminDimens.SpacingMedium)
+            ) {
+                Text(
+                    "Logging Configuration",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
+                )
+                
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text("Enable System Logging")
+                    androidx.compose.material3.Switch(
+                        checked = enableLogging,
+                        onCheckedChange = { enableLogging = it }
+                    )
+                }
+                
+                Text("Log Level: $logLevel", style = MaterialTheme.typography.bodyMedium)
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    listOf("DEBUG", "INFO", "WARN", "ERROR").forEach { level ->
+                        AssistChip(
+                            onClick = { logLevel = level },
+                            label = { Text(level) },
+                            colors = AssistChipDefaults.assistChipColors(
+                                containerColor = if (logLevel == level) 
+                                    MaterialTheme.colorScheme.primaryContainer 
+                                else MaterialTheme.colorScheme.surface
+                            )
+                        )
+                    }
+                }
+            }
+        }
+
+        // Performance Configuration
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(12.dp)
+        ) {
+            Column(
+                modifier = Modifier.padding(AdminDimens.SpacingLarge),
+                verticalArrangement = Arrangement.spacedBy(AdminDimens.SpacingMedium)
+            ) {
+                Text(
+                    "Performance Configuration",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    "Max Concurrent Jobs: $maxConcurrentJobs",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                androidx.compose.material3.Slider(
+                    value = maxConcurrentJobs.toFloat(),
+                    onValueChange = { maxConcurrentJobs = it.toInt() },
+                    valueRange = 1f..50f,
+                    steps = 48
+                )
+            }
+        }
+
+        Spacer(Modifier.weight(1f))
+
+        // Save Button
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.End
+        ) {
+            Button(onClick = { }) {
+                Text("Save System Settings")
+            }
+        }
+    }
+}
+
+/**
+ * Notification Settings
+ */
+@Composable
+private fun NotificationSettings() {
+    var emailNotifications by remember { mutableStateOf(true) }
+    var loginAlerts by remember { mutableStateOf(true) }
+    var failedVerifications by remember { mutableStateOf(true) }
+    var systemAlerts by remember { mutableStateOf(true) }
+    var weeklyReport by remember { mutableStateOf(true) }
+    var monthlyReport by remember { mutableStateOf(false) }
+    
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.spacedBy(AdminDimens.SpacingLarge)
+    ) {
+        Text(
+            "Notification Settings",
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.Bold
+        )
+
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(12.dp)
+        ) {
+            Column(
+                modifier = Modifier.padding(AdminDimens.SpacingLarge),
+                verticalArrangement = Arrangement.spacedBy(AdminDimens.SpacingLarge)
+            ) {
+                Text(
+                    "Email Notifications",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
+                )
+                
+                NotificationToggle(
+                    title = "Enable Email Notifications",
+                    description = "Receive notifications via email",
+                    checked = emailNotifications,
+                    onCheckedChange = { emailNotifications = it }
+                )
+                
+                Divider()
+                
+                NotificationToggle(
+                    title = "Login Alerts",
+                    description = "Notify on new login attempts",
+                    checked = loginAlerts,
+                    onCheckedChange = { loginAlerts = it }
+                )
+                
+                NotificationToggle(
+                    title = "Failed Verifications",
+                    description = "Alert on failed biometric verifications",
+                    checked = failedVerifications,
+                    onCheckedChange = { failedVerifications = it }
+                )
+                
+                NotificationToggle(
+                    title = "System Alerts",
+                    description = "Critical system notifications",
+                    checked = systemAlerts,
+                    onCheckedChange = { systemAlerts = it }
+                )
+                
+                Divider()
+                
+                Text(
+                    "Reports",
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold
+                )
+                
+                NotificationToggle(
+                    title = "Weekly Report",
+                    description = "Summary of system activity",
+                    checked = weeklyReport,
+                    onCheckedChange = { weeklyReport = it }
+                )
+                
+                NotificationToggle(
+                    title = "Monthly Report",
+                    description = "Detailed monthly analytics",
+                    checked = monthlyReport,
+                    onCheckedChange = { monthlyReport = it }
+                )
+            }
+        }
+
+        Spacer(Modifier.weight(1f))
+
+        // Save Button
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.End
+        ) {
+            Button(onClick = { }) {
+                Text("Save Preferences")
+            }
+        }
+    }
+}
+
+/**
+ * Notification Toggle Component
+ */
+@Composable
+private fun NotificationToggle(
+    title: String,
+    description: String,
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                title,
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.Medium
+            )
+            Text(
+                description,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+        androidx.compose.material3.Switch(
+            checked = checked,
+            onCheckedChange = onCheckedChange
+        )
+    }
+}
+
+/**
+ * Appearance Settings
+ */
+@Composable
+private fun AppearanceSettings() {
+    var darkMode by remember { mutableStateOf(false) }
+    var compactView by remember { mutableStateOf(false) }
+    var showAvatars by remember { mutableStateOf(true) }
+    var animationsEnabled by remember { mutableStateOf(true) }
+    
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.spacedBy(AdminDimens.SpacingLarge)
+    ) {
+        Text(
+            "Appearance Settings",
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.Bold
+        )
+
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(12.dp)
+        ) {
+            Column(
+                modifier = Modifier.padding(AdminDimens.SpacingLarge),
+                verticalArrangement = Arrangement.spacedBy(AdminDimens.SpacingLarge)
+            ) {
+                Text(
+                    "Theme",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
+                )
+                
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column {
+                        Text(
+                            "Dark Mode",
+                            style = MaterialTheme.typography.bodyLarge,
+                            fontWeight = FontWeight.Medium
+                        )
+                        Text(
+                            "Use dark theme for the interface",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                    androidx.compose.material3.Switch(
+                        checked = darkMode,
+                        onCheckedChange = { darkMode = it }
+                    )
+                }
+            }
+        }
+
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(12.dp)
+        ) {
+            Column(
+                modifier = Modifier.padding(AdminDimens.SpacingLarge),
+                verticalArrangement = Arrangement.spacedBy(AdminDimens.SpacingLarge)
+            ) {
+                Text(
+                    "Display Options",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
+                )
+                
+                NotificationToggle(
+                    title = "Compact View",
+                    description = "Show more content with tighter spacing",
+                    checked = compactView,
+                    onCheckedChange = { compactView = it }
+                )
+                
+                NotificationToggle(
+                    title = "Show User Avatars",
+                    description = "Display avatars in user lists",
+                    checked = showAvatars,
+                    onCheckedChange = { showAvatars = it }
+                )
+                
+                NotificationToggle(
+                    title = "Enable Animations",
+                    description = "Smooth transitions and effects",
+                    checked = animationsEnabled,
+                    onCheckedChange = { animationsEnabled = it }
+                )
+            }
+        }
+
+        Spacer(Modifier.weight(1f))
+
+        // Save Button
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.End
+        ) {
+            Button(onClick = { }) {
+                Text("Apply Changes")
+            }
+        }
     }
 }
 
