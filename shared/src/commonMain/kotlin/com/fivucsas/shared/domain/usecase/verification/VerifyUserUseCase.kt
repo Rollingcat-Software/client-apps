@@ -8,12 +8,12 @@ import com.fivucsas.shared.domain.repository.BiometricRepository
 
 /**
  * Use case for verifying a user's face
- * 
+ *
  * Business logic:
  * 1. Validate face image
  * 2. Perform face verification against enrolled faces
  * 3. Return verification result with confidence score
- * 
+ *
  * Example usage:
  * ```
  * val useCase = VerifyUserUseCase(biometricRepo)
@@ -36,7 +36,7 @@ class VerifyUserUseCase(
 ) {
     /**
      * Execute face verification
-     * 
+     *
      * @param faceImage Captured face image (as byte array)
      * @return Result with verification result or error
      */
@@ -47,13 +47,13 @@ class VerifyUserUseCase(
                 ValidationException("Face image is required for verification")
             )
         }
-        
+
         if (faceImage.size > MAX_IMAGE_SIZE) {
             return Result.failure(
                 ValidationException("Face image is too large (max ${MAX_IMAGE_SIZE / 1024 / 1024}MB)")
             )
         }
-        
+
         if (faceImage.size < MIN_IMAGE_SIZE) {
             return Result.failure(
                 BiometricException(
@@ -62,11 +62,11 @@ class VerifyUserUseCase(
                 )
             )
         }
-        
+
         // Perform verification
         return biometricRepository.verifyFace(faceImage)
     }
-    
+
     companion object {
         private const val MAX_IMAGE_SIZE = 10 * 1024 * 1024 // 10 MB
         private const val MIN_IMAGE_SIZE = 10 * 1024 // 10 KB

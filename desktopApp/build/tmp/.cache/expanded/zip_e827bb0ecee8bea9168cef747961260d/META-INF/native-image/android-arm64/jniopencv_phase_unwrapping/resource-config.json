@@ -1,0 +1,8 @@
+{
+  "resources": [
+    {"pattern": "META-INF/.*"},
+    {"pattern": "org/bytedeco/javacpp/properties/.*"},
+    {"pattern": ".*/libjniopencv_phase_unwrapping.so"},
+    {"pattern": ".*/libopencv_phase_unwrapping.so"}
+  ]
+}

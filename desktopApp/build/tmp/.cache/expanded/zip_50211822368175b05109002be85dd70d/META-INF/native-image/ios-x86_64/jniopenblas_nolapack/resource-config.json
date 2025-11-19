@@ -1,0 +1,10 @@
+{
+  "resources": [
+    {"pattern": "META-INF/.*"},
+    {"pattern": "org/bytedeco/javacpp/properties/.*"},
+    {"pattern": ".*/jniopenblas_nolapack.o"},
+    {"pattern": ".*/libopenblas.a"},
+    {"pattern": ".*/include/.*"},
+    {"pattern": ".*/lib/.*"}
+  ]
+}

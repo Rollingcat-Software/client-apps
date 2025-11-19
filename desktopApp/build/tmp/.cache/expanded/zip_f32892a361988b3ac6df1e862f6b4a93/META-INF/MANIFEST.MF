@@ -1,0 +1,14 @@
+Manifest-Version: 1.0
+Implementation-Title: JavaCPP Presets Platform for FlyCapture
+Implementation-Version: 2.13.3.31-1.5.9
+Multi-Release: true
+Specification-Vendor: Bytedeco
+Specification-Title: JavaCPP Presets Platform for FlyCapture
+Class-Path: flycapture.jar flycapture-linux-x86.jar flycapture-linux-x
+ 86_64.jar flycapture-linux-armhf.jar flycapture-linux-arm64.jar flyca
+ pture-windows-x86.jar flycapture-windows-x86_64.jar
+Build-Jdk-Spec: 1.8
+Created-By: Maven Jar Plugin 3.2.0
+Specification-Version: 2.13.3.31-1.5.9
+Implementation-Vendor: Bytedeco
+

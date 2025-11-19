@@ -52,6 +52,7 @@ object UIDimens {
 
     val CardRadius: Dp = 12.dp
     val CardElevation: Dp = 4.dp
+    val CardElevationPressed: Dp = 8.dp
     val CardPadding: Dp = 16.dp
 
     val InputFieldHeight: Dp = 56.dp
@@ -89,12 +90,14 @@ object UIDimens {
     val StatisticCardHeight: Dp = 120.dp
     val NavigationRailWidth: Dp = 80.dp
     val TopBarHeight: Dp = 64.dp
+    val AppBarHeight: Dp = 64.dp  // Alias for TopBarHeight for component compatibility
     val SidebarWidth: Dp = 256.dp
 
     // ============================================
     // Border and Corner Radius
     // ============================================
 
+    val BorderWidth: Dp = 2.dp  // Default border width
     val BorderWidthThin: Dp = 1.dp
     val BorderWidthMedium: Dp = 2.dp
     val BorderWidthThick: Dp = 4.dp

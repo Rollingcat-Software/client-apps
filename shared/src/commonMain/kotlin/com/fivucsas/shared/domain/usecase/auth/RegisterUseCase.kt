@@ -1,9 +1,9 @@
 package com.fivucsas.shared.domain.usecase.auth
 
-import com.fivucsas.shared.domain.model.User
 import com.fivucsas.shared.domain.repository.AuthRepository
-import com.fivucsas.shared.domain.validation.ValidationRules
+import com.fivucsas.shared.domain.repository.AuthTokens
 import com.fivucsas.shared.domain.validation.ValidationResult
+import com.fivucsas.shared.domain.validation.ValidationRules
 
 /**
  * Register Use Case
@@ -17,7 +17,7 @@ class RegisterUseCase(private val authRepository: AuthRepository) {
         password: String,
         firstName: String,
         lastName: String
-    ): Result<User> {
+    ): Result<AuthTokens> {
         // Validate email
         val emailValidation = ValidationRules.validateEmail(email)
         if (emailValidation is ValidationResult.Error) {

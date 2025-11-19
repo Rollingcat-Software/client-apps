@@ -6,17 +6,17 @@ package com.fivucsas.shared.domain.model
  */
 sealed class LoadingState {
     data object Idle : LoadingState()
-    
+
     data class Loading(
         val progress: Float? = null,
         val message: String? = null
     ) : LoadingState()
-    
+
     data class Success<T>(
         val data: T,
         val message: String? = null
     ) : LoadingState()
-    
+
     data class Error(
         val error: AppError,
         val canRetry: Boolean = error.isRetryable

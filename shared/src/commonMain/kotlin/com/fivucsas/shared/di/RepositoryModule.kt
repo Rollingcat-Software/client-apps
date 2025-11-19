@@ -16,10 +16,10 @@ import org.koin.dsl.module
 val repositoryModule = module {
     // Auth Repository
     singleOf(::AuthRepositoryImpl) { bind<AuthRepository>() }
-    
+
     // Biometric Repository
     singleOf(::BiometricRepositoryImpl) { bind<BiometricRepository>() }
-    
+
     // User Repository
     singleOf(::UserRepositoryImpl) { bind<UserRepository>() }
 }

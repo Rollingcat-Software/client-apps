@@ -1,0 +1,10 @@
+prefix=D:/a/javacpp-presets/javacpp-presets/leptonica/cppbuild/windows-x86_64
+exec_prefix=D:/a/javacpp-presets/javacpp-presets/leptonica/cppbuild/windows-x86_64
+libdir=D:/a/javacpp-presets/javacpp-presets/leptonica/cppbuild/windows-x86_64/lib
+includedir=D:/a/javacpp-presets/javacpp-presets/leptonica/cppbuild/windows-x86_64/include
+
+Name: libturbojpeg
+Description: A SIMD-accelerated JPEG codec that provides the TurboJPEG API
+Version: 3.0.1
+Libs: -L${libdir} -lturbojpeg
+Cflags: -I${includedir}

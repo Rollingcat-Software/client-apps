@@ -1,0 +1,327 @@
+[
+  {
+    "name" : "org.bytedeco.librealsense.context"
+  },
+  {
+    "name" : "org.bytedeco.librealsense.device"
+  },
+  {
+    "name" : "org.bytedeco.librealsense.error"
+  },
+  {
+    "name" : "org.bytedeco.librealsense.extrinsics"
+  },
+  {
+    "name" : "org.bytedeco.librealsense.float2"
+  },
+  {
+    "name" : "org.bytedeco.librealsense.float3"
+  },
+  {
+    "name" : "org.bytedeco.librealsense.frame"
+  },
+  {
+    "name" : "org.bytedeco.librealsense.frame_callback"
+  },
+  {
+    "name" : "org.bytedeco.librealsense.presets.RealSense"
+  },
+  {
+    "name" : "org.bytedeco.librealsense.global.RealSense"
+  },
+  {
+    "name" : "org.bytedeco.librealsense.intrinsics"
+  },
+  {
+    "name" : "org.bytedeco.librealsense.log_callback"
+  },
+  {
+    "name" : "org.bytedeco.librealsense.motion_callback"
+  },
+  {
+    "name" : "org.bytedeco.librealsense.motion_data"
+  },
+  {
+    "name" : "org.bytedeco.librealsense.motion_intrinsics"
+  },
+  {
+    "name" : "org.bytedeco.librealsense.rs_context"
+  },
+  {
+    "name" : "org.bytedeco.librealsense.rs_device"
+  },
+  {
+    "name" : "org.bytedeco.librealsense.rs_error"
+  },
+  {
+    "name" : "org.bytedeco.librealsense.rs_extrinsics"
+  },
+  {
+    "name" : "org.bytedeco.librealsense.rs_frame_callback"
+  },
+  {
+    "name" : "org.bytedeco.librealsense.rs_frame_callback_ptr",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true,
+    "allDeclaredClasses" : true,
+    "allPublicClasses" : true
+  },
+  {
+    "name" : "org.bytedeco.librealsense.rs_frame_ref"
+  },
+  {
+    "name" : "org.bytedeco.librealsense.rs_frameset"
+  },
+  {
+    "name" : "org.bytedeco.librealsense.rs_intrinsics"
+  },
+  {
+    "name" : "org.bytedeco.librealsense.rs_log_callback"
+  },
+  {
+    "name" : "org.bytedeco.librealsense.rs_log_callback_ptr",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true,
+    "allDeclaredClasses" : true,
+    "allPublicClasses" : true
+  },
+  {
+    "name" : "org.bytedeco.librealsense.rs_motion_callback"
+  },
+  {
+    "name" : "org.bytedeco.librealsense.rs_motion_callback_ptr",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true,
+    "allDeclaredClasses" : true,
+    "allPublicClasses" : true
+  },
+  {
+    "name" : "org.bytedeco.librealsense.rs_motion_data"
+  },
+  {
+    "name" : "org.bytedeco.librealsense.rs_motion_device_intrinsic"
+  },
+  {
+    "name" : "org.bytedeco.librealsense.rs_motion_intrinsics"
+  },
+  {
+    "name" : "org.bytedeco.librealsense.rs_stream_interface"
+  },
+  {
+    "name" : "org.bytedeco.librealsense.rs_timestamp_callback"
+  },
+  {
+    "name" : "org.bytedeco.librealsense.rs_timestamp_callback_ptr",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true,
+    "allDeclaredClasses" : true,
+    "allPublicClasses" : true
+  },
+  {
+    "name" : "org.bytedeco.librealsense.rs_timestamp_data"
+  },
+  {
+    "name" : "org.bytedeco.librealsense.timestamp_callback"
+  },
+  {
+    "name" : "org.bytedeco.librealsense.timestamp_data"
+  },
+  {
+    "name" : "org.bytedeco.javacpp.Pointer",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true,
+    "allDeclaredClasses" : true,
+    "allPublicClasses" : true
+  },
+  {
+    "name" : "java.lang.String",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true,
+    "allDeclaredClasses" : true,
+    "allPublicClasses" : true
+  },
+  {
+    "name" : "org.bytedeco.javacpp.Pointer$NativeDeallocator",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true,
+    "allDeclaredClasses" : true,
+    "allPublicClasses" : true
+  },
+  {
+    "name" : "org.bytedeco.javacpp.Loader",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true,
+    "allDeclaredClasses" : true,
+    "allPublicClasses" : true
+  },
+  {
+    "name" : "java.nio.Buffer",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true,
+    "allDeclaredClasses" : true,
+    "allPublicClasses" : true
+  },
+  {
+    "name" : "java.lang.Object",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true,
+    "allDeclaredClasses" : true,
+    "allPublicClasses" : true
+  },
+  {
+    "name" : "java.nio.charset.Charset",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true,
+    "allDeclaredClasses" : true,
+    "allPublicClasses" : true
+  },
+  {
+    "name" : "java.lang.NullPointerException"
+  },
+  {
+    "name" : "java.lang.RuntimeException"
+  },
+  {
+    "name" : "org.bytedeco.javacpp.BytePointer",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true,
+    "allDeclaredClasses" : true,
+    "allPublicClasses" : true
+  },
+  {
+    "name" : "org.bytedeco.librealsense.presets.RealSense$LogCallbackFunction",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true,
+    "allDeclaredClasses" : true,
+    "allPublicClasses" : true
+  },
+  {
+    "name" : "org.bytedeco.librealsense.presets.RealSense$TimestampFunction",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true,
+    "allDeclaredClasses" : true,
+    "allPublicClasses" : true
+  },
+  {
+    "name" : "org.bytedeco.librealsense.presets.RealSense$FrameFunction",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true,
+    "allDeclaredClasses" : true,
+    "allPublicClasses" : true
+  },
+  {
+    "name" : "org.bytedeco.librealsense.presets.RealSense$MotionFunction",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true,
+    "allDeclaredClasses" : true,
+    "allPublicClasses" : true
+  },
+  {
+    "name" : "org.bytedeco.librealsense.rs_device$On_event_rs_device_rs_timestamp_data_Pointer",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true,
+    "allDeclaredClasses" : true,
+    "allPublicClasses" : true
+  },
+  {
+    "name" : "org.bytedeco.librealsense.rs_device$On_event_rs_device_rs_motion_data_Pointer",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true,
+    "allDeclaredClasses" : true,
+    "allPublicClasses" : true
+  },
+  {
+    "name" : "org.bytedeco.librealsense.rs_device$On_frame_rs_device_rs_frame_ref_Pointer",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true,
+    "allDeclaredClasses" : true,
+    "allPublicClasses" : true
+  },
+  {
+    "name" : "org.bytedeco.javacpp.FloatPointer",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true,
+    "allDeclaredClasses" : true,
+    "allPublicClasses" : true
+  }
+]

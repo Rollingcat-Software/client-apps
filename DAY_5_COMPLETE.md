@@ -11,11 +11,13 @@
 ## 🎉 What We Achieved
 
 ### 1. Added Koin Dependencies ✅
+
 - ✅ Koin Core 3.5.0 (commonMain)
 - ✅ Koin Compose 1.1.0 (commonMain + desktop)
 - ✅ Koin Android 3.5.0 (androidMain)
 
 ### 2. Created 5 DI Modules ✅
+
 - ✅ `NetworkModule.kt` - HTTP client configuration
 - ✅ `RepositoryModule.kt` - Repository implementations
 - ✅ `UseCaseModule.kt` - Business logic use cases (9 use cases)
@@ -23,16 +25,19 @@
 - ✅ `AppModule.kt` - Main module combining all modules
 
 ### 3. Platform Initialization ✅
+
 - ✅ Desktop: `Main.kt` with `startKoin`
 - ✅ Android: `FIVUCSASApplication.kt` with Android context
 - ✅ iOS: `KoinHelper.kt` for future iOS integration
 
 ### 4. Removed Manual Factory ✅
+
 - ✅ Deleted `ViewModelFactory.kt` (no longer needed!)
 - ✅ Updated `KioskMode.kt` to use `koinInject()`
 - ✅ Updated `AdminDashboard.kt` to use `koinInject()`
 
 ### 5. Verified Everything Works ✅
+
 - ✅ Shared module builds successfully
 - ✅ Desktop app builds successfully
 - ✅ Desktop app runs successfully
@@ -44,6 +49,7 @@
 ## 📊 Before vs After
 
 ### Before Day 5 ❌
+
 ```kotlin
 // Manual factory - verbose, error-prone
 object ViewModelFactory {
@@ -66,6 +72,7 @@ fun KioskMode() {
 ```
 
 ### After Day 5 ✅
+
 ```kotlin
 // Koin modules - clean, automatic
 val appModule = module {
@@ -137,13 +144,16 @@ shared/src/iosMain/kotlin/com/fivucsas/shared/di/
 ## 🎯 What Day 5 Unlocks
 
 ### 1. Automatic Dependency Management ✨
+
 No more manual wiring! Koin handles everything:
+
 ```kotlin
 // Before: 20 lines of manual dependencies
 // After:  1 line with koinInject()
 ```
 
 ### 2. Easy Testing 🧪
+
 ```kotlin
 @Test
 fun testKioskViewModel() {
@@ -159,13 +169,16 @@ fun testKioskViewModel() {
 ```
 
 ### 3. Platform-Agnostic DI 🌐
+
 Same modules work on:
+
 - ✅ Desktop (JVM)
 - ✅ Android
 - ✅ iOS (with KoinHelper)
 - ✅ Web (future)
 
 ### 4. Cleaner Code 🧹
+
 - No more `remember { ViewModelFactory... }`
 - No factory boilerplate
 - Automatic lifecycle management
@@ -176,18 +189,21 @@ Same modules work on:
 ## 🚀 Build Results
 
 ### Shared Module
+
 ```bash
 .\gradlew.bat :shared:build
 BUILD SUCCESSFUL in 16s
 ```
 
 ### Desktop App
+
 ```bash
 .\gradlew.bat :desktopApp:build
 BUILD SUCCESSFUL in 4s
 ```
 
 ### Desktop App Running
+
 ```bash
 .\gradlew.bat :desktopApp:run
 ✅ App launches successfully
@@ -201,24 +217,28 @@ BUILD SUCCESSFUL in 4s
 ## 🎓 What We Learned
 
 ### 1. Koin is Simple
+
 - No annotation processing
 - No code generation
 - Pure Kotlin DSL
 - Works great with KMP!
 
 ### 2. DI Improves Architecture
+
 - Clear separation of concerns
 - Easy to test
 - Easy to maintain
 - Professional-grade code
 
 ### 3. Modules Organize Dependencies
+
 - **networkModule** → Network layer
 - **repositoryModule** → Data layer
 - **useCaseModule** → Domain layer
 - **viewModelModule** → Presentation layer
 
 ### 4. Platform Initialization Varies
+
 - **Desktop:** `startKoin` in `main()`
 - **Android:** `startKoin` in `Application.onCreate()`
 - **iOS:** `initKoin()` helper function
@@ -228,15 +248,19 @@ BUILD SUCCESSFUL in 4s
 ## 🐛 Issues Encountered & Fixed
 
 ### Issue 1: API Clients Don't Exist Yet
+
 **Solution:** Simplified NetworkModule - API clients will be added in Day 6
 
 ### Issue 2: Validators Don't Exist Yet
+
 **Solution:** Removed from UseCaseModule - will add when implementing validation
 
 ### Issue 3: AppViewModel Doesn't Exist
+
 **Solution:** Removed from ViewModelModule - only KioskViewModel and AdminViewModel exist
 
 ### Issue 4: `viewModelOf` Not Available in KMP
+
 **Solution:** Used `factoryOf` instead - works perfectly!
 
 ---
@@ -284,9 +308,11 @@ Day 10: Final Integration          ⬜ (100%)
 ## 🎯 What's Next: Day 6
 
 ### API Integration
+
 **Goal:** Connect to real backend APIs
 
 **Tasks:**
+
 1. Implement API client classes
 2. Environment configuration
 3. Error handling
@@ -298,6 +324,7 @@ Day 10: Final Integration          ⬜ (100%)
 **Impact:** HIGH - Real data flow!
 
 **Command to start:**
+
 ```bash
 cd mobile-app
 # Say "Start Day 6 - Add API Integration"
@@ -320,6 +347,7 @@ cd mobile-app
 **YOU COMPLETED DAY 5!** 🚀
 
 Your project now has:
+
 - ✅ Professional dependency injection
 - ✅ Clean, maintainable architecture
 - ✅ Platform-agnostic DI modules

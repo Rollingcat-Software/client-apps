@@ -1,9 +1,7 @@
 package com.fivucsas.desktop.ui.theme
 
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 
 enum class WindowSize {
     COMPACT,
@@ -32,6 +30,7 @@ fun getResponsiveSizes(width: Dp): ResponsiveSizes {
             buttonHeight = 48.dp,
             spacing = 8.dp
         )
+
         width < 840.dp -> ResponsiveSizes(
             windowSize = WindowSize.MEDIUM,
             horizontalPadding = 16.dp,
@@ -41,6 +40,7 @@ fun getResponsiveSizes(width: Dp): ResponsiveSizes {
             buttonHeight = 56.dp,
             spacing = 16.dp
         )
+
         else -> ResponsiveSizes(
             windowSize = WindowSize.EXPANDED,
             horizontalPadding = 32.dp,

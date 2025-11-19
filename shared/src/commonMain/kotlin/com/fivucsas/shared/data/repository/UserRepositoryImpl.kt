@@ -8,17 +8,17 @@ import kotlinx.coroutines.delay
 
 /**
  * Mock implementation of UserRepository
- * 
+ *
  * Uses in-memory data for development and testing.
  * TODO: Replace with API implementation when backend is ready (Week 2)
- * 
+ *
  * This follows the Repository Pattern:
  * - Interface in domain/ (UserRepository)
  * - Implementation in data/ (this file)
  * - Easy to swap mock → real API later
  */
 class UserRepositoryImpl : UserRepository {
-    
+
     // In-memory data storage (simulates database)
     private val users = mutableListOf(
         User(
@@ -72,7 +72,7 @@ class UserRepositoryImpl : UserRepository {
             hasBiometric = true
         )
     )
-    
+
     override suspend fun getUsers(): Result<List<User>> {
         return try {
             // Simulate network delay
@@ -82,7 +82,7 @@ class UserRepositoryImpl : UserRepository {
             Result.failure(e)
         }
     }
-    
+
     override suspend fun getUserById(id: String): Result<User> {
         return try {
             delay(300)
@@ -96,14 +96,14 @@ class UserRepositoryImpl : UserRepository {
             Result.failure(e)
         }
     }
-    
+
     override suspend fun createUser(user: User): Result<User> {
         return try {
             delay(500)
-            
+
             // Generate new ID
             val newId = (users.size + 1).toString()
-            
+
             // Create new user with generated ID and current date
             val newUser = user.copy(
                 id = newId,
@@ -111,14 +111,14 @@ class UserRepositoryImpl : UserRepository {
                 status = UserStatus.PENDING,
                 hasBiometric = false
             )
-            
+
             users.add(newUser)
             Result.success(newUser)
         } catch (e: Exception) {
             Result.failure(e)
         }
     }
-    
+
     override suspend fun updateUser(id: String, user: User): Result<User> {
         return try {
             delay(500)
@@ -133,7 +133,7 @@ class UserRepositoryImpl : UserRepository {
             Result.failure(e)
         }
     }
-    
+
     override suspend fun deleteUser(id: String): Result<Unit> {
         return try {
             delay(500)
@@ -149,32 +149,32 @@ class UserRepositoryImpl : UserRepository {
             Result.failure(e)
         }
     }
-    
+
     override suspend fun searchUsers(query: String): Result<List<User>> {
         return try {
             delay(300)
-            
+
             if (query.isBlank()) {
                 return Result.success(users.toList())
             }
-            
+
             val results = users.filter {
                 it.name.contains(query, ignoreCase = true) ||
-                it.email.contains(query, ignoreCase = true) ||
-                it.idNumber.contains(query) ||
-                it.phoneNumber.contains(query)
+                        it.email.contains(query, ignoreCase = true) ||
+                        it.idNumber.contains(query) ||
+                        it.phoneNumber.contains(query)
             }
-            
+
             Result.success(results)
         } catch (e: Exception) {
             Result.failure(e)
         }
     }
-    
+
     override suspend fun getStatistics(): Result<Statistics> {
         return try {
             delay(500)
-            
+
             val stats = Statistics(
                 totalUsers = users.size,
                 activeUsers = users.count { it.status == UserStatus.ACTIVE },
@@ -183,13 +183,13 @@ class UserRepositoryImpl : UserRepository {
                 successRate = 94.2, // Mock value
                 failedAttempts = 12 // Mock value
             )
-            
+
             Result.success(stats)
         } catch (e: Exception) {
             Result.failure(e)
         }
     }
-    
+
     /**
      * Get current date
      * TODO: Replace with actual date/time library (kotlinx-datetime)

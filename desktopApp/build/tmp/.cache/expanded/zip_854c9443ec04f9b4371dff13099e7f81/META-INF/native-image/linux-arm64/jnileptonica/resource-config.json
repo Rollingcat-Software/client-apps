@@ -1,0 +1,11 @@
+{
+  "resources": [
+    {"pattern": "META-INF/.*"},
+    {"pattern": "org/bytedeco/javacpp/properties/.*"},
+    {"pattern": ".*/libjnileptonica.so"},
+    {"pattern": ".*/libgomp.so.1"},
+    {"pattern": ".*/libleptonica.so.6"},
+    {"pattern": ".*/include/.*"},
+    {"pattern": ".*/lib/.*"}
+  ]
+}

@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "com.fivucsas.mobile.android.androidApp-mergeDebugResources-60:/values-xlarge-v4/values-xlarge-v4.xml",
+            "outputFile": "com.fivucsas.mobile.android.androidApp-mergeDebugResources-62:/values-xlarge-v4/values-xlarge-v4.xml",
             "map": [
                 {
                     "source": "C:\\Users\\ahabg\\.gradle\\caches\\8.14.3\\transforms\\27ac394ae843f24a7ecf545bf7a8df49\\transformed\\appcompat-1.6.1\\res\\values-xlarge-v4\\values-xlarge-v4.xml",

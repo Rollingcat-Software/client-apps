@@ -1,0 +1,308 @@
+[
+  {
+    "name" : "org.bytedeco.opencv.presets.opencv_imgproc"
+  },
+  {
+    "name" : "org.bytedeco.opencv.helper.opencv_imgproc"
+  },
+  {
+    "name" : "org.bytedeco.opencv.global.opencv_imgproc"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_imgproc.AbstractCvHistogram"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_imgproc.AbstractCvMoments"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_imgproc.AbstractIplConvKernel"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_imgproc.CLAHE"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_imgproc.CvChainPtReader"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_imgproc.CvConnectedComp"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_imgproc.CvContourScanner"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_imgproc.CvConvexityDefect"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_imgproc.CvDistanceFunction",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true,
+    "allDeclaredClasses" : true,
+    "allPublicClasses" : true
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_imgproc.CvFeatureTree"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_imgproc.CvFont"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_imgproc.CvHuMoments"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_imgproc.CvLSH"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_imgproc.CvLSHOperations"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_imgproc.CvMoments"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_imgproc.GeneralizedHough"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_imgproc.GeneralizedHoughBallard"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_imgproc.GeneralizedHoughGuil"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_imgproc.LineIterator"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_imgproc.LineSegmentDetector"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_imgproc.Subdiv2D"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_imgproc.Vec2fVector"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_imgproc.Vec3fVector"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_imgproc.Vec4fVector"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_imgproc.Vec4iVector"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_imgproc.Vec6fVector"
+  },
+  {
+    "name" : "org.bytedeco.javacpp.Pointer",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true,
+    "allDeclaredClasses" : true,
+    "allPublicClasses" : true
+  },
+  {
+    "name" : "java.lang.String",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true,
+    "allDeclaredClasses" : true,
+    "allPublicClasses" : true
+  },
+  {
+    "name" : "org.bytedeco.javacpp.Pointer$NativeDeallocator",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true,
+    "allDeclaredClasses" : true,
+    "allPublicClasses" : true
+  },
+  {
+    "name" : "org.bytedeco.javacpp.Loader"
+  },
+  {
+    "name" : "java.nio.Buffer",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true,
+    "allDeclaredClasses" : true,
+    "allPublicClasses" : true
+  },
+  {
+    "name" : "java.lang.Object",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true,
+    "allDeclaredClasses" : true,
+    "allPublicClasses" : true
+  },
+  {
+    "name" : "java.nio.charset.Charset",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true,
+    "allDeclaredClasses" : true,
+    "allPublicClasses" : true
+  },
+  {
+    "name" : "java.lang.NullPointerException"
+  },
+  {
+    "name" : "java.lang.RuntimeException"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_core.Rect"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_core.RotatedRect"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_core.CvSeq"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_core.CvHistogram"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_core.CvScalar"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_core.Moments"
+  },
+  {
+    "name" : "org.bytedeco.javacpp.PointerPointer",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true,
+    "allDeclaredClasses" : true,
+    "allPublicClasses" : true
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_core.CvMat"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_core.IplConvKernel"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_core.CvPoint"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_core.CvRect"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_core.CvBox2D"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_core.Mat"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_core.Scalar"
+  },
+  {
+    "name" : "org.bytedeco.javacpp.DoublePointer",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true,
+    "allDeclaredClasses" : true,
+    "allPublicClasses" : true
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_core.Point2d"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_core.Size"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_core.Algorithm"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_core.CvSeqBlock"
+  },
+  {
+    "name" : "org.bytedeco.javacpp.BytePointer",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true,
+    "allDeclaredClasses" : true,
+    "allPublicClasses" : true
+  },
+  {
+    "name" : "org.bytedeco.javacpp.FloatPointer",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true,
+    "allDeclaredClasses" : true,
+    "allPublicClasses" : true
+  },
+  {
+    "name" : "org.bytedeco.javacpp.IntPointer",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true,
+    "allDeclaredClasses" : true,
+    "allPublicClasses" : true
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_core.Point"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_core.Point2f"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_imgproc.Vec2fVector$Iterator"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_core.Point3f"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_imgproc.Vec3fVector$Iterator"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_core.Scalar4f"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_imgproc.Vec4fVector$Iterator"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_core.Scalar4i"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_imgproc.Vec4iVector$Iterator"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_imgproc.Vec6fVector$Iterator"
+  }
+]

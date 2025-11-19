@@ -1,0 +1,15 @@
+{
+  "resources": [
+    {"pattern": "META-INF/.*"},
+    {"pattern": "org/bytedeco/javacpp/properties/.*"},
+    {"pattern": ".*/jniopencv_core.dll"},
+    {"pattern": ".*/opencv_core490.dll"},
+    {"pattern": ".*/opencv_imgproc490.dll"},
+    {"pattern": ".*/include/.*"},
+    {"pattern": ".*/lib/.*"},
+    {"pattern": ".*/x64/.*"},
+    {"pattern": ".*/OpenCVConfig.cmake"},
+    {"pattern": ".*/OpenCVConfig-version.cmake"},
+    {"pattern": ".*/python/.*"}
+  ]
+}

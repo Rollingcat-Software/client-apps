@@ -2,7 +2,7 @@ package com.fivucsas.shared.domain.model
 
 /**
  * Biometric data model
- * 
+ *
  * Contains face recognition data for a user
  */
 data class BiometricData(

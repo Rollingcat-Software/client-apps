@@ -15,30 +15,30 @@ object AppColors {
     val PrimaryVariant = Color(0xFF1565C0)    // Darker Blue
     val Secondary = Color(0xFF00ACC1)         // Cyan
     val SecondaryVariant = Color(0xFF0097A7)  // Darker Cyan
-    
+
     val Success = Color(0xFF4CAF50)           // Green
     val Warning = Color(0xFFFFA726)           // Orange
     val Error = Color(0xFFF44336)             // Red
     val Info = Color(0xFF2196F3)              // Blue
-    
+
     val Background = Color(0xFFF5F5F5)        // Light gray
     val Surface = Color(0xFFFFFFFF)           // White
     val SurfaceVariant = Color(0xFFFAFAFA)    // Off-white
-    
+
     val OnPrimary = Color(0xFFFFFFFF)         // White on primary
     val OnSurface = Color(0xFF212121)         // Dark gray
     val OnSurfaceVariant = Color(0xFF757575)  // Medium gray
     val OnBackground = Color(0xFF212121)      // Dark gray
-    
+
     // Gradients
     val PrimaryGradient = Brush.linearGradient(
         colors = listOf(Primary, PrimaryVariant)
     )
-    
+
     val SuccessGradient = Brush.linearGradient(
         colors = listOf(Success, Color(0xFF388E3C))
     )
-    
+
     val BackgroundGradient = Brush.verticalGradient(
         colors = listOf(Color(0xFFE3F2FD), Color(0xFFFAFAFA))
     )

@@ -1,19 +1,18 @@
 package com.fivucsas.shared.ui.components.molecules
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.AlertDialog
-import androidx.compose.material.Card
-import androidx.compose.material.TextButton
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.fivucsas.shared.config.UIDimens
 import com.fivucsas.shared.ui.components.atoms.BodyMediumText
@@ -21,7 +20,6 @@ import com.fivucsas.shared.ui.components.atoms.PrimaryButton
 import com.fivucsas.shared.ui.components.atoms.SecondaryButton
 import com.fivucsas.shared.ui.components.atoms.TitleLargeText
 import com.fivucsas.shared.ui.components.atoms.VerticalSpacerMedium
-import com.fivucsas.shared.ui.components.atoms.VerticalSpacerSmall
 import com.fivucsas.shared.ui.theme.AppColors
 import com.fivucsas.shared.ui.theme.AppShapes
 
@@ -52,7 +50,7 @@ fun ConfirmationDialog(
         text = { BodyMediumText(text = message) },
         confirmButton = {
             TextButton(onClick = onConfirm) {
-                androidx.compose.material.Text(
+                Text(
                     text = confirmText,
                     color = AppColors.Error
                 )
@@ -60,14 +58,14 @@ fun ConfirmationDialog(
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                androidx.compose.material.Text(
+                Text(
                     text = dismissText,
                     color = AppColors.OnSurface
                 )
             }
         },
         shape = AppShapes.Dialog,
-        backgroundColor = AppColors.Surface
+        containerColor = AppColors.Surface
     )
 }
 
@@ -94,14 +92,14 @@ fun InfoDialog(
         text = { BodyMediumText(text = message) },
         confirmButton = {
             TextButton(onClick = onDismiss) {
-                androidx.compose.material.Text(
+                Text(
                     text = buttonText,
                     color = AppColors.Primary
                 )
             }
         },
         shape = AppShapes.Dialog,
-        backgroundColor = AppColors.Surface
+        containerColor = AppColors.Surface
     )
 }
 
@@ -121,8 +119,12 @@ fun CustomDialog(
     Dialog(onDismissRequest = onDismiss) {
         Card(
             shape = AppShapes.Dialog,
-            backgroundColor = AppColors.Surface,
-            elevation = UIDimens.CardElevation
+            colors = CardDefaults.cardColors(
+                containerColor = AppColors.Surface
+            ),
+            elevation = CardDefaults.cardElevation(
+                defaultElevation = UIDimens.CardElevation
+            )
         ) {
             Box(modifier = Modifier.padding(UIDimens.SpacingLarge)) {
                 content()
@@ -155,8 +157,12 @@ fun FormDialog(
     Dialog(onDismissRequest = onDismiss) {
         Card(
             shape = AppShapes.Dialog,
-            backgroundColor = AppColors.Surface,
-            elevation = UIDimens.CardElevation
+            colors = CardDefaults.cardColors(
+                containerColor = AppColors.Surface
+            ),
+            elevation = CardDefaults.cardElevation(
+                defaultElevation = UIDimens.CardElevation
+            )
         ) {
             Column(
                 modifier = Modifier

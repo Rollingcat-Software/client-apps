@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "com.fivucsas.mobile.android.androidApp-mergeDebugResources-60:/values-pl/values-pl.xml",
+            "outputFile": "com.fivucsas.mobile.android.androidApp-mergeDebugResources-62:/values-pl/values-pl.xml",
             "map": [
                 {
                     "source": "C:\\Users\\ahabg\\.gradle\\caches\\8.14.3\\transforms\\137180cf5141c2491d679f35de90c4a9\\transformed\\jetified-material3-release\\res\\values-pl\\values-pl.xml",

@@ -9,7 +9,7 @@ sealed class AppError(
     val userMessage: String,
     val isRetryable: Boolean = false
 ) {
-    
+
     // Network Errors
     data class NetworkError(
         val errorMessage: String = "Network connection failed"
@@ -18,7 +18,7 @@ sealed class AppError(
         userMessage = "Please check your internet connection and try again",
         isRetryable = true
     )
-    
+
     data class TimeoutError(
         val errorMessage: String = "Request timeout"
     ) : AppError(
@@ -26,7 +26,7 @@ sealed class AppError(
         userMessage = "The request is taking too long. Please try again",
         isRetryable = true
     )
-    
+
     // Server Errors
     data class ServerError(
         val code: Int,
@@ -40,7 +40,7 @@ sealed class AppError(
         },
         isRetryable = code in 500..599
     )
-    
+
     data class UnauthorizedError(
         val errorMessage: String = "Unauthorized"
     ) : AppError(
@@ -48,7 +48,7 @@ sealed class AppError(
         userMessage = "Your session has expired. Please log in again",
         isRetryable = false
     )
-    
+
     data class NotFoundError(
         val resource: String
     ) : AppError(
@@ -56,7 +56,7 @@ sealed class AppError(
         userMessage = "The requested $resource could not be found",
         isRetryable = false
     )
-    
+
     // Validation Errors
     data class ValidationError(
         val field: String,
@@ -66,7 +66,7 @@ sealed class AppError(
         userMessage = reason,
         isRetryable = false
     )
-    
+
     data class InvalidInputError(
         val field: String,
         val errorMessage: String
@@ -75,7 +75,7 @@ sealed class AppError(
         userMessage = errorMessage,
         isRetryable = false
     )
-    
+
     // Business Logic Errors
     data class BiometricEnrollmentError(
         val reason: String
@@ -84,7 +84,7 @@ sealed class AppError(
         userMessage = "Could not enroll face: $reason",
         isRetryable = true
     )
-    
+
     data class VerificationError(
         val reason: String
     ) : AppError(
@@ -92,7 +92,7 @@ sealed class AppError(
         userMessage = "Verification failed: $reason",
         isRetryable = true
     )
-    
+
     data class LivenessCheckError(
         val reason: String
     ) : AppError(
@@ -100,7 +100,7 @@ sealed class AppError(
         userMessage = "Please ensure good lighting and try again",
         isRetryable = true
     )
-    
+
     // Generic Errors
     data class UnknownError(
         val errorMessage: String = "An unexpected error occurred"
@@ -109,7 +109,7 @@ sealed class AppError(
         userMessage = "Something unexpected happened. Please try again",
         isRetryable = true
     )
-    
+
     data class PermissionError(
         val permission: String
     ) : AppError(
@@ -128,10 +128,14 @@ fun Throwable.toAppError(): AppError {
             is NetworkException.NetworkError -> AppError.NetworkError(message ?: "Network error")
             is NetworkException.Timeout -> AppError.TimeoutError(message ?: "Timeout")
             is NetworkException.ServerError -> AppError.ServerError(code, message ?: "Server error")
-            is NetworkException.Unauthorized -> AppError.UnauthorizedError(message ?: "Unauthorized")
+            is NetworkException.Unauthorized -> AppError.UnauthorizedError(
+                message ?: "Unauthorized"
+            )
+
             is NetworkException.NotFound -> AppError.NotFoundError("Resource")
             is NetworkException.Unknown -> AppError.UnknownError(message ?: "Unknown error")
         }
+
         else -> AppError.UnknownError(message ?: "An unexpected error occurred")
     }
 }

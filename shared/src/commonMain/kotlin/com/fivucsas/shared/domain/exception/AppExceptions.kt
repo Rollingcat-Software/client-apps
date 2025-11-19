@@ -2,7 +2,7 @@ package com.fivucsas.shared.domain.exception
 
 /**
  * Base exception for all application exceptions
- * 
+ *
  * All custom exceptions inherit from this.
  * Makes it easy to catch all app-specific errors.
  */
@@ -10,7 +10,7 @@ sealed class AppException(message: String, cause: Throwable? = null) : Exception
 
 /**
  * Validation error
- * 
+ *
  * Thrown when user input fails validation.
  * Example: Invalid email format, Turkish ID checksum failed
  */
@@ -18,7 +18,7 @@ class ValidationException(message: String) : AppException(message)
 
 /**
  * Network error
- * 
+ *
  * Thrown when network communication fails.
  * Example: No internet connection, timeout, DNS failure
  */
@@ -29,7 +29,7 @@ class NetworkException(
 
 /**
  * Server error
- * 
+ *
  * Thrown when server returns error response.
  * Example: 500 Internal Server Error, 503 Service Unavailable
  */
@@ -41,7 +41,7 @@ class ServerException(
 
 /**
  * Authentication error
- * 
+ *
  * Thrown when authentication fails.
  * Example: Invalid credentials, expired token, unauthorized access
  */
@@ -52,7 +52,7 @@ class AuthException(
 
 /**
  * Not found error
- * 
+ *
  * Thrown when requested resource doesn't exist.
  * Example: User not found, biometric data not found
  */
@@ -63,7 +63,7 @@ class NotFoundException(
 
 /**
  * Biometric error
- * 
+ *
  * Thrown when biometric operations fail.
  * Example: No face detected, low quality image, liveness check failed
  */
@@ -91,7 +91,7 @@ enum class BiometricErrorCode {
 
 /**
  * Business logic error
- * 
+ *
  * Thrown when business rules are violated.
  * Example: User already enrolled, cannot delete active user
  */
@@ -102,7 +102,7 @@ class BusinessException(
 
 /**
  * Data conflict error
- * 
+ *
  * Thrown when data conflict occurs.
  * Example: Email already exists, duplicate national ID
  */

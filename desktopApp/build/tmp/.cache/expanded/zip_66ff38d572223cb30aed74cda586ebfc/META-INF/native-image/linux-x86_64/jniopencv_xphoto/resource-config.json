@@ -1,0 +1,8 @@
+{
+  "resources": [
+    {"pattern": "META-INF/.*"},
+    {"pattern": "org/bytedeco/javacpp/properties/.*"},
+    {"pattern": ".*/libjniopencv_xphoto.so"},
+    {"pattern": ".*/libopencv_xphoto.so.409"}
+  ]
+}

@@ -4,7 +4,7 @@ import com.fivucsas.shared.domain.model.Statistics
 
 /**
  * Data Transfer Object for Statistics
- * 
+ *
  * TODO: Add @Serializable when Ktor is added (Week 2)
  */
 data class StatisticsDto(

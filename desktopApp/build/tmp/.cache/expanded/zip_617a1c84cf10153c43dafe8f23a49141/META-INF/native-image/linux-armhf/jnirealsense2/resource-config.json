@@ -1,0 +1,8 @@
+{
+  "resources": [
+    {"pattern": "META-INF/.*"},
+    {"pattern": "org/bytedeco/javacpp/properties/.*"},
+    {"pattern": ".*/libjnirealsense2.so"},
+    {"pattern": ".*/librealsense2.so.2.53"}
+  ]
+}

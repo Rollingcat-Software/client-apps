@@ -1,8 +1,8 @@
 package com.fivucsas.shared.test.mocks
 
+import com.fivucsas.shared.domain.model.Statistics
 import com.fivucsas.shared.domain.model.User
 import com.fivucsas.shared.domain.model.UserStatus
-import com.fivucsas.shared.domain.model.Statistics
 import com.fivucsas.shared.domain.usecase.admin.DeleteUserUseCase
 import com.fivucsas.shared.domain.usecase.admin.GetStatisticsUseCase
 import com.fivucsas.shared.domain.usecase.admin.GetUsersUseCase

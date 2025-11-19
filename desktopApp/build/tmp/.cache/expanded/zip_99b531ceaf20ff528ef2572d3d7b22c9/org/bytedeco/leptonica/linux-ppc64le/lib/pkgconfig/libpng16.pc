@@ -1,0 +1,12 @@
+prefix=/home/runner/work/javacpp-presets/javacpp-presets/leptonica/cppbuild/linux-ppc64le
+exec_prefix=/home/runner/work/javacpp-presets/javacpp-presets/leptonica/cppbuild/linux-ppc64le
+libdir=/home/runner/work/javacpp-presets/javacpp-presets/leptonica/cppbuild/linux-ppc64le/lib
+includedir=/home/runner/work/javacpp-presets/javacpp-presets/leptonica/cppbuild/linux-ppc64le/include/libpng16
+
+Name: libpng
+Description: Loads and saves PNG files
+Version: 1.6.40
+Requires.private: zlib
+Libs: -L${libdir} -lpng16
+Libs.private: -lz -lm
+Cflags: -I${includedir}

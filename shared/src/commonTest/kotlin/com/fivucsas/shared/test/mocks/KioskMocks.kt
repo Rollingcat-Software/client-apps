@@ -27,7 +27,10 @@ class MockEnrollUserUseCase : EnrollUserUseCase {
     )
     var errorMessage = "Failed to enroll user"
 
-    override suspend fun invoke(data: EnrollmentData, imageBytes: ByteArray): Result<EnrollmentResult> {
+    override suspend fun invoke(
+        data: EnrollmentData,
+        imageBytes: ByteArray
+    ): Result<EnrollmentResult> {
         lastEnrollmentData = data
         lastImageBytes = imageBytes
         return if (shouldSucceed) {

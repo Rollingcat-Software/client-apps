@@ -1,0 +1,157 @@
+[
+  {
+    "name" : "org.bytedeco.opencv.presets.opencv_ml"
+  },
+  {
+    "name" : "org.bytedeco.opencv.global.opencv_ml"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_ml.ANN_MLP"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_ml.AbstractStatModel"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_ml.Boost"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_ml.DTrees"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_ml.EM"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_ml.KNearest"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_ml.LogisticRegression"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_ml.NormalBayesClassifier"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_ml.ParamGrid"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_ml.RTrees"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_ml.SVM"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_ml.SVMSGD"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_ml.StatModel"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_ml.TrainData"
+  },
+  {
+    "name" : "org.bytedeco.javacpp.Pointer",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true,
+    "allDeclaredClasses" : true,
+    "allPublicClasses" : true
+  },
+  {
+    "name" : "java.lang.String",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true,
+    "allDeclaredClasses" : true,
+    "allPublicClasses" : true
+  },
+  {
+    "name" : "org.bytedeco.javacpp.Pointer$NativeDeallocator",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true,
+    "allDeclaredClasses" : true,
+    "allPublicClasses" : true
+  },
+  {
+    "name" : "org.bytedeco.javacpp.Loader"
+  },
+  {
+    "name" : "java.nio.Buffer",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true,
+    "allDeclaredClasses" : true,
+    "allPublicClasses" : true
+  },
+  {
+    "name" : "java.lang.Object",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true,
+    "allDeclaredClasses" : true,
+    "allPublicClasses" : true
+  },
+  {
+    "name" : "java.nio.charset.Charset",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true,
+    "allDeclaredClasses" : true,
+    "allPublicClasses" : true
+  },
+  {
+    "name" : "java.lang.NullPointerException"
+  },
+  {
+    "name" : "java.lang.RuntimeException"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_core.Mat"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_core.TermCriteria"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_ml.DTrees$Split"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_ml.DTrees$Node"
+  },
+  {
+    "name" : "org.bytedeco.javacpp.IntPointer",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true,
+    "allDeclaredClasses" : true,
+    "allPublicClasses" : true
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_core.Point2d"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_core.Algorithm"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_ml.SVM$Kernel"
+  }
+]

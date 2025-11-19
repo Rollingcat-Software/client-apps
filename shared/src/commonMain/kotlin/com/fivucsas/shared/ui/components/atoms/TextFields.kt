@@ -2,13 +2,13 @@ package com.fivucsas.shared.ui.components.atoms
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material.OutlinedTextField
-import androidx.compose.material.Text
-import androidx.compose.material.TextFieldDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.material.Icon
 import com.fivucsas.shared.ui.theme.AppColors
 import com.fivucsas.shared.ui.theme.AppShapes
 import com.fivucsas.shared.ui.theme.AppTypography
@@ -75,9 +75,11 @@ fun AppTextField(
             modifier = Modifier.fillMaxWidth(),
             shape = AppShapes.TextField,
             textStyle = AppTypography.BodyMedium,
-            colors = TextFieldDefaults.outlinedTextFieldColors(
-                textColor = AppColors.OnSurface,
-                backgroundColor = AppColors.Surface,
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedTextColor = AppColors.OnSurface,
+                unfocusedTextColor = AppColors.OnSurface,
+                focusedContainerColor = AppColors.Surface,
+                unfocusedContainerColor = AppColors.Surface,
                 focusedBorderColor = AppColors.Primary,
                 unfocusedBorderColor = AppColors.Gray300,
                 errorBorderColor = AppColors.Error,
@@ -85,7 +87,8 @@ fun AppTextField(
                 focusedLabelColor = AppColors.Primary,
                 unfocusedLabelColor = AppColors.OnSurfaceVariant,
                 errorLabelColor = AppColors.Error,
-                placeholderColor = AppColors.OnSurfaceVariant,
+                focusedPlaceholderColor = AppColors.OnSurfaceVariant,
+                unfocusedPlaceholderColor = AppColors.OnSurfaceVariant,
                 disabledTextColor = AppColors.OnSurfaceVariant,
                 disabledBorderColor = AppColors.Gray300,
                 disabledLabelColor = AppColors.OnSurfaceVariant

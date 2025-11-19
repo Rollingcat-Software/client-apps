@@ -1,0 +1,8 @@
+{
+  "resources": [
+    {"pattern": "META-INF/.*"},
+    {"pattern": "org/bytedeco/javacpp/properties/.*"},
+    {"pattern": ".*/libjniswscale.dylib"},
+    {"pattern": ".*/libswscale.7.dylib"}
+  ]
+}

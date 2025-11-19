@@ -76,5 +76,9 @@ dependencies {
     // Accompanist (permissions)
     implementation("com.google.accompanist:accompanist-permissions:0.32.0")
 
+    // Koin for Android
+    implementation("io.insert-koin:koin-android:3.5.3")
+    implementation("io.insert-koin:koin-androidx-compose:3.5.3")
+
     debugImplementation("androidx.compose.ui:ui-tooling")
 }

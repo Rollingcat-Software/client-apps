@@ -1,7 +1,7 @@
 package com.fivucsas.desktop.platform
 
-import com.fivucsas.shared.platform.ICameraService
 import com.fivucsas.shared.config.BiometricConfig
+import com.fivucsas.shared.platform.ICameraService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlin.random.Random

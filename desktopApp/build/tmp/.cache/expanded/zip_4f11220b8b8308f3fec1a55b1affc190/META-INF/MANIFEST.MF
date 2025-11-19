@@ -1,0 +1,15 @@
+Manifest-Version: 1.0
+Implementation-Title: JavaCPP Presets Platform for OpenBLAS
+Implementation-Version: 0.3.26-1.5.10
+Multi-Release: true
+Specification-Vendor: Bytedeco
+Specification-Title: JavaCPP Presets Platform for OpenBLAS
+Class-Path: openblas.jar openblas-linux-x86.jar openblas-linux-x86_64.
+ jar openblas-linux-armhf.jar openblas-linux-arm64.jar openblas-linux-
+ ppc64le.jar openblas-macosx-arm64.jar openblas-macosx-x86_64.jar open
+ blas-windows-x86.jar openblas-windows-x86_64.jar
+Build-Jdk-Spec: 1.8
+Created-By: Maven Jar Plugin 3.2.0
+Specification-Version: 0.3.26-1.5.10
+Implementation-Vendor: Bytedeco
+

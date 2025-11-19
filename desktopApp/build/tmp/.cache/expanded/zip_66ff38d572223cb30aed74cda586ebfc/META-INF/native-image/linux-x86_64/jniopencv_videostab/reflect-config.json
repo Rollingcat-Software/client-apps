@@ -1,0 +1,260 @@
+[
+  {
+    "name" : "org.bytedeco.opencv.presets.opencv_videostab"
+  },
+  {
+    "name" : "org.bytedeco.opencv.global.opencv_videostab"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_videostab.ColorAverageInpainter"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_videostab.ColorInpainter"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_videostab.ConsistentMosaicInpainter"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_videostab.DeblurerBase"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_videostab.FastMarchingMethod"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_videostab.FromFileMotionReader"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_videostab.GaussianMotionFilter"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_videostab.IDenseOptFlowEstimator"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_videostab.IFrameSource",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true,
+    "allDeclaredClasses" : true,
+    "allPublicClasses" : true
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_videostab.ILog"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_videostab.IMotionStabilizer"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_videostab.IOutlierRejector"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_videostab.ISparseOptFlowEstimator"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_videostab.ImageMotionEstimatorBase"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_videostab.InpainterBase"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_videostab.InpaintingPipeline"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_videostab.KeypointBasedMotionEstimator"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_videostab.LogToStdout"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_videostab.LpMotionStabilizer"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_videostab.MaskFrameSource"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_videostab.MoreAccurateMotionWobbleSuppressor"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_videostab.MoreAccurateMotionWobbleSuppressorBase"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_videostab.MotionEstimatorBase"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_videostab.MotionEstimatorL1"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_videostab.MotionEstimatorRansacL2"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_videostab.MotionFilterBase"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_videostab.MotionInpainter"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_videostab.MotionStabilizationPipeline"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_videostab.NullDeblurer"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_videostab.NullFrameSource"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_videostab.NullInpainter"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_videostab.NullLog"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_videostab.NullOutlierRejector"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_videostab.NullWobbleSuppressor"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_videostab.OnePassStabilizer"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_videostab.PyrLkOptFlowEstimatorBase"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_videostab.RansacParams"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_videostab.SparsePyrLkOptFlowEstimator"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_videostab.StabilizerBase"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_videostab.ToFileMotionWriter"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_videostab.TranslationBasedLocalOutlierRejector"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_videostab.TwoPassStabilizer"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_videostab.VideoFileSource"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_videostab.WeightingDeblurer"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_videostab.WobbleSuppressorBase"
+  },
+  {
+    "name" : "org.bytedeco.javacpp.Pointer",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true,
+    "allDeclaredClasses" : true,
+    "allPublicClasses" : true
+  },
+  {
+    "name" : "java.lang.String",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true,
+    "allDeclaredClasses" : true,
+    "allPublicClasses" : true
+  },
+  {
+    "name" : "org.bytedeco.javacpp.Pointer$NativeDeallocator",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true,
+    "allDeclaredClasses" : true,
+    "allPublicClasses" : true
+  },
+  {
+    "name" : "org.bytedeco.javacpp.Loader"
+  },
+  {
+    "name" : "java.nio.Buffer",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true,
+    "allDeclaredClasses" : true,
+    "allPublicClasses" : true
+  },
+  {
+    "name" : "java.lang.Object",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true,
+    "allDeclaredClasses" : true,
+    "allPublicClasses" : true
+  },
+  {
+    "name" : "java.nio.charset.Charset",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true,
+    "allDeclaredClasses" : true,
+    "allPublicClasses" : true
+  },
+  {
+    "name" : "org.bytedeco.opencv.presets.opencv_videostab$MaskCallback",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true,
+    "allDeclaredClasses" : true,
+    "allPublicClasses" : true
+  },
+  {
+    "name" : "java.lang.NullPointerException"
+  },
+  {
+    "name" : "java.lang.RuntimeException"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_core.Mat"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_core.MatVector"
+  },
+  {
+    "name" : "org.bytedeco.javacpp.FloatPointer",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true,
+    "allDeclaredClasses" : true,
+    "allPublicClasses" : true
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_features2d.Feature2D"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_core.Size"
+  }
+]

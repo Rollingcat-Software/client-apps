@@ -129,7 +129,9 @@ fun BiometricVerifyScreen(
                     }
 
                     if (state.isSuccess && state.result != null) {
-                        val isVerified = state.result!!.verified
+                        val verifyResult =
+                            state.result as? com.fivucsas.shared.presentation.viewmodel.auth.BiometricResult.VerificationSuccess
+                        val isVerified = verifyResult?.result?.isVerified ?: false
                         Card(
                             colors = CardDefaults.cardColors(
                                 containerColor = if (isVerified)
@@ -152,7 +154,7 @@ fun BiometricVerifyScreen(
                                 )
                                 Spacer(modifier = Modifier.height(8.dp))
                                 Text(
-                                    text = state.result!!.message,
+                                    text = verifyResult?.result?.message ?: "Verification complete",
                                     color = if (isVerified)
                                         MaterialTheme.colorScheme.onPrimaryContainer
                                     else
@@ -160,7 +162,7 @@ fun BiometricVerifyScreen(
                                 )
                                 Spacer(modifier = Modifier.height(8.dp))
                                 Text(
-                                    text = "Confidence: ${(state.result!!.confidence * 100).toInt()}%",
+                                    text = "Confidence: ${((verifyResult?.result?.confidence ?: 0f) * 100).toInt()}%",
                                     color = if (isVerified)
                                         MaterialTheme.colorScheme.onPrimaryContainer
                                     else
@@ -193,7 +195,7 @@ fun BiometricVerifyScreen(
                                             val imageBytes = bitmapToByteArray(rotatedBitmap)
 
                                             scope.launch {
-                                                viewModel.verifyFace(userId, imageBytes)
+                                                viewModel.verifyFace(imageBytes)
                                             }
                                             image.close()
                                         }

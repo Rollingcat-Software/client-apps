@@ -11,6 +11,7 @@
 ## 📊 What We'll Achieve
 
 ### Before Day 7 ⚠️
+
 ```kotlin
 // No tests - hope it works!
 class GetUsersUseCase(
@@ -24,6 +25,7 @@ class GetUsersUseCase(
 ```
 
 ### After Day 7 ✅
+
 ```kotlin
 // Comprehensive tests - confidence!
 @Test
@@ -255,7 +257,8 @@ class MainDispatcherRule : TestWatcher() {
 
 ### 3.1 Test GetUsersUseCase
 
-**File:** `shared/src/commonTest/kotlin/com/fivucsas/shared/domain/usecase/admin/GetUsersUseCaseTest.kt`
+**File:**
+`shared/src/commonTest/kotlin/com/fivucsas/shared/domain/usecase/admin/GetUsersUseCaseTest.kt`
 
 ```kotlin
 package com.fivucsas.shared.domain.usecase.admin
@@ -322,7 +325,8 @@ class GetUsersUseCaseTest {
 
 ### 3.2 Test SearchUsersUseCase
 
-**File:** `shared/src/commonTest/kotlin/com/fivucsas/shared/domain/usecase/admin/SearchUsersUseCaseTest.kt`
+**File:**
+`shared/src/commonTest/kotlin/com/fivucsas/shared/domain/usecase/admin/SearchUsersUseCaseTest.kt`
 
 ```kotlin
 package com.fivucsas.shared.domain.usecase.admin
@@ -392,7 +396,8 @@ class SearchUsersUseCaseTest {
 
 ### 4.1 Test UserRepositoryImpl
 
-**File:** `shared/src/commonTest/kotlin/com/fivucsas/shared/data/repository/UserRepositoryImplTest.kt`
+**File:**
+`shared/src/commonTest/kotlin/com/fivucsas/shared/data/repository/UserRepositoryImplTest.kt`
 
 ```kotlin
 package com.fivucsas.shared.data.repository
@@ -464,7 +469,8 @@ class UserRepositoryImplTest {
 
 ### 5.1 Test AdminViewModel
 
-**File:** `shared/src/commonTest/kotlin/com/fivucsas/shared/presentation/viewmodel/AdminViewModelTest.kt`
+**File:**
+`shared/src/commonTest/kotlin/com/fivucsas/shared/presentation/viewmodel/AdminViewModelTest.kt`
 
 ```kotlin
 package com.fivucsas.shared.presentation.viewmodel
@@ -588,6 +594,7 @@ cd mobile-app
 ### 6.2 View Test Reports
 
 Tests results will be in:
+
 ```
 shared/build/reports/tests/testDebugUnitTest/index.html
 ```
@@ -628,12 +635,15 @@ Day 10: Final Integration          ⬜ (100%)
 ## 🐛 Troubleshooting
 
 ### Issue 1: "Could not find MockK"
+
 **Solution:** Ensure version catalog or direct dependency is correct
 
 ### Issue 2: "Turbine timeout"
+
 **Solution:** Increase timeout or use `expectNoEvents()`
 
 ### Issue 3: "Coroutine test fails"
+
 **Solution:** Use `runTest` wrapper and `StandardTestDispatcher`
 
 ---

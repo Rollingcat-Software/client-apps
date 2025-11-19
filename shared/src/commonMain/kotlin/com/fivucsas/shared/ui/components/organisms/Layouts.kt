@@ -9,10 +9,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.fivucsas.shared.config.UIDimens
-import com.fivucsas.shared.ui.components.molecules.ErrorMessage
-import com.fivucsas.shared.ui.components.molecules.SuccessMessage
 import com.fivucsas.shared.ui.components.atoms.LoadingBox
 import com.fivucsas.shared.ui.components.atoms.VerticalSpacerMedium
+import com.fivucsas.shared.ui.components.molecules.ErrorMessage
+import com.fivucsas.shared.ui.components.molecules.SuccessMessage
 import com.fivucsas.shared.ui.theme.AppColors
 
 /**

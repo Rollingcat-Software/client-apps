@@ -1,0 +1,15 @@
+{
+  "resources": [
+    {"pattern": "META-INF/.*"},
+    {"pattern": "org/bytedeco/javacpp/properties/.*"},
+    {"pattern": ".*/libjniopenblas_nolapack.dylib"},
+    {"pattern": ".*/libgcc_s.1.dylib"},
+    {"pattern": ".*/libquadmath.0.dylib"},
+    {"pattern": ".*/libgfortran.5.dylib"},
+    {"pattern": ".*/libgfortran.dylib"},
+    {"pattern": ".*/libopenblas.0.dylib"},
+    {"pattern": ".*/libopenblas_nolapack.0.dylib"},
+    {"pattern": ".*/include/.*"},
+    {"pattern": ".*/lib/.*"}
+  ]
+}

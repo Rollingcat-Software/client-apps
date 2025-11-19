@@ -5,7 +5,7 @@ import com.fivucsas.shared.domain.repository.UserRepository
 
 /**
  * Use case for searching users
- * 
+ *
  * Business logic:
  * - If query is blank, return all users
  * - Otherwise, search by name, email, ID number, phone
@@ -17,12 +17,12 @@ class SearchUsersUseCase(
     suspend operator fun invoke(query: String): Result<List<User>> {
         // Trim query
         val trimmedQuery = query.trim()
-        
+
         // If empty, return all users
         if (trimmedQuery.isBlank()) {
             return userRepository.getUsers()
         }
-        
+
         // Search
         return userRepository.searchUsers(trimmedQuery)
     }

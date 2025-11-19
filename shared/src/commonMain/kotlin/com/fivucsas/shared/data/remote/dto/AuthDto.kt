@@ -4,7 +4,7 @@ import com.fivucsas.shared.domain.repository.AuthTokens
 
 /**
  * Login Request DTO
- * 
+ *
  * TODO: Add @Serializable when Ktor is added (Week 2)
  */
 data class LoginRequestDto(
@@ -14,7 +14,7 @@ data class LoginRequestDto(
 
 /**
  * Auth Response DTO
- * 
+ *
  * TODO: Add @Serializable when Ktor is added (Week 2)
  */
 data class AuthResponseDto(

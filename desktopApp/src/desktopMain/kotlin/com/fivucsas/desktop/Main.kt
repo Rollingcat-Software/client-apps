@@ -4,7 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -20,12 +19,9 @@ import androidx.compose.material.icons.filled.Fingerprint
 import androidx.compose.material.icons.filled.TouchApp
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
@@ -118,30 +114,30 @@ fun main() {
     startKoin {
         modules(getAppModules())
     }
-    
+
     application {
         // State management separated from UI
         val stateManager = remember { AppStateManager() }
         val currentMode by stateManager.currentMode.collectAsState()
 
-    Window(
-        onCloseRequest = ::exitApplication,
-        title = AppConfig.WINDOW_TITLE,
-        state = rememberWindowState(
-            width = AppConfig.WINDOW_WIDTH_DP.dp,
-            height = AppConfig.WINDOW_HEIGHT_DP.dp,
-            placement = WindowPlacement.Maximized
-        )
-    ) {
-        MaterialTheme(
-            colorScheme = darkColorScheme()
-        ) {
-            AppContent(
-                currentMode = currentMode,
-                onNavigate = stateManager::navigateTo
+        Window(
+            onCloseRequest = ::exitApplication,
+            title = AppConfig.WINDOW_TITLE,
+            state = rememberWindowState(
+                width = AppConfig.WINDOW_WIDTH_DP.dp,
+                height = AppConfig.WINDOW_HEIGHT_DP.dp,
+                placement = WindowPlacement.Maximized
             )
+        ) {
+            MaterialTheme(
+                colorScheme = darkColorScheme()
+            ) {
+                AppContent(
+                    currentMode = currentMode,
+                    onNavigate = stateManager::navigateTo
+                )
+            }
         }
-    }
 
         // System tray - disabled for now (requires icon resource)
         // TODO: Add icon.png and enable system tray

@@ -9,6 +9,6 @@ sealed class SuccessMessage(val message: String) {
     data object UserUpdated : SuccessMessage("User updated successfully")
     data object UserDeleted : SuccessMessage("User deleted successfully")
     data object LivenessCheckPassed : SuccessMessage("Liveness check passed ✓")
-    
+
     data class Custom(val customMessage: String) : SuccessMessage(customMessage)
 }

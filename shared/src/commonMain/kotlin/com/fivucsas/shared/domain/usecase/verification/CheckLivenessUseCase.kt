@@ -9,18 +9,18 @@ import com.fivucsas.shared.domain.repository.BiometricRepository
 
 /**
  * Use case for checking liveness (anti-spoofing)
- * 
+ *
  * Business logic:
  * 1. Validate facial actions list
  * 2. Perform liveness detection
  * 3. Ensure minimum number of actions performed
  * 4. Return liveness result with confidence score
- * 
+ *
  * Liveness detection prevents spoofing attacks:
  * - Photo attacks (holding a photo)
  * - Video replay attacks
  * - Mask attacks (3D masks)
- * 
+ *
  * Example usage:
  * ```
  * val useCase = CheckLivenessUseCase(biometricRepo)
@@ -33,7 +33,7 @@ class CheckLivenessUseCase(
 ) {
     /**
      * Execute liveness check
-     * 
+     *
      * @param actions List of facial actions performed
      * @return Result with liveness result or error
      */
@@ -44,7 +44,7 @@ class CheckLivenessUseCase(
                 ValidationException("At least one facial action is required for liveness check")
             )
         }
-        
+
         if (actions.size < MIN_ACTIONS_REQUIRED) {
             return Result.failure(
                 BiometricException(
@@ -53,24 +53,24 @@ class CheckLivenessUseCase(
                 )
             )
         }
-        
+
         if (actions.size > MAX_ACTIONS_ALLOWED) {
             return Result.failure(
                 ValidationException("Too many actions (max $MAX_ACTIONS_ALLOWED)")
             )
         }
-        
+
         // Check for duplicate actions
         val uniqueActions = actions.distinct()
         if (uniqueActions.size < actions.size) {
             // Has duplicates - might be acceptable but note it
             // For now, we allow it
         }
-        
+
         // Perform liveness check
         return biometricRepository.checkLiveness(actions)
     }
-    
+
     companion object {
         private const val MIN_ACTIONS_REQUIRED = 2
         private const val MAX_ACTIONS_ALLOWED = 5

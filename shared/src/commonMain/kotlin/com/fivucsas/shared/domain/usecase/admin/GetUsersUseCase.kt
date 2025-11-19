@@ -5,7 +5,7 @@ import com.fivucsas.shared.domain.repository.UserRepository
 
 /**
  * Use case for getting all users
- * 
+ *
  * Simple pass-through to repository.
  * Can add business logic here if needed (e.g., filtering, sorting).
  */

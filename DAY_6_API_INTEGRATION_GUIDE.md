@@ -11,6 +11,7 @@
 ## 📊 What We'll Achieve
 
 ### Before Day 6 ⚠️
+
 ```kotlin
 // Mock data everywhere
 class UserRepositoryImpl : UserRepository {
@@ -25,6 +26,7 @@ class UserRepositoryImpl : UserRepository {
 ```
 
 ### After Day 6 ✅
+
 ```kotlin
 // Real API integration
 class UserRepositoryImpl(
@@ -567,12 +569,15 @@ Day 10: Final Integration          ⬜ (100%)
 ## 🐛 Troubleshooting
 
 ### Issue 1: "Serialization not found"
+
 **Solution:** Ensure DTOs have `@Serializable` annotation
 
 ### Issue 2: "Connection refused"
+
 **Solution:** Backend not running - use mock data fallback
 
 ### Issue 3: "Timeout errors"
+
 **Solution:** Increase timeout values in ApiConfig
 
 ---

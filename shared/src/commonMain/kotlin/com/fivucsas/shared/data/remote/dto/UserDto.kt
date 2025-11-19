@@ -5,13 +5,13 @@ import com.fivucsas.shared.domain.model.UserStatus
 
 /**
  * Data Transfer Object for User
- * 
+ *
  * Used for API communication (JSON serialization).
  * Separate from domain model to:
  * - Allow API changes without affecting domain
  * - Handle nullable/optional fields from API
  * - Add serialization annotations
- * 
+ *
  * TODO: Add @Serializable annotation when Ktor is added (Week 2)
  */
 data class UserDto(

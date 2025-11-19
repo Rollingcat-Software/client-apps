@@ -1,0 +1,172 @@
+[
+  {
+    "name" : "org.bytedeco.artoolkitplus.ARMarkerInfo"
+  },
+  {
+    "name" : "org.bytedeco.artoolkitplus.ARMarkerInfo2"
+  },
+  {
+    "name" : "org.bytedeco.artoolkitplus.ARMat"
+  },
+  {
+    "name" : "org.bytedeco.artoolkitplus.ARMultiEachMarkerInfoT"
+  },
+  {
+    "name" : "org.bytedeco.artoolkitplus.ARMultiMarkerInfoT"
+  },
+  {
+    "name" : "org.bytedeco.artoolkitplus.arPrevInfo"
+  },
+  {
+    "name" : "org.bytedeco.artoolkitplus.ARVec"
+  },
+  {
+    "name" : "org.bytedeco.artoolkitplus.BCH"
+  },
+  {
+    "name" : "org.bytedeco.artoolkitplus.Camera"
+  },
+  {
+    "name" : "org.bytedeco.artoolkitplus.CornerPoint"
+  },
+  {
+    "name" : "org.bytedeco.artoolkitplus.presets.ARToolKitPlus"
+  },
+  {
+    "name" : "org.bytedeco.artoolkitplus.global.ARToolKitPlus"
+  },
+  {
+    "name" : "org.bytedeco.artoolkitplus.MarkerPoint"
+  },
+  {
+    "name" : "org.bytedeco.artoolkitplus.MultiTracker"
+  },
+  {
+    "name" : "org.bytedeco.artoolkitplus.SingleTracker"
+  },
+  {
+    "name" : "org.bytedeco.artoolkitplus.Tracker"
+  },
+  {
+    "name" : "org.bytedeco.artoolkitplus.TrackerMultiMarker"
+  },
+  {
+    "name" : "org.bytedeco.artoolkitplus.TrackerSingleMarker"
+  },
+  {
+    "name" : "org.bytedeco.javacpp.Pointer",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true,
+    "allDeclaredClasses" : true,
+    "allPublicClasses" : true
+  },
+  {
+    "name" : "java.lang.String",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true,
+    "allDeclaredClasses" : true,
+    "allPublicClasses" : true
+  },
+  {
+    "name" : "org.bytedeco.javacpp.Pointer$NativeDeallocator",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true,
+    "allDeclaredClasses" : true,
+    "allPublicClasses" : true
+  },
+  {
+    "name" : "org.bytedeco.javacpp.Loader",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true,
+    "allDeclaredClasses" : true,
+    "allPublicClasses" : true
+  },
+  {
+    "name" : "java.nio.Buffer",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true,
+    "allDeclaredClasses" : true,
+    "allPublicClasses" : true
+  },
+  {
+    "name" : "java.lang.Object",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true,
+    "allDeclaredClasses" : true,
+    "allPublicClasses" : true
+  },
+  {
+    "name" : "java.nio.charset.Charset",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true,
+    "allDeclaredClasses" : true,
+    "allPublicClasses" : true
+  },
+  {
+    "name" : "java.lang.NullPointerException"
+  },
+  {
+    "name" : "org.bytedeco.javacpp.FloatPointer",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true,
+    "allDeclaredClasses" : true,
+    "allPublicClasses" : true
+  },
+  {
+    "name" : "java.lang.RuntimeException"
+  },
+  {
+    "name" : "org.bytedeco.javacpp.IntPointer",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true,
+    "allDeclaredClasses" : true,
+    "allPublicClasses" : true
+  },
+  {
+    "name" : "org.bytedeco.javacpp.BytePointer",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true,
+    "allDeclaredClasses" : true,
+    "allPublicClasses" : true
+  }
+]

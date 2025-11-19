@@ -1,0 +1,182 @@
+[
+  {
+    "name" : "org.bytedeco.opencv.presets.opencv_xfeatures2d"
+  },
+  {
+    "name" : "org.bytedeco.opencv.global.opencv_xfeatures2d"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_xfeatures2d.AffineFeature2D"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_xfeatures2d.BEBLID"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_xfeatures2d.BoostDesc"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_xfeatures2d.BriefDescriptorExtractor"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_xfeatures2d.DAISY"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_xfeatures2d.Elliptic_KeyPoint"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_xfeatures2d.FREAK"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_xfeatures2d.HarrisLaplaceFeatureDetector"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_xfeatures2d.LATCH"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_xfeatures2d.LUCID"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_xfeatures2d.MSDDetector"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_xfeatures2d.PCTSignatures"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_xfeatures2d.PCTSignaturesSQFD"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_xfeatures2d.StarDetector"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_xfeatures2d.SURF"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_xfeatures2d.TBMR"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_xfeatures2d.TEBLID"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_xfeatures2d.VGG"
+  },
+  {
+    "name" : "org.bytedeco.javacpp.Pointer",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true,
+    "allDeclaredClasses" : true,
+    "allPublicClasses" : true
+  },
+  {
+    "name" : "java.lang.String",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true,
+    "allDeclaredClasses" : true,
+    "allPublicClasses" : true
+  },
+  {
+    "name" : "org.bytedeco.javacpp.Pointer$NativeDeallocator",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true,
+    "allDeclaredClasses" : true,
+    "allPublicClasses" : true
+  },
+  {
+    "name" : "org.bytedeco.javacpp.Loader"
+  },
+  {
+    "name" : "java.nio.Buffer",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true,
+    "allDeclaredClasses" : true,
+    "allPublicClasses" : true
+  },
+  {
+    "name" : "java.lang.Object",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true,
+    "allDeclaredClasses" : true,
+    "allPublicClasses" : true
+  },
+  {
+    "name" : "java.nio.charset.Charset",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true,
+    "allDeclaredClasses" : true,
+    "allPublicClasses" : true
+  },
+  {
+    "name" : "java.lang.NullPointerException"
+  },
+  {
+    "name" : "java.lang.RuntimeException"
+  },
+  {
+    "name" : "org.bytedeco.javacpp.BytePointer",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true,
+    "allDeclaredClasses" : true,
+    "allPublicClasses" : true
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_core.Mat"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_core.Size2f"
+  },
+  {
+    "name" : "org.bytedeco.javacpp.FloatPointer",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true,
+    "allDeclaredClasses" : true,
+    "allPublicClasses" : true
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_core.Algorithm"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_core.Point2fVector"
+  },
+  {
+    "name" : "org.bytedeco.javacpp.IntPointer",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true,
+    "allDeclaredClasses" : true,
+    "allPublicClasses" : true
+  }
+]

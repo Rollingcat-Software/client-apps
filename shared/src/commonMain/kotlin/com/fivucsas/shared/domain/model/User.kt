@@ -2,7 +2,7 @@ package com.fivucsas.shared.domain.model
 
 /**
  * User model - shared across all platforms
- * 
+ *
  * Represents a registered user in the system
  */
 data class User(

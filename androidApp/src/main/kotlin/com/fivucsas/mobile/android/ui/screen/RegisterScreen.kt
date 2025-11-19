@@ -29,7 +29,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
-import com.fivucsas.shared.domain.model.User
 import com.fivucsas.shared.presentation.viewmodel.auth.RegisterViewModel
 import kotlinx.coroutines.launch
 
@@ -38,7 +37,7 @@ import kotlinx.coroutines.launch
 fun RegisterScreen(
     viewModel: RegisterViewModel,
     onNavigateBack: () -> Unit,
-    onRegisterSuccess: (User) -> Unit
+    onRegisterSuccess: () -> Unit
 ) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -48,8 +47,8 @@ fun RegisterScreen(
     val scope = rememberCoroutineScope()
 
     LaunchedEffect(state.isSuccess) {
-        if (state.isSuccess && state.user != null) {
-            onRegisterSuccess(state.user!!)
+        if (state.isSuccess && state.tokens != null) {
+            onRegisterSuccess()
         }
     }
 

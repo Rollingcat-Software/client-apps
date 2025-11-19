@@ -1,0 +1,380 @@
+[
+  {
+    "name" : "org.bytedeco.leptonica.AbstractDPIX"
+  },
+  {
+    "name" : "org.bytedeco.leptonica.AbstractFPIX"
+  },
+  {
+    "name" : "org.bytedeco.leptonica.AbstractPIX"
+  },
+  {
+    "name" : "org.bytedeco.leptonica.BOX"
+  },
+  {
+    "name" : "org.bytedeco.leptonica.BOXA"
+  },
+  {
+    "name" : "org.bytedeco.leptonica.BOXAA"
+  },
+  {
+    "name" : "org.bytedeco.leptonica.CCBORD"
+  },
+  {
+    "name" : "org.bytedeco.leptonica.CCBORDA"
+  },
+  {
+    "name" : "org.bytedeco.leptonica.DLLIST"
+  },
+  {
+    "name" : "org.bytedeco.leptonica.DPIX"
+  },
+  {
+    "name" : "org.bytedeco.leptonica.FPIX"
+  },
+  {
+    "name" : "org.bytedeco.leptonica.FPIXA"
+  },
+  {
+    "name" : "org.bytedeco.leptonica.GPLOT"
+  },
+  {
+    "name" : "org.bytedeco.leptonica.Handler_BytePointer",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true,
+    "allDeclaredClasses" : true,
+    "allPublicClasses" : true
+  },
+  {
+    "name" : "org.bytedeco.leptonica.Handler_String",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true,
+    "allDeclaredClasses" : true,
+    "allPublicClasses" : true
+  },
+  {
+    "name" : "org.bytedeco.leptonica.JBCLASSER"
+  },
+  {
+    "name" : "org.bytedeco.leptonica.JBDATA"
+  },
+  {
+    "name" : "org.bytedeco.leptonica.L_AMAP"
+  },
+  {
+    "name" : "org.bytedeco.leptonica.L_AMAP_NODE"
+  },
+  {
+    "name" : "org.bytedeco.leptonica.L_ASET"
+  },
+  {
+    "name" : "org.bytedeco.leptonica.L_ASET_NODE"
+  },
+  {
+    "name" : "org.bytedeco.leptonica.L_BBUFFER"
+  },
+  {
+    "name" : "org.bytedeco.leptonica.L_BMF"
+  },
+  {
+    "name" : "org.bytedeco.leptonica.L_BYTEA"
+  },
+  {
+    "name" : "org.bytedeco.leptonica.L_COLORFILL"
+  },
+  {
+    "name" : "org.bytedeco.leptonica.L_COMP_DATA"
+  },
+  {
+    "name" : "org.bytedeco.leptonica.L_DEWARP"
+  },
+  {
+    "name" : "org.bytedeco.leptonica.L_DEWARPA"
+  },
+  {
+    "name" : "org.bytedeco.leptonica.L_DNA"
+  },
+  {
+    "name" : "org.bytedeco.leptonica.L_DNAA"
+  },
+  {
+    "name" : "org.bytedeco.leptonica.L_DNAHASH"
+  },
+  {
+    "name" : "org.bytedeco.leptonica.L_HASHITEM"
+  },
+  {
+    "name" : "org.bytedeco.leptonica.L_HASHMAP"
+  },
+  {
+    "name" : "org.bytedeco.leptonica.L_HEAP"
+  },
+  {
+    "name" : "org.bytedeco.leptonica.L_KERNEL"
+  },
+  {
+    "name" : "org.bytedeco.leptonica.L_PDF_DATA"
+  },
+  {
+    "name" : "org.bytedeco.leptonica.L_PTRA"
+  },
+  {
+    "name" : "org.bytedeco.leptonica.L_PTRAA"
+  },
+  {
+    "name" : "org.bytedeco.leptonica.L_QUEUE"
+  },
+  {
+    "name" : "org.bytedeco.leptonica.L_RBTREE"
+  },
+  {
+    "name" : "org.bytedeco.leptonica.L_RBTREE_NODE"
+  },
+  {
+    "name" : "org.bytedeco.leptonica.L_RCH"
+  },
+  {
+    "name" : "org.bytedeco.leptonica.L_RCHA"
+  },
+  {
+    "name" : "org.bytedeco.leptonica.L_RDID"
+  },
+  {
+    "name" : "org.bytedeco.leptonica.L_RECOG"
+  },
+  {
+    "name" : "org.bytedeco.leptonica.L_REGPARAMS"
+  },
+  {
+    "name" : "org.bytedeco.leptonica.L_STACK"
+  },
+  {
+    "name" : "org.bytedeco.leptonica.L_STRCODE"
+  },
+  {
+    "name" : "org.bytedeco.leptonica.L_SUDOKU"
+  },
+  {
+    "name" : "org.bytedeco.leptonica.L_TIMER"
+  },
+  {
+    "name" : "org.bytedeco.leptonica.L_WALLTIMER"
+  },
+  {
+    "name" : "org.bytedeco.leptonica.L_WSHED"
+  },
+  {
+    "name" : "org.bytedeco.leptonica.NUMA"
+  },
+  {
+    "name" : "org.bytedeco.leptonica.NUMAA"
+  },
+  {
+    "name" : "org.bytedeco.leptonica.PIX"
+  },
+  {
+    "name" : "org.bytedeco.leptonica.PIXA"
+  },
+  {
+    "name" : "org.bytedeco.leptonica.PIXAA"
+  },
+  {
+    "name" : "org.bytedeco.leptonica.PIXAC"
+  },
+  {
+    "name" : "org.bytedeco.leptonica.PIXACC"
+  },
+  {
+    "name" : "org.bytedeco.leptonica.PIXC"
+  },
+  {
+    "name" : "org.bytedeco.leptonica.PIXCMAP"
+  },
+  {
+    "name" : "org.bytedeco.leptonica.PIXTILING"
+  },
+  {
+    "name" : "org.bytedeco.leptonica.PTA"
+  },
+  {
+    "name" : "org.bytedeco.leptonica.PTAA"
+  },
+  {
+    "name" : "org.bytedeco.leptonica.RB_TYPE"
+  },
+  {
+    "name" : "org.bytedeco.leptonica.RGBA_QUAD"
+  },
+  {
+    "name" : "org.bytedeco.leptonica.SARRAY"
+  },
+  {
+    "name" : "org.bytedeco.leptonica.SEL"
+  },
+  {
+    "name" : "org.bytedeco.leptonica.SELA"
+  },
+  {
+    "name" : "org.bytedeco.leptonica.alloc_fn",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true,
+    "allDeclaredClasses" : true,
+    "allPublicClasses" : true
+  },
+  {
+    "name" : "org.bytedeco.leptonica.dealloc_fn",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true,
+    "allDeclaredClasses" : true,
+    "allPublicClasses" : true
+  },
+  {
+    "name" : "org.bytedeco.leptonica.presets.leptonica"
+  },
+  {
+    "name" : "org.bytedeco.leptonica.global.leptonica"
+  },
+  {
+    "name" : "org.bytedeco.javacpp.Pointer",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true,
+    "allDeclaredClasses" : true,
+    "allPublicClasses" : true
+  },
+  {
+    "name" : "java.lang.String",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true,
+    "allDeclaredClasses" : true,
+    "allPublicClasses" : true
+  },
+  {
+    "name" : "org.bytedeco.javacpp.Pointer$NativeDeallocator",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true,
+    "allDeclaredClasses" : true,
+    "allPublicClasses" : true
+  },
+  {
+    "name" : "org.bytedeco.javacpp.Loader"
+  },
+  {
+    "name" : "java.nio.Buffer",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true,
+    "allDeclaredClasses" : true,
+    "allPublicClasses" : true
+  },
+  {
+    "name" : "java.lang.Object",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true,
+    "allDeclaredClasses" : true,
+    "allPublicClasses" : true
+  },
+  {
+    "name" : "java.nio.charset.Charset",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true,
+    "allDeclaredClasses" : true,
+    "allPublicClasses" : true
+  },
+  {
+    "name" : "java.lang.NullPointerException"
+  },
+  {
+    "name" : "org.bytedeco.javacpp.PointerPointer",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true,
+    "allDeclaredClasses" : true,
+    "allPublicClasses" : true
+  },
+  {
+    "name" : "org.bytedeco.javacpp.DoublePointer",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true,
+    "allDeclaredClasses" : true,
+    "allPublicClasses" : true
+  },
+  {
+    "name" : "org.bytedeco.javacpp.FloatPointer",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true,
+    "allDeclaredClasses" : true,
+    "allPublicClasses" : true
+  },
+  {
+    "name" : "org.bytedeco.javacpp.BytePointer",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true,
+    "allDeclaredClasses" : true,
+    "allPublicClasses" : true
+  },
+  {
+    "name" : "org.bytedeco.javacpp.IntPointer",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true,
+    "allDeclaredClasses" : true,
+    "allPublicClasses" : true
+  }
+]

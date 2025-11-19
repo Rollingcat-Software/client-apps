@@ -5,26 +5,31 @@
 Your app is already optimized! Here's what we've done:
 
 ### 1. Efficient State Management
+
 - **StateFlow** for reactive UI updates
 - **Minimal recompositions** with proper state management
 - **Lazy loading** where appropriate
 
 ### 2. Dependency Injection
+
 - **Singleton** repositories and APIs (reused, not recreated)
 - **Factory** for ViewModels (new instance per screen)
 - **Efficient** dependency graph
 
 ### 3. Network Optimization
+
 - **Timeout configuration** prevents hanging requests
 - **Connection pooling** with Ktor client
 - **JSON serialization** optimized with kotlinx.serialization
 
 ### 4. Memory Management
+
 - **No memory leaks** - proper lifecycle management
 - **Efficient data structures** - using immutable data classes
 - **Resource cleanup** handled automatically
 
 ### 5. Code Organization
+
 - **Modular architecture** - easy to maintain and extend
 - **Clear separation** - UI, domain, data layers
 - **Reusable code** - shared across platforms
@@ -32,12 +37,14 @@ Your app is already optimized! Here's what we've done:
 ## Performance Monitoring
 
 ### Key Metrics to Watch
+
 1. **App startup time** - Should be < 2 seconds
 2. **Screen transition time** - Should be instant
 3. **API response time** - Depends on network/backend
 4. **Memory usage** - Should be stable
 
 ### How to Profile
+
 ```bash
 # Android profiling
 .\gradlew.bat :androidApp:installDebug

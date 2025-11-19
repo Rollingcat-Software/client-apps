@@ -1,13 +1,16 @@
 package com.fivucsas.shared.test
 
-import com.fivucsas.shared.domain.model.*
+import com.fivucsas.shared.domain.model.EnrollmentData
+import com.fivucsas.shared.domain.model.Statistics
+import com.fivucsas.shared.domain.model.User
+import com.fivucsas.shared.domain.model.UserStatus
 
 /**
  * Test data factory
  * Provides consistent test data across all tests
  */
 object TestData {
-    
+
     // Test Users
     val testUser1 = User(
         id = "user-1",
@@ -19,7 +22,7 @@ object TestData {
         enrollmentDate = "2025-01-01",
         hasBiometric = true
     )
-    
+
     val testUser2 = User(
         id = "user-2",
         name = "Jane Smith",
@@ -30,7 +33,7 @@ object TestData {
         enrollmentDate = "2025-01-02",
         hasBiometric = true
     )
-    
+
     val inactiveUser = User(
         id = "user-3",
         name = "Bob Inactive",
@@ -41,7 +44,7 @@ object TestData {
         enrollmentDate = "2025-01-03",
         hasBiometric = false
     )
-    
+
     // Test Statistics
     val testStatistics = Statistics(
         totalUsers = 100,
@@ -50,7 +53,7 @@ object TestData {
         successRate = 95.5,
         failedAttempts = 12
     )
-    
+
     // Test Enrollment Data
     val testEnrollmentData = EnrollmentData(
         fullName = "Test User",
@@ -58,7 +61,7 @@ object TestData {
         idNumber = "ID999",
         phoneNumber = "+1234567890"
     )
-    
+
     // Helper functions
     fun createTestUser(
         id: String = "test-id",
@@ -76,7 +79,7 @@ object TestData {
         enrollmentDate = "2025-01-01",
         hasBiometric = false
     )
-    
+
     fun createTestUsers(count: Int): List<User> {
         return (1..count).map { i ->
             createTestUser(

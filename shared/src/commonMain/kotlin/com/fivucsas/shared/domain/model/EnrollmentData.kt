@@ -2,7 +2,7 @@ package com.fivucsas.shared.domain.model
 
 /**
  * Enrollment data model - shared across all platforms
- * 
+ *
  * Contains user information for enrollment process
  */
 data class EnrollmentData(

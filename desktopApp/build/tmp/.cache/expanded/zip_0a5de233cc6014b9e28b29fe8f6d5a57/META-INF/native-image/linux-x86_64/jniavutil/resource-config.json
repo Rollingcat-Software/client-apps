@@ -1,0 +1,9 @@
+{
+  "resources": [
+    {"pattern": "META-INF/.*"},
+    {"pattern": "org/bytedeco/javacpp/properties/.*"},
+    {"pattern": ".*/libjniavutil.so"},
+    {"pattern": ".*/libdrm.so.2"},
+    {"pattern": ".*/libavutil.so.58"}
+  ]
+}

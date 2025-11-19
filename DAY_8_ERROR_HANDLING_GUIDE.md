@@ -11,6 +11,7 @@
 ## 📊 What We'll Achieve
 
 ### Before Day 8 ⚠️
+
 ```kotlin
 // Basic error handling
 try {
@@ -22,6 +23,7 @@ try {
 ```
 
 ### After Day 8 ✅
+
 ```kotlin
 // Professional error handling
 when (val result = getUsers()) {

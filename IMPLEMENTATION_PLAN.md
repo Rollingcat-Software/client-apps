@@ -29,9 +29,12 @@
 ## Overview
 
 ### Goal
-Transform the mobile-app codebase from a **B+ (Good foundation, poor organization)** to **A+ (Professional in all aspects)** through systematic refactoring.
+
+Transform the mobile-app codebase from a **B+ (Good foundation, poor organization)** to **A+ (
+Professional in all aspects)** through systematic refactoring.
 
 ### Key Improvements
+
 - 🔴 **Reduce largest file** from 2,335 lines → 150 lines
 - 🟢 **Increase test coverage** from 10% → 70%
 - 🔵 **Extract components** from 0 → 20+ reusable components
@@ -39,6 +42,7 @@ Transform the mobile-app codebase from a **B+ (Good foundation, poor organizatio
 - 🟠 **Add abstractions** for platform-specific code
 
 ### Success Criteria
+
 - ✅ All functionality preserved
 - ✅ All tests passing
 - ✅ Code coverage ≥ 70%
@@ -51,6 +55,7 @@ Transform the mobile-app codebase from a **B+ (Good foundation, poor organizatio
 ## Prerequisites
 
 ### Before Starting
+
 - [ ] Read `ARCHITECTURE_REVIEW.md` completely
 - [ ] Understand current architecture
 - [ ] Set up development environment
@@ -59,6 +64,7 @@ Transform the mobile-app codebase from a **B+ (Good foundation, poor organizatio
 - [ ] Git configured with proper credentials
 
 ### Branch Strategy
+
 ```bash
 # Create feature branch
 git checkout -b refactor/professional-architecture
@@ -71,6 +77,7 @@ git checkout -b refactor/phase-0.1-packages
 ```
 
 ### Development Environment
+
 ```bash
 # Verify setup
 ./gradlew clean build
@@ -89,9 +96,11 @@ git checkout -b refactor/phase-0.1-packages
 ## Phase 0.1: Package Consolidation (1 Day)
 
 ### Goal
+
 Eliminate duplicate package structure: merge `com.fivucsas.mobile` → `com.fivucsas.shared`
 
 ### Current Structure
+
 ```
 shared/src/commonMain/kotlin/
 ├── com.fivucsas.mobile/    # 🔴 TO BE DELETED
@@ -108,6 +117,7 @@ shared/src/commonMain/kotlin/
 ### Steps
 
 #### Step 1: Analyze Differences (30 minutes)
+
 ```bash
 # List files in both packages
 find shared/src/commonMain/kotlin/com/fivucsas/mobile -name "*.kt"
@@ -119,16 +129,19 @@ diff -r shared/src/commonMain/kotlin/com/fivucsas/mobile \
 ```
 
 **Expected Findings**:
+
 - Some models duplicated (User, AuthToken)
 - Legacy ViewModels in mobile package
 - Older repository implementations
 
 **Decision**:
+
 - Keep `shared` package versions (newer)
 - Migrate any unique code from `mobile` to `shared`
 - Delete `mobile` package entirely
 
 #### Step 2: Identify Dependencies (30 minutes)
+
 ```bash
 # Find all imports from mobile package
 grep -r "import com.fivucsas.mobile" shared/
@@ -137,14 +150,17 @@ grep -r "import com.fivucsas.mobile" androidApp/
 ```
 
 **Document**:
+
 - Which files import from mobile package?
 - Are they using unique code or duplicates?
 - Create migration list
 
 #### Step 3: Migrate Unique Code (2 hours)
+
 For each unique file in `com.fivucsas.mobile`:
 
 **Example: Migrate LoginViewModel**
+
 ```bash
 # 1. Check if equivalent exists in shared
 ls shared/src/commonMain/kotlin/com/fivucsas/shared/presentation/viewmodel/
@@ -160,12 +176,14 @@ mv shared/src/commonMain/kotlin/com/fivucsas/mobile/presentation/login/LoginView
 ```
 
 **IntelliJ Method** (Recommended):
+
 1. Right-click file → Refactor → Move
 2. Select new package: `com.fivucsas.shared.presentation.viewmodel.auth`
 3. IDE will update imports automatically
 4. Review changes before committing
 
 #### Step 4: Update All Imports (2 hours)
+
 ```bash
 # Use IntelliJ's "Find and Replace in Path"
 # Find:    import com.fivucsas.mobile
@@ -176,12 +194,14 @@ find . -name "*.kt" -exec sed -i 's/com\.fivucsas\.mobile/com.fivucsas.shared/g'
 ```
 
 **Verify Each Change**:
+
 - [ ] File compiles
 - [ ] Imports resolved
 - [ ] No duplicate imports
 - [ ] Tests still pass
 
 #### Step 5: Delete Mobile Package (30 minutes)
+
 ```bash
 # After ALL imports updated and verified
 rm -rf shared/src/commonMain/kotlin/com/fivucsas/mobile/
@@ -192,13 +212,16 @@ rm -rf shared/src/commonMain/kotlin/com/fivucsas/mobile/
 ```
 
 #### Step 6: Update Build Files (30 minutes)
+
 Check if `build.gradle.kts` files reference mobile package:
+
 ```kotlin
 // Search for any hardcoded package references
 grep -r "com.fivucsas.mobile" *.gradle.kts
 ```
 
 ### Verification Checklist
+
 - [ ] `com.fivucsas.mobile` package deleted
 - [ ] All imports use `com.fivucsas.shared`
 - [ ] `./gradlew clean build` succeeds
@@ -208,6 +231,7 @@ grep -r "com.fivucsas.mobile" *.gradle.kts
 - [ ] No unused imports
 
 ### Commit
+
 ```bash
 git add .
 git commit -m "refactor: Consolidate packages - merge mobile into shared
@@ -226,9 +250,11 @@ git push origin refactor/phase-0.1-packages
 ## Phase 0.2: Extract Configuration (1 Day)
 
 ### Goal
+
 Centralize all magic numbers and configuration into config objects
 
 ### Target Files to Create
+
 ```
 shared/src/commonMain/kotlin/com/fivucsas/shared/config/
 ├── AppConfig.kt          # App-wide constants
@@ -242,6 +268,7 @@ shared/src/commonMain/kotlin/com/fivucsas/shared/config/
 #### Step 1: Create Configuration Files (1 hour)
 
 **File: `AppConfig.kt`**
+
 ```kotlin
 package com.fivucsas.shared.config
 
@@ -279,6 +306,7 @@ object AppConfig {
 ```
 
 **File: `UIDimens.kt`**
+
 ```kotlin
 package com.fivucsas.shared.config
 
@@ -329,6 +357,7 @@ object UIDimens {
 ```
 
 **File: `AnimationConfig.kt`**
+
 ```kotlin
 package com.fivucsas.shared.config
 
@@ -355,6 +384,7 @@ object AnimationConfig {
 ```
 
 **File: `BiometricConfig.kt`**
+
 ```kotlin
 package com.fivucsas.shared.config
 
@@ -396,6 +426,7 @@ object BiometricConfig {
 #### Step 2: Find and Replace Magic Numbers (3-4 hours)
 
 **Search for Magic Numbers**:
+
 ```bash
 # In AdminDashboard.kt
 grep -n "\.dp" desktopApp/src/desktopMain/kotlin/com/fivucsas/desktop/ui/admin/AdminDashboard.kt | head -20
@@ -410,6 +441,7 @@ grep -rn "delay(" shared/
 **Example Refactoring**:
 
 **Before**:
+
 ```kotlin
 @Composable
 fun WelcomeScreen() {
@@ -437,6 +469,7 @@ fun WelcomeScreen() {
 ```
 
 **After**:
+
 ```kotlin
 import com.fivucsas.shared.config.UIDimens
 
@@ -466,12 +499,14 @@ fun WelcomeScreen() {
 ```
 
 **Files to Update**:
+
 1. AdminDashboard.kt
 2. KioskMode.kt
 3. All ViewModels (for delays, thresholds)
 4. Repository implementations (for timeouts, retries)
 
 **Use Find/Replace**:
+
 ```
 Find:    Modifier.padding(16.dp)
 Replace: Modifier.padding(UIDimens.SpacingMedium)
@@ -486,6 +521,7 @@ Replace: if (confidence > BiometricConfig.CONFIDENCE_THRESHOLD)
 #### Step 3: Update ViewModel Configurations (1 hour)
 
 **Example: AdminViewModel.kt**
+
 ```kotlin
 // Before
 private fun loadUsers() {
@@ -507,6 +543,7 @@ private fun loadUsers() {
 ```
 
 ### Verification Checklist
+
 - [ ] All 4 config files created
 - [ ] All magic numbers replaced in UI code
 - [ ] All magic numbers replaced in ViewModels
@@ -517,6 +554,7 @@ private fun loadUsers() {
 - [ ] No hardcoded values remain (verify with grep)
 
 ### Commit
+
 ```bash
 git add .
 git commit -m "refactor: Extract configuration constants
@@ -534,9 +572,11 @@ git push origin refactor/phase-0.2-configuration
 ## Phase 0.3: Shared UI Components (2 Days)
 
 ### Goal
+
 Create reusable UI component library for cross-platform use
 
 ### Target Structure
+
 ```
 shared/src/commonMain/kotlin/com/fivucsas/shared/ui/
 ├── components/
@@ -569,19 +609,23 @@ shared/src/commonMain/kotlin/com/fivucsas/shared/ui/
 ### Day 1: Extract Atoms & Molecules
 
 #### Step 1: Identify Reusable Components (1 hour)
+
 Scan AdminDashboard.kt and KioskMode.kt for repeated patterns:
 
 **Buttons**:
+
 ```bash
 grep -A 10 "@Composable.*Button" desktopApp/src/desktopMain/kotlin/com/fivucsas/desktop/ui/admin/AdminDashboard.kt
 ```
 
 **Cards**:
+
 ```bash
 grep -A 10 "Card\(" desktopApp/src/desktopMain/kotlin/com/fivucsas/desktop/ui/admin/AdminDashboard.kt
 ```
 
 **List of Components to Extract**:
+
 - [ ] StatisticCard (used 4+ times in AdminDashboard)
 - [ ] GradientButton (used in KioskMode)
 - [ ] ValidatedTextField (used 3+ times)
@@ -592,6 +636,7 @@ grep -A 10 "Card\(" desktopApp/src/desktopMain/kotlin/com/fivucsas/desktop/ui/ad
 #### Step 2: Create Component Files (3 hours)
 
 **Example: StatisticCard.kt**
+
 ```kotlin
 package com.fivucsas.shared.ui.components.molecules.cards
 
@@ -721,6 +766,7 @@ private fun TrendIndicator(trend: Trend) {
 ```
 
 **Create Similar Files**:
+
 1. `PrimaryButton.kt`
 2. `GradientButton.kt`
 3. `ValidatedTextField.kt`
@@ -733,6 +779,7 @@ private fun TrendIndicator(trend: Trend) {
 **In AdminDashboard.kt**:
 
 **Before**:
+
 ```kotlin
 @Composable
 private fun StatisticCard(title: String, value: String, icon: ImageVector) {
@@ -750,6 +797,7 @@ fun UsersTab() {
 ```
 
 **After**:
+
 ```kotlin
 import com.fivucsas.shared.ui.components.molecules.cards.StatisticCard
 import com.fivucsas.shared.ui.components.molecules.cards.Trend
@@ -779,6 +827,7 @@ fun UsersTab() {
 #### Step 4: Extract Theme (2 hours)
 
 **File: `Colors.kt`**
+
 ```kotlin
 package com.fivucsas.shared.ui.theme
 
@@ -814,6 +863,7 @@ object AppColors {
 ```
 
 **File: `AppTheme.kt`**
+
 ```kotlin
 package com.fivucsas.shared.ui.theme
 
@@ -857,6 +907,7 @@ fun AppTheme(
 #### Step 5: Update Desktop App to Use Theme (1 hour)
 
 **In Main.kt**:
+
 ```kotlin
 import com.fivucsas.shared.ui.theme.AppTheme
 
@@ -870,6 +921,7 @@ fun main() = application {
 ```
 
 ### Verification Checklist
+
 - [ ] 15+ component files created
 - [ ] All components documented
 - [ ] Components use config constants (UIDimens, etc.)
@@ -881,6 +933,7 @@ fun main() = application {
 - [ ] No visual regressions
 
 ### Commit
+
 ```bash
 git add .
 git commit -m "feat: Create shared UI component library
@@ -901,10 +954,13 @@ git push origin refactor/phase-0.3-components
 This is the most critical phase - breaking down a 2,335-line file.
 
 ### Goal
+
 Transform AdminDashboard.kt from monolithic 2,335 lines → organized 20+ files averaging 150 lines
 
 ### Strategy: Incremental Extraction
+
 **Don't try to refactor everything at once!**
+
 - Extract one tab per session
 - Test after each extraction
 - Keep original file working until all extractions complete
@@ -912,6 +968,7 @@ Transform AdminDashboard.kt from monolithic 2,335 lines → organized 20+ files 
 ### Day 1: Extract Users Tab
 
 #### Morning Session: Create Structure (2 hours)
+
 ```bash
 # Create directory structure
 mkdir -p desktopApp/src/desktopMain/kotlin/com/fivucsas/desktop/ui/admin/tabs/users/components
@@ -921,6 +978,7 @@ mkdir -p desktopApp/src/desktopMain/kotlin/com/fivucsas/desktop/ui/admin/tabs/us
 #### Step 1: Extract User Statistics (30 minutes)
 
 **Create: `tabs/users/components/UserStatisticsCards.kt`**
+
 ```kotlin
 package com.fivucsas.desktop.ui.admin.tabs.users.components
 
@@ -984,6 +1042,7 @@ fun UserStatisticsCards(
 #### Step 2: Extract User Table (1 hour)
 
 **Create: `tabs/users/components/UserTable.kt`**
+
 ```kotlin
 package com.fivucsas.desktop.ui.admin.tabs.users.components
 
@@ -1097,6 +1156,7 @@ private fun UserStatusBadge(status: UserStatus, modifier: Modifier = Modifier) {
 #### Step 3: Extract Dialogs (1 hour)
 
 **Create 3 dialog files**:
+
 1. `tabs/users/dialogs/AddUserDialog.kt`
 2. `tabs/users/dialogs/EditUserDialog.kt`
 3. `tabs/users/dialogs/DeleteUserDialog.kt`
@@ -1106,6 +1166,7 @@ private fun UserStatusBadge(status: UserStatus, modifier: Modifier = Modifier) {
 #### Step 4: Compose UsersTab (30 minutes)
 
 **Create: `tabs/users/UsersTab.kt`**
+
 ```kotlin
 package com.fivucsas.desktop.ui.admin.tabs.users
 
@@ -1228,6 +1289,7 @@ fun UsersTab(
 4. Commit
 
 **In AdminDashboard.kt**:
+
 ```kotlin
 import com.fivucsas.desktop.ui.admin.tabs.users.UsersTab
 
@@ -1245,6 +1307,7 @@ fun AdminDashboard(viewModel: AdminViewModel = koinInject()) {
 ```
 
 **Test**:
+
 - [ ] Users tab displays correctly
 - [ ] Statistics cards show data
 - [ ] Search works
@@ -1256,6 +1319,7 @@ fun AdminDashboard(viewModel: AdminViewModel = koinInject()) {
 ### Day 2: Extract Analytics, Security, Settings Navigation
 
 **Repeat similar process** for:
+
 1. AnalyticsTab (2 hours)
 2. SecurityTab (2 hours)
 3. SettingsTab container + navigation (2 hours)
@@ -1266,6 +1330,7 @@ fun AdminDashboard(viewModel: AdminViewModel = koinInject()) {
 **Afternoon**: Refactor AdminDashboard.kt to use all new tabs, remove old code, test (3 hours)
 
 ### Final AdminDashboard.kt (Target: ~150 lines)
+
 ```kotlin
 package com.fivucsas.desktop.ui.admin
 
@@ -1333,6 +1398,7 @@ fun AdminDashboard(
 ```
 
 ### Verification Checklist
+
 - [ ] AdminDashboard.kt reduced to ~150 lines
 - [ ] 20+ new files created
 - [ ] All tabs working
@@ -1345,6 +1411,7 @@ fun AdminDashboard(
 - [ ] Desktop app fully functional
 
 ### Commit
+
 ```bash
 git add .
 git commit -m "refactor: Break down AdminDashboard into modular components
@@ -1365,6 +1432,7 @@ git push origin refactor/phase-0.4-admin-dashboard
 Similar approach to AdminDashboard but simpler (3 screens vs 4 complex tabs)
 
 ### Target Structure
+
 ```
 desktopApp/src/desktopMain/kotlin/com/fivucsas/desktop/ui/kiosk/
 ├── KioskMode.kt (100 lines - container)
@@ -1386,12 +1454,14 @@ desktopApp/src/desktopMain/kotlin/com/fivucsas/desktop/ui/kiosk/
 ```
 
 ### Day 1: Extract Screens (4 hours)
+
 1. Create WelcomeScreen.kt
 2. Create EnrollmentScreen.kt
 3. Create VerificationScreen.kt
 4. Test navigation
 
 ### Day 2: Extract Components & Integration (4 hours)
+
 1. Extract enrollment components
 2. Extract verification components
 3. Refactor KioskMode.kt to container
@@ -1401,6 +1471,7 @@ desktopApp/src/desktopMain/kotlin/com/fivucsas/desktop/ui/kiosk/
 **(Detailed steps similar to AdminDashboard - omitted for brevity)**
 
 ### Verification Checklist
+
 - [ ] KioskMode.kt reduced to ~100 lines
 - [ ] 12+ new files created
 - [ ] Welcome screen working
@@ -1411,6 +1482,7 @@ desktopApp/src/desktopMain/kotlin/com/fivucsas/desktop/ui/kiosk/
 - [ ] No regressions
 
 ### Commit
+
 ```bash
 git add .
 git commit -m "refactor: Break down KioskMode into modular screens
@@ -1429,11 +1501,13 @@ git push origin refactor/phase-0.5-kiosk-mode
 ## Phase 0.6: Platform Abstractions (2 Days)
 
 ### Goal
+
 Create interfaces for platform-specific code (camera, logger, storage)
 
 ### Day 1: Define Interfaces
 
 **Create: `shared/src/commonMain/kotlin/com/fivucsas/shared/platform/camera/ICameraService.kt`**
+
 ```kotlin
 package com.fivucsas.shared.platform.camera
 
@@ -1499,13 +1573,17 @@ enum class CameraFacing {
 ```
 
 **Similarly create**:
+
 - `ILogger.kt`
 - `ISecureStorage.kt`
 - `IFileStorage.kt`
 
 ### Day 2: Implement Desktop Versions
 
-**Create: `shared/src/desktopMain/kotlin/com/fivucsas/shared/platform/camera/DesktopCameraService.kt`**
+*
+*Create: `shared/src/desktopMain/kotlin/com/fivucsas/shared/platform/camera/DesktopCameraService.kt`
+**
+
 ```kotlin
 package com.fivucsas.shared.platform.camera
 
@@ -1595,6 +1673,7 @@ class DesktopCameraService(
 ```
 
 **Update DI Module**:
+
 ```kotlin
 // shared/src/commonMain/kotlin/.../di/PlatformModule.kt
 expect fun platformModule(): Module
@@ -1609,6 +1688,7 @@ actual fun platformModule() = module {
 ```
 
 ### Verification Checklist
+
 - [ ] All platform interfaces defined
 - [ ] Desktop implementations complete
 - [ ] DI configured
@@ -1617,6 +1697,7 @@ actual fun platformModule() = module {
 - [ ] Ready for Android/iOS implementations
 
 ### Commit
+
 ```bash
 git add .
 git commit -m "feat: Add platform abstractions for multiplatform support
@@ -1634,11 +1715,14 @@ git push origin refactor/phase-0.6-platform-abstractions
 ## Phase 0.7: ViewModel Tests (2 Days)
 
 ### Goal
+
 Achieve 70%+ test coverage on ViewModels
 
 ### Day 1: AdminViewModel Tests (4 hours)
 
-**Create: `shared/src/commonTest/kotlin/com/fivucsas/shared/presentation/viewmodel/AdminViewModelTest.kt`**
+**Create:
+`shared/src/commonTest/kotlin/com/fivucsas/shared/presentation/viewmodel/AdminViewModelTest.kt`**
+
 ```kotlin
 package com.fivucsas.shared.presentation.viewmodel
 
@@ -1768,6 +1852,7 @@ class AdminViewModelTest {
 ```
 
 **Write Tests For**:
+
 1. Loading users (success/failure)
 2. Creating users
 3. Updating users
@@ -1781,9 +1866,11 @@ class AdminViewModelTest {
 
 ### Day 2: KioskViewModel Tests (4 hours)
 
-**Create: `shared/src/commonTest/kotlin/com/fivucsas/shared/presentation/viewmodel/KioskViewModelTest.kt`**
+**Create:
+`shared/src/commonTest/kotlin/com/fivucsas/shared/presentation/viewmodel/KioskViewModelTest.kt`**
 
 Write similar comprehensive tests for KioskViewModel:
+
 1. Enrollment flow
 2. Verification flow
 3. Camera state management
@@ -1794,6 +1881,7 @@ Write similar comprehensive tests for KioskViewModel:
 8. Edge cases
 
 ### Run Coverage Report
+
 ```bash
 ./gradlew koverReport
 
@@ -1804,6 +1892,7 @@ open shared/build/reports/kover/html/index.html
 **Target**: 70%+ coverage on ViewModels
 
 ### Verification Checklist
+
 - [ ] AdminViewModel: 15+ tests written
 - [ ] KioskViewModel: 15+ tests written
 - [ ] All tests passing
@@ -1812,6 +1901,7 @@ open shared/build/reports/kover/html/index.html
 - [ ] CI/CD updated with coverage check
 
 ### Commit
+
 ```bash
 git add .
 git commit -m "test: Add comprehensive ViewModel tests
@@ -1830,16 +1920,19 @@ git push origin refactor/phase-0.7-tests
 ## Phase 0.8: Documentation (1 Day)
 
 ### Goal
+
 Document all changes and create migration guides
 
 ### Tasks
 
 #### 1. Update README (1 hour)
+
 - Document new structure
 - Update getting started guide
 - Add component usage examples
 
 #### 2. Create Component Catalog (2 hours)
+
 ```markdown
 # Component Catalog
 
@@ -1853,6 +1946,7 @@ Document all changes and create migration guides
 ```
 
 #### 3. Create Migration Guide (2 hours)
+
 ```markdown
 # Migration Guide
 
@@ -1869,16 +1963,19 @@ Document all changes and create migration guides
 ```
 
 #### 4. Update Architecture Docs (1 hour)
+
 - Update architecture diagrams
 - Document package structure
 - Document testing strategy
 
 #### 5. Create Demo/Examples (2 hours)
+
 - Create component showcase app
 - Record demo video
 - Update screenshots
 
 ### Verification Checklist
+
 - [ ] README updated
 - [ ] Component catalog created
 - [ ] Migration guide written
@@ -1887,6 +1984,7 @@ Document all changes and create migration guides
 - [ ] Demo video recorded
 
 ### Commit
+
 ```bash
 git add .
 git commit -m "docs: Complete refactoring documentation
@@ -1905,6 +2003,7 @@ git push origin refactor/phase-0.8-documentation
 ## Testing Checklist
 
 ### After Each Phase
+
 - [ ] Code compiles: `./gradlew clean build`
 - [ ] Tests pass: `./gradlew test`
 - [ ] Desktop app runs: `./gradlew desktopApp:run`
@@ -1912,54 +2011,55 @@ git push origin refactor/phase-0.8-documentation
 - [ ] All features work as before
 
 ### Final Integration Testing
+
 - [ ] **Users Tab**
-  - [ ] View users list
-  - [ ] Search users
-  - [ ] Add new user
-  - [ ] Edit user
-  - [ ] Delete user
-  - [ ] Statistics update correctly
+    - [ ] View users list
+    - [ ] Search users
+    - [ ] Add new user
+    - [ ] Edit user
+    - [ ] Delete user
+    - [ ] Statistics update correctly
 
 - [ ] **Analytics Tab**
-  - [ ] View statistics
-  - [ ] Charts render
-  - [ ] Recent verifications list
-  - [ ] Data refreshes
+    - [ ] View statistics
+    - [ ] Charts render
+    - [ ] Recent verifications list
+    - [ ] Data refreshes
 
 - [ ] **Security Tab**
-  - [ ] Security alerts display
-  - [ ] Audit logs table
-  - [ ] Expandable details
-  - [ ] Filtering works
+    - [ ] Security alerts display
+    - [ ] Audit logs table
+    - [ ] Expandable details
+    - [ ] Filtering works
 
 - [ ] **Settings Tab**
-  - [ ] All 6 sections accessible
-  - [ ] Profile settings update
-  - [ ] Security settings update
-  - [ ] Biometric settings update
-  - [ ] System settings update
-  - [ ] Notification settings update
-  - [ ] Appearance settings update
-  - [ ] Settings persist
+    - [ ] All 6 sections accessible
+    - [ ] Profile settings update
+    - [ ] Security settings update
+    - [ ] Biometric settings update
+    - [ ] System settings update
+    - [ ] Notification settings update
+    - [ ] Appearance settings update
+    - [ ] Settings persist
 
 - [ ] **Kiosk Mode**
-  - [ ] Welcome screen displays
-  - [ ] Navigate to enrollment
-  - [ ] Enrollment form works
-  - [ ] Camera preview (if available)
-  - [ ] Submit enrollment
-  - [ ] Navigate to verification
-  - [ ] Verification flow works
-  - [ ] Success state displays
-  - [ ] Failure state displays
-  - [ ] Back navigation works
+    - [ ] Welcome screen displays
+    - [ ] Navigate to enrollment
+    - [ ] Enrollment form works
+    - [ ] Camera preview (if available)
+    - [ ] Submit enrollment
+    - [ ] Navigate to verification
+    - [ ] Verification flow works
+    - [ ] Success state displays
+    - [ ] Failure state displays
+    - [ ] Back navigation works
 
 - [ ] **Performance**
-  - [ ] App startup time < 2 seconds
-  - [ ] Tab switching instant
-  - [ ] Search responsive
-  - [ ] No UI lag
-  - [ ] Memory usage normal
+    - [ ] App startup time < 2 seconds
+    - [ ] Tab switching instant
+    - [ ] Search responsive
+    - [ ] No UI lag
+    - [ ] Memory usage normal
 
 ---
 
@@ -1968,6 +2068,7 @@ git push origin refactor/phase-0.8-documentation
 ### If Issues Arise During Any Phase
 
 #### Option 1: Rollback Phase
+
 ```bash
 # Rollback to previous phase
 git reset --hard HEAD~1
@@ -1977,6 +2078,7 @@ git reset --hard backup-before-refactor
 ```
 
 #### Option 2: Fix Forward
+
 1. Identify issue
 2. Create fix branch
 3. Apply fix
@@ -1984,12 +2086,14 @@ git reset --hard backup-before-refactor
 5. Merge
 
 #### Option 3: Partial Rollback
+
 ```bash
 # Rollback specific files
 git checkout HEAD~1 -- path/to/file.kt
 ```
 
 ### Emergency Rollback (Critical Production Issue)
+
 ```bash
 # Full rollback to backup
 git reset --hard backup-before-refactor
@@ -2001,6 +2105,7 @@ git push --force origin main
 ## Success Metrics
 
 ### Code Quality
+
 - ✅ Largest file: 2,335 lines → < 500 lines
 - ✅ Test coverage: 10% → 70%+
 - ✅ Package structure: 2 duplicates → 1 clean
@@ -2008,12 +2113,14 @@ git push --force origin main
 - ✅ Platform abstractions: 0 → 4+
 
 ### Developer Experience
+
 - ✅ Time to find code: ~5 min → < 30 sec
 - ✅ Time to add feature: High → Low
 - ✅ Merge conflicts: Frequent → Rare
 - ✅ Onboarding time: 3 days → 1 day
 
 ### SOLID Compliance
+
 - ✅ SRP: 60% → 95%
 - ✅ OCP: 90% → 95%
 - ✅ LSP: 95% → 95%
@@ -2027,6 +2134,7 @@ git push --force origin main
 Once refactoring is complete:
 
 1. **Merge to Main**
+
 ```bash
 git checkout main
 git merge refactor/professional-architecture
@@ -2035,14 +2143,17 @@ git push origin main --tags
 ```
 
 2. **Start Phase 1: Backend Integration**
+
 - See MODULE_PLAN.md Phase 1
 - Easier to implement with clean codebase
 
 3. **Start Phase 2: Camera Integration**
+
 - Use new ICameraService abstraction
 - Implement for each platform
 
 4. **Start Phase 3: Mobile Development**
+
 - Reuse shared components
 - Parallel development possible
 

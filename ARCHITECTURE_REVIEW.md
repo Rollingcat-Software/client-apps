@@ -11,7 +11,9 @@
 ## Executive Summary
 
 ### Strengths ✅
+
 The mobile-app codebase demonstrates **professional-grade architecture** with:
+
 - ✅ **Clean Architecture** with proper layer separation
 - ✅ **SOLID Principles** followed in shared module
 - ✅ **Dependency Injection** using Koin (well-structured)
@@ -21,14 +23,18 @@ The mobile-app codebase demonstrates **professional-grade architecture** with:
 - ✅ **90% code sharing** capability across platforms
 
 ### Critical Issues 🔴
-1. **Monolithic UI Files** - AdminDashboard.kt (2,335 lines) and KioskMode.kt (1,756 lines) violate SRP
+
+1. **Monolithic UI Files** - AdminDashboard.kt (2,335 lines) and KioskMode.kt (1,756 lines) violate
+   SRP
 2. **Duplicate Package Structure** - Both `com.fivucsas.mobile` and `com.fivucsas.shared` exist
 3. **Low Test Coverage** - ~10% coverage, missing ViewModel tests
 4. **No Component Library** - Reusable components defined as private functions
 5. **Missing Platform Abstractions** - Camera service not abstracted
 
 ### Recommendation
-**Invest 14 days in refactoring before adding new features**. The architecture is sound but implementation needs reorganization for long-term maintainability.
+
+**Invest 14 days in refactoring before adding new features**. The architecture is sound but
+implementation needs reorganization for long-term maintainability.
 
 ---
 
@@ -37,6 +43,7 @@ The mobile-app codebase demonstrates **professional-grade architecture** with:
 ### 1.1 Single Responsibility Principle (SRP)
 
 #### ✅ Excellent Implementation (Shared Module)
+
 ```kotlin
 // Each use case has ONE job
 class GetUsersUseCase(private val repository: UserRepository) {
@@ -56,6 +63,7 @@ interface UserRepository {
 #### 🔴 Violated (Desktop UI)
 
 **AdminDashboard.kt (2,335 lines)** has multiple responsibilities:
+
 1. Users tab with CRUD operations
 2. Analytics tab with charts
 3. Security tab with audit logs
@@ -66,6 +74,7 @@ interface UserRepository {
 8. Data transformation
 
 **Impact**:
+
 - Difficult to test individual features
 - Merge conflicts inevitable with team development
 - Hard to navigate and maintain
@@ -76,6 +85,7 @@ interface UserRepository {
 ### 1.2 Open/Closed Principle (OCP)
 
 #### ✅ Well Implemented
+
 ```kotlin
 // Repository interface - closed for modification, open for extension
 interface UserRepository {
@@ -93,6 +103,7 @@ class CachedUserRepository : UserRepository { ... } // Future: add caching
 ### 1.3 Liskov Substitution Principle (LSP)
 
 #### ✅ Properly Followed
+
 ```kotlin
 // Can substitute ANY UserRepository implementation
 class GetUsersUseCase(private val repository: UserRepository) {
@@ -108,6 +119,7 @@ class GetUsersUseCase(private val repository: UserRepository) {
 ### 1.4 Interface Segregation Principle (ISP)
 
 #### ✅ Good Separation
+
 ```kotlin
 // Separate APIs instead of one giant API
 interface AuthApi { ... }           // Only auth operations
@@ -116,7 +128,9 @@ interface IdentityApi { ... }       // Only user CRUD operations
 ```
 
 #### ⚠️ Could Improve
+
 The `UserRepository` interface has 7 methods. Consider splitting:
+
 ```kotlin
 interface UserQueryRepository {
     suspend fun getUsers(): Result<List<User>>
@@ -140,6 +154,7 @@ interface UserStatisticsRepository {
 ### 1.5 Dependency Inversion Principle (DIP)
 
 #### ✅ Excellent Implementation
+
 ```
 High-level (ViewModels) ←→ Abstractions (Repository Interfaces)
                                 ↑
@@ -158,6 +173,7 @@ class GetUsersUseCase(private val repository: UserRepository) // Interface!
 ```
 
 **Enabled by Koin DI**:
+
 ```kotlin
 val repositoryModule = module {
     single<UserRepository> { UserRepositoryImpl(get()) }  // Bind interface to impl
@@ -172,20 +188,21 @@ val repositoryModule = module {
 
 ### 2.1 Implemented Patterns ✅
 
-| Pattern | Location | Quality | Notes |
-|---------|----------|---------|-------|
-| **MVVM** | presentation/viewmodel/ | ✅ Excellent | Clean separation of UI and logic |
-| **Repository** | domain/repository/ | ✅ Excellent | Interfaces in domain, impl in data |
-| **Use Case** | domain/usecase/ | ✅ Excellent | Single-responsibility business logic |
-| **DTO** | data/remote/dto/ | ✅ Good | Separates API models from domain |
-| **State Pattern** | presentation/state/ | ✅ Good | Immutable state objects |
-| **Factory** | di/ modules | ✅ Good | Koin factories for dependencies |
-| **Observer** | StateFlow | ✅ Excellent | Reactive state updates |
-| **Strategy** | Repository impls | ✅ Good | Swappable implementations |
+| Pattern           | Location                | Quality     | Notes                                |
+|-------------------|-------------------------|-------------|--------------------------------------|
+| **MVVM**          | presentation/viewmodel/ | ✅ Excellent | Clean separation of UI and logic     |
+| **Repository**    | domain/repository/      | ✅ Excellent | Interfaces in domain, impl in data   |
+| **Use Case**      | domain/usecase/         | ✅ Excellent | Single-responsibility business logic |
+| **DTO**           | data/remote/dto/        | ✅ Good      | Separates API models from domain     |
+| **State Pattern** | presentation/state/     | ✅ Good      | Immutable state objects              |
+| **Factory**       | di/ modules             | ✅ Good      | Koin factories for dependencies      |
+| **Observer**      | StateFlow               | ✅ Excellent | Reactive state updates               |
+| **Strategy**      | Repository impls        | ✅ Good      | Swappable implementations            |
 
 ### 2.2 Anti-Patterns Identified 🔴
 
 #### **God Object**
+
 ```kotlin
 // AdminDashboard.kt - knows about EVERYTHING
 @Composable
@@ -202,16 +219,19 @@ fun AdminDashboard() {
 **Solution**: Break into feature-specific modules.
 
 #### **Long Method/File**
+
 - AdminDashboard.kt: 2,335 lines
 - KioskMode.kt: 1,756 lines
 - Individual composables > 200 lines
 
 **Rule of Thumb**:
+
 - Files: < 500 lines
 - Functions: < 100 lines
 - Classes: < 300 lines
 
 #### **Magic Numbers**
+
 ```kotlin
 // Found throughout codebase
 Modifier.padding(16.dp)
@@ -221,6 +241,7 @@ if (confidence > 0.85)
 ```
 
 **Solution**: Extract to constants or config:
+
 ```kotlin
 object UIDimens {
     val PaddingStandard = 16.dp
@@ -234,6 +255,7 @@ object BiometricConfig {
 ```
 
 #### **Duplicate Code**
+
 ```kotlin
 // Similar components in AdminDashboard and KioskMode
 @Composable private fun StatisticCard() { ... }  // Duplicated
@@ -250,13 +272,16 @@ object BiometricConfig {
 ### 3.1 DRY (Don't Repeat Yourself)
 
 #### 🔴 Violated
+
 **Duplicate Package Structure**:
+
 ```
 com.fivucsas.mobile/      # Legacy mobile-focused package
 com.fivucsas.shared/      # New shared package
 ```
 
 **Issues**:
+
 - Some models duplicated (User, AuthToken)
 - Confusing which package to import
 - Maintenance burden
@@ -264,6 +289,7 @@ com.fivucsas.shared/      # New shared package
 **Solution**: Consolidate to `com.fivucsas.shared` only.
 
 **Duplicate UI Components**:
+
 - StatisticCard appears in multiple places
 - TextField validation logic repeated
 - Loading/Error states duplicated
@@ -271,6 +297,7 @@ com.fivucsas.shared/      # New shared package
 **Solution**: Create `shared/ui/components/` module.
 
 #### ✅ Good Examples
+
 ```kotlin
 // Reused across ViewModels
 sealed class LoadingState {
@@ -284,6 +311,7 @@ sealed class LoadingState {
 ### 3.2 KISS (Keep It Simple, Stupid)
 
 #### ✅ Good Examples
+
 ```kotlin
 // Simple, focused use case
 class DeleteUserUseCase(private val repository: UserRepository) {
@@ -301,6 +329,7 @@ data class AdminUiState(
 ```
 
 #### ⚠️ Could Simplify
+
 ```kotlin
 // AdminViewModel has complex logic that could be extracted
 private fun filterUsers(query: String) {
@@ -322,6 +351,7 @@ private fun filterUsers(query: String) {
 ```
 
 **Simplified**:
+
 ```kotlin
 // Extract to domain layer
 class UserFilter {
@@ -342,11 +372,13 @@ fun User.matchesQuery(query: String): Boolean {
 ### 3.3 YAGNI (You Aren't Gonna Need It)
 
 #### ✅ Good Adherence
+
 - No unnecessary features implemented
 - Focused on core requirements
 - Mock mode instead of complex backend (until needed)
 
 #### ⚠️ Potential Over-Engineering
+
 ```kotlin
 // Found in some areas: Sealed classes with many states that aren't all used
 sealed class EnrollmentState {
@@ -364,6 +396,7 @@ sealed class EnrollmentState {
 ### 3.4 Separation of Concerns
 
 #### ✅ Excellent (Shared Module)
+
 ```
 Domain Layer (Business Logic)
     ↓ depends on
@@ -375,10 +408,12 @@ Presentation Layer (UI)
 Each layer has clear responsibilities and dependencies flow correctly.
 
 #### 🔴 Poor (Desktop UI)
+
 - UI contains layout logic + navigation logic + data transformation
 - Composables do too much
 
 **Solution**: Follow atomic design:
+
 ```
 ui/
 ├── atoms/        # Basic elements (buttons, inputs)
@@ -391,6 +426,7 @@ ui/
 ### 3.5 Composition Over Inheritance
 
 #### ✅ Well Applied
+
 ```kotlin
 // Using composition (Koin DI)
 class AdminViewModel(
@@ -412,6 +448,7 @@ class AdminViewModel(
 ### 4.1 Refactor Monolithic UI Files
 
 #### Current Structure (2 files, 4,091 lines)
+
 ```
 desktopApp/src/desktopMain/kotlin/com/fivucsas/desktop/ui/
 ├── admin/
@@ -421,6 +458,7 @@ desktopApp/src/desktopMain/kotlin/com/fivucsas/desktop/ui/
 ```
 
 #### Proposed Structure (30+ files, avg 150 lines each)
+
 ```
 desktopApp/src/desktopMain/kotlin/com/fivucsas/desktop/
 ├── ui/
@@ -513,6 +551,7 @@ desktopApp/src/desktopMain/kotlin/com/fivucsas/desktop/
 ```
 
 **Benefits**:
+
 - ✅ Each file < 200 lines (easy to understand)
 - ✅ Single responsibility per file
 - ✅ Easy to test components in isolation
@@ -577,6 +616,7 @@ shared/src/commonMain/kotlin/com/fivucsas/shared/ui/
 ```
 
 **Usage Example**:
+
 ```kotlin
 // Before (duplicated private functions)
 @Composable
@@ -601,6 +641,7 @@ fun UsersTab() {
 ### 4.3 Consolidate Package Structure
 
 #### Current (Confusing)
+
 ```
 shared/src/commonMain/kotlin/
 ├── com.fivucsas.mobile/    # 94KB - Legacy
@@ -615,6 +656,7 @@ shared/src/commonMain/kotlin/
 ```
 
 #### Proposed (Clean)
+
 ```
 shared/src/commonMain/kotlin/
 └── com.fivucsas.shared/
@@ -661,6 +703,7 @@ shared/src/commonMain/kotlin/
 ```
 
 **Migration Steps**:
+
 1. Create new package structure
 2. Move files from `com.fivucsas.mobile` to `com.fivucsas.shared`
 3. Update imports across codebase
@@ -672,6 +715,7 @@ shared/src/commonMain/kotlin/
 ### 4.4 Add Platform Abstractions
 
 #### Problem
+
 ```kotlin
 // Desktop-specific code
 class DesktopCameraService {
@@ -687,6 +731,7 @@ class AndroidCameraService {
 ```
 
 #### Solution
+
 ```kotlin
 // shared/src/commonMain/kotlin/.../platform/camera/ICameraService.kt
 interface ICameraService {
@@ -786,6 +831,7 @@ interface IBiometricAuth {
 ### 4.5 Extract Configuration
 
 #### Current (Magic Numbers Everywhere)
+
 ```kotlin
 // Scattered throughout code
 Modifier.padding(16.dp)
@@ -796,6 +842,7 @@ if (retryCount > 3)
 ```
 
 #### Proposed Configuration System
+
 ```kotlin
 // shared/src/commonMain/kotlin/.../config/AppConfig.kt
 object AppConfig {
@@ -864,6 +911,7 @@ object AnimationConfig {
 ```
 
 **Usage**:
+
 ```kotlin
 // Before
 if (confidence > 0.85) { ... }
@@ -877,6 +925,7 @@ Modifier.padding(UIDimens.SpacingMedium)
 ```
 
 **Benefits**:
+
 - ✅ Single source of truth for configuration
 - ✅ Easy to adjust thresholds
 - ✅ Consistent UI spacing
@@ -889,6 +938,7 @@ Modifier.padding(UIDimens.SpacingMedium)
 ## 5. Testing Strategy
 
 ### 5.1 Current State ❌
+
 - **Coverage**: ~10%
 - **ViewModel tests**: Missing
 - **UI tests**: Missing
@@ -1068,14 +1118,14 @@ class UsersTabTest {
 
 ### 5.5 Testing Coverage Goals
 
-| Layer | Current | Target | Priority |
-|-------|---------|--------|----------|
-| Domain (Use Cases) | 40% | 90% | High |
-| Domain (Models) | 0% | 60% | Medium |
-| Data (Repositories) | 20% | 80% | High |
-| Presentation (ViewModels) | 0% | 80% | **Critical** |
-| UI (Composables) | 0% | 40% | Medium |
-| **Overall** | **10%** | **70%** | |
+| Layer                     | Current | Target  | Priority     |
+|---------------------------|---------|---------|--------------|
+| Domain (Use Cases)        | 40%     | 90%     | High         |
+| Domain (Models)           | 0%      | 60%     | Medium       |
+| Data (Repositories)       | 20%     | 80%     | High         |
+| Presentation (ViewModels) | 0%      | 80%     | **Critical** |
+| UI (Composables)          | 0%      | 40%     | Medium       |
+| **Overall**               | **10%** | **70%** |              |
 
 **Estimated Effort**: 3-4 days for critical tests
 
@@ -1084,23 +1134,28 @@ class UsersTabTest {
 ## 6. Implementation Roadmap
 
 ### Phase 0: Preparation (1 day)
+
 **Goal**: Set up for refactoring success
 
 **Tasks**:
+
 - [ ] Create feature branch: `refactor/professional-architecture`
 - [ ] Back up current working code
 - [ ] Set up automated tests (CI/CD)
 - [ ] Document current functionality
 
 **Deliverables**:
+
 - Branch created
 - Test suite running
 - Baseline metrics captured
 
 ### Phase 1: Package Consolidation (1 day)
+
 **Goal**: Eliminate duplicate packages
 
 **Tasks**:
+
 - [ ] Create new package structure in `com.fivucsas.shared`
 - [ ] Move files from `com.fivucsas.mobile` to `com.fivucsas.shared`
 - [ ] Update all imports
@@ -1108,6 +1163,7 @@ class UsersTabTest {
 - [ ] Verify compilation
 
 **Deliverables**:
+
 - Single package structure
 - All imports updated
 - Tests passing
@@ -1115,9 +1171,11 @@ class UsersTabTest {
 **Risk**: Medium - Many file moves, but IDE can help
 
 ### Phase 2: Extract Configuration (1 day)
+
 **Goal**: Centralize configuration
 
 **Tasks**:
+
 - [ ] Create `AppConfig.kt` with all constants
 - [ ] Create `UIDimens.kt` for UI dimensions
 - [ ] Create `AnimationConfig.kt` for animations
@@ -1125,6 +1183,7 @@ class UsersTabTest {
 - [ ] Update tests
 
 **Deliverables**:
+
 - Configuration modules created
 - Magic numbers eliminated
 - Tests passing
@@ -1132,9 +1191,11 @@ class UsersTabTest {
 **Risk**: Low - Straightforward refactoring
 
 ### Phase 3: Create Shared UI Components (2 days)
+
 **Goal**: Extract reusable UI components
 
 **Tasks**:
+
 - [ ] Create `shared/ui/components/` structure
 - [ ] Extract atoms (buttons, inputs, etc.)
 - [ ] Extract molecules (cards, forms, etc.)
@@ -1144,6 +1205,7 @@ class UsersTabTest {
 - [ ] Create component showcase/catalog
 
 **Deliverables**:
+
 - 20+ reusable components
 - Component documentation
 - Desktop UI using shared components
@@ -1152,9 +1214,11 @@ class UsersTabTest {
 **Risk**: Medium - Requires careful extraction
 
 ### Phase 4: Refactor AdminDashboard (3 days)
+
 **Goal**: Break monolithic file into features
 
 **Day 1: Users Tab**
+
 - [ ] Extract UsersTab.kt (200 lines)
 - [ ] Extract UserStatisticsCards.kt (100 lines)
 - [ ] Extract UserTable.kt (150 lines)
@@ -1162,6 +1226,7 @@ class UsersTabTest {
 - [ ] Test users tab functionality
 
 **Day 2: Analytics, Security, Settings Navigation**
+
 - [ ] Extract AnalyticsTab.kt + components (300 lines)
 - [ ] Extract SecurityTab.kt + components (300 lines)
 - [ ] Extract SettingsTab.kt container (120 lines)
@@ -1169,6 +1234,7 @@ class UsersTabTest {
 - [ ] Test tabs functionality
 
 **Day 3: Settings Sections**
+
 - [ ] Extract 6 settings sections (~900 lines)
 - [ ] Refactor AdminDashboard.kt to scaffold (150 lines)
 - [ ] Extract navigation (80 lines)
@@ -1176,6 +1242,7 @@ class UsersTabTest {
 - [ ] Verify all functionality works
 
 **Deliverables**:
+
 - AdminDashboard.kt reduced from 2,335 → ~150 lines
 - 20+ new organized files
 - All functionality preserved
@@ -1184,9 +1251,11 @@ class UsersTabTest {
 **Risk**: High - Large refactoring, careful testing needed
 
 ### Phase 5: Refactor KioskMode (2 days)
+
 **Goal**: Break monolithic file into screens
 
 **Day 1: Extract Screens**
+
 - [ ] Extract WelcomeScreen.kt (150 lines)
 - [ ] Extract EnrollmentScreen.kt (180 lines)
 - [ ] Extract VerificationScreen.kt (150 lines)
@@ -1194,12 +1263,14 @@ class UsersTabTest {
 - [ ] Test screen navigation
 
 **Day 2: Extract Components**
+
 - [ ] Extract enrollment components (3 files, ~300 lines)
 - [ ] Extract verification components (4 files, ~380 lines)
 - [ ] Refactor KioskMode.kt to scaffold (100 lines)
 - [ ] Integration testing
 
 **Deliverables**:
+
 - KioskMode.kt reduced from 1,756 → ~100 lines
 - 12+ new organized files
 - All functionality preserved
@@ -1208,9 +1279,11 @@ class UsersTabTest {
 **Risk**: Medium - Well-defined screens make extraction easier
 
 ### Phase 6: Add Platform Abstractions (2 days)
+
 **Goal**: Abstract platform-specific code
 
 **Day 1: Create Interfaces**
+
 - [ ] Create ICameraService interface
 - [ ] Create ILogger interface
 - [ ] Create ISecureStorage interface
@@ -1218,6 +1291,7 @@ class UsersTabTest {
 - [ ] Document platform contracts
 
 **Day 2: Implement Desktop**
+
 - [ ] Implement DesktopCameraService
 - [ ] Implement DesktopLogger
 - [ ] Implement DesktopSecureStorage
@@ -1226,6 +1300,7 @@ class UsersTabTest {
 - [ ] Test implementations
 
 **Deliverables**:
+
 - Platform interfaces defined
 - Desktop implementations complete
 - DI configured
@@ -1235,9 +1310,11 @@ class UsersTabTest {
 **Risk**: Low - Clean abstraction work
 
 ### Phase 7: Add ViewModel Tests (2 days)
+
 **Goal**: Achieve 70%+ test coverage on ViewModels
 
 **Day 1: AdminViewModel Tests**
+
 - [ ] Set up test infrastructure
 - [ ] Write fake repositories
 - [ ] Test loadUsers()
@@ -1247,6 +1324,7 @@ class UsersTabTest {
 - [ ] Test state transitions
 
 **Day 2: KioskViewModel Tests**
+
 - [ ] Test enrollment flow
 - [ ] Test verification flow
 - [ ] Test camera integration
@@ -1255,6 +1333,7 @@ class UsersTabTest {
 - [ ] Run coverage report
 
 **Deliverables**:
+
 - 20+ ViewModel tests
 - 70%+ ViewModel coverage
 - Coverage report
@@ -1263,9 +1342,11 @@ class UsersTabTest {
 **Risk**: Low - ViewModel architecture supports testing
 
 ### Phase 8: Documentation & Review (1 day)
+
 **Goal**: Document changes and review
 
 **Tasks**:
+
 - [ ] Update README with new structure
 - [ ] Update architecture documentation
 - [ ] Create component usage guide
@@ -1275,6 +1356,7 @@ class UsersTabTest {
 - [ ] Create demo video
 
 **Deliverables**:
+
 - Updated documentation
 - Migration guide
 - Code reviewed
@@ -1288,35 +1370,35 @@ class UsersTabTest {
 
 ### Code Quality Metrics
 
-| Metric | Before | Target | Measurement |
-|--------|--------|--------|-------------|
-| **Largest File** | 2,335 lines | < 500 lines | ✅ Critical |
-| **Avg File Size** | 123 lines | < 200 lines | ✅ Good |
-| **Test Coverage** | 10% | 70% | ✅ Critical |
-| **Packages** | 2 (duplicated) | 1 | ✅ Critical |
-| **Reusable Components** | 0 | 20+ | ✅ Important |
-| **Magic Numbers** | 50+ | 0 | ✅ Important |
-| **Platform Abstractions** | 0 | 4+ | ✅ Important |
+| Metric                    | Before         | Target      | Measurement |
+|---------------------------|----------------|-------------|-------------|
+| **Largest File**          | 2,335 lines    | < 500 lines | ✅ Critical  |
+| **Avg File Size**         | 123 lines      | < 200 lines | ✅ Good      |
+| **Test Coverage**         | 10%            | 70%         | ✅ Critical  |
+| **Packages**              | 2 (duplicated) | 1           | ✅ Critical  |
+| **Reusable Components**   | 0              | 20+         | ✅ Important |
+| **Magic Numbers**         | 50+            | 0           | ✅ Important |
+| **Platform Abstractions** | 0              | 4+          | ✅ Important |
 
 ### SOLID Compliance
 
 | Principle | Before | After | Status |
 |-----------|--------|-------|--------|
-| **SRP** | 60% | 95% | 🔴 → ✅ |
-| **OCP** | 90% | 95% | ✅ → ✅ |
-| **LSP** | 95% | 95% | ✅ → ✅ |
-| **ISP** | 85% | 90% | ✅ → ✅ |
-| **DIP** | 95% | 95% | ✅ → ✅ |
+| **SRP**   | 60%    | 95%   | 🔴 → ✅ |
+| **OCP**   | 90%    | 95%   | ✅ → ✅  |
+| **LSP**   | 95%    | 95%   | ✅ → ✅  |
+| **ISP**   | 85%    | 90%   | ✅ → ✅  |
+| **DIP**   | 95%    | 95%   | ✅ → ✅  |
 
 ### Developer Experience
 
-| Metric | Before | Target |
-|--------|--------|--------|
-| **Time to Find Code** | ~5 min | < 30 sec |
-| **Time to Add Feature** | High (merge conflicts) | Low |
-| **Onboarding Time** | ~3 days | < 1 day |
-| **Build Time** | ~30 sec | < 30 sec |
-| **Test Run Time** | ~2 sec (few tests) | < 10 sec |
+| Metric                  | Before                 | Target   |
+|-------------------------|------------------------|----------|
+| **Time to Find Code**   | ~5 min                 | < 30 sec |
+| **Time to Add Feature** | High (merge conflicts) | Low      |
+| **Onboarding Time**     | ~3 days                | < 1 day  |
+| **Build Time**          | ~30 sec                | < 30 sec |
+| **Test Run Time**       | ~2 sec (few tests)     | < 10 sec |
 
 ---
 
@@ -1325,46 +1407,47 @@ class UsersTabTest {
 ### High Risk Items 🔴
 
 1. **AdminDashboard Refactoring (Phase 4)**
-   - Risk: Breaking functionality during file splits
-   - Mitigation: Test after each extraction, use feature flags
-   - Rollback: Keep backup branch
+    - Risk: Breaking functionality during file splits
+    - Mitigation: Test after each extraction, use feature flags
+    - Rollback: Keep backup branch
 
 2. **Package Migration (Phase 1)**
-   - Risk: Import errors, compilation failures
-   - Mitigation: Use IDE refactoring tools, incremental changes
-   - Rollback: Git reset
+    - Risk: Import errors, compilation failures
+    - Mitigation: Use IDE refactoring tools, incremental changes
+    - Rollback: Git reset
 
 ### Medium Risk Items ⚠️
 
 1. **Shared Components (Phase 3)**
-   - Risk: Components not flexible enough
-   - Mitigation: Start with simple components, iterate
-   - Rollback: Keep private functions temporarily
+    - Risk: Components not flexible enough
+    - Mitigation: Start with simple components, iterate
+    - Rollback: Keep private functions temporarily
 
 2. **KioskMode Refactoring (Phase 5)**
-   - Risk: Navigation breaking
-   - Mitigation: Preserve existing navigation logic
-   - Rollback: Revert files
+    - Risk: Navigation breaking
+    - Mitigation: Preserve existing navigation logic
+    - Rollback: Revert files
 
 ### Low Risk Items ✅
 
 1. **Configuration Extraction (Phase 2)**
-   - Risk: Minimal - find/replace operation
-   - Mitigation: Comprehensive testing
+    - Risk: Minimal - find/replace operation
+    - Mitigation: Comprehensive testing
 
 2. **Platform Abstractions (Phase 6)**
-   - Risk: Minimal - adding new code
-   - Mitigation: Tests for interfaces
+    - Risk: Minimal - adding new code
+    - Mitigation: Tests for interfaces
 
 3. **Testing (Phase 7)**
-   - Risk: Minimal - only adding tests
-   - Mitigation: None needed
+    - Risk: Minimal - only adding tests
+    - Mitigation: None needed
 
 ---
 
 ## 9. Cost-Benefit Analysis
 
 ### Investment Required
+
 - **Time**: 14 working days (2.8 weeks)
 - **Resources**: 1 senior developer
 - **Risk**: Medium (mostly low-risk refactorings)
@@ -1372,18 +1455,21 @@ class UsersTabTest {
 ### Benefits
 
 #### Short-term (0-3 months)
+
 - ✅ Easier code navigation (5 min → 30 sec)
 - ✅ Reduced merge conflicts (80% reduction)
 - ✅ Faster feature development (30% faster)
 - ✅ Better code reviews (can review per feature)
 
 #### Medium-term (3-6 months)
+
 - ✅ Faster onboarding (3 days → 1 day)
 - ✅ Fewer bugs (better testing)
 - ✅ Easier maintenance (clear boundaries)
 - ✅ Parallel mobile development (iOS/Android teams)
 
 #### Long-term (6-12 months)
+
 - ✅ Lower technical debt
 - ✅ Higher team productivity
 - ✅ Better architecture for scaling
@@ -1392,14 +1478,17 @@ class UsersTabTest {
 ### ROI Calculation
 
 **Assumptions**:
+
 - Team size: 3 developers
 - Developer cost: $100/hour
 - Project duration: 12 months
 
 **Costs**:
+
 - Refactoring: 14 days × 8 hours × $100 = $11,200
 
 **Savings** (conservative estimates):
+
 - Reduced debugging: 2 hours/week/dev × 48 weeks × 3 devs × $100 = $28,800
 - Faster features: 20% of 40 hours/week × 48 weeks × 3 devs × $100 = $115,200
 - Fewer production bugs: 1 bug/month × 4 hours × 12 months × $100 = $4,800
@@ -1415,6 +1504,7 @@ class UsersTabTest {
 ### Current State: Good Foundation, Poor Organization
 
 The mobile-app codebase has a **professional architecture** with excellent patterns:
+
 - ✅ Clean Architecture
 - ✅ SOLID principles (in shared module)
 - ✅ Modern technology stack
@@ -1422,6 +1512,7 @@ The mobile-app codebase has a **professional architecture** with excellent patte
 - ✅ 90% code sharing potential
 
 **However**, the desktop UI implementation has **critical organizational issues**:
+
 - 🔴 Monolithic files (4,091 lines in 2 files)
 - 🔴 Duplicate packages
 - 🔴 Low test coverage
@@ -1431,12 +1522,14 @@ The mobile-app codebase has a **professional architecture** with excellent patte
 ### Recommendation: REFACTOR NOW
 
 **Why Now?**
+
 1. Desktop is 96% complete - good time to refactor
 2. Before mobile development starts (avoid proliferating issues)
 3. Before adding backend integration (cleaner codebase)
 4. Team is small (easier coordination)
 
 **Why Not Later?**
+
 1. Technical debt grows exponentially
 2. More developers = more merge conflicts
 3. Harder to refactor with more features
@@ -1445,6 +1538,7 @@ The mobile-app codebase has a **professional architecture** with excellent patte
 ### Expected Outcome
 
 **After refactoring**:
+
 - ✅ 30+ well-organized files instead of 2 monolithic files
 - ✅ 20+ reusable UI components
 - ✅ 70%+ test coverage
@@ -1466,6 +1560,7 @@ The mobile-app codebase has a **professional architecture** with excellent patte
 ## Appendix A: Code Examples
 
 ### Before: Monolithic AdminDashboard.kt
+
 ```kotlin
 // 2,335 lines in one file
 @Composable
@@ -1479,6 +1574,7 @@ fun AdminDashboard() {
 ```
 
 ### After: Organized Structure
+
 ```kotlin
 // AdminDashboard.kt - 150 lines
 @Composable
@@ -1521,16 +1617,19 @@ See Section 5.3 for comprehensive ViewModel testing examples.
 ## Appendix C: References
 
 **Design Patterns**:
+
 - Clean Architecture (Robert C. Martin)
 - Domain-Driven Design (Eric Evans)
 - SOLID Principles (Robert C. Martin)
 
 **Best Practices**:
+
 - Effective Kotlin (Marcin Moskała)
 - Compose Guidelines (Google)
 - Kotlin Multiplatform Guide (JetBrains)
 
 **Tools**:
+
 - Koin (Dependency Injection)
 - Ktor (Networking)
 - Compose Multiplatform (UI)

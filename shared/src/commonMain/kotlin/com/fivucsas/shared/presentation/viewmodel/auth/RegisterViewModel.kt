@@ -1,6 +1,6 @@
 package com.fivucsas.shared.presentation.viewmodel.auth
 
-import com.fivucsas.shared.domain.model.User
+import com.fivucsas.shared.domain.repository.AuthTokens
 import com.fivucsas.shared.domain.usecase.auth.RegisterUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.asStateFlow
 data class RegisterState(
     val isLoading: Boolean = false,
     val error: String? = null,
-    val user: User? = null,
+    val tokens: AuthTokens? = null,
     val isSuccess: Boolean = false
 )
 
@@ -23,10 +23,10 @@ class RegisterViewModel(
         _state.value = RegisterState(isLoading = true)
 
         registerUseCase(email, password, firstName, lastName).fold(
-            onSuccess = { (user, _) ->
+            onSuccess = { tokens ->
                 _state.value = RegisterState(
                     isLoading = false,
-                    user = user,
+                    tokens = tokens,
                     isSuccess = true
                 )
             },

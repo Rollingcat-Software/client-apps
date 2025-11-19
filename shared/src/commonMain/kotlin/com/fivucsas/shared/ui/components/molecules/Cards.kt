@@ -5,8 +5,9 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.Card
-import androidx.compose.material.Icon
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -16,7 +17,6 @@ import com.fivucsas.shared.config.UIDimens
 import com.fivucsas.shared.ui.components.atoms.BodyMediumText
 import com.fivucsas.shared.ui.components.atoms.BodySmallText
 import com.fivucsas.shared.ui.components.atoms.HeadlineMediumText
-import com.fivucsas.shared.ui.components.atoms.TitleLargeText
 import com.fivucsas.shared.ui.components.atoms.TitleMediumText
 import com.fivucsas.shared.ui.components.atoms.VerticalSpacerSmall
 import com.fivucsas.shared.ui.components.atoms.VerticalSpacerXSmall
@@ -39,8 +39,12 @@ fun AppCard(
     Card(
         modifier = modifier,
         shape = AppShapes.Card,
-        backgroundColor = AppColors.Surface,
-        elevation = UIDimens.CardElevation
+        colors = CardDefaults.cardColors(
+            containerColor = AppColors.Surface
+        ),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = UIDimens.CardElevation
+        )
     ) {
         content()
     }
@@ -164,8 +168,12 @@ fun ClickableCard(
         onClick = onClick,
         modifier = modifier,
         shape = AppShapes.Card,
-        backgroundColor = AppColors.Surface,
-        elevation = UIDimens.CardElevation
+        colors = CardDefaults.cardColors(
+            containerColor = AppColors.Surface
+        ),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = UIDimens.CardElevation
+        )
     ) {
         content()
     }

@@ -2,10 +2,10 @@ package com.fivucsas.shared.presentation.state
 
 /**
  * UI State for Kiosk screens
- * 
+ *
  * Represents the current state of the kiosk UI.
  * Immutable data class - changes create new instances.
- * 
+ *
  * Benefits:
  * - Type-safe state management
  * - Easy to test

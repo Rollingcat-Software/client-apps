@@ -135,14 +135,16 @@ fun BiometricEnrollScreen(
                                 modifier = Modifier.padding(16.dp),
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
+                                val enrollResult =
+                                    state.result as? com.fivucsas.shared.presentation.viewmodel.auth.BiometricResult.EnrollmentSuccess
                                 Text(
-                                    text = "✓ ${state.result!!.message}",
+                                    text = "✓ Enrollment Successful",
                                     color = MaterialTheme.colorScheme.onPrimaryContainer,
                                     style = MaterialTheme.typography.titleMedium
                                 )
                                 Spacer(modifier = Modifier.height(8.dp))
                                 Text(
-                                    text = "Confidence: ${(state.result!!.confidence * 100).toInt()}%",
+                                    text = "User: ${enrollResult?.user?.name ?: "Unknown"}",
                                     color = MaterialTheme.colorScheme.onPrimaryContainer
                                 )
                                 Spacer(modifier = Modifier.height(16.dp))
@@ -166,7 +168,13 @@ fun BiometricEnrollScreen(
                                             val imageBytes = bitmapToByteArray(rotatedBitmap)
 
                                             scope.launch {
-                                                viewModel.enrollFace(userId, imageBytes)
+                                                val enrollmentData =
+                                                    com.fivucsas.shared.domain.model.EnrollmentData(
+                                                        fullName = "Test User",
+                                                        email = "test@example.com",
+                                                        idNumber = userId
+                                                    )
+                                                viewModel.enrollFace(enrollmentData, imageBytes)
                                             }
                                             image.close()
                                         }

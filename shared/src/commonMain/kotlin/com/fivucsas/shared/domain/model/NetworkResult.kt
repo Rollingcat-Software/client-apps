@@ -8,25 +8,25 @@ sealed class NetworkResult<out T> {
     data class Success<T>(val data: T) : NetworkResult<T>()
     data class Error(val exception: NetworkException) : NetworkResult<Nothing>()
     data object Loading : NetworkResult<Nothing>()
-    
+
     /**
      * Check if result is success
      */
     val isSuccess: Boolean
         get() = this is Success
-    
+
     /**
      * Check if result is error
      */
     val isError: Boolean
         get() = this is Error
-    
+
     /**
      * Check if result is loading
      */
     val isLoading: Boolean
         get() = this is Loading
-    
+
     /**
      * Get data or null
      */
@@ -41,7 +41,9 @@ sealed class NetworkResult<out T> {
  */
 sealed class NetworkException(message: String) : Exception(message) {
     class NetworkError(message: String = "Network error occurred") : NetworkException(message)
-    class ServerError(val code: Int, message: String = "Server error: $code") : NetworkException(message)
+    class ServerError(val code: Int, message: String = "Server error: $code") :
+        NetworkException(message)
+
     class Unauthorized(message: String = "Unauthorized") : NetworkException(message)
     class NotFound(message: String = "Resource not found") : NetworkException(message)
     class Timeout(message: String = "Request timeout") : NetworkException(message)

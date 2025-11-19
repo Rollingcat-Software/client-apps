@@ -1,0 +1,186 @@
+[
+  {
+    "name" : "org.bytedeco.opencv.presets.opencv_text"
+  },
+  {
+    "name" : "org.bytedeco.opencv.global.opencv_text"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_text.BaseOCR"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_text.DoubleVector"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_text.ERFilter"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_text.ERStat"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_text.ERStatVector"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_text.ERStatVectorVector"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_text.FloatVector"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_text.IntDeque"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_text.IntVector"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_text.OCRBeamSearchDecoder"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_text.OCRHMMDecoder"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_text.OCRHolisticWordRecognizer"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_text.OCRTesseract"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_text.TextDetector"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_text.TextDetectorCNN"
+  },
+  {
+    "name" : "org.bytedeco.javacpp.Pointer",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true,
+    "allDeclaredClasses" : true,
+    "allPublicClasses" : true
+  },
+  {
+    "name" : "java.lang.String",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true,
+    "allDeclaredClasses" : true,
+    "allPublicClasses" : true
+  },
+  {
+    "name" : "org.bytedeco.javacpp.Pointer$NativeDeallocator",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true,
+    "allDeclaredClasses" : true,
+    "allPublicClasses" : true
+  },
+  {
+    "name" : "org.bytedeco.javacpp.Loader"
+  },
+  {
+    "name" : "java.nio.Buffer",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true,
+    "allDeclaredClasses" : true,
+    "allPublicClasses" : true
+  },
+  {
+    "name" : "java.lang.Object",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true,
+    "allDeclaredClasses" : true,
+    "allPublicClasses" : true
+  },
+  {
+    "name" : "java.nio.charset.Charset",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true,
+    "allDeclaredClasses" : true,
+    "allPublicClasses" : true
+  },
+  {
+    "name" : "java.lang.RuntimeException"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_text.ERFilter$Callback"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_text.OCRHMMDecoder$ClassifierCallback"
+  },
+  {
+    "name" : "java.lang.NullPointerException"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_core.Mat"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_text.OCRBeamSearchDecoder$ClassifierCallback"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_text.DoubleVector$Iterator"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_core.Algorithm"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_core.Rect"
+  },
+  {
+    "name" : "org.bytedeco.javacpp.DoublePointer",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true,
+    "allDeclaredClasses" : true,
+    "allPublicClasses" : true
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_text.ERStatVector$Iterator"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_text.ERStatVectorVector$Iterator"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_text.FloatVector$Iterator"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_text.IntDeque$Iterator"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_text.IntVector$Iterator"
+  },
+  {
+    "name" : "org.bytedeco.javacpp.BytePointer",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true,
+    "allDeclaredClasses" : true,
+    "allPublicClasses" : true
+  }
+]

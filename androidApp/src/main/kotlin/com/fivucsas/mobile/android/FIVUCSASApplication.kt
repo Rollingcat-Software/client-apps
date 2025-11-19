@@ -14,7 +14,7 @@ import org.koin.core.logger.Level
 class FIVUCSASApplication : Application() {
     override fun onCreate() {
         super.onCreate()
-        
+
         // Initialize Koin
         startKoin {
             androidLogger(Level.DEBUG)

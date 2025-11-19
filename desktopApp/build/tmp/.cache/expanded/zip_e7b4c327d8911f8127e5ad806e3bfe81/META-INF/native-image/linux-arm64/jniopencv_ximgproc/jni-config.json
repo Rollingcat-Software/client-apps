@@ -1,0 +1,193 @@
+[
+  {
+    "name" : "org.bytedeco.opencv.presets.opencv_ximgproc"
+  },
+  {
+    "name" : "org.bytedeco.opencv.global.opencv_ximgproc"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_ximgproc.AdaptiveManifoldFilter"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_ximgproc.Box"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_ximgproc.ContourFitting"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_ximgproc.DTFilter"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_ximgproc.DisparityFilter"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_ximgproc.DisparityWLSFilter"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_ximgproc.EdgeAwareInterpolator"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_ximgproc.EdgeBoxes"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_ximgproc.FastBilateralSolverFilter"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_ximgproc.FastGlobalSmootherFilter"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_ximgproc.FastLineDetector"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_ximgproc.GraphSegmentation"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_ximgproc.GuidedFilter"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_ximgproc.RFFeatureGetter"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_ximgproc.RICInterpolator"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_ximgproc.RidgeDetectionFilter"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_ximgproc.SelectiveSearchSegmentation"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_ximgproc.SelectiveSearchSegmentationStrategy"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_ximgproc.SelectiveSearchSegmentationStrategyColor"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_ximgproc.SelectiveSearchSegmentationStrategyFill"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_ximgproc.SelectiveSearchSegmentationStrategyMultiple"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_ximgproc.SelectiveSearchSegmentationStrategySize"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_ximgproc.SelectiveSearchSegmentationStrategyTexture"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_ximgproc.SparseMatchInterpolator"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_ximgproc.StructuredEdgeDetection"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_ximgproc.SuperpixelLSC"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_ximgproc.SuperpixelSEEDS"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_ximgproc.SuperpixelSLIC"
+  },
+  {
+    "name" : "org.bytedeco.javacpp.Pointer",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true,
+    "allDeclaredClasses" : true,
+    "allPublicClasses" : true
+  },
+  {
+    "name" : "java.lang.String",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true,
+    "allDeclaredClasses" : true,
+    "allPublicClasses" : true
+  },
+  {
+    "name" : "org.bytedeco.javacpp.Pointer$NativeDeallocator",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true,
+    "allDeclaredClasses" : true,
+    "allPublicClasses" : true
+  },
+  {
+    "name" : "org.bytedeco.javacpp.Loader"
+  },
+  {
+    "name" : "java.nio.Buffer",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true,
+    "allDeclaredClasses" : true,
+    "allPublicClasses" : true
+  },
+  {
+    "name" : "java.lang.Object",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true,
+    "allDeclaredClasses" : true,
+    "allPublicClasses" : true
+  },
+  {
+    "name" : "java.nio.charset.Charset",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true,
+    "allDeclaredClasses" : true,
+    "allPublicClasses" : true
+  },
+  {
+    "name" : "java.lang.NullPointerException"
+  },
+  {
+    "name" : "java.lang.RuntimeException"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_calib3d.StereoMatcher"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_core.Mat"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_core.Scalar4i"
+  },
+  {
+    "name" : "org.bytedeco.javacpp.DoublePointer",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true,
+    "allDeclaredClasses" : true,
+    "allPublicClasses" : true
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_core.Algorithm"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_core.Rect"
+  }
+]

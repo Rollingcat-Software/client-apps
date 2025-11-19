@@ -11,6 +11,7 @@
 ## 📊 What We'll Achieve
 
 ### Before Day 5 ⚠️
+
 ```kotlin
 // Manual factory - verbose, error-prone
 object ViewModelFactory {
@@ -31,6 +32,7 @@ fun KioskMode() {
 ```
 
 ### After Day 5 ✅
+
 ```kotlin
 // Koin modules - clean, automatic
 val appModule = module {
@@ -416,6 +418,7 @@ fun initKoin() {
 **File:** `desktopApp/src/desktopMain/kotlin/com/fivucsas/desktop/ui/kiosk/KioskMode.kt`
 
 **Before:**
+
 ```kotlin
 @Composable
 fun KioskMode(
@@ -427,6 +430,7 @@ fun KioskMode(
 ```
 
 **After:**
+
 ```kotlin
 import org.koin.compose.koinInject
 
@@ -442,6 +446,7 @@ fun KioskMode(
 **File:** `desktopApp/src/desktopMain/kotlin/com/fivucsas/desktop/ui/admin/AdminDashboard.kt`
 
 **Before:**
+
 ```kotlin
 @Composable
 fun AdminDashboard(
@@ -453,6 +458,7 @@ fun AdminDashboard(
 ```
 
 **After:**
+
 ```kotlin
 import org.koin.compose.koinInject
 
@@ -501,7 +507,8 @@ cd mobile-app
 ./gradlew :desktopApp:run
 ```
 
-**Expected:** 
+**Expected:**
+
 - ✅ App launches
 - ✅ Koin initializes
 - ✅ ViewModels injected automatically
@@ -534,6 +541,7 @@ Check console output for Koin initialization:
 **Cause:** ViewModelModule not loaded
 
 **Fix:**
+
 ```kotlin
 // Verify appModule includes viewModelModule
 val appModule = module {
@@ -557,6 +565,7 @@ val appModule = module {
 **Cause:** Missing Koin Compose dependency
 
 **Fix:**
+
 ```kotlin
 // shared/build.gradle.kts
 implementation("io.insert-koin:koin-compose:1.1.0")
@@ -567,6 +576,7 @@ implementation("io.insert-koin:koin-compose:1.1.0")
 **Cause:** Forgot to register FIVUCSASApplication in manifest
 
 **Fix:**
+
 ```xml
 <application
     android:name=".FIVUCSASApplication"
@@ -633,6 +643,7 @@ fun testKioskViewModel() {
 ### 4. **Platform-Agnostic DI** ✅
 
 Same modules work on:
+
 - ✅ Desktop
 - ✅ Android
 - ✅ iOS (with KoinHelper)
@@ -675,21 +686,25 @@ singleOf(::AuthRepositoryImpl) { bind<AuthRepository>() }
 ## 🎓 What We Learned
 
 ### 1. **Koin is Simple**
+
 - No annotation processing
 - No code generation
 - Pure Kotlin DSL
 
 ### 2. **DI Improves Testability**
+
 - Easy to mock dependencies
 - Clean test setup
 
 ### 3. **Modules Organize Dependencies**
+
 - Network layer = networkModule
 - Data layer = repositoryModule
 - Domain layer = useCaseModule
 - Presentation layer = viewModelModule
 
 ### 4. **Platform Initialization Varies**
+
 - Desktop: `startKoin` in `main()`
 - Android: `startKoin` in `Application.onCreate()`
 - iOS: `initKoin()` helper function
@@ -699,6 +714,7 @@ singleOf(::AuthRepositoryImpl) { bind<AuthRepository>() }
 ## 🚀 What's Next?
 
 ### Day 6: API Integration
+
 - Connect to real backend APIs
 - Environment configuration
 - Error handling

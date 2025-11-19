@@ -26,7 +26,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
-import com.fivucsas.shared.domain.model.User
 import com.fivucsas.shared.presentation.viewmodel.auth.LoginViewModel
 import kotlinx.coroutines.launch
 
@@ -34,7 +33,7 @@ import kotlinx.coroutines.launch
 fun LoginScreen(
     viewModel: LoginViewModel,
     onNavigateToRegister: () -> Unit,
-    onLoginSuccess: (User) -> Unit
+    onLoginSuccess: () -> Unit
 ) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -42,8 +41,8 @@ fun LoginScreen(
     val scope = rememberCoroutineScope()
 
     LaunchedEffect(state.isSuccess) {
-        if (state.isSuccess && state.user != null) {
-            onLoginSuccess(state.user!!)
+        if (state.isSuccess && state.tokens != null) {
+            onLoginSuccess()
         }
     }
 

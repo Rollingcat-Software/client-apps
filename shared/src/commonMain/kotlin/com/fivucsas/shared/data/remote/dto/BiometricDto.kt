@@ -1,12 +1,12 @@
 package com.fivucsas.shared.data.remote.dto
 
 import com.fivucsas.shared.domain.model.BiometricData
-import com.fivucsas.shared.domain.model.VerificationResult
 import com.fivucsas.shared.domain.model.LivenessResult
+import com.fivucsas.shared.domain.model.VerificationResult
 
 /**
  * Data Transfer Object for Biometric Data
- * 
+ *
  * TODO: Add @Serializable when Ktor is added (Week 2)
  */
 data class BiometricDto(

@@ -5,7 +5,7 @@ package com.fivucsas.shared.presentation.state
  */
 sealed class DialogState {
     data object None : DialogState()
-    
+
     data class Confirmation(
         val title: String,
         val message: String,
@@ -14,14 +14,14 @@ sealed class DialogState {
         val onConfirm: () -> Unit,
         val onCancel: () -> Unit = {}
     ) : DialogState()
-    
+
     data class Alert(
         val title: String,
         val message: String,
         val buttonText: String = "OK",
         val onDismiss: () -> Unit = {}
     ) : DialogState()
-    
+
     data class Error(
         val title: String = "Error",
         val message: String,

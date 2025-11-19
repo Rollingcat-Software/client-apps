@@ -1,25 +1,46 @@
 package com.fivucsas.desktop.ui.components
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Face
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.toComposeImageBitmap
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.fivucsas.desktop.data.DesktopCameraService
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import org.jetbrains.skia.Image as SkiaImage
 import java.awt.image.BufferedImage
 import java.io.ByteArrayOutputStream
 import javax.imageio.ImageIO
+import org.jetbrains.skia.Image as SkiaImage
 
 /**
  * Camera Preview Composable
@@ -38,18 +59,18 @@ fun CameraPreview(
     var error by remember { mutableStateOf<String?>(null) }
     var useMockMode by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
-    
+
     // Initialize camera and start preview
     LaunchedEffect(Unit) {
         if (useMockMode) return@LaunchedEffect
-        
+
         val initResult = cameraService.initialize()
         if (initResult.isFailure) {
             error = initResult.exceptionOrNull()?.message
             // Don't enable mock mode automatically - let user decide
             return@LaunchedEffect
         }
-        
+
         // Continuous preview loop
         while (isActive && !useMockMode) {
             val frameResult = cameraService.getPreviewFrame()
@@ -64,7 +85,7 @@ fun CameraPreview(
             kotlinx.coroutines.delay(33) // ~30 FPS
         }
     }
-    
+
     // Clean up camera on dispose
     DisposableEffect(Unit) {
         onDispose {
@@ -73,7 +94,7 @@ fun CameraPreview(
             }
         }
     }
-    
+
     Column(
         modifier = modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -82,9 +103,9 @@ fun CameraPreview(
             if (useMockMode) "Mock Capture Mode" else "Live Camera Preview",
             style = MaterialTheme.typography.titleLarge
         )
-        
+
         Spacer(modifier = Modifier.height(16.dp))
-        
+
         // Camera preview or error message
         Surface(
             modifier = Modifier
@@ -121,6 +142,7 @@ fun CameraPreview(
                             )
                         }
                     }
+
                     error != null -> {
                         Column(
                             horizontalAlignment = Alignment.CenterHorizontally,
@@ -144,6 +166,7 @@ fun CameraPreview(
                             }
                         }
                     }
+
                     previewImage != null -> {
                         Image(
                             bitmap = previewImage!!,
@@ -151,6 +174,7 @@ fun CameraPreview(
                             modifier = Modifier.fillMaxSize()
                         )
                     }
+
                     else -> {
                         Column(
                             horizontalAlignment = Alignment.CenterHorizontally
@@ -163,9 +187,9 @@ fun CameraPreview(
                 }
             }
         }
-        
+
         Spacer(modifier = Modifier.height(16.dp))
-        
+
         // Capture controls
         Row(
             horizontalArrangement = Arrangement.spacedBy(16.dp)
@@ -176,7 +200,7 @@ fun CameraPreview(
             ) {
                 Text("Cancel")
             }
-            
+
             Button(
                 onClick = {
                     isCapturing = true
@@ -223,9 +247,10 @@ private fun generateMockImage(): ByteArray {
     // Create a simple test image
     val width = 640
     val height = 480
-    val image = java.awt.image.BufferedImage(width, height, java.awt.image.BufferedImage.TYPE_INT_RGB)
+    val image =
+        java.awt.image.BufferedImage(width, height, java.awt.image.BufferedImage.TYPE_INT_RGB)
     val graphics = image.createGraphics()
-    
+
     // Draw gradient background
     val paint = java.awt.GradientPaint(
         0f, 0f, java.awt.Color(100, 150, 200),
@@ -233,26 +258,26 @@ private fun generateMockImage(): ByteArray {
     )
     graphics.paint = paint
     graphics.fillRect(0, 0, width, height)
-    
+
     // Draw face circle
     graphics.color = java.awt.Color(255, 220, 180)
-    graphics.fillOval(width/2 - 100, height/2 - 120, 200, 240)
-    
+    graphics.fillOval(width / 2 - 100, height / 2 - 120, 200, 240)
+
     // Draw eyes
     graphics.color = java.awt.Color(50, 50, 50)
-    graphics.fillOval(width/2 - 60, height/2 - 60, 40, 40)
-    graphics.fillOval(width/2 + 20, height/2 - 60, 40, 40)
-    
+    graphics.fillOval(width / 2 - 60, height / 2 - 60, 40, 40)
+    graphics.fillOval(width / 2 + 20, height / 2 - 60, 40, 40)
+
     // Draw smile
-    graphics.drawArc(width/2 - 50, height/2 - 20, 100, 80, 0, -180)
-    
+    graphics.drawArc(width / 2 - 50, height / 2 - 20, 100, 80, 0, -180)
+
     // Draw text
     graphics.color = java.awt.Color.WHITE
     graphics.font = java.awt.Font("Arial", java.awt.Font.BOLD, 24)
-    graphics.drawString("MOCK TEST IMAGE", width/2 - 100, height - 50)
-    
+    graphics.drawString("MOCK TEST IMAGE", width / 2 - 100, height - 50)
+
     graphics.dispose()
-    
+
     // Convert to JPEG bytes
     val outputStream = ByteArrayOutputStream()
     ImageIO.write(image, "jpg", outputStream)

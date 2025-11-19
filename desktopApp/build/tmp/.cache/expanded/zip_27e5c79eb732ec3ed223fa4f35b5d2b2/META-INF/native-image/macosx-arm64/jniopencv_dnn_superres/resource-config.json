@@ -1,0 +1,8 @@
+{
+  "resources": [
+    {"pattern": "META-INF/.*"},
+    {"pattern": "org/bytedeco/javacpp/properties/.*"},
+    {"pattern": ".*/libjniopencv_dnn_superres.dylib"},
+    {"pattern": ".*/libopencv_dnn_superres.409.dylib"}
+  ]
+}

@@ -69,13 +69,13 @@ kotlin {
         val commonTest by getting {
             dependencies {
                 implementation(kotlin("test"))
-                
+
                 // Coroutines Test
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
-                
+
                 // Turbine (for Flow testing)
                 implementation("app.cash.turbine:turbine:1.0.0")
-                
+
                 // MockK (for mocking) - Note: Common MockK doesn't exist, we'll use expect/actual pattern
                 // For now, we'll create our own test doubles
             }

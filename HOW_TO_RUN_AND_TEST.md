@@ -3,13 +3,15 @@
 ## Overview
 
 This is a **Kotlin Multiplatform (KMP) + Compose Multiplatform (CMP)** project that targets:
+
 - **Android** - Native Android app
-- **iOS** - Native iOS app  
+- **iOS** - Native iOS app
 - **Desktop** - JVM desktop application (Windows, macOS, Linux)
 
 ## Architecture
 
 ### Technology Stack
+
 - **Kotlin 1.9.21** - Programming language
 - **Compose Multiplatform 1.5.11** - UI framework
 - **Ktor 2.3.5** - Networking client
@@ -18,6 +20,7 @@ This is a **Kotlin Multiplatform (KMP) + Compose Multiplatform (CMP)** project t
 - **Kotlinx DateTime** - Date/time handling
 
 ### Project Structure
+
 ```
 mobile-app/
 ├── shared/              # Shared business logic (KMP)
@@ -35,20 +38,20 @@ mobile-app/
 ### Required Tools
 
 1. **JDK 11+** (for Android/Shared) and **JDK 21** (for Desktop)
-   - Download: https://adoptium.net/
-   - Verify: `java -version`
+    - Download: https://adoptium.net/
+    - Verify: `java -version`
 
 2. **Android Studio** (for Android development)
-   - Download: https://developer.android.com/studio
-   - Install Android SDK 24-34
-   - Install Android Build Tools
+    - Download: https://developer.android.com/studio
+    - Install Android SDK 24-34
+    - Install Android Build Tools
 
 3. **Xcode 14+** (for iOS development - macOS only)
-   - Install from App Store
-   - Install Command Line Tools: `xcode-select --install`
+    - Install from App Store
+    - Install Command Line Tools: `xcode-select --install`
 
 4. **Gradle 8.14+** (included in project)
-   - Verify: `.\gradlew --version`
+    - Verify: `.\gradlew --version`
 
 ### Recommended Tools
 
@@ -76,6 +79,7 @@ cd C:\Users\ahabg\OneDrive\Belgeler\GitHub\FIVUCSAS\mobile-app
 **Output**: Executable JAR in `desktopApp/build/compose/jars/`
 
 **System Requirements**:
+
 - Windows: Windows 10+
 - macOS: macOS 10.14+
 - Linux: Any modern distribution
@@ -105,6 +109,7 @@ cd C:\Users\ahabg\OneDrive\Belgeler\GitHub\FIVUCSAS\mobile-app
 **Output**: APK in `androidApp/build/outputs/apk/debug/`
 
 **Requirements**:
+
 - Android 7.0+ (API 24+)
 - Minimum 2GB RAM
 - Camera permission for biometric features
@@ -123,6 +128,7 @@ open iosApp/iosApp.xcworkspace
 ```
 
 **Requirements**:
+
 - macOS 12.0+
 - Xcode 14.0+
 - iOS 12.0+
@@ -228,6 +234,7 @@ signingConfigs {
 **Error**: `Compose Multiplatform X doesn't support Kotlin Y`
 
 **Solution**: Check compatibility matrix:
+
 - Compose 1.5.11 → Kotlin 1.9.21 ✅
 - See: https://github.com/JetBrains/compose-jb/blob/master/VERSIONING.md
 
@@ -236,6 +243,7 @@ signingConfigs {
 **Error**: iOS targets cannot be built on Windows
 
 **Solution**: This is expected. iOS development requires macOS. Add to `gradle.properties`:
+
 ```properties
 kotlin.native.ignoreDisabledTargets=true
 ```
@@ -267,6 +275,7 @@ Remove-Item -Recurse -Force .gradle, build, */build
 **Error**: `UnsupportedClassVersionError`
 
 **Solution**: Ensure JDK 21 is installed and JAVA_HOME is set:
+
 ```bash
 # Check Java version
 java -version  # Should show 21.x
@@ -278,6 +287,7 @@ $env:JAVA_HOME = "C:\Program Files\Java\jdk-21"
 #### 6. Camera/Permissions Issues on Android
 
 Add to `androidApp/src/main/AndroidManifest.xml`:
+
 ```xml
 <uses-permission android:name="android.permission.CAMERA" />
 <uses-permission android:name="android.permission.INTERNET" />
@@ -369,26 +379,27 @@ cd mobile-app
 ### IntelliJ IDEA / Android Studio
 
 1. **Import Project**
-   - `File` → `Open` → Select `mobile-app` folder
-   - Wait for Gradle sync
+    - `File` → `Open` → Select `mobile-app` folder
+    - Wait for Gradle sync
 
 2. **Configure Run Configurations**
 
    **Desktop:**
-   - Main class: `com.fivucsas.desktop.MainKt`
-   - Module: `desktopApp.main`
-   - JRE: 21
+    - Main class: `com.fivucsas.desktop.MainKt`
+    - Module: `desktopApp.main`
+    - JRE: 21
 
    **Android:**
-   - Module: `androidApp`
-   - Use existing `androidApp` configuration
+    - Module: `androidApp`
+    - Use existing `androidApp` configuration
 
 3. **Enable Compose Support**
-   - `Settings` → `Languages & Frameworks` → `Kotlin` → Enable "Compose"
+    - `Settings` → `Languages & Frameworks` → `Kotlin` → Enable "Compose"
 
 ### VS Code
 
 Install extensions:
+
 - Kotlin Language
 - Gradle for Java
 
@@ -435,7 +446,8 @@ android {
 
 After successfully running the app:
 
-1. **Configure Backend URLs** in `shared/src/commonMain/kotlin/com/fivucsas/mobile/data/remote/ApiClient.kt`
+1. **Configure Backend URLs** in
+   `shared/src/commonMain/kotlin/com/fivucsas/mobile/data/remote/ApiClient.kt`
 2. **Test Authentication** - Register → Login → Logout flow
 3. **Test Biometric Features** - Enroll → Verify
 4. **Review Architecture** - Check `shared/src/commonMain` for business logic
@@ -451,6 +463,7 @@ After successfully running the app:
 ## Support
 
 For issues specific to:
+
 - **KMP Setup**: Check Kotlin Slack #multiplatform
 - **Compose UI**: Check Kotlin Slack #compose
 - **Android Issues**: Check Android Studio logs

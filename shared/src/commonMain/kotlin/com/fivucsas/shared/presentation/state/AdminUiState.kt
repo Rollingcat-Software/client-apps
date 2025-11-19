@@ -5,7 +5,7 @@ import com.fivucsas.shared.domain.model.User
 
 /**
  * UI State for Admin Dashboard
- * 
+ *
  * Represents the complete state of the admin dashboard.
  * Immutable - all changes create new instances.
  */

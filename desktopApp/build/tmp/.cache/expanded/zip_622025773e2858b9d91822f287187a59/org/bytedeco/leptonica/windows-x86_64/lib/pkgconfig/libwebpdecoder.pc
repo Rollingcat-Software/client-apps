@@ -1,0 +1,11 @@
+prefix=D:/a/javacpp-presets/javacpp-presets/leptonica/cppbuild/windows-x86_64
+exec_prefix=${prefix}
+libdir=D:/a/javacpp-presets/javacpp-presets/leptonica/cppbuild/windows-x86_64/lib
+includedir=${prefix}/include
+
+Name: libwebpdecoder
+Description: Library for the WebP graphics format (decode only)
+Version: 1.3.2
+Cflags: -I${includedir}
+Libs: -L${libdir} -lwebpdecoder
+Libs.private:   

@@ -1,0 +1,13 @@
+libdir=/Users/runner/work/javacpp-presets/javacpp-presets/openblas/cppbuild/macosx-x86_64/lib
+libsuffix=
+includedir=/Users/runner/work/javacpp-presets/javacpp-presets/openblas/cppbuild/macosx-x86_64/include
+openblas_config= USE_64BITINT= DYNAMIC_ARCH= DYNAMIC_OLDER= NO_CBLAS= NO_LAPACK=1 NO_LAPACKE=1 NO_AFFINITY=1 USE_OPENMP= NEHALEM MAX_THREADS=64
+version=0.3.26
+extralib=-lpthread -lpthread
+Name: openblas
+Description: OpenBLAS is an optimized BLAS library based on GotoBLAS2 1.13 BSD version
+Version: ${version}
+URL: https://github.com/xianyi/OpenBLAS
+Libs: -L${libdir} -lopenblas${libsuffix}
+Libs.private: ${extralib}
+Cflags: -I${includedir}

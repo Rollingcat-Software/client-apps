@@ -1,0 +1,436 @@
+[
+  {
+    "name" : "org.bytedeco.opencv.presets.opencv_stitching"
+  },
+  {
+    "name" : "org.bytedeco.opencv.global.opencv_stitching"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_stitching.AffineBasedEstimator"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_stitching.AffineBestOf2NearestMatcher"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_stitching.AffineWarper"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_stitching.BestOf2NearestMatcher"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_stitching.BestOf2NearestRangeMatcher"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_stitching.Blender"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_stitching.BlocksChannelsCompensator"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_stitching.BlocksCompensator"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_stitching.BlocksGainCompensator"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_stitching.BundleAdjusterAffine"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_stitching.BundleAdjusterAffinePartial"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_stitching.BundleAdjusterBase"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_stitching.BundleAdjusterRay"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_stitching.BundleAdjusterReproj"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_stitching.CameraParams"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_stitching.CameraParamsVector"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_stitching.ChannelsCompensator"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_stitching.CompressedRectilinearPortraitProjector"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_stitching.CompressedRectilinearPortraitWarper"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_stitching.CompressedRectilinearProjector"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_stitching.CompressedRectilinearWarper"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_stitching.CylindricalPortraitProjector"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_stitching.CylindricalPortraitWarper"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_stitching.CylindricalProjector"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_stitching.CylindricalWarper"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_stitching.DetailCompressedRectilinearPortraitWarper"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_stitching.DetailCompressedRectilinearWarper"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_stitching.DetailCylindricalWarper"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_stitching.DetailCylindricalWarperGpu"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_stitching.DetailFisheyeWarper"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_stitching.DetailMercatorWarper"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_stitching.DetailPaniniPortraitWarper"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_stitching.DetailPaniniWarper"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_stitching.DetailPlaneWarper"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_stitching.DetailPlaneWarperGpu"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_stitching.DetailSphericalWarper"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_stitching.DetailSphericalWarperGpu"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_stitching.DetailStereographicWarper"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_stitching.DetailTransverseMercatorWarper"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_stitching.DisjointSets"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_stitching.DpSeamFinder"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_stitching.Estimator"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_stitching.ExposureCompensator"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_stitching.FeatherBlender"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_stitching.FeaturesMatcher"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_stitching.FisheyeProjector"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_stitching.FisheyeWarper"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_stitching.GainCompensator"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_stitching.Graph"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_stitching.GraphCutSeamFinder"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_stitching.GraphCutSeamFinderBase"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_stitching.GraphEdge"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_stitching.HomographyBasedEstimator"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_stitching.ImageFeatures"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_stitching.ImageFeaturesVector"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_stitching.MatchesInfo"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_stitching.MatchesInfoVector"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_stitching.MercatorProjector"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_stitching.MercatorWarper"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_stitching.MultiBandBlender"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_stitching.NoBundleAdjuster"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_stitching.NoExposureCompensator"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_stitching.NoSeamFinder"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_stitching.PairwiseSeamFinder"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_stitching.PaniniPortraitProjector"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_stitching.PaniniPortraitWarper"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_stitching.PaniniProjector"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_stitching.PaniniWarper"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_stitching.PlanePortraitProjector"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_stitching.PlanePortraitWarper"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_stitching.PlaneProjector"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_stitching.PlaneWarper"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_stitching.ProjectorBase"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_stitching.PyRotationWarper"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_stitching.RotationWarper"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_stitching.SeamFinder"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_stitching.SphericalPortraitProjector"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_stitching.SphericalPortraitWarper"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_stitching.SphericalProjector"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_stitching.SphericalWarper"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_stitching.StereographicProjector"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_stitching.StereographicWarper"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_stitching.Stitcher"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_stitching.Timelapser"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_stitching.TimelapserCrop"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_stitching.TransverseMercatorProjector"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_stitching.TransverseMercatorWarper"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_stitching.VoronoiSeamFinder"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_stitching.WarperCreator"
+  },
+  {
+    "name" : "org.bytedeco.javacpp.Pointer",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true,
+    "allDeclaredClasses" : true,
+    "allPublicClasses" : true
+  },
+  {
+    "name" : "java.lang.String",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true,
+    "allDeclaredClasses" : true,
+    "allPublicClasses" : true
+  },
+  {
+    "name" : "org.bytedeco.javacpp.Pointer$NativeDeallocator",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true,
+    "allDeclaredClasses" : true,
+    "allPublicClasses" : true
+  },
+  {
+    "name" : "org.bytedeco.javacpp.Loader"
+  },
+  {
+    "name" : "java.nio.Buffer",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true,
+    "allDeclaredClasses" : true,
+    "allPublicClasses" : true
+  },
+  {
+    "name" : "java.lang.Object",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true,
+    "allDeclaredClasses" : true,
+    "allPublicClasses" : true
+  },
+  {
+    "name" : "java.nio.charset.Charset",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true,
+    "allDeclaredClasses" : true,
+    "allPublicClasses" : true
+  },
+  {
+    "name" : "java.lang.NullPointerException"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_core.Rect"
+  },
+  {
+    "name" : "java.lang.RuntimeException"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_core.Point"
+  },
+  {
+    "name" : "org.bytedeco.javacpp.IntPointer",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true,
+    "allDeclaredClasses" : true,
+    "allPublicClasses" : true
+  },
+  {
+    "name" : "org.bytedeco.javacpp.BytePointer",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true,
+    "allDeclaredClasses" : true,
+    "allPublicClasses" : true
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_core.Point2f"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_core.Size"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_core.Mat"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_core.TermCriteria"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_stitching.CameraParamsVector$Iterator"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_core.ScalarVector"
+  },
+  {
+    "name" : "org.bytedeco.javacpp.DoublePointer",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true,
+    "allDeclaredClasses" : true,
+    "allPublicClasses" : true
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_core.UMat"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_core.KeyPointVector"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_stitching.ImageFeaturesVector$Iterator"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_core.DMatchVector"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_stitching.MatchesInfoVector$Iterator"
+  },
+  {
+    "name" : "org.bytedeco.javacpp.FloatPointer",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true,
+    "allDeclaredClasses" : true,
+    "allPublicClasses" : true
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_features2d.Feature2D"
+  }
+]

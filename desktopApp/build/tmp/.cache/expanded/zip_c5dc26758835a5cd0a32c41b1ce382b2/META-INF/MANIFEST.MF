@@ -1,0 +1,15 @@
+Manifest-Version: 1.0
+Implementation-Title: JavaCPP Presets Platform for librealsense2
+Implementation-Version: 2.53.1-1.5.9
+Multi-Release: true
+Specification-Vendor: Bytedeco
+Specification-Title: JavaCPP Presets Platform for librealsense2
+Class-Path: librealsense2.jar librealsense2-linux-armhf.jar librealsen
+ se2-linux-arm64.jar librealsense2-linux-x86.jar librealsense2-linux-x
+ 86_64.jar librealsense2-macosx-x86_64.jar librealsense2-windows-x86.j
+ ar librealsense2-windows-x86_64.jar
+Build-Jdk-Spec: 1.8
+Created-By: Maven Jar Plugin 3.2.0
+Specification-Version: 2.53.1-1.5.9
+Implementation-Vendor: Bytedeco
+

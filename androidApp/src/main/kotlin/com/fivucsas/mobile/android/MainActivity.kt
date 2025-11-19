@@ -14,16 +14,13 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Initialize dependencies (simple DI for MVP)
-        val appDependencies = AppDependencies(applicationContext)
-
         setContent {
             FIVUCSASTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    AppNavigation(appDependencies)
+                    AppNavigation()
                 }
             }
         }

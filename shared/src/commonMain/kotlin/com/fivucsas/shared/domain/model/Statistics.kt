@@ -2,7 +2,7 @@ package com.fivucsas.shared.domain.model
 
 /**
  * Statistics model for admin dashboard
- * 
+ *
  * Contains system-wide statistics and metrics
  */
 data class Statistics(

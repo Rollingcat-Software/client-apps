@@ -1,0 +1,127 @@
+[
+  {
+    "name" : "org.bytedeco.opencv.presets.opencv_flann"
+  },
+  {
+    "name" : "org.bytedeco.opencv.global.opencv_flann"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_flann.AutotunedIndexParams"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_flann.CompositeIndexParams"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_flann.HierarchicalClusteringIndexParams"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_flann.Index"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_flann.IndexParams"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_flann.KDTreeIndexParams"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_flann.KMeansIndexParams"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_flann.LinearIndexParams"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_flann.LshIndexParams"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_flann.SavedIndexParams"
+  },
+  {
+    "name" : "org.bytedeco.opencv.opencv_flann.SearchParams"
+  },
+  {
+    "name" : "org.bytedeco.javacpp.Pointer",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true,
+    "allDeclaredClasses" : true,
+    "allPublicClasses" : true
+  },
+  {
+    "name" : "java.lang.String",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true,
+    "allDeclaredClasses" : true,
+    "allPublicClasses" : true
+  },
+  {
+    "name" : "org.bytedeco.javacpp.Pointer$NativeDeallocator",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true,
+    "allDeclaredClasses" : true,
+    "allPublicClasses" : true
+  },
+  {
+    "name" : "org.bytedeco.javacpp.Loader"
+  },
+  {
+    "name" : "java.nio.Buffer",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true,
+    "allDeclaredClasses" : true,
+    "allPublicClasses" : true
+  },
+  {
+    "name" : "java.lang.Object",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true,
+    "allDeclaredClasses" : true,
+    "allPublicClasses" : true
+  },
+  {
+    "name" : "java.nio.charset.Charset",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true,
+    "allDeclaredClasses" : true,
+    "allPublicClasses" : true
+  },
+  {
+    "name" : "java.lang.RuntimeException"
+  },
+  {
+    "name" : "java.lang.NullPointerException"
+  },
+  {
+    "name" : "org.bytedeco.javacpp.BytePointer",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true,
+    "allDeclaredClasses" : true,
+    "allPublicClasses" : true
+  }
+]

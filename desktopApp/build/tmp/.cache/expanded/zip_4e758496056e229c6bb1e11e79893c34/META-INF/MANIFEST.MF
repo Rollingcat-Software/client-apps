@@ -1,0 +1,13 @@
+Manifest-Version: 1.0
+Implementation-Title: JavaCPP Presets Platform for videoInput
+Implementation-Version: 0.200-1.5.9
+Multi-Release: true
+Specification-Vendor: Bytedeco
+Specification-Title: JavaCPP Presets Platform for videoInput
+Class-Path: videoinput.jar videoinput-windows-x86.jar videoinput-windo
+ ws-x86_64.jar
+Build-Jdk-Spec: 1.8
+Created-By: Maven Jar Plugin 3.2.0
+Specification-Version: 0.200-1.5.9
+Implementation-Vendor: Bytedeco
+

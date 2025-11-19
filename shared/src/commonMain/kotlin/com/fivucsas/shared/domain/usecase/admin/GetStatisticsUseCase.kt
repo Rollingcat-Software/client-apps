@@ -5,7 +5,7 @@ import com.fivucsas.shared.domain.repository.UserRepository
 
 /**
  * Use case for getting system statistics
- * 
+ *
  * Returns:
  * - Total users
  * - Active users

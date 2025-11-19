@@ -13,7 +13,8 @@
 
 ## 🏗️ Architecture Overview (Kotlin Multiplatform)
 
-This project uses **Kotlin Multiplatform (KMP)** with **Compose Multiplatform** for cross-platform development.
+This project uses **Kotlin Multiplatform (KMP)** with **Compose Multiplatform** for cross-platform
+development.
 
 ### Project Structure
 
@@ -75,14 +76,17 @@ mobile-app/
 
 ## 🎨 Shared UI Component Library
 
-Following **Atomic Design** principles, the shared UI library provides consistent, reusable components:
+Following **Atomic Design** principles, the shared UI library provides consistent, reusable
+components:
 
 ### Theme System
+
 - **AppColors** - Complete color palette (Primary, Secondary, Semantic, Gradients)
 - **AppTypography** - Material Design 3 typography scale
 - **AppShapes** - Consistent shape system
 
 ### Atoms
+
 - `PrimaryButton`, `SecondaryButton`, `AppTextButton`, `KioskButton`
 - `AppTextField`, `SearchTextField`
 - `BodyText`, `TitleText`, `HeadlineText`, etc.
@@ -90,11 +94,13 @@ Following **Atomic Design** principles, the shared UI library provides consisten
 - `AppSpacer`, `VerticalSpacer*`, `HorizontalSpacer*`
 
 ### Molecules
+
 - `AppCard`, `InfoCard`, `StatCard`, `ClickableCard`
 - `ConfirmationDialog`, `InfoDialog`, `FormDialog`
 - `MessageBanner`, `SuccessMessage`, `ErrorMessage`
 
 ### Organisms
+
 - `TopAppBar`, `SimpleTopAppBar`
 - `ScreenLayout`, `CardContainerLayout`
 - `EmptyState`
@@ -131,6 +137,7 @@ BiometricConfig.LIVENESS_THRESHOLD   // 0.80
 ## 🧪 Testing
 
 ### Unit Tests
+
 The project includes comprehensive ViewModel tests with mock implementations:
 
 ```bash
@@ -139,11 +146,14 @@ The project includes comprehensive ViewModel tests with mock implementations:
 ```
 
 ### Test Coverage
+
 - **AdminViewModel**: 25+ tests (navigation, CRUD, search, dialogs)
 - **KioskViewModel**: 25+ tests (navigation, enrollment, verification)
 
 ### Mock System
+
 Mock implementations in `shared/src/commonTest/kotlin/.../test/mocks/`:
+
 - `MockGetUsersUseCase`, `MockDeleteUserUseCase`, etc.
 - `MockEnrollUserUseCase`, `MockVerifyUserUseCase`, etc.
 
@@ -182,6 +192,7 @@ Desktop implementations are in `desktopApp/.../platform/`.
 ## 🚀 Getting Started
 
 ### Prerequisites
+
 - JDK 17+
 - Kotlin 1.9+
 - Gradle 8.0+
@@ -205,16 +216,16 @@ Desktop implementations are in `desktopApp/.../platform/`.
 
 The codebase underwent a comprehensive 14-day architectural refactoring:
 
-| Phase | Achievement |
-|-------|-------------|
-| 0.1 Package Consolidation | Eliminated duplicate packages (-727 lines) |
-| 0.2 Extract Configuration | Centralized magic numbers (4 config files) |
-| 0.3 Shared UI Components | Created component library (+1,870 lines) |
-| 0.4 Refactor AdminDashboard | 2,326 → 150 lines (93% reduction) |
-| 0.5 Refactor KioskMode | 1,745 → 100 lines (94% reduction) |
-| 0.6 Platform Abstractions | Created testable interfaces (7 files) |
-| 0.7 ViewModel Tests | Added 50+ unit tests |
-| 0.8 Documentation | Updated architecture docs |
+| Phase                       | Achievement                                |
+|-----------------------------|--------------------------------------------|
+| 0.1 Package Consolidation   | Eliminated duplicate packages (-727 lines) |
+| 0.2 Extract Configuration   | Centralized magic numbers (4 config files) |
+| 0.3 Shared UI Components    | Created component library (+1,870 lines)   |
+| 0.4 Refactor AdminDashboard | 2,326 → 150 lines (93% reduction)          |
+| 0.5 Refactor KioskMode      | 1,745 → 100 lines (94% reduction)          |
+| 0.6 Platform Abstractions   | Created testable interfaces (7 files)      |
+| 0.7 ViewModel Tests         | Added 50+ unit tests                       |
+| 0.8 Documentation           | Updated architecture docs                  |
 
 **Result**: Architecture grade improved from B+ to A+
 

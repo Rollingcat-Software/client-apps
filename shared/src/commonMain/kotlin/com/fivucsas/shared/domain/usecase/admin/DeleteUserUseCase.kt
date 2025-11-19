@@ -8,7 +8,7 @@ import com.fivucsas.shared.domain.repository.UserRepository
 
 /**
  * Use case for deleting a user
- * 
+ *
  * Business logic:
  * 1. Validate user ID
  * 2. Get user to check status
@@ -23,7 +23,7 @@ class DeleteUserUseCase(
 ) {
     /**
      * Delete user and associated biometric data
-     * 
+     *
      * @param userId User ID to delete
      * @return Result with Unit or error
      */
@@ -32,7 +32,7 @@ class DeleteUserUseCase(
         if (userId.isBlank()) {
             return Result.failure(ValidationException("User ID is required"))
         }
-        
+
         // Get user to check status
         val userResult = userRepository.getUserById(userId)
         if (userResult.isFailure) {
@@ -40,9 +40,9 @@ class DeleteUserUseCase(
                 userResult.exceptionOrNull() ?: Exception("User not found")
             )
         }
-        
+
         val user = userResult.getOrThrow()
-        
+
         // Business rule: Cannot delete active users
         // Must set to INACTIVE first
         if (user.status == UserStatus.ACTIVE) {
@@ -50,18 +50,18 @@ class DeleteUserUseCase(
                 BusinessException("Cannot delete active user. Please deactivate first.")
             )
         }
-        
+
         // Delete biometric data if exists
         if (user.hasBiometric) {
             val bioDeleteResult = biometricRepository.deleteBiometricData(userId)
             if (bioDeleteResult.isFailure) {
                 return Result.failure(
-                    bioDeleteResult.exceptionOrNull() 
+                    bioDeleteResult.exceptionOrNull()
                         ?: Exception("Failed to delete biometric data")
                 )
             }
         }
-        
+
         // Delete user
         return userRepository.deleteUser(userId)
     }

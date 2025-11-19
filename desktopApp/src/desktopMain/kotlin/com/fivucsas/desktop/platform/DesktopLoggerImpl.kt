@@ -49,9 +49,11 @@ class DesktopLoggerImpl(
                 System.err.println(logMessage)
                 throwable?.printStackTrace(System.err)
             }
+
             LogLevel.WARN -> {
                 System.err.println(logMessage)
             }
+
             else -> {
                 println(logMessage)
             }

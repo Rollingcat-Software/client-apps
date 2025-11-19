@@ -25,36 +25,41 @@
 ## 🎯 Module Overview
 
 ### Purpose
-The mobile-app repository contains **both desktop and mobile applications** using Kotlin Multiplatform. It provides:
+
+The mobile-app repository contains **both desktop and mobile applications** using Kotlin
+Multiplatform. It provides:
 
 **Desktop App** (Kiosk Mode + Admin Dashboard):
+
 - Kiosk mode for enrollment and verification
 - Admin dashboard for managing users and viewing analytics
 - Runs on Windows, macOS, Linux
 
 **Mobile App** (Planned - Android/iOS):
+
 - Mobile enrollment and verification
 - User profile management
 - Biometric authentication on mobile devices
 
 ### Key Features
+
 1. **Kiosk Mode** (Desktop)
-   - Welcome screen with enrollment/verification options
-   - Enrollment flow with camera capture
-   - Verification flow with liveness detection
-   - Success/failure feedback
+    - Welcome screen with enrollment/verification options
+    - Enrollment flow with camera capture
+    - Verification flow with liveness detection
+    - Success/failure feedback
 
 2. **Admin Dashboard** (Desktop)
-   - Users tab - User management with CRUD operations
-   - Analytics tab - Charts and statistics
-   - Security tab - Audit logs and security events
-   - Settings tab - System and profile configuration
+    - Users tab - User management with CRUD operations
+    - Analytics tab - Charts and statistics
+    - Security tab - Audit logs and security events
+    - Settings tab - System and profile configuration
 
 3. **Shared Code** (90%)
-   - Business logic shared between desktop and mobile
-   - Network layer (Ktor client)
-   - Data models
-   - ViewModels
+    - Business logic shared between desktop and mobile
+    - Network layer (Ktor client)
+    - Data models
+    - ViewModels
 
 ---
 
@@ -63,68 +68,71 @@ The mobile-app repository contains **both desktop and mobile applications** usin
 ### ✅ Desktop App: What's Implemented (96% Complete)
 
 #### Kiosk Mode (100% Complete)
+
 **File**: `desktopApp/src/jvmMain/kotlin/KioskMode.kt`
 
 - ✅ **Welcome Screen**
-  - Gradient background
-  - Enrollment and verification buttons
-  - Employee ID input field
-  - Modern UI with shadows and gradients
+    - Gradient background
+    - Enrollment and verification buttons
+    - Employee ID input field
+    - Modern UI with shadows and gradients
 
 - ✅ **Enrollment Screen**
-  - User information form (name, email, employee ID)
-  - Camera button for photo capture
-  - Form validation
-  - Submit button with loading state
-  - Success/error messages
+    - User information form (name, email, employee ID)
+    - Camera button for photo capture
+    - Form validation
+    - Submit button with loading state
+    - Success/error messages
 
 - ✅ **Verification Screen**
-  - Camera button for face capture
-  - Success state: Green gradient icon, confidence score, progress bar
-  - Failure state: Red gradient icon, retry/cancel buttons
-  - Loading state with circular progress indicator
-  - Liveness detection UI
+    - Camera button for face capture
+    - Success state: Green gradient icon, confidence score, progress bar
+    - Failure state: Red gradient icon, retry/cancel buttons
+    - Loading state with circular progress indicator
+    - Liveness detection UI
 
 #### Admin Dashboard (96% Complete)
+
 **File**: `desktopApp/src/jvmMain/kotlin/AdminDashboard.kt` (2211 lines)
 
 - ✅ **Users Tab** (100% Complete)
-  - Statistics cards (Total, Active, Inactive, Pending)
-  - User list table with search
-  - Add/Edit/Delete dialogs
-  - Pagination controls
-  - Status badges
-  - Export functionality
-  - Mock data working
+    - Statistics cards (Total, Active, Inactive, Pending)
+    - User list table with search
+    - Add/Edit/Delete dialogs
+    - Pagination controls
+    - Status badges
+    - Export functionality
+    - Mock data working
 
 - ✅ **Analytics Tab** (100% Complete)
-  - Statistics cards overview
-  - Verification trends chart placeholder
-  - Success rate chart placeholder
-  - Recent verifications list
-  - Mock data working
+    - Statistics cards overview
+    - Verification trends chart placeholder
+    - Success rate chart placeholder
+    - Recent verifications list
+    - Mock data working
 
 - ✅ **Security Tab** (80% Complete)
-  - 3 security alert cards (Failed Logins, Active Sessions, Suspicious Activity)
-  - Recent activity table with expandable details
-  - ❌ Missing: Detailed audit logs table
-  - ❌ Missing: Advanced filtering
+    - 3 security alert cards (Failed Logins, Active Sessions, Suspicious Activity)
+    - Recent activity table with expandable details
+    - ❌ Missing: Detailed audit logs table
+    - ❌ Missing: Advanced filtering
 
 - ✅ **Settings Tab** (100% Complete - Nov 17, 2025)
-  - 6 comprehensive sections:
-    1. Profile (avatar, name, email, role)
-    2. Security (password, 2FA, session timeout)
-    3. Biometric (face match threshold, liveness, quality)
-    4. System (API URL, logging, cache, performance)
-    5. Notifications (email alerts, reports, updates)
-    6. Appearance (theme, display, date format, timezone)
-  - 25+ input controls (text fields, sliders, switches, dropdowns)
-  - Settings navigation panel
-  - Save/Cancel buttons
+    - 6 comprehensive sections:
+        1. Profile (avatar, name, email, role)
+        2. Security (password, 2FA, session timeout)
+        3. Biometric (face match threshold, liveness, quality)
+        4. System (API URL, logging, cache, performance)
+        5. Notifications (email alerts, reports, updates)
+        6. Appearance (theme, display, date format, timezone)
+    - 25+ input controls (text fields, sliders, switches, dropdowns)
+    - Settings navigation panel
+    - Save/Cancel buttons
 
 ### ❌ Mobile App: Not Started
 
-The mobile app (Android/iOS) has not been implemented yet. The shared code (93 Kotlin files) provides foundation, but platform-specific UI and features are missing.
+The mobile app (Android/iOS) has not been implemented yet. The shared code (93 Kotlin files)
+provides foundation, but platform-specific UI and features are missing.
 
 ### ⚠️ Backend Integration: Not Started
 
@@ -135,6 +143,7 @@ All desktop functionality uses mock data. No backend API integration exists.
 ## 🏗️ Architecture
 
 ### Technology Stack
+
 ```yaml
 Language: Kotlin 1.9+
 Framework: Kotlin Multiplatform (KMP)
@@ -148,6 +157,7 @@ Build: Gradle 8+
 ```
 
 ### Project Structure (Kotlin Multiplatform)
+
 ```
 mobile-app/
 ├── shared/                    # 90% shared code
@@ -181,6 +191,7 @@ mobile-app/
 ```
 
 ### Code Sharing
+
 ```
 ┌────────────────────────────────────────┐
 │         Shared Module (90%)            │
@@ -206,6 +217,7 @@ mobile-app/
 ### Desktop App Components
 
 #### KioskMode.kt (Enrollment & Verification)
+
 ```kotlin
 @Composable
 fun KioskMode() {
@@ -222,6 +234,7 @@ fun KioskMode() {
 ```
 
 #### AdminDashboard.kt (Admin Interface)
+
 ```kotlin
 @Composable
 fun AdminDashboard() {
@@ -242,6 +255,7 @@ fun AdminDashboard() {
 ### Shared Code Structure
 
 #### Models (commonMain)
+
 ```kotlin
 // User.kt
 data class User(
@@ -259,6 +273,7 @@ data class User(
 ```
 
 #### API Client (commonMain)
+
 ```kotlin
 // ApiClient.kt
 class ApiClient {
@@ -279,6 +294,7 @@ class ApiClient {
 ```
 
 #### ViewModels (commonMain)
+
 ```kotlin
 // UsersViewModel.kt
 class UsersViewModel {
@@ -297,9 +313,11 @@ class UsersViewModel {
 ## 📝 Implementation Tasks
 
 ### Phase 1: Desktop Backend Integration (3-4 hours)
+
 **Priority**: 🔴 CRITICAL
 
 #### Task 1.1: Create API Service Layer
+
 - [ ] Create `ApiService.kt` in shared/commonMain
 - [ ] Configure Ktor client with base URL
 - [ ] Add JWT token interceptor
@@ -334,24 +352,28 @@ class ApiService(private val baseUrl: String) {
 ```
 
 #### Task 1.2: Update ViewModels
+
 - [ ] Create `AuthViewModel.kt` for login state
 - [ ] Create `UsersViewModel.kt` for user management
 - [ ] Create `DashboardViewModel.kt` for statistics
 - [ ] Replace mock data with API calls
 
 #### Task 1.3: Environment Configuration
+
 - [ ] Create `local.properties` for API URL
 - [ ] Add environment variable support
 - [ ] Add MOCK_MODE flag for development
 - [ ] Configure different URLs for dev/staging/prod
 
 #### Task 1.4: Update Desktop UI
+
 - [ ] Replace mock data in `AdminDashboard.kt`
 - [ ] Add loading states
 - [ ] Add error handling
 - [ ] Add retry logic
 
 **Acceptance Criteria**:
+
 - ✅ Desktop app connects to backend API
 - ✅ Login works with real credentials
 - ✅ User CRUD operations use real API
@@ -361,9 +383,11 @@ class ApiService(private val baseUrl: String) {
 ---
 
 ### Phase 2: Camera Integration (2-3 hours)
+
 **Priority**: 🟠 HIGH
 
 #### Task 2.1: Desktop Camera (Java/JavaFX)
+
 - [ ] Add JavaCV or WebCam Capture library
 - [ ] Create camera preview component
 - [ ] Capture photo and convert to ByteArray
@@ -381,6 +405,7 @@ fun CameraCapture(onCapture: (ByteArray) -> Unit) {
 ```
 
 #### Task 2.2: Mobile Camera (Android)
+
 - [ ] Use CameraX library
 - [ ] Create camera preview composable
 - [ ] Capture photo
@@ -398,6 +423,7 @@ fun CameraCapture(onCapture: (ByteArray) -> Unit) {
 ```
 
 #### Task 2.3: Mobile Camera (iOS)
+
 - [ ] Use AVFoundation via Swift interop
 - [ ] Create camera wrapper
 - [ ] Expose to Kotlin
@@ -412,6 +438,7 @@ class CameraHelper {
 ```
 
 **Acceptance Criteria**:
+
 - ✅ Desktop camera shows live preview
 - ✅ Can capture photos on desktop
 - ✅ Android camera works (after mobile app created)
@@ -420,15 +447,18 @@ class CameraHelper {
 ---
 
 ### Phase 3: Mobile App - Android (2-3 weeks)
+
 **Priority**: 🟡 MEDIUM
 
 #### Task 3.1: Android Project Setup
+
 - [ ] Configure `androidApp` module in `build.gradle.kts`
 - [ ] Add Android dependencies (Compose, CameraX, etc.)
 - [ ] Create Android manifest with permissions
 - [ ] Setup Material3 theme
 
 #### Task 3.2: Android UI - Enrollment Flow
+
 - [ ] Create `EnrollmentScreen.kt` (Compose)
 - [ ] User information form
 - [ ] Camera capture integration
@@ -436,24 +466,28 @@ class CameraHelper {
 - [ ] Submit to backend
 
 #### Task 3.3: Android UI - Verification Flow
+
 - [ ] Create `VerificationScreen.kt` (Compose)
 - [ ] Camera capture
 - [ ] Liveness detection UI
 - [ ] Results display
 
 #### Task 3.4: Android UI - User Profile
+
 - [ ] Create `ProfileScreen.kt` (Compose)
 - [ ] View profile
 - [ ] Edit profile
 - [ ] Biometric settings
 
 #### Task 3.5: Android Testing
+
 - [ ] Test on emulator
 - [ ] Test on physical device (min Android 8.0)
 - [ ] Test camera on various devices
 - [ ] Performance testing
 
 **Acceptance Criteria**:
+
 - ✅ Android app builds successfully
 - ✅ Can enroll users on Android
 - ✅ Can verify users on Android
@@ -463,38 +497,45 @@ class CameraHelper {
 ---
 
 ### Phase 4: Mobile App - iOS (2-3 weeks)
+
 **Priority**: 🟢 LOW
 
 #### Task 4.1: iOS Project Setup
+
 - [ ] Configure `iosApp` in Xcode
 - [ ] Link shared KMP framework
 - [ ] Setup SwiftUI views
 - [ ] Configure Info.plist with permissions
 
 #### Task 4.2: iOS UI - Enrollment Flow
+
 - [ ] Create `EnrollmentView.swift` (SwiftUI)
 - [ ] Call shared ViewModels from Swift
 - [ ] Camera integration with AVFoundation
 - [ ] Submit to backend
 
 #### Task 4.3: iOS UI - Verification Flow
+
 - [ ] Create `VerificationView.swift` (SwiftUI)
 - [ ] Camera integration
 - [ ] Liveness detection UI
 - [ ] Results display
 
 #### Task 4.4: iOS UI - User Profile
+
 - [ ] Create `ProfileView.swift` (SwiftUI)
 - [ ] View/edit profile
 - [ ] Biometric settings
 
 #### Task 4.5: iOS Testing
+
 - [ ] Test on simulator
 - [ ] Test on physical device (min iOS 14)
 - [ ] Test camera on various devices
 - [ ] Performance testing
 
 **Acceptance Criteria**:
+
 - ✅ iOS app builds successfully
 - ✅ Can enroll users on iOS
 - ✅ Can verify users on iOS
@@ -504,20 +545,24 @@ class CameraHelper {
 ---
 
 ### Phase 5: Security Tab Completion (1-2 hours)
+
 **Priority**: 🟡 MEDIUM
 
 #### Task 5.1: Complete Audit Logs Table
+
 - [ ] Add detailed audit logs table
 - [ ] Implement filtering (action type, date range, user)
 - [ ] Add pagination
 - [ ] Expand JSON details viewer
 
 #### Task 5.2: Security Analytics
+
 - [ ] Add failed login trends chart
 - [ ] Add geographic access map (if IP geolocation available)
 - [ ] Add security score widget
 
 **Acceptance Criteria**:
+
 - ✅ Security tab shows comprehensive audit logs
 - ✅ Filtering and search work
 - ✅ Charts display security trends
@@ -525,31 +570,37 @@ class CameraHelper {
 ---
 
 ### Phase 6: Testing & Polish (1 week)
+
 **Priority**: 🟡 MEDIUM
 
 #### Task 6.1: Unit Tests (Shared Code)
+
 - [ ] Test ViewModels
 - [ ] Test API client
 - [ ] Test data models
 - [ ] 80%+ coverage
 
 #### Task 6.2: UI Tests (Desktop)
+
 - [ ] Test user flows (enrollment, verification, admin)
 - [ ] Test navigation
 - [ ] Test error handling
 
 #### Task 6.3: UI Tests (Mobile)
+
 - [ ] Test Android UI
 - [ ] Test iOS UI
 - [ ] Test camera integration
 
 #### Task 6.4: Performance Optimization
+
 - [ ] Optimize image loading
 - [ ] Reduce app size
 - [ ] Improve startup time
 - [ ] Memory profiling
 
 **Acceptance Criteria**:
+
 - ✅ 80%+ test coverage on shared code
 - ✅ All critical flows tested
 - ✅ No memory leaks
@@ -560,6 +611,7 @@ class CameraHelper {
 ## 🧪 Testing Requirements
 
 ### Unit Tests (Shared Module)
+
 ```kotlin
 // UsersViewModelTest.kt
 class UsersViewModelTest {
@@ -578,6 +630,7 @@ class UsersViewModelTest {
 ```
 
 ### UI Tests (Desktop)
+
 ```kotlin
 // DesktopUITest.kt
 @Test
@@ -593,6 +646,7 @@ fun testAdminDashboardAnalytics()
 ### Manual Testing Checklist
 
 #### Desktop App
+
 - [ ] Kiosk mode: Enrollment flow works end-to-end
 - [ ] Kiosk mode: Verification flow works end-to-end
 - [ ] Admin dashboard: All tabs navigate correctly
@@ -601,6 +655,7 @@ fun testAdminDashboardAnalytics()
 - [ ] Settings: All configuration options work
 
 #### Android App
+
 - [ ] Enrollment flow works on Android
 - [ ] Verification flow works on Android
 - [ ] Camera captures photos correctly
@@ -608,6 +663,7 @@ fun testAdminDashboardAnalytics()
 - [ ] Permissions requested correctly
 
 #### iOS App
+
 - [ ] Enrollment flow works on iOS
 - [ ] Verification flow works on iOS
 - [ ] Camera captures photos correctly
@@ -621,6 +677,7 @@ fun testAdminDashboardAnalytics()
 ### Desktop App Deployment
 
 #### Build Commands
+
 ```bash
 # Build desktop app (JVM)
 ./gradlew desktopApp:packageDistributionForCurrentOS
@@ -632,6 +689,7 @@ fun testAdminDashboardAnalytics()
 ```
 
 #### Distribution
+
 ```bash
 # Create installers
 ./gradlew desktopApp:package
@@ -646,6 +704,7 @@ fun testAdminDashboardAnalytics()
 ### Android App Deployment
 
 #### Build APK
+
 ```bash
 ./gradlew androidApp:assembleRelease
 
@@ -654,6 +713,7 @@ fun testAdminDashboardAnalytics()
 ```
 
 #### Build App Bundle (for Google Play)
+
 ```bash
 ./gradlew androidApp:bundleRelease
 
@@ -664,6 +724,7 @@ fun testAdminDashboardAnalytics()
 ### iOS App Deployment
 
 #### Build Archive (Xcode)
+
 ```bash
 # In Xcode:
 # Product → Archive
@@ -671,6 +732,7 @@ fun testAdminDashboardAnalytics()
 ```
 
 #### Build from Command Line
+
 ```bash
 xcodebuild archive -workspace iosApp.xcworkspace \
   -scheme iosApp -archivePath build/iosApp.xcarchive
@@ -756,6 +818,7 @@ GET /api/v1/statistics → DashboardStats { totalUsers, activeUsers, ... }
 ## 📈 Success Criteria
 
 ### Desktop App
+
 - ✅ Kiosk mode fully functional
 - ✅ Admin dashboard shows real data
 - ✅ Camera captures photos
@@ -763,6 +826,7 @@ GET /api/v1/statistics → DashboardStats { totalUsers, activeUsers, ... }
 - ✅ Settings persist correctly
 
 ### Android App
+
 - ✅ Enrollment and verification work
 - ✅ Camera integration successful
 - ✅ App runs on Android 8.0+
@@ -770,6 +834,7 @@ GET /api/v1/statistics → DashboardStats { totalUsers, activeUsers, ... }
 - ✅ 90% code shared with desktop
 
 ### iOS App
+
 - ✅ Enrollment and verification work
 - ✅ Camera integration successful
 - ✅ App runs on iOS 14+
@@ -777,6 +842,7 @@ GET /api/v1/statistics → DashboardStats { totalUsers, activeUsers, ... }
 - ✅ 90% code shared with desktop
 
 ### Performance
+
 - ✅ Desktop app startup < 2s
 - ✅ Android app startup < 1s
 - ✅ iOS app startup < 1s
@@ -793,6 +859,7 @@ GET /api/v1/statistics → DashboardStats { totalUsers, activeUsers, ... }
 ### Architecture Grade: A+ (Achieved!)
 
 **Strengths** ✅:
+
 - Excellent Clean Architecture with proper layer separation
 - SOLID principles followed in shared module
 - Professional DI setup with Koin
@@ -800,16 +867,20 @@ GET /api/v1/statistics → DashboardStats { totalUsers, activeUsers, ... }
 - 90% code sharing capability
 
 **Issues Resolved** ✅:
-1. ✅ **Monolithic UI Files**: AdminDashboard.kt (2,335 → 150 lines) + KioskMode.kt (1,756 → 100 lines)
+
+1. ✅ **Monolithic UI Files**: AdminDashboard.kt (2,335 → 150 lines) + KioskMode.kt (1,756 → 100
+   lines)
 2. ✅ **Duplicate Packages**: Consolidated to `com.fivucsas.shared` (-727 lines)
 3. ✅ **Low Test Coverage**: 50+ ViewModel unit tests added
 4. ✅ **No Component Library**: 14 shared UI components created (Atomic Design)
 5. ✅ **Missing Abstractions**: Platform interfaces created (ICameraService, ILogger, ISecureStorage)
 
 ### Phase 0 Results
+
 **14-day architectural refactoring completed successfully**
 
 **Achieved ROI**: 1,229% over 12 months
+
 - Reduced debugging time: $28,800 saved
 - Faster feature development: $115,200 saved
 - Fewer production bugs: $4,800 saved
@@ -827,20 +898,21 @@ GET /api/v1/statistics → DashboardStats { totalUsers, activeUsers, ... }
 
 **Goal**: Professional-grade codebase before feature development
 
-| Sub-Phase | Tasks | Time | Status |
-|-----------|-------|------|--------|
-| **0.1** | Package Consolidation | 1 day | ✅ Complete |
-| **0.2** | Extract Configuration | 1 day | ✅ Complete |
-| **0.3** | Shared UI Components | 2 days | ✅ Complete |
-| **0.4** | Refactor AdminDashboard | 3 days | ✅ Complete |
-| **0.5** | Refactor KioskMode | 2 days | ✅ Complete |
-| **0.6** | Platform Abstractions | 2 days | ✅ Complete |
-| **0.7** | ViewModel Tests | 2 days | ✅ Complete |
-| **0.8** | Documentation | 1 day | ✅ Complete |
+| Sub-Phase | Tasks                   | Time   | Status     |
+|-----------|-------------------------|--------|------------|
+| **0.1**   | Package Consolidation   | 1 day  | ✅ Complete |
+| **0.2**   | Extract Configuration   | 1 day  | ✅ Complete |
+| **0.3**   | Shared UI Components    | 2 days | ✅ Complete |
+| **0.4**   | Refactor AdminDashboard | 3 days | ✅ Complete |
+| **0.5**   | Refactor KioskMode      | 2 days | ✅ Complete |
+| **0.6**   | Platform Abstractions   | 2 days | ✅ Complete |
+| **0.7**   | ViewModel Tests         | 2 days | ✅ Complete |
+| **0.8**   | Documentation           | 1 day  | ✅ Complete |
 
 **Completed**: November 18, 2025
 
 **Deliverables**:
+
 - ✅ AdminDashboard: 2,335 → 150 lines (20+ new files)
 - ✅ KioskMode: 1,756 → 100 lines (12+ new files)
 - ✅ 20+ reusable UI components
@@ -850,6 +922,7 @@ GET /api/v1/statistics → DashboardStats { totalUsers, activeUsers, ... }
 - ✅ Professional-grade codebase
 
 **Why Phase 0 First?**
+
 1. Technical debt grows exponentially if not addressed
 2. Mobile development will proliferate organizational issues
 3. Backend integration easier with clean codebase
@@ -862,21 +935,22 @@ GET /api/v1/statistics → DashboardStats { totalUsers, activeUsers, ... }
 
 **Prerequisites**: Phase 0 complete
 
-| Phase | Tasks | Estimated Time | Priority |
-|-------|-------|----------------|----------|
-| **Phase 1** | Desktop Backend Integration | 3-4 hours | 🔴 CRITICAL |
-| **Phase 2** | Camera Integration | 2-3 hours | 🟠 HIGH |
-| **Phase 3** | Android App | 2-3 weeks | 🟡 MEDIUM |
-| **Phase 4** | iOS App | 2-3 weeks | 🟢 LOW |
-| **Phase 5** | Security Tab Completion | 1-2 hours | 🟡 MEDIUM |
-| **Phase 6** | Testing & Polish | 1 week | 🟡 MEDIUM |
-| **Total** | | **8-10 weeks** | (includes Phase 0) |
+| Phase       | Tasks                       | Estimated Time | Priority           |
+|-------------|-----------------------------|----------------|--------------------|
+| **Phase 1** | Desktop Backend Integration | 3-4 hours      | 🔴 CRITICAL        |
+| **Phase 2** | Camera Integration          | 2-3 hours      | 🟠 HIGH            |
+| **Phase 3** | Android App                 | 2-3 weeks      | 🟡 MEDIUM          |
+| **Phase 4** | iOS App                     | 2-3 weeks      | 🟢 LOW             |
+| **Phase 5** | Security Tab Completion     | 1-2 hours      | 🟡 MEDIUM          |
+| **Phase 6** | Testing & Polish            | 1 week         | 🟡 MEDIUM          |
+| **Total**   |                             | **8-10 weeks** | (includes Phase 0) |
 
 ---
 
 ## 📞 Next Steps
 
 ### Immediate Actions
+
 1. Pull latest code from repository
 2. Open project in IntelliJ IDEA
 3. Run desktop app: `./gradlew desktopApp:run`

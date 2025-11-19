@@ -6,12 +6,15 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.fivucsas.mobile.android.AppDependencies
 import com.fivucsas.mobile.android.ui.screen.BiometricEnrollScreen
 import com.fivucsas.mobile.android.ui.screen.BiometricVerifyScreen
 import com.fivucsas.mobile.android.ui.screen.HomeScreen
 import com.fivucsas.mobile.android.ui.screen.LoginScreen
 import com.fivucsas.mobile.android.ui.screen.RegisterScreen
+import com.fivucsas.shared.presentation.viewmodel.auth.BiometricViewModel
+import com.fivucsas.shared.presentation.viewmodel.auth.LoginViewModel
+import com.fivucsas.shared.presentation.viewmodel.auth.RegisterViewModel
+import org.koin.compose.koinInject
 
 sealed class Screen(val route: String) {
     object Login : Screen("login")
@@ -30,7 +33,7 @@ sealed class Screen(val route: String) {
 }
 
 @Composable
-fun AppNavigation(dependencies: AppDependencies) {
+fun AppNavigation() {
     val navController = rememberNavController()
 
     NavHost(
@@ -38,13 +41,14 @@ fun AppNavigation(dependencies: AppDependencies) {
         startDestination = Screen.Login.route
     ) {
         composable(Screen.Login.route) {
+            val viewModel = koinInject<LoginViewModel>()
             LoginScreen(
-                viewModel = dependencies.loginViewModel,
+                viewModel = viewModel,
                 onNavigateToRegister = {
                     navController.navigate(Screen.Register.route)
                 },
-                onLoginSuccess = { user ->
-                    navController.navigate(Screen.Home.createRoute(user.id, user.fullName)) {
+                onLoginSuccess = {
+                    navController.navigate(Screen.Home.createRoute("1", "Test User")) {
                         popUpTo(Screen.Login.route) { inclusive = true }
                     }
                 }
@@ -52,13 +56,14 @@ fun AppNavigation(dependencies: AppDependencies) {
         }
 
         composable(Screen.Register.route) {
+            val viewModel = koinInject<RegisterViewModel>()
             RegisterScreen(
-                viewModel = dependencies.registerViewModel,
+                viewModel = viewModel,
                 onNavigateBack = {
                     navController.popBackStack()
                 },
-                onRegisterSuccess = { user ->
-                    navController.navigate(Screen.Home.createRoute(user.id, user.fullName)) {
+                onRegisterSuccess = {
+                    navController.navigate(Screen.Home.createRoute("1", "Test User")) {
                         popUpTo(Screen.Login.route) { inclusive = true }
                     }
                 }
@@ -97,10 +102,11 @@ fun AppNavigation(dependencies: AppDependencies) {
             arguments = listOf(navArgument("userId") { type = NavType.StringType })
         ) { backStackEntry ->
             val userId = backStackEntry.arguments?.getString("userId") ?: ""
+            val viewModel = koinInject<BiometricViewModel>()
 
             BiometricEnrollScreen(
                 userId = userId,
-                viewModel = dependencies.biometricViewModel,
+                viewModel = viewModel,
                 onNavigateBack = {
                     navController.popBackStack()
                 }
@@ -112,10 +118,11 @@ fun AppNavigation(dependencies: AppDependencies) {
             arguments = listOf(navArgument("userId") { type = NavType.StringType })
         ) { backStackEntry ->
             val userId = backStackEntry.arguments?.getString("userId") ?: ""
+            val viewModel = koinInject<BiometricViewModel>()
 
             BiometricVerifyScreen(
                 userId = userId,
-                viewModel = dependencies.biometricViewModel,
+                viewModel = viewModel,
                 onNavigateBack = {
                     navController.popBackStack()
                 }

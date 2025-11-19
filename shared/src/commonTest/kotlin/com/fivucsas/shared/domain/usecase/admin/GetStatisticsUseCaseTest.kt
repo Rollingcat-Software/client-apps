@@ -9,16 +9,16 @@ import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
 class GetStatisticsUseCaseTest {
-    
+
     @Test
     fun `invoke should return statistics from repository`() = runTest {
         // Given
         val repository = FakeUserRepository()
         val useCase = GetStatisticsUseCase(repository)
-        
+
         // When
         val result = useCase()
-        
+
         // Then
         assertTrue(result.isSuccess)
         val stats = result.getOrNull()!!
@@ -27,16 +27,16 @@ class GetStatisticsUseCaseTest {
         assertEquals(TestData.testStatistics.activeUsers, stats.activeUsers)
         assertEquals(TestData.testStatistics.successRate, stats.successRate)
     }
-    
+
     @Test
     fun `invoke should calculate correct values`() = runTest {
         // Given
         val repository = FakeUserRepository()
         val useCase = GetStatisticsUseCase(repository)
-        
+
         // When
         val result = useCase()
-        
+
         // Then
         assertTrue(result.isSuccess)
         val stats = result.getOrNull()!!
@@ -44,7 +44,7 @@ class GetStatisticsUseCaseTest {
         assertEquals(85, stats.activeUsers)
         assertEquals(95.5, stats.successRate)
     }
-    
+
     @Test
     fun `invoke should return failure when repository throws error`() = runTest {
         // Given
@@ -52,10 +52,10 @@ class GetStatisticsUseCaseTest {
         repository.shouldThrowError = true
         repository.errorMessage = "Statistics unavailable"
         val useCase = GetStatisticsUseCase(repository)
-        
+
         // When
         val result = useCase()
-        
+
         // Then
         assertTrue(result.isFailure)
         assertEquals("Statistics unavailable", result.exceptionOrNull()?.message)
