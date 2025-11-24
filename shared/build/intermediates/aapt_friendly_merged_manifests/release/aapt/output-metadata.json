@@ -5,7 +5,7 @@
     "kind": "Directory"
   },
   "applicationId": "com.fivucsas.mobile.shared",
-  "variantName": "debug",
+  "variantName": "release",
   "elements": [
     {
       "type": "SINGLE",

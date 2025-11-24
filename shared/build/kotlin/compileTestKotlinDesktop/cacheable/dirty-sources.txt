@@ -1,6 +1,10 @@
 C:\Users\ahabg\OneDrive\Belgeler\GitHub\FIVUCSAS\mobile-app\shared\src\commonTest\kotlin\com\fivucsas\shared\test\FakeUserRepository.kt
 C:\Users\ahabg\OneDrive\Belgeler\GitHub\FIVUCSAS\mobile-app\shared\src\commonTest\kotlin\com\fivucsas\shared\domain\usecase\admin\GetStatisticsUseCaseTest.kt
 C:\Users\ahabg\OneDrive\Belgeler\GitHub\FIVUCSAS\mobile-app\shared\src\commonTest\kotlin\com\fivucsas\shared\test\TestData.kt
+C:\Users\ahabg\OneDrive\Belgeler\GitHub\FIVUCSAS\mobile-app\shared\src\commonTest\kotlin\com\fivucsas\shared\presentation\viewmodel\AdminViewModelTest.kt
 C:\Users\ahabg\OneDrive\Belgeler\GitHub\FIVUCSAS\mobile-app\shared\src\commonTest\kotlin\com\fivucsas\shared\data\repository\UserRepositoryImplTest.kt
 C:\Users\ahabg\OneDrive\Belgeler\GitHub\FIVUCSAS\mobile-app\shared\src\commonTest\kotlin\com\fivucsas\shared\domain\usecase\admin\GetUsersUseCaseTest.kt
 C:\Users\ahabg\OneDrive\Belgeler\GitHub\FIVUCSAS\mobile-app\shared\src\commonTest\kotlin\com\fivucsas\shared\domain\usecase\admin\SearchUsersUseCaseTest.kt
+C:\Users\ahabg\OneDrive\Belgeler\GitHub\FIVUCSAS\mobile-app\shared\src\commonTest\kotlin\com\fivucsas\shared\presentation\viewmodel\KioskViewModelTest.kt
+C:\Users\ahabg\OneDrive\Belgeler\GitHub\FIVUCSAS\mobile-app\shared\src\commonTest\kotlin\com\fivucsas\shared\test\mocks\AdminMocks.kt
+C:\Users\ahabg\OneDrive\Belgeler\GitHub\FIVUCSAS\mobile-app\shared\src\commonTest\kotlin\com\fivucsas\shared\test\mocks\KioskMocks.kt

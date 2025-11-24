@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "com.fivucsas.mobile.android.androidApp-mergeReleaseResources-57:/values-en-rAU/values-en-rAU.xml",
+            "outputFile": "com.fivucsas.mobile.android.androidApp-mergeReleaseResources-59:/values-en-rAU/values-en-rAU.xml",
             "map": [
                 {
                     "source": "C:\\Users\\ahabg\\.gradle\\caches\\8.14.3\\transforms\\27ac394ae843f24a7ecf545bf7a8df49\\transformed\\appcompat-1.6.1\\res\\values-en-rAU\\values-en-rAU.xml",

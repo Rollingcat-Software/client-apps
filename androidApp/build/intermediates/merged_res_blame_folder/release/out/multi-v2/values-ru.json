@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "com.fivucsas.mobile.android.androidApp-mergeReleaseResources-57:/values-ru/values-ru.xml",
+            "outputFile": "com.fivucsas.mobile.android.androidApp-mergeReleaseResources-59:/values-ru/values-ru.xml",
             "map": [
                 {
                     "source": "C:\\Users\\ahabg\\.gradle\\caches\\8.14.3\\transforms\\bd4145c7282a469f6b1a59a69f0f700d\\transformed\\core-1.12.0\\res\\values-ru\\values-ru.xml",
