@@ -1581,6 +1581,7 @@ enum class CameraFacing {
 ### Day 2: Implement Desktop Versions
 
 *
+
 *Create: `shared/src/desktopMain/kotlin/com/fivucsas/shared/platform/camera/DesktopCameraService.kt`
 **
 

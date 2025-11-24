@@ -1,0 +1,1 @@
+com.fivucsas.mobile.shared
