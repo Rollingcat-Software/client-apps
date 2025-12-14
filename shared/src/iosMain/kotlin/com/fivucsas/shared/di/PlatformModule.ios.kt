@@ -1,0 +1,40 @@
+package com.fivucsas.shared.di
+
+import com.fivucsas.shared.platform.ICameraService
+import com.fivucsas.shared.platform.ISecureStorage
+import com.fivucsas.shared.platform.ILogger
+import com.fivucsas.shared.platform.IosCameraService
+import com.fivucsas.shared.platform.IosSecureStorage
+import com.fivucsas.shared.platform.IosLogger
+import org.koin.dsl.module
+
+/**
+ * iOS Platform Module
+ *
+ * Provides iOS-specific implementations for platform abstractions.
+ * Uses Koin for dependency injection.
+ *
+ * Provides:
+ * - IosCameraService: AVFoundation-based camera implementation
+ * - IosSecureStorage: iOS Keychain-based secure storage
+ * - IosLogger: NSLog-based logging implementation
+ *
+ * Design Patterns:
+ * - Dependency Injection Pattern: Uses Koin for IoC
+ * - Factory Pattern: Creates platform-specific instances
+ * - Singleton Pattern: Single instances for stateful services
+ *
+ * Architecture:
+ * - Hexagonal Architecture: Platform implementations as adapters
+ * - SOLID Principles: Dependency inversion through interfaces
+ */
+actual val platformModule = module {
+    // Camera Service - Singleton for state management
+    single<ICameraService> { IosCameraService() }
+
+    // Secure Storage - Singleton for consistent data access
+    single<ISecureStorage> { IosSecureStorage() }
+
+    // Logger - Singleton for centralized logging
+    single<ILogger> { IosLogger() }
+}

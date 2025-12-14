@@ -59,5 +59,5 @@ object ApiConfig {
     /**
      * Feature flags
      */
-    var useRealApi: Boolean = false // Set to true when backend is ready
+    var useRealApi: Boolean = true // Set to false to use mock data
 }

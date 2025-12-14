@@ -22,7 +22,11 @@ data class AdminUiState(
     val showEditUserDialog: Boolean = false,
     val editingUser: User? = null,
     val showDeleteConfirmation: Boolean = false,
-    val userToDelete: User? = null
+    val userToDelete: User? = null,
+
+    // Settings
+    val settings: SettingsState = SettingsState(),
+    val hasUnsavedSettings: Boolean = false
 )
 
 /**

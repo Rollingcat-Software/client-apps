@@ -1,5 +1,6 @@
 package com.fivucsas.shared.di
 
+import com.fivucsas.shared.data.local.TokenManager
 import com.fivucsas.shared.data.remote.api.AuthApi
 import com.fivucsas.shared.data.remote.api.AuthApiImpl
 import com.fivucsas.shared.data.remote.api.BiometricApi
@@ -15,6 +16,8 @@ import io.ktor.client.plugins.logging.DEFAULT
 import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logger
 import io.ktor.client.plugins.logging.Logging
+import io.ktor.client.request.header
+import io.ktor.http.HttpHeaders
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 import org.koin.core.module.dsl.bind
@@ -50,6 +53,16 @@ val networkModule = module {
 
             defaultRequest {
                 url(ApiConfig.baseUrl + "/")
+
+                // Add JWT token to all requests (except auth endpoints)
+                val tokenManager = get<TokenManager>()
+                val accessToken = tokenManager.getAccessToken()
+
+                if (accessToken != null &&
+                    !url.toString().contains("/auth/login") &&
+                    !url.toString().contains("/auth/register")) {
+                    header(HttpHeaders.Authorization, "Bearer $accessToken")
+                }
             }
         }
     }

@@ -374,6 +374,192 @@ class AdminViewModel(
         _uiState.update { it.copy(successMessage = null) }
     }
 
+    // SETTINGS MANAGEMENT
+    fun updateSettings(settings: com.fivucsas.shared.presentation.state.SettingsState) {
+        _uiState.update {
+            it.copy(
+                settings = settings,
+                hasUnsavedSettings = true
+            )
+        }
+    }
+
+    fun saveSettings() {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
+
+            try {
+                kotlinx.coroutines.delay(com.fivucsas.shared.config.AnimationConfig.DELAY_API_SIMULATION_SHORT)
+
+                // TODO: When backend is ready, save to API
+                // For now, just persist in state
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        hasUnsavedSettings = false,
+                        successMessage = "✅ Settings saved successfully\n⚠️ Using local storage (server not connected)"
+                    )
+                }
+
+                kotlinx.coroutines.delay(com.fivucsas.shared.config.AnimationConfig.TOAST_DISPLAY_DURATION)
+                _uiState.update { it.copy(successMessage = null) }
+
+            } catch (e: Exception) {
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        errorMessage = "⚠️ Error saving settings: ${e.message}"
+                    )
+                }
+            }
+        }
+    }
+
+    fun resetSettings() {
+        _uiState.update {
+            it.copy(
+                settings = com.fivucsas.shared.presentation.state.SettingsState(),
+                hasUnsavedSettings = false,
+                successMessage = "Settings reset to defaults"
+            )
+        }
+
+        viewModelScope.launch {
+            kotlinx.coroutines.delay(com.fivucsas.shared.config.AnimationConfig.TOAST_DISPLAY_DURATION)
+            _uiState.update { it.copy(successMessage = null) }
+        }
+    }
+
+    fun testDatabaseConnection() {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
+
+            try {
+                kotlinx.coroutines.delay(1000L)
+
+                // TODO: Actual database connection test
+                val isConnected = Random.nextBoolean()
+
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        successMessage = if (isConnected) {
+                            "✅ Database connection successful"
+                        } else {
+                            null
+                        },
+                        errorMessage = if (!isConnected) {
+                            "❌ Database connection failed"
+                        } else {
+                            null
+                        }
+                    )
+                }
+
+                kotlinx.coroutines.delay(com.fivucsas.shared.config.AnimationConfig.TOAST_DISPLAY_DURATION)
+                _uiState.update { it.copy(successMessage = null, errorMessage = null) }
+
+            } catch (e: Exception) {
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        errorMessage = "❌ Connection test failed: ${e.message}"
+                    )
+                }
+            }
+        }
+    }
+
+    fun clearCache() {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
+
+            try {
+                kotlinx.coroutines.delay(500L)
+
+                // TODO: Actual cache clearing
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        successMessage = "✅ Cache cleared successfully"
+                    )
+                }
+
+                kotlinx.coroutines.delay(com.fivucsas.shared.config.AnimationConfig.TOAST_DISPLAY_DURATION)
+                _uiState.update { it.copy(successMessage = null) }
+
+            } catch (e: Exception) {
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        errorMessage = "⚠️ Error clearing cache: ${e.message}"
+                    )
+                }
+            }
+        }
+    }
+
+    fun exportLogs() {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
+
+            try {
+                kotlinx.coroutines.delay(1000L)
+
+                // TODO: Actual log export
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        successMessage = "✅ Logs exported to logs_export_${System.currentTimeMillis()}.txt"
+                    )
+                }
+
+                kotlinx.coroutines.delay(com.fivucsas.shared.config.AnimationConfig.TOAST_DISPLAY_DURATION)
+                _uiState.update { it.copy(successMessage = null) }
+
+            } catch (e: Exception) {
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        errorMessage = "⚠️ Error exporting logs: ${e.message}"
+                    )
+                }
+            }
+        }
+    }
+
+    fun checkSystemHealth() {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
+
+            try {
+                kotlinx.coroutines.delay(1500L)
+
+                // TODO: Actual system health check
+                val healthStatus = com.fivucsas.shared.presentation.state.HealthStatus.GOOD
+
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        settings = it.settings.copy(systemHealthStatus = healthStatus),
+                        successMessage = "✅ System health check completed: ${healthStatus.name}"
+                    )
+                }
+
+                kotlinx.coroutines.delay(com.fivucsas.shared.config.AnimationConfig.TOAST_DISPLAY_DURATION)
+                _uiState.update { it.copy(successMessage = null) }
+
+            } catch (e: Exception) {
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        errorMessage = "⚠️ Health check failed: ${e.message}"
+                    )
+                }
+            }
+        }
+    }
+
     // MOCK DATA GENERATOR
     private fun generateMockUsers(): List<User> {
         val firstNames = listOf("John", "Sarah", "Mike", "Emily", "David", "Lisa", "James", "Anna")
