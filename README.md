@@ -1,6 +1,6 @@
-# FIVUCSAS Mobile App
+# FIVUCSAS Client Apps
 
-**Facial Identity Verification Using Computer Vision and Sensor-Augmented Systems**
+**Cross-Platform Applications for Face and Identity Verification Using Cloud-based SaaS**
 
 ## 🎯 Project Status
 
@@ -19,7 +19,7 @@ development.
 ### Project Structure
 
 ```
-mobile-app/
+client-apps/
 ├── shared/                           # Shared KMP module
 │   └── src/
 │       ├── commonMain/kotlin/com/fivucsas/shared/
