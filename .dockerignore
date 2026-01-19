@@ -1,0 +1,96 @@
+# .dockerignore
+# Files and directories to exclude from Docker build context
+# Reduces build time and image size
+
+# Build outputs
+build/
+*/build/
+.gradle/
+*.class
+*.jar
+*.war
+*.ear
+*.nar
+out/
+target/
+
+# IDE files
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# Documentation (unless needed in container)
+*.md
+!README.md
+docs/
+
+# CI/CD
+.github/
+.gitlab-ci.yml
+Jenkinsfile
+
+# Logs
+*.log
+logs/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+local.properties
+
+# Test files
+*/test/
+*/androidTest/
+*/commonTest/
+*/desktopTest/
+*/iosTest/
+
+# Temporary files
+*.tmp
+*.temp
+tmp/
+temp/
+
+# OS files
+Thumbs.db
+.DS_Store
+desktop.ini
+
+# Node modules (if any)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Kotlin
+*.kotlin_module
+
+# Android
+*.apk
+*.ap_
+*.aab
+*.dex
+local.properties
+
+# Gradle
+.gradle/
+gradle-app.setting
+!gradle-wrapper.jar
+!gradle-wrapper.properties
+
+# Docker files (don't include in build context)
+Dockerfile
+docker-compose*.yml
+.dockerignore

@@ -1,0 +1,167 @@
+# Docker Compose for FIVUCSAS Client Apps
+# Orchestrates the complete application stack
+#
+# Usage:
+#   Development: docker-compose up
+#   Production:  docker-compose -f docker-compose.yml -f docker-compose.prod.yml up
+#   Stop:        docker-compose down
+
+version: '3.9'
+
+services:
+  # Desktop Application Service
+  desktop-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - BUILD_ENV=development
+    image: fivucsas-desktop:latest
+    container_name: fivucsas-desktop-app
+    restart: unless-stopped
+
+    environment:
+      # Application Configuration
+      - APP_ENV=development
+      - APP_NAME=FIVUCSAS
+      - APP_VERSION=1.0.0
+
+      # API Configuration
+      - API_BASE_URL=https://api.fivucsas.com
+      - API_TIMEOUT=30
+      - API_MAX_RETRIES=3
+
+      # Logging Configuration
+      - LOG_LEVEL=INFO
+      - ENABLE_DEBUG_LOGS=true
+      - ENABLE_NETWORK_LOGS=true
+
+      # Java Options
+      - JAVA_OPTS=-Xmx2g -Xms512m -XX:+UseG1GC
+
+    volumes:
+      # Persist application data
+      - app-data:/home/fivucsas/data
+
+      # Configuration files
+      - ./config:/home/fivucsas/app/config:ro
+
+      # Logs
+      - ./logs:/home/fivucsas/app/logs
+
+      # X11 socket for GUI (Linux only)
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+
+    # Network configuration
+    networks:
+      - fivucsas-network
+
+    # Resource limits
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 2G
+        reservations:
+          cpus: '1'
+          memory: 512M
+
+    # Health check
+    healthcheck:
+      test: ["CMD", "pgrep", "-f", "java"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+    # Logging
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # Backend API Service (Placeholder - configure as needed)
+  # Uncomment when backend is ready
+  # backend-api:
+  #   image: fivucsas-backend:latest
+  #   container_name: fivucsas-backend-api
+  #   restart: unless-stopped
+  #   ports:
+  #     - "8080:8080"
+  #   environment:
+  #     - DATABASE_URL=postgresql://postgres:password@postgres:5432/fivucsas
+  #     - JWT_SECRET=${JWT_SECRET}
+  #   networks:
+  #     - fivucsas-network
+  #   depends_on:
+  #     - postgres
+  #     - redis
+
+  # Database Service (PostgreSQL)
+  # Uncomment when database is needed
+  # postgres:
+  #   image: postgres:15-alpine
+  #   container_name: fivucsas-postgres
+  #   restart: unless-stopped
+  #   environment:
+  #     - POSTGRES_DB=fivucsas
+  #     - POSTGRES_USER=postgres
+  #     - POSTGRES_PASSWORD=${DB_PASSWORD}
+  #   volumes:
+  #     - postgres-data:/var/lib/postgresql/data
+  #   networks:
+  #     - fivucsas-network
+  #   ports:
+  #     - "5432:5432"
+
+  # Cache Service (Redis)
+  # Uncomment when caching is needed
+  # redis:
+  #   image: redis:7-alpine
+  #   container_name: fivucsas-redis
+  #   restart: unless-stopped
+  #   command: redis-server --appendonly yes
+  #   volumes:
+  #     - redis-data:/data
+  #   networks:
+  #     - fivucsas-network
+  #   ports:
+  #     - "6379:6379"
+
+# Networks
+networks:
+  fivucsas-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.25.0.0/16
+
+# Volumes
+volumes:
+  app-data:
+    driver: local
+  # postgres-data:
+  #   driver: local
+  # redis-data:
+  #   driver: local
+
+# Usage Instructions:
+#
+# 1. Build and start services:
+#    docker-compose up -d
+#
+# 2. View logs:
+#    docker-compose logs -f desktop-app
+#
+# 3. Stop services:
+#    docker-compose down
+#
+# 4. Rebuild after code changes:
+#    docker-compose up -d --build
+#
+# 5. For GUI on Linux, first run:
+#    xhost +local:docker
+#
+# 6. Access bash in container:
+#    docker-compose exec desktop-app bash
