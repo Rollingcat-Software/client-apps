@@ -1,313 +1,395 @@
-# Professional Implementation Plan - Mobile App Refactoring
+# Client Apps - Implementation Plan for 100% Completion
 
-**Project**: FIVUCSAS Mobile App
-**Phase**: 0 - Architectural Refactoring
-**Duration**: 14 working days (2.8 weeks)
-**Start Date**: TBD
-**Owner**: Development Team
-**Status**: READY TO IMPLEMENT
+**Version**: 2.0
+**Date**: January 2026
+**Target**: 100% Production-Ready
+**Current Status**: ~60% Complete
+**Estimated Effort**: 21 days
 
 ---
 
 ## Table of Contents
 
-1. [Overview](#overview)
-2. [Prerequisites](#prerequisites)
-3. [Phase 0.1: Package Consolidation](#phase-01-package-consolidation-1-day)
-4. [Phase 0.2: Extract Configuration](#phase-02-extract-configuration-1-day)
-5. [Phase 0.3: Shared UI Components](#phase-03-shared-ui-components-2-days)
-6. [Phase 0.4: Refactor AdminDashboard](#phase-04-refactor-admindashboard-3-days)
-7. [Phase 0.5: Refactor KioskMode](#phase-05-refactor-kioskmode-2-days)
-8. [Phase 0.6: Platform Abstractions](#phase-06-platform-abstractions-2-days)
-9. [Phase 0.7: ViewModel Tests](#phase-07-viewmodel-tests-2-days)
-10. [Phase 0.8: Documentation](#phase-08-documentation-1-day)
-11. [Testing Checklist](#testing-checklist)
-12. [Rollback Procedures](#rollback-procedures)
+1. [Executive Summary](#executive-summary)
+2. [Current State Analysis](#current-state-analysis)
+3. [API Contracts](#api-contracts)
+4. [Implementation Phases](#implementation-phases)
+   - [Phase 1: Package Consolidation & Code Cleanup](#phase-1-package-consolidation--code-cleanup)
+   - [Phase 2: Backend Integration](#phase-2-backend-integration)
+   - [Phase 3: Camera Integration](#phase-3-camera-integration)
+   - [Phase 4: Biometric Flow Implementation](#phase-4-biometric-flow-implementation)
+   - [Phase 5: Platform-Specific Features](#phase-5-platform-specific-features)
+   - [Phase 6: Test Coverage Expansion](#phase-6-test-coverage-expansion)
+   - [Phase 7: Production Readiness](#phase-7-production-readiness)
+5. [Integration Points](#integration-points)
+6. [Testing Strategy](#testing-strategy)
+7. [Deployment Checklist](#deployment-checklist)
 
 ---
 
-## Overview
+## Executive Summary
 
-### Goal
+This document provides a comprehensive implementation plan for completing the FIVUCSAS Client Apps to 100% production readiness. The client-apps module is a Kotlin Multiplatform project supporting Android, iOS, and Desktop platforms.
 
-Transform the mobile-app codebase from a **B+ (Good foundation, poor organization)** to **A+ (
-Professional in all aspects)** through systematic refactoring.
+### Architecture
 
-### Key Improvements
+```
+client-apps/
+├── shared/                      # Shared Kotlin Multiplatform code
+│   └── src/
+│       ├── commonMain/          # Cross-platform code
+│       │   └── kotlin/com/fivucsas/shared/
+│       │       ├── config/      # Configuration constants
+│       │       ├── data/        # Data layer (repositories, API)
+│       │       ├── di/          # Koin dependency injection
+│       │       ├── domain/      # Domain models and use cases
+│       │       ├── platform/    # Platform abstractions
+│       │       └── presentation/# ViewModels and UI state
+│       ├── androidMain/         # Android-specific implementations
+│       ├── iosMain/             # iOS-specific implementations
+│       └── desktopMain/         # Desktop-specific implementations
+├── androidApp/                  # Android application
+├── desktopApp/                  # Desktop application (Compose Desktop)
+└── iosApp/                      # iOS application (SwiftUI wrapper)
+```
 
-- 🔴 **Reduce largest file** from 2,335 lines → 150 lines
-- 🟢 **Increase test coverage** from 10% → 70%
-- 🔵 **Extract components** from 0 → 20+ reusable components
-- 🟣 **Consolidate packages** from 2 duplicates → 1 clean structure
-- 🟠 **Add abstractions** for platform-specific code
+### Key Dependencies
 
-### Success Criteria
-
-- ✅ All functionality preserved
-- ✅ All tests passing
-- ✅ Code coverage ≥ 70%
-- ✅ Largest file < 500 lines
-- ✅ Build time unchanged
-- ✅ No regression bugs
+- **Kotlin Multiplatform** - Cross-platform development
+- **Compose Multiplatform** - UI framework
+- **Koin** - Dependency injection
+- **Ktor** - HTTP client
+- **Kotlinx.serialization** - JSON serialization
+- **Kotlinx.coroutines** - Async operations
+- **CameraX** (Android) - Camera capture
+- **AVFoundation** (iOS) - Camera capture
+- **JavaCV** (Desktop) - Camera capture
 
 ---
 
-## Prerequisites
+## Current State Analysis
 
-### Before Starting
+### Completed Features (60%)
 
-- [ ] Read `ARCHITECTURE_REVIEW.md` completely
-- [ ] Understand current architecture
-- [ ] Set up development environment
-- [ ] Ensure IntelliJ IDEA with Kotlin plugin installed
-- [ ] Gradle 8+ configured
-- [ ] Git configured with proper credentials
+| Feature | Status | Notes |
+|---------|--------|-------|
+| Project Structure | ✅ 100% | KMP setup complete |
+| Koin DI | ✅ 100% | Dependency injection configured |
+| Mock API Mode | ✅ 100% | Development without backend |
+| Admin Dashboard UI | ✅ 90% | All tabs implemented |
+| Kiosk Mode UI | ✅ 85% | Welcome, Enrollment, Verification |
+| Desktop App | ✅ 80% | Functional but needs polish |
+| Shared Components | ✅ 70% | Some extraction needed |
 
-### Branch Strategy
+### Pending Features (40%)
 
-```bash
-# Create feature branch
-git checkout -b refactor/professional-architecture
-
-# Backup current state
-git tag backup-before-refactor
-
-# Create sub-branches for each phase
-git checkout -b refactor/phase-0.1-packages
-```
-
-### Development Environment
-
-```bash
-# Verify setup
-./gradlew clean build
-
-# Run desktop app
-./gradlew desktopApp:run
-
-# Run tests
-./gradlew test
-
-# Expected output: All builds successful, app runs, ~10% test coverage
-```
+| Feature | Status | Priority |
+|---------|--------|----------|
+| Real API Integration | 🔴 10% | HIGH |
+| Camera Integration (Android) | 🔴 20% | HIGH |
+| Camera Integration (Desktop) | 🟡 40% | HIGH |
+| Camera Integration (iOS) | 🔴 0% | MEDIUM |
+| Biometric Capture Flow | 🔴 20% | HIGH |
+| Test Coverage | 🔴 10% | HIGH |
+| Error Handling | 🟡 50% | HIGH |
+| Offline Support | 🔴 0% | MEDIUM |
+| Package Consolidation | 🔴 0% | HIGH |
 
 ---
 
-## Phase 0.1: Package Consolidation (1 Day)
+## API Contracts
 
-### Goal
+### Identity Core API (http://localhost:8080/api/v1)
 
-Eliminate duplicate package structure: merge `com.fivucsas.mobile` → `com.fivucsas.shared`
-
-### Current Structure
-
-```
-shared/src/commonMain/kotlin/
-├── com.fivucsas.mobile/    # 🔴 TO BE DELETED
-│   ├── data/
-│   ├── domain/
-│   └── presentation/
-└── com.fivucsas.shared/    # ✅ KEEP
-    ├── data/
-    ├── domain/
-    ├── di/
-    └── presentation/
-```
-
-### Steps
-
-#### Step 1: Analyze Differences (30 minutes)
-
-```bash
-# List files in both packages
-find shared/src/commonMain/kotlin/com/fivucsas/mobile -name "*.kt"
-find shared/src/commonMain/kotlin/com/fivucsas/shared -name "*.kt"
-
-# Check for duplicates
-diff -r shared/src/commonMain/kotlin/com/fivucsas/mobile \
-        shared/src/commonMain/kotlin/com/fivucsas/shared
-```
-
-**Expected Findings**:
-
-- Some models duplicated (User, AuthToken)
-- Legacy ViewModels in mobile package
-- Older repository implementations
-
-**Decision**:
-
-- Keep `shared` package versions (newer)
-- Migrate any unique code from `mobile` to `shared`
-- Delete `mobile` package entirely
-
-#### Step 2: Identify Dependencies (30 minutes)
-
-```bash
-# Find all imports from mobile package
-grep -r "import com.fivucsas.mobile" shared/
-grep -r "import com.fivucsas.mobile" desktopApp/
-grep -r "import com.fivucsas.mobile" androidApp/
-```
-
-**Document**:
-
-- Which files import from mobile package?
-- Are they using unique code or duplicates?
-- Create migration list
-
-#### Step 3: Migrate Unique Code (2 hours)
-
-For each unique file in `com.fivucsas.mobile`:
-
-**Example: Migrate LoginViewModel**
-
-```bash
-# 1. Check if equivalent exists in shared
-ls shared/src/commonMain/kotlin/com/fivucsas/shared/presentation/viewmodel/
-
-# 2. If unique, move to shared
-mkdir -p shared/src/commonMain/kotlin/com/fivucsas/shared/presentation/viewmodel/auth/
-mv shared/src/commonMain/kotlin/com/fivucsas/mobile/presentation/login/LoginViewModel.kt \
-   shared/src/commonMain/kotlin/com/fivucsas/shared/presentation/viewmodel/auth/LoginViewModel.kt
-
-# 3. Update package declaration in file
-# Change: package com.fivucsas.mobile.presentation.login
-# To:     package com.fivucsas.shared.presentation.viewmodel.auth
-```
-
-**IntelliJ Method** (Recommended):
-
-1. Right-click file → Refactor → Move
-2. Select new package: `com.fivucsas.shared.presentation.viewmodel.auth`
-3. IDE will update imports automatically
-4. Review changes before committing
-
-#### Step 4: Update All Imports (2 hours)
-
-```bash
-# Use IntelliJ's "Find and Replace in Path"
-# Find:    import com.fivucsas.mobile
-# Replace: import com.fivucsas.shared
-
-# Or use sed (Linux/Mac)
-find . -name "*.kt" -exec sed -i 's/com\.fivucsas\.mobile/com.fivucsas.shared/g' {} +
-```
-
-**Verify Each Change**:
-
-- [ ] File compiles
-- [ ] Imports resolved
-- [ ] No duplicate imports
-- [ ] Tests still pass
-
-#### Step 5: Delete Mobile Package (30 minutes)
-
-```bash
-# After ALL imports updated and verified
-rm -rf shared/src/commonMain/kotlin/com/fivucsas/mobile/
-
-# Rebuild and test
-./gradlew clean build
-./gradlew test
-```
-
-#### Step 6: Update Build Files (30 minutes)
-
-Check if `build.gradle.kts` files reference mobile package:
+All requests require the following headers:
 
 ```kotlin
-// Search for any hardcoded package references
-grep -r "com.fivucsas.mobile" *.gradle.kts
+// Common headers interface
+interface CommonHeaders {
+    val authorization: String  // "Bearer ${accessToken}"
+    val tenantId: String       // X-Tenant-ID header
+    val contentType: String    // "application/json"
+}
 ```
 
-### Verification Checklist
+### Authentication Endpoints
 
-- [ ] `com.fivucsas.mobile` package deleted
-- [ ] All imports use `com.fivucsas.shared`
-- [ ] `./gradlew clean build` succeeds
-- [ ] `./gradlew test` passes all tests
-- [ ] Desktop app runs: `./gradlew desktopApp:run`
-- [ ] No compilation errors
-- [ ] No unused imports
+```kotlin
+// POST /auth/login
+@Serializable
+data class LoginRequest(
+    val email: String,
+    val password: String
+)
 
-### Commit
+@Serializable
+data class LoginResponse(
+    val accessToken: String,
+    val refreshToken: String,
+    val expiresIn: Long,
+    val user: UserDTO
+)
 
-```bash
-git add .
-git commit -m "refactor: Consolidate packages - merge mobile into shared
+// POST /auth/refresh
+@Serializable
+data class RefreshRequest(
+    val refreshToken: String
+)
 
-- Migrated unique code from com.fivucsas.mobile to com.fivucsas.shared
-- Updated all imports to use shared package
-- Deleted duplicate mobile package
-- All tests passing
-- No functionality changes"
+@Serializable
+data class RefreshResponse(
+    val accessToken: String,
+    val refreshToken: String,
+    val expiresIn: Long
+)
 
-git push origin refactor/phase-0.1-packages
+// GET /auth/me
+// Returns UserDTO
+
+// POST /auth/logout
+// Returns 204 No Content
+```
+
+### User Management Endpoints
+
+```kotlin
+// GET /users?page=0&size=20&sort=createdAt,desc
+@Serializable
+data class PaginatedResponse<T>(
+    val content: List<T>,
+    val page: Int,
+    val size: Int,
+    val totalElements: Long,
+    val totalPages: Int
+)
+
+@Serializable
+data class UserDTO(
+    val id: Long,
+    val email: String,
+    val firstName: String,
+    val lastName: String,
+    val role: UserRole,
+    val status: UserStatus,
+    val tenantId: Long,
+    val permissions: List<String>,
+    val createdAt: String,
+    val updatedAt: String,
+    val lastLoginAt: String? = null,
+    val lastLoginIp: String? = null
+)
+
+@Serializable
+enum class UserRole {
+    SUPER_ADMIN, ADMIN, OPERATOR, VIEWER
+}
+
+@Serializable
+enum class UserStatus {
+    ACTIVE, INACTIVE, LOCKED
+}
+
+// POST /users
+@Serializable
+data class CreateUserRequest(
+    val email: String,
+    val firstName: String,
+    val lastName: String,
+    val password: String,
+    val role: UserRole
+)
+
+// PUT /users/{id}
+@Serializable
+data class UpdateUserRequest(
+    val firstName: String,
+    val lastName: String,
+    val role: UserRole,
+    val status: UserStatus
+)
+
+// DELETE /users/{id}
+// Returns 204 No Content
+```
+
+### Biometric Processor API (http://localhost:8001/api/v1)
+
+```kotlin
+// POST /enrollments
+@Serializable
+data class EnrollmentRequest(
+    val userId: Long,
+    val image: String,  // Base64 encoded image
+    val metadata: EnrollmentMetadata? = null
+)
+
+@Serializable
+data class EnrollmentMetadata(
+    val deviceType: String,
+    val captureQuality: Float,
+    val lightCondition: String
+)
+
+@Serializable
+data class EnrollmentResponse(
+    val enrollmentId: String,
+    val status: EnrollmentStatus,
+    val qualityScore: Float,
+    val message: String
+)
+
+@Serializable
+enum class EnrollmentStatus {
+    PENDING, COMPLETED, FAILED
+}
+
+// POST /verify
+@Serializable
+data class VerificationRequest(
+    val image: String,  // Base64 encoded image
+    val userId: Long? = null,  // Optional for 1:N matching
+    val threshold: Float = 0.85f
+)
+
+@Serializable
+data class VerificationResponse(
+    val verified: Boolean,
+    val confidence: Float,
+    val userId: Long? = null,
+    val message: String,
+    val processingTimeMs: Long
+)
+
+// POST /liveness
+@Serializable
+data class LivenessRequest(
+    val image: String,  // Base64 encoded image
+    val challenge: LivenessChallenge? = null
+)
+
+@Serializable
+data class LivenessChallenge(
+    val type: String,  // "BLINK", "SMILE", "TURN_HEAD"
+    val direction: String? = null
+)
+
+@Serializable
+data class LivenessResponse(
+    val isLive: Boolean,
+    val confidence: Float,
+    val challengePassed: Boolean,
+    val message: String
+)
+
+// GET /enrollments/{userId}
+// Returns List<EnrollmentDTO>
+
+@Serializable
+data class EnrollmentDTO(
+    val id: String,
+    val userId: Long,
+    val status: EnrollmentStatus,
+    val qualityScore: Float,
+    val createdAt: String,
+    val expiresAt: String? = null
+)
+```
+
+### Dashboard/Statistics Endpoints
+
+```kotlin
+// GET /dashboard/statistics
+@Serializable
+data class DashboardStatistics(
+    val totalUsers: Int,
+    val activeUsers: Int,
+    val totalEnrollments: Int,
+    val totalVerifications: Int,
+    val recentVerifications: List<VerificationActivity>,
+    val enrollmentsByDay: List<DailyCount>,
+    val verificationsByDay: List<DailyCount>
+)
+
+@Serializable
+data class VerificationActivity(
+    val id: Long,
+    val userId: Long,
+    val userName: String,
+    val result: Boolean,
+    val confidence: Float,
+    val timestamp: String
+)
+
+@Serializable
+data class DailyCount(
+    val date: String,
+    val count: Int
+)
 ```
 
 ---
 
-## Phase 0.2: Extract Configuration (1 Day)
+## Implementation Phases
 
-### Goal
+### Phase 1: Package Consolidation & Code Cleanup
 
-Centralize all magic numbers and configuration into config objects
+**Duration**: 2 days
+**Priority**: HIGH
+**Goal**: Clean up duplicate packages and establish clean architecture
 
-### Target Files to Create
-
-```
-shared/src/commonMain/kotlin/com/fivucsas/shared/config/
-├── AppConfig.kt          # App-wide constants
-├── UIDimens.kt           # UI dimensions
-├── AnimationConfig.kt    # Animation timings
-└── BiometricConfig.kt    # Biometric thresholds
-```
-
-### Steps
-
-#### Step 1: Create Configuration Files (1 hour)
-
-**File: `AppConfig.kt`**
+#### 1.1 Merge Duplicate Packages
 
 ```kotlin
+// Current structure has duplicates:
+// com.fivucsas.mobile -> DELETE
+// com.fivucsas.shared -> KEEP
+
+// Step 1: Find all imports from mobile package
+// grep -r "import com.fivucsas.mobile" shared/
+
+// Step 2: Update imports to use shared package
+// Find: import com.fivucsas.mobile
+// Replace: import com.fivucsas.shared
+```
+
+#### 1.2 Create Configuration Objects
+
+```kotlin
+// shared/src/commonMain/kotlin/com/fivucsas/shared/config/AppConfig.kt
 package com.fivucsas.shared.config
 
 object AppConfig {
     const val APP_NAME = "FIVUCSAS"
     const val APP_VERSION = "1.0.0"
-    const val APP_ID = "com.fivucsas.mobile"
 
     object Api {
-        const val BASE_URL = "https://api.fivucsas.com"
-        const val API_VERSION = "v1"
+        const val IDENTITY_BASE_URL = "http://localhost:8080/api/v1"
+        const val BIOMETRIC_BASE_URL = "http://localhost:8001/api/v1"
         const val TIMEOUT_SECONDS = 30L
         const val MAX_RETRIES = 3
-        const val RETRY_DELAY_MS = 1000L
+    }
+
+    object Auth {
+        const val TOKEN_REFRESH_THRESHOLD_SECONDS = 300L  // 5 minutes
+        const val SESSION_TIMEOUT_MINUTES = 30
+    }
+
+    object Biometric {
+        const val CONFIDENCE_THRESHOLD = 0.85f
+        const val LIVENESS_THRESHOLD = 0.80f
+        const val QUALITY_THRESHOLD = 0.75f
+        const val MAX_ENROLLMENT_RETRIES = 3
     }
 
     object Cache {
         const val MAX_AGE_MINUTES = 15
         const val MAX_SIZE_MB = 50
-        const val ENABLE_CACHE = true
-    }
-
-    object Logging {
-        const val ENABLE_DEBUG_LOGS = true
-        const val ENABLE_NETWORK_LOGS = true
-        const val ENABLE_ANALYTICS = false
-    }
-
-    object Session {
-        const val TIMEOUT_MINUTES = 30
-        const val AUTO_LOGOUT_ENABLED = true
-        const val REMEMBER_ME_DAYS = 30
     }
 }
 ```
 
-**File: `UIDimens.kt`**
-
 ```kotlin
+// shared/src/commonMain/kotlin/com/fivucsas/shared/config/UIDimens.kt
 package com.fivucsas.shared.config
 
 import androidx.compose.ui.unit.Dp
@@ -322,1285 +404,753 @@ object UIDimens {
     val SpacingXLarge: Dp = 32.dp
     val SpacingXXLarge: Dp = 64.dp
 
-    // Icon Sizes
-    val IconXSmall: Dp = 16.dp
+    // Icons
     val IconSmall: Dp = 24.dp
     val IconMedium: Dp = 32.dp
     val IconLarge: Dp = 48.dp
     val IconXLarge: Dp = 64.dp
-    val IconXXLarge: Dp = 120.dp
+    val KioskIconSize: Dp = 120.dp
 
-    // Button Sizes
+    // Buttons
     val ButtonHeight: Dp = 48.dp
-    val ButtonHeightSmall: Dp = 36.dp
-    val ButtonHeightLarge: Dp = 56.dp
     val ButtonHeightKiosk: Dp = 80.dp
     val ButtonWidthKiosk: Dp = 250.dp
 
-    // Component Sizes
+    // Cards
     val CardRadius: Dp = 12.dp
     val CardElevation: Dp = 4.dp
-    val InputFieldHeight: Dp = 56.dp
-    val DialogWidth: Dp = 400.dp
-    val DialogMaxWidth: Dp = 600.dp
 
-    // Kiosk Specific
-    val KioskIconSize: Dp = 120.dp
+    // Camera
     val CameraPreviewHeight: Dp = 400.dp
     val CameraPreviewWidth: Dp = 600.dp
-
-    // Table
-    val TableRowHeight: Dp = 56.dp
-    val TableHeaderHeight: Dp = 64.dp
-    val TableCellPadding: Dp = 16.dp
 }
 ```
 
-**File: `AnimationConfig.kt`**
-
-```kotlin
-package com.fivucsas.shared.config
-
-object AnimationConfig {
-    // Duration (milliseconds)
-    const val DURATION_INSTANT = 0
-    const val DURATION_FAST = 150
-    const val DURATION_NORMAL = 300
-    const val DURATION_SLOW = 500
-    const val DURATION_VERY_SLOW = 1000
-
-    // Delays (milliseconds)
-    const val DELAY_SHORT = 100L
-    const val DELAY_MEDIUM = 500L
-    const val DELAY_LONG = 1000L
-    const val DELAY_VERIFICATION = 2000L
-
-    // Fade
-    const val FADE_IN_ALPHA_START = 0f
-    const val FADE_IN_ALPHA_END = 1f
-    const val FADE_OUT_ALPHA_START = 1f
-    const val FADE_OUT_ALPHA_END = 0f
-}
-```
-
-**File: `BiometricConfig.kt`**
-
-```kotlin
-package com.fivucsas.shared.config
-
-object BiometricConfig {
-    // Verification Thresholds
-    const val CONFIDENCE_THRESHOLD = 0.85
-    const val LIVENESS_THRESHOLD = 0.80
-    const val QUALITY_THRESHOLD = 0.75
-
-    // Retry Limits
-    const val MAX_ENROLLMENT_RETRIES = 3
-    const val MAX_VERIFICATION_RETRIES = 3
-    const val MAX_CAMERA_INIT_RETRIES = 3
-
-    // Timeouts (seconds)
-    const val CAMERA_INIT_TIMEOUT = 10L
-    const val CAPTURE_TIMEOUT = 5L
-    const val LIVENESS_CHECK_TIMEOUT = 10L
-    const val PROCESSING_TIMEOUT = 30L
-
-    // Image Requirements
-    const val MIN_FACE_SIZE_PIXELS = 100
-    const val MAX_FACE_SIZE_PIXELS = 500
-    const val PREFERRED_IMAGE_WIDTH = 640
-    const val PREFERRED_IMAGE_HEIGHT = 480
-
-    // Quality Checks
-    const val MIN_BRIGHTNESS = 0.3
-    const val MAX_BRIGHTNESS = 0.9
-    const val MIN_SHARPNESS = 0.5
-    const val MAX_BLUR_SCORE = 0.3
-
-    // Enrollment
-    const val ENROLLMENT_SAMPLES_REQUIRED = 1
-    const val ENROLLMENT_DIVERSITY_THRESHOLD = 0.2
-}
-```
-
-#### Step 2: Find and Replace Magic Numbers (3-4 hours)
-
-**Search for Magic Numbers**:
-
-```bash
-# In AdminDashboard.kt
-grep -n "\.dp" desktopApp/src/desktopMain/kotlin/com/fivucsas/desktop/ui/admin/AdminDashboard.kt | head -20
-
-# In KioskMode.kt
-grep -n "\.dp" desktopApp/src/desktopMain/kotlin/com/fivucsas/desktop/ui/kiosk/KioskMode.kt | head -20
-
-# Find delay() calls
-grep -rn "delay(" shared/
-```
-
-**Example Refactoring**:
-
-**Before**:
-
-```kotlin
-@Composable
-fun WelcomeScreen() {
-    Column(
-        modifier = Modifier.padding(64.dp),
-        verticalArrangement = Arrangement.spacedBy(32.dp)
-    ) {
-        Icon(
-            Icons.Default.Fingerprint,
-            contentDescription = null,
-            modifier = Modifier.size(120.dp)
-        )
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        Button(
-            modifier = Modifier
-                .width(250.dp)
-                .height(80.dp)
-        ) {
-            Text("Enroll")
-        }
-    }
-}
-```
-
-**After**:
-
-```kotlin
-import com.fivucsas.shared.config.UIDimens
-
-@Composable
-fun WelcomeScreen() {
-    Column(
-        modifier = Modifier.padding(UIDimens.SpacingXXLarge),
-        verticalArrangement = Arrangement.spacedBy(UIDimens.SpacingXLarge)
-    ) {
-        Icon(
-            Icons.Default.Fingerprint,
-            contentDescription = null,
-            modifier = Modifier.size(UIDimens.KioskIconSize)
-        )
-
-        Spacer(modifier = Modifier.height(UIDimens.SpacingLarge))
-
-        Button(
-            modifier = Modifier
-                .width(UIDimens.ButtonWidthKiosk)
-                .height(UIDimens.ButtonHeightKiosk)
-        ) {
-            Text("Enroll")
-        }
-    }
-}
-```
-
-**Files to Update**:
-
-1. AdminDashboard.kt
-2. KioskMode.kt
-3. All ViewModels (for delays, thresholds)
-4. Repository implementations (for timeouts, retries)
-
-**Use Find/Replace**:
+#### 1.3 Establish Clean Package Structure
 
 ```
-Find:    Modifier.padding(16.dp)
-Replace: Modifier.padding(UIDimens.SpacingMedium)
-
-Find:    delay(2000)
-Replace: delay(AnimationConfig.DELAY_VERIFICATION)
-
-Find:    if (confidence > 0.85)
-Replace: if (confidence > BiometricConfig.CONFIDENCE_THRESHOLD)
+shared/src/commonMain/kotlin/com/fivucsas/shared/
+├── config/
+│   ├── AppConfig.kt
+│   ├── UIDimens.kt
+│   └── AnimationConfig.kt
+├── data/
+│   ├── api/
+│   │   ├── IdentityApiClient.kt
+│   │   └── BiometricApiClient.kt
+│   ├── repository/
+│   │   ├── AuthRepository.kt
+│   │   ├── UserRepository.kt
+│   │   └── BiometricRepository.kt
+│   └── local/
+│       └── TokenStorage.kt
+├── domain/
+│   ├── model/
+│   │   ├── User.kt
+│   │   ├── Enrollment.kt
+│   │   └── Verification.kt
+│   └── usecase/
+│       ├── auth/
+│       │   ├── LoginUseCase.kt
+│       │   └── LogoutUseCase.kt
+│       └── biometric/
+│           ├── EnrollUserUseCase.kt
+│           └── VerifyUserUseCase.kt
+├── di/
+│   ├── AppModule.kt
+│   ├── NetworkModule.kt
+│   └── PlatformModule.kt
+├── platform/
+│   ├── camera/
+│   │   └── ICameraService.kt
+│   ├── storage/
+│   │   └── ISecureStorage.kt
+│   └── logger/
+│       └── ILogger.kt
+└── presentation/
+    ├── viewmodel/
+    │   ├── AdminViewModel.kt
+    │   ├── KioskViewModel.kt
+    │   └── AuthViewModel.kt
+    └── state/
+        ├── AdminUiState.kt
+        ├── KioskUiState.kt
+        └── AuthUiState.kt
 ```
 
-#### Step 3: Update ViewModel Configurations (1 hour)
-
-**Example: AdminViewModel.kt**
-
-```kotlin
-// Before
-private fun loadUsers() {
-    viewModelScope.launch {
-        delay(500) // Loading delay
-        // ...
-    }
-}
-
-// After
-import com.fivucsas.shared.config.AnimationConfig
-
-private fun loadUsers() {
-    viewModelScope.launch {
-        delay(AnimationConfig.DELAY_MEDIUM)
-        // ...
-    }
-}
-```
-
-### Verification Checklist
-
-- [ ] All 4 config files created
-- [ ] All magic numbers replaced in UI code
-- [ ] All magic numbers replaced in ViewModels
-- [ ] All magic numbers replaced in repositories
-- [ ] `./gradlew clean build` succeeds
-- [ ] `./gradlew test` passes
-- [ ] Desktop app runs with same behavior
-- [ ] No hardcoded values remain (verify with grep)
-
-### Commit
-
-```bash
-git add .
-git commit -m "refactor: Extract configuration constants
-
-- Created AppConfig, UIDimens, AnimationConfig, BiometricConfig
-- Replaced all magic numbers with config references
-- Improved maintainability and consistency
-- All tests passing"
-
-git push origin refactor/phase-0.2-configuration
-```
+**Acceptance Criteria**:
+- [ ] com.fivucsas.mobile package deleted
+- [ ] All imports updated to com.fivucsas.shared
+- [ ] Configuration objects created
+- [ ] Clean package structure established
+- [ ] Build succeeds without errors
 
 ---
 
-## Phase 0.3: Shared UI Components (2 Days)
+### Phase 2: Backend Integration
 
-### Goal
+**Duration**: 4 days
+**Priority**: HIGH
+**Goal**: Connect to real Identity Core API and Biometric Processor
 
-Create reusable UI component library for cross-platform use
-
-### Target Structure
-
-```
-shared/src/commonMain/kotlin/com/fivucsas/shared/ui/
-├── components/
-│   ├── atoms/
-│   │   ├── buttons/
-│   │   │   ├── PrimaryButton.kt
-│   │   │   ├── SecondaryButton.kt
-│   │   │   └── GradientButton.kt
-│   │   └── inputs/
-│   │       ├── ValidatedTextField.kt
-│   │       └── SearchField.kt
-│   ├── molecules/
-│   │   ├── cards/
-│   │   │   ├── StatisticCard.kt
-│   │   │   └── InfoCard.kt
-│   │   └── feedback/
-│   │       ├── LoadingIndicator.kt
-│   │       ├── SuccessMessage.kt
-│   │       └── ErrorMessage.kt
-│   └── organisms/
-│       └── DataTable.kt (future)
-├── theme/
-│   ├── AppTheme.kt
-│   ├── Colors.kt
-│   └── Typography.kt
-└── modifiers/
-    └── GradientModifiers.kt
-```
-
-### Day 1: Extract Atoms & Molecules
-
-#### Step 1: Identify Reusable Components (1 hour)
-
-Scan AdminDashboard.kt and KioskMode.kt for repeated patterns:
-
-**Buttons**:
-
-```bash
-grep -A 10 "@Composable.*Button" desktopApp/src/desktopMain/kotlin/com/fivucsas/desktop/ui/admin/AdminDashboard.kt
-```
-
-**Cards**:
-
-```bash
-grep -A 10 "Card\(" desktopApp/src/desktopMain/kotlin/com/fivucsas/desktop/ui/admin/AdminDashboard.kt
-```
-
-**List of Components to Extract**:
-
-- [ ] StatisticCard (used 4+ times in AdminDashboard)
-- [ ] GradientButton (used in KioskMode)
-- [ ] ValidatedTextField (used 3+ times)
-- [ ] LoadingIndicator
-- [ ] SuccessMessage / ErrorMessage
-- [ ] SearchBar
-
-#### Step 2: Create Component Files (3 hours)
-
-**Example: StatisticCard.kt**
+#### 2.1 Create Ktor HTTP Client
 
 ```kotlin
-package com.fivucsas.shared.ui.components.molecules.cards
+// shared/src/commonMain/kotlin/com/fivucsas/shared/data/api/HttpClientFactory.kt
+package com.fivucsas.shared.data.api
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.TrendingUp
-import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
-import com.fivucsas.shared.config.UIDimens
+import com.fivucsas.shared.config.AppConfig
+import io.ktor.client.*
+import io.ktor.client.plugins.*
+import io.ktor.client.plugins.auth.*
+import io.ktor.client.plugins.auth.providers.*
+import io.ktor.client.plugins.contentnegotiation.*
+import io.ktor.client.plugins.logging.*
+import io.ktor.serialization.kotlinx.json.*
+import kotlinx.serialization.json.Json
 
-/**
- * Reusable statistic card component
- *
- * @param title Card title (e.g., "Total Users")
- * @param value Main value to display (e.g., "150")
- * @param icon Optional icon
- * @param trend Optional trend indicator (UP, DOWN, NEUTRAL)
- * @param modifier Optional modifier
- */
-@Composable
-fun StatisticCard(
-    title: String,
-    value: String,
-    icon: ImageVector? = null,
-    trend: Trend? = null,
-    modifier: Modifier = Modifier
+class HttpClientFactory(
+    private val tokenProvider: TokenProvider
 ) {
-    Card(
-        modifier = modifier
-            .fillMaxWidth()
-            .height(120.dp),
-        shape = RoundedCornerShape(UIDimens.CardRadius),
-        elevation = CardDefaults.cardElevation(UIDimens.CardElevation)
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(
-                    brush = Brush.horizontalGradient(
-                        colors = listOf(
-                            MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
-                            MaterialTheme.colorScheme.primary.copy(alpha = 0.05f)
-                        )
-                    )
-                )
-                .padding(UIDimens.SpacingMedium)
-        ) {
-            Column(
-                verticalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier.fillMaxSize()
-            ) {
-                Row(
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(
-                        text = title,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
-                    )
-                    if (icon != null) {
-                        Icon(
-                            imageVector = icon,
-                            contentDescription = null,
-                            modifier = Modifier.size(UIDimens.IconMedium),
-                            tint = MaterialTheme.colorScheme.primary
-                        )
+    fun create(): HttpClient = HttpClient {
+        install(ContentNegotiation) {
+            json(Json {
+                ignoreUnknownKeys = true
+                isLenient = true
+                prettyPrint = false
+            })
+        }
+
+        install(Logging) {
+            logger = Logger.DEFAULT
+            level = LogLevel.BODY
+        }
+
+        install(HttpTimeout) {
+            requestTimeoutMillis = AppConfig.Api.TIMEOUT_SECONDS * 1000
+            connectTimeoutMillis = AppConfig.Api.TIMEOUT_SECONDS * 1000
+        }
+
+        install(Auth) {
+            bearer {
+                loadTokens {
+                    val accessToken = tokenProvider.getAccessToken()
+                    val refreshToken = tokenProvider.getRefreshToken()
+                    if (accessToken != null && refreshToken != null) {
+                        BearerTokens(accessToken, refreshToken)
+                    } else {
+                        null
                     }
                 }
 
-                Row(
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.Bottom,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(
-                        text = value,
-                        style = MaterialTheme.typography.headlineLarge,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-
-                    if (trend != null) {
-                        TrendIndicator(trend)
+                refreshTokens {
+                    val refreshToken = tokenProvider.getRefreshToken()
+                    if (refreshToken != null) {
+                        val newTokens = tokenProvider.refreshTokens(refreshToken)
+                        BearerTokens(newTokens.accessToken, newTokens.refreshToken)
+                    } else {
+                        null
                     }
                 }
             }
         }
-    }
-}
 
-enum class Trend {
-    UP, DOWN, NEUTRAL
-}
-
-@Composable
-private fun TrendIndicator(trend: Trend) {
-    val color = when (trend) {
-        Trend.UP -> Color(0xFF4CAF50)
-        Trend.DOWN -> Color(0xFFF44336)
-        Trend.NEUTRAL -> Color(0xFFFF9800)
-    }
-
-    val icon = when (trend) {
-        Trend.UP -> Icons.Default.TrendingUp
-        Trend.DOWN -> Icons.Default.TrendingDown
-        Trend.NEUTRAL -> Icons.Default.TrendingFlat
-    }
-
-    Icon(
-        imageVector = icon,
-        contentDescription = trend.name,
-        modifier = Modifier.size(UIDimens.IconSmall),
-        tint = color
-    )
-}
-```
-
-**Create Similar Files**:
-
-1. `PrimaryButton.kt`
-2. `GradientButton.kt`
-3. `ValidatedTextField.kt`
-4. `LoadingIndicator.kt`
-5. `SuccessMessage.kt`
-6. `ErrorMessage.kt`
-
-#### Step 3: Replace Private Functions with Components (2 hours)
-
-**In AdminDashboard.kt**:
-
-**Before**:
-
-```kotlin
-@Composable
-private fun StatisticCard(title: String, value: String, icon: ImageVector) {
-    Card(modifier = Modifier.fillMaxWidth().height(120.dp)) {
-        // ... 40 lines of code
-    }
-}
-
-@Composable
-fun UsersTab() {
-    StatisticCard("Total Users", "150", Icons.Default.People)
-    StatisticCard("Active Users", "120", Icons.Default.CheckCircle)
-    // ...
-}
-```
-
-**After**:
-
-```kotlin
-import com.fivucsas.shared.ui.components.molecules.cards.StatisticCard
-import com.fivucsas.shared.ui.components.molecules.cards.Trend
-
-@Composable
-fun UsersTab() {
-    StatisticCard(
-        title = "Total Users",
-        value = "150",
-        icon = Icons.Default.People,
-        trend = Trend.UP
-    )
-    StatisticCard(
-        title = "Active Users",
-        value = "120",
-        icon = Icons.Default.CheckCircle,
-        trend = Trend.UP
-    )
-    // ...
-}
-
-// Remove private StatisticCard function - now uses shared component
-```
-
-### Day 2: Create Theme System
-
-#### Step 4: Extract Theme (2 hours)
-
-**File: `Colors.kt`**
-
-```kotlin
-package com.fivucsas.shared.ui.theme
-
-import androidx.compose.ui.graphics.Color
-
-object AppColors {
-    // Primary
-    val Primary = Color(0xFF6200EE)
-    val PrimaryVariant = Color(0xFF3700B3)
-    val PrimaryLight = Color(0xFFBB86FC)
-
-    // Secondary
-    val Secondary = Color(0xFF03DAC6)
-    val SecondaryVariant = Color(0xFF018786)
-
-    // Background
-    val Background = Color(0xFFFAFAFA)
-    val BackgroundDark = Color(0xFF121212)
-    val Surface = Color(0xFFFFFFFF)
-    val SurfaceDark = Color(0xFF1E1E1E)
-
-    // Status
-    val Success = Color(0xFF4CAF50)
-    val Warning = Color(0xFFFF9800)
-    val Error = Color(0xFFF44336)
-    val Info = Color(0xFF2196F3)
-
-    // Text
-    val TextPrimary = Color(0xFF000000)
-    val TextSecondary = Color(0xFF757575)
-    val TextDisabled = Color(0xFFBDBDBD)
-}
-```
-
-**File: `AppTheme.kt`**
-
-```kotlin
-package com.fivucsas.shared.ui.theme
-
-import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-
-private val LightColorScheme = lightColorScheme(
-    primary = AppColors.Primary,
-    onPrimary = Color.White,
-    secondary = AppColors.Secondary,
-    background = AppColors.Background,
-    surface = AppColors.Surface,
-    error = AppColors.Error
-)
-
-private val DarkColorScheme = darkColorScheme(
-    primary = AppColors.PrimaryLight,
-    onPrimary = Color.Black,
-    secondary = AppColors.Secondary,
-    background = AppColors.BackgroundDark,
-    surface = AppColors.SurfaceDark,
-    error = AppColors.Error
-)
-
-@Composable
-fun AppTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
-    content: @Composable () -> Unit
-) {
-    val colorScheme = if (darkTheme) DarkColorScheme else LightColorScheme
-
-    MaterialTheme(
-        colorScheme = colorScheme,
-        typography = Typography,
-        content = content
-    )
-}
-```
-
-#### Step 5: Update Desktop App to Use Theme (1 hour)
-
-**In Main.kt**:
-
-```kotlin
-import com.fivucsas.shared.ui.theme.AppTheme
-
-fun main() = application {
-    Window(onCloseRequest = ::exitApplication) {
-        AppTheme {
-            // App content
+        defaultRequest {
+            url(AppConfig.Api.IDENTITY_BASE_URL)
         }
     }
 }
+
+interface TokenProvider {
+    suspend fun getAccessToken(): String?
+    suspend fun getRefreshToken(): String?
+    suspend fun refreshTokens(refreshToken: String): TokenPair
+    suspend fun clearTokens()
+}
+
+data class TokenPair(
+    val accessToken: String,
+    val refreshToken: String
+)
 ```
 
-### Verification Checklist
-
-- [ ] 15+ component files created
-- [ ] All components documented
-- [ ] Components use config constants (UIDimens, etc.)
-- [ ] Desktop UI updated to use new components
-- [ ] Private component functions removed/replaced
-- [ ] Theme system in place
-- [ ] `./gradlew clean build` succeeds
-- [ ] Desktop app runs with same appearance
-- [ ] No visual regressions
-
-### Commit
-
-```bash
-git add .
-git commit -m "feat: Create shared UI component library
-
-- Extracted 15+ reusable components (atoms, molecules)
-- Created theme system (Colors, Typography, AppTheme)
-- Replaced private functions with shared components
-- Improved consistency and reusability
-- All functionality preserved"
-
-git push origin refactor/phase-0.3-components
-```
-
----
-
-## Phase 0.4: Refactor AdminDashboard (3 Days)
-
-This is the most critical phase - breaking down a 2,335-line file.
-
-### Goal
-
-Transform AdminDashboard.kt from monolithic 2,335 lines → organized 20+ files averaging 150 lines
-
-### Strategy: Incremental Extraction
-
-**Don't try to refactor everything at once!**
-
-- Extract one tab per session
-- Test after each extraction
-- Keep original file working until all extractions complete
-
-### Day 1: Extract Users Tab
-
-#### Morning Session: Create Structure (2 hours)
-
-```bash
-# Create directory structure
-mkdir -p desktopApp/src/desktopMain/kotlin/com/fivucsas/desktop/ui/admin/tabs/users/components
-mkdir -p desktopApp/src/desktopMain/kotlin/com/fivucsas/desktop/ui/admin/tabs/users/dialogs
-```
-
-#### Step 1: Extract User Statistics (30 minutes)
-
-**Create: `tabs/users/components/UserStatisticsCards.kt`**
+#### 2.2 Create Identity API Client
 
 ```kotlin
-package com.fivucsas.desktop.ui.admin.tabs.users.components
+// shared/src/commonMain/kotlin/com/fivucsas/shared/data/api/IdentityApiClient.kt
+package com.fivucsas.shared.data.api
 
-import androidx.compose.foundation.layout.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import com.fivucsas.shared.config.UIDimens
-import com.fivucsas.shared.domain.model.Statistics
-import com.fivucsas.shared.ui.components.molecules.cards.StatisticCard
-import com.fivucsas.shared.ui.components.molecules.cards.Trend
+import com.fivucsas.shared.data.api.dto.*
+import io.ktor.client.*
+import io.ktor.client.call.*
+import io.ktor.client.request.*
+import io.ktor.http.*
 
-/**
- * User statistics cards - displays Total, Active, Inactive, Pending counts
- */
-@Composable
-fun UserStatisticsCards(
-    statistics: Statistics,
-    modifier: Modifier = Modifier
+class IdentityApiClient(
+    private val httpClient: HttpClient
 ) {
-    Row(
-        modifier = modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(UIDimens.SpacingMedium)
-    ) {
-        StatisticCard(
-            title = "Total Users",
-            value = statistics.totalUsers.toString(),
-            icon = Icons.Default.People,
-            trend = Trend.UP,
-            modifier = Modifier.weight(1f)
-        )
+    // Authentication
+    suspend fun login(request: LoginRequest): Result<LoginResponse> = runCatching {
+        httpClient.post("/auth/login") {
+            contentType(ContentType.Application.Json)
+            setBody(request)
+        }.body()
+    }
 
-        StatisticCard(
-            title = "Active Users",
-            value = statistics.activeUsers.toString(),
-            icon = Icons.Default.CheckCircle,
-            trend = Trend.UP,
-            modifier = Modifier.weight(1f)
-        )
+    suspend fun refreshToken(request: RefreshRequest): Result<RefreshResponse> = runCatching {
+        httpClient.post("/auth/refresh") {
+            contentType(ContentType.Application.Json)
+            setBody(request)
+        }.body()
+    }
 
-        StatisticCard(
-            title = "Inactive Users",
-            value = statistics.inactiveUsers.toString(),
-            icon = Icons.Default.Block,
-            trend = Trend.NEUTRAL,
-            modifier = Modifier.weight(1f)
-        )
+    suspend fun logout(): Result<Unit> = runCatching {
+        httpClient.post("/auth/logout")
+    }
 
-        StatisticCard(
-            title = "Pending Users",
-            value = statistics.pendingUsers.toString(),
-            icon = Icons.Default.Schedule,
-            trend = Trend.DOWN,
-            modifier = Modifier.weight(1f)
-        )
+    suspend fun getCurrentUser(): Result<UserDTO> = runCatching {
+        httpClient.get("/auth/me").body()
+    }
+
+    // Users
+    suspend fun getUsers(
+        page: Int = 0,
+        size: Int = 20,
+        sort: String? = null
+    ): Result<PaginatedResponse<UserDTO>> = runCatching {
+        httpClient.get("/users") {
+            parameter("page", page)
+            parameter("size", size)
+            sort?.let { parameter("sort", it) }
+        }.body()
+    }
+
+    suspend fun getUser(id: Long): Result<UserDTO> = runCatching {
+        httpClient.get("/users/$id").body()
+    }
+
+    suspend fun createUser(request: CreateUserRequest): Result<UserDTO> = runCatching {
+        httpClient.post("/users") {
+            contentType(ContentType.Application.Json)
+            setBody(request)
+        }.body()
+    }
+
+    suspend fun updateUser(id: Long, request: UpdateUserRequest): Result<UserDTO> = runCatching {
+        httpClient.put("/users/$id") {
+            contentType(ContentType.Application.Json)
+            setBody(request)
+        }.body()
+    }
+
+    suspend fun deleteUser(id: Long): Result<Unit> = runCatching {
+        httpClient.delete("/users/$id")
+    }
+
+    // Dashboard
+    suspend fun getDashboardStatistics(): Result<DashboardStatistics> = runCatching {
+        httpClient.get("/dashboard/statistics").body()
     }
 }
 ```
 
-#### Step 2: Extract User Table (1 hour)
-
-**Create: `tabs/users/components/UserTable.kt`**
+#### 2.3 Create Biometric API Client
 
 ```kotlin
-package com.fivucsas.desktop.ui.admin.tabs.users.components
+// shared/src/commonMain/kotlin/com/fivucsas/shared/data/api/BiometricApiClient.kt
+package com.fivucsas.shared.data.api
 
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import com.fivucsas.shared.config.UIDimens
+import com.fivucsas.shared.config.AppConfig
+import com.fivucsas.shared.data.api.dto.*
+import io.ktor.client.*
+import io.ktor.client.call.*
+import io.ktor.client.request.*
+import io.ktor.http.*
+
+class BiometricApiClient(
+    private val httpClient: HttpClient
+) {
+    private val baseUrl = AppConfig.Api.BIOMETRIC_BASE_URL
+
+    suspend fun enroll(request: EnrollmentRequest): Result<EnrollmentResponse> = runCatching {
+        httpClient.post("$baseUrl/enrollments") {
+            contentType(ContentType.Application.Json)
+            setBody(request)
+        }.body()
+    }
+
+    suspend fun verify(request: VerificationRequest): Result<VerificationResponse> = runCatching {
+        httpClient.post("$baseUrl/verify") {
+            contentType(ContentType.Application.Json)
+            setBody(request)
+        }.body()
+    }
+
+    suspend fun checkLiveness(request: LivenessRequest): Result<LivenessResponse> = runCatching {
+        httpClient.post("$baseUrl/liveness") {
+            contentType(ContentType.Application.Json)
+            setBody(request)
+        }.body()
+    }
+
+    suspend fun getEnrollments(userId: Long): Result<List<EnrollmentDTO>> = runCatching {
+        httpClient.get("$baseUrl/enrollments/$userId").body()
+    }
+
+    suspend fun deleteEnrollment(enrollmentId: String): Result<Unit> = runCatching {
+        httpClient.delete("$baseUrl/enrollments/$enrollmentId")
+    }
+}
+```
+
+#### 2.4 Create Auth Repository
+
+```kotlin
+// shared/src/commonMain/kotlin/com/fivucsas/shared/data/repository/AuthRepository.kt
+package com.fivucsas.shared.data.repository
+
+import com.fivucsas.shared.data.api.IdentityApiClient
+import com.fivucsas.shared.data.api.TokenProvider
+import com.fivucsas.shared.data.api.TokenPair
+import com.fivucsas.shared.data.api.dto.LoginRequest
+import com.fivucsas.shared.data.local.TokenStorage
 import com.fivucsas.shared.domain.model.User
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 
-/**
- * User table component - displays list of users with actions
- */
-@Composable
-fun UserTable(
-    users: List<User>,
-    onEditClick: (User) -> Unit,
-    onDeleteClick: (User) -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Card(modifier = modifier.fillMaxWidth()) {
-        LazyColumn {
-            // Header
-            item {
-                UserTableHeader()
-            }
+class AuthRepository(
+    private val apiClient: IdentityApiClient,
+    private val tokenStorage: TokenStorage
+) : TokenProvider {
 
-            // Rows
-            items(users) { user ->
-                UserTableRow(
-                    user = user,
-                    onEditClick = { onEditClick(user) },
-                    onDeleteClick = { onDeleteClick(user) }
+    private val _currentUser = MutableStateFlow<User?>(null)
+    val currentUser: StateFlow<User?> = _currentUser.asStateFlow()
+
+    private val _isAuthenticated = MutableStateFlow(false)
+    val isAuthenticated: StateFlow<Boolean> = _isAuthenticated.asStateFlow()
+
+    suspend fun login(email: String, password: String): Result<User> {
+        val result = apiClient.login(LoginRequest(email, password))
+
+        return result.fold(
+            onSuccess = { response ->
+                tokenStorage.saveTokens(
+                    accessToken = response.accessToken,
+                    refreshToken = response.refreshToken
                 )
-                Divider()
-            }
-        }
-    }
-}
-
-@Composable
-private fun UserTableHeader() {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(UIDimens.TableHeaderHeight)
-            .padding(horizontal = UIDimens.TableCellPadding),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text("Name", modifier = Modifier.weight(2f), style = MaterialTheme.typography.titleSmall)
-        Text("Email", modifier = Modifier.weight(2f), style = MaterialTheme.typography.titleSmall)
-        Text("Status", modifier = Modifier.weight(1f), style = MaterialTheme.typography.titleSmall)
-        Text("Actions", modifier = Modifier.weight(1f), style = MaterialTheme.typography.titleSmall)
-    }
-}
-
-@Composable
-private fun UserTableRow(
-    user: User,
-    onEditClick: () -> Unit,
-    onDeleteClick: () -> Unit
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(UIDimens.TableRowHeight)
-            .padding(horizontal = UIDimens.TableCellPadding),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(user.name, modifier = Modifier.weight(2f))
-        Text(user.email, modifier = Modifier.weight(2f))
-
-        UserStatusBadge(
-            status = user.status,
-            modifier = Modifier.weight(1f)
-        )
-
-        Row(modifier = Modifier.weight(1f)) {
-            IconButton(onClick = onEditClick) {
-                Icon(Icons.Default.Edit, "Edit")
-            }
-            IconButton(onClick = onDeleteClick) {
-                Icon(Icons.Default.Delete, "Delete")
-            }
-        }
-    }
-}
-
-@Composable
-private fun UserStatusBadge(status: UserStatus, modifier: Modifier = Modifier) {
-    val color = when (status) {
-        UserStatus.ACTIVE -> Color(0xFF4CAF50)
-        UserStatus.INACTIVE -> Color(0xFF9E9E9E)
-        UserStatus.PENDING -> Color(0xFFFF9800)
-    }
-
-    AssistChip(
-        onClick = {},
-        label = { Text(status.name) },
-        colors = AssistChipDefaults.assistChipColors(containerColor = color),
-        modifier = modifier
-    )
-}
-```
-
-#### Step 3: Extract Dialogs (1 hour)
-
-**Create 3 dialog files**:
-
-1. `tabs/users/dialogs/AddUserDialog.kt`
-2. `tabs/users/dialogs/EditUserDialog.kt`
-3. `tabs/users/dialogs/DeleteUserDialog.kt`
-
-**(Example file content omitted for brevity - similar pattern)**
-
-#### Step 4: Compose UsersTab (30 minutes)
-
-**Create: `tabs/users/UsersTab.kt`**
-
-```kotlin
-package com.fivucsas.desktop.ui.admin.tabs.users
-
-import androidx.compose.foundation.layout.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.Modifier
-import com.fivucsas.desktop.ui.admin.tabs.users.components.*
-import com.fivucsas.desktop.ui.admin.tabs.users.dialogs.*
-import com.fivucsas.shared.config.UIDimens
-import com.fivucsas.shared.presentation.viewmodel.AdminViewModel
-
-/**
- * Users Tab - User management interface
- *
- * Features:
- * - View all users in table
- * - Search and filter users
- * - Add new users
- * - Edit existing users
- * - Delete users
- * - View statistics
- */
-@Composable
-fun UsersTab(
-    viewModel: AdminViewModel,
-    modifier: Modifier = Modifier
-) {
-    val uiState by viewModel.uiState.collectAsState()
-    var showAddDialog by remember { mutableStateOf(false) }
-    var showEditDialog by remember { mutableStateOf(false) }
-    var showDeleteDialog by remember { mutableStateOf(false) }
-    var selectedUser by remember { mutableStateOf<User?>(null) }
-
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(UIDimens.SpacingLarge),
-        verticalArrangement = Arrangement.spacedBy(UIDimens.SpacingLarge)
-    ) {
-        // Statistics Cards
-        UserStatisticsCards(statistics = uiState.statistics)
-
-        // Search Bar and Add Button
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            SearchField(
-                value = uiState.searchQuery,
-                onValueChange = viewModel::updateSearchQuery,
-                modifier = Modifier.weight(1f)
-            )
-
-            Spacer(modifier = Modifier.width(UIDimens.SpacingMedium))
-
-            Button(onClick = { showAddDialog = true }) {
-                Icon(Icons.Default.Add, "Add User")
-                Spacer(modifier = Modifier.width(UIDimens.SpacingSmall))
-                Text("Add User")
-            }
-        }
-
-        // User Table
-        UserTable(
-            users = uiState.filteredUsers,
-            onEditClick = { user ->
-                selectedUser = user
-                showEditDialog = true
+                val user = response.user.toDomain()
+                _currentUser.value = user
+                _isAuthenticated.value = true
+                Result.success(user)
             },
-            onDeleteClick = { user ->
-                selectedUser = user
-                showDeleteDialog = true
+            onFailure = { error ->
+                Result.failure(error)
             }
         )
     }
 
-    // Dialogs
-    if (showAddDialog) {
-        AddUserDialog(
-            onDismiss = { showAddDialog = false },
-            onConfirm = { user ->
-                viewModel.createUser(user)
-                showAddDialog = false
-            }
-        )
+    suspend fun logout() {
+        apiClient.logout()
+        tokenStorage.clearTokens()
+        _currentUser.value = null
+        _isAuthenticated.value = false
     }
 
-    if (showEditDialog && selectedUser != null) {
-        EditUserDialog(
-            user = selectedUser!!,
-            onDismiss = { showEditDialog = false },
-            onConfirm = { user ->
-                viewModel.updateUser(user)
-                showEditDialog = false
-            }
-        )
+    suspend fun checkAuthState() {
+        val token = tokenStorage.getAccessToken()
+        if (token != null) {
+            apiClient.getCurrentUser().fold(
+                onSuccess = { userDto ->
+                    _currentUser.value = userDto.toDomain()
+                    _isAuthenticated.value = true
+                },
+                onFailure = {
+                    tokenStorage.clearTokens()
+                    _isAuthenticated.value = false
+                }
+            )
+        }
     }
 
-    if (showDeleteDialog && selectedUser != null) {
-        DeleteUserDialog(
-            user = selectedUser!!,
-            onDismiss = { showDeleteDialog = false },
-            onConfirm = {
-                viewModel.deleteUser(selectedUser!!.id)
-                showDeleteDialog = false
-            }
+    // TokenProvider implementation
+    override suspend fun getAccessToken(): String? = tokenStorage.getAccessToken()
+
+    override suspend fun getRefreshToken(): String? = tokenStorage.getRefreshToken()
+
+    override suspend fun refreshTokens(refreshToken: String): TokenPair {
+        val response = apiClient.refreshToken(RefreshRequest(refreshToken))
+            .getOrThrow()
+
+        tokenStorage.saveTokens(
+            accessToken = response.accessToken,
+            refreshToken = response.refreshToken
         )
+
+        return TokenPair(response.accessToken, response.refreshToken)
+    }
+
+    override suspend fun clearTokens() {
+        tokenStorage.clearTokens()
     }
 }
 ```
 
-#### Afternoon Session: Test Users Tab (2 hours)
-
-1. Update AdminDashboard.kt to use new UsersTab
-2. Test all functionality
-3. Fix any bugs
-4. Commit
-
-**In AdminDashboard.kt**:
+#### 2.5 Create Biometric Repository
 
 ```kotlin
-import com.fivucsas.desktop.ui.admin.tabs.users.UsersTab
+// shared/src/commonMain/kotlin/com/fivucsas/shared/data/repository/BiometricRepository.kt
+package com.fivucsas.shared.data.repository
 
-@Composable
-fun AdminDashboard(viewModel: AdminViewModel = koinInject()) {
-    // ... scaffold code
+import com.fivucsas.shared.config.AppConfig
+import com.fivucsas.shared.data.api.BiometricApiClient
+import com.fivucsas.shared.data.api.dto.*
+import com.fivucsas.shared.domain.model.Enrollment
+import com.fivucsas.shared.domain.model.VerificationResult
+import kotlin.io.encoding.Base64
+import kotlin.io.encoding.ExperimentalEncodingApi
 
-    when (uiState.selectedTab) {
-        AdminTab.USERS -> UsersTab(viewModel)
-        AdminTab.ANALYTICS -> AnalyticsTabOld() // Still using old code
-        AdminTab.SECURITY -> SecurityTabOld()
-        AdminTab.SETTINGS -> SettingsTabOld()
-    }
-}
-```
-
-**Test**:
-
-- [ ] Users tab displays correctly
-- [ ] Statistics cards show data
-- [ ] Search works
-- [ ] Add user dialog opens
-- [ ] Edit user dialog opens
-- [ ] Delete user dialog opens
-- [ ] All actions work
-
-### Day 2: Extract Analytics, Security, Settings Navigation
-
-**Repeat similar process** for:
-
-1. AnalyticsTab (2 hours)
-2. SecurityTab (2 hours)
-3. SettingsTab container + navigation (2 hours)
-
-### Day 3: Extract Settings Sections & Final Integration
-
-**Morning**: Extract 6 settings sections (3 hours)
-**Afternoon**: Refactor AdminDashboard.kt to use all new tabs, remove old code, test (3 hours)
-
-### Final AdminDashboard.kt (Target: ~150 lines)
-
-```kotlin
-package com.fivucsas.desktop.ui.admin
-
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.Modifier
-import com.fivucsas.desktop.ui.admin.navigation.AdminNavigationRail
-import com.fivucsas.desktop.ui.admin.tabs.users.UsersTab
-import com.fivucsas.desktop.ui.admin.tabs.analytics.AnalyticsTab
-import com.fivucsas.desktop.ui.admin.tabs.security.SecurityTab
-import com.fivucsas.desktop.ui.admin.tabs.settings.SettingsTab
-import com.fivucsas.shared.presentation.viewmodel.AdminViewModel
-import com.fivucsas.shared.presentation.state.AdminTab
-import org.koin.compose.koinInject
-
-/**
- * Admin Dashboard - Main container
- *
- * Provides navigation between tabs:
- * - Users: User management
- * - Analytics: Statistics and charts
- * - Security: Audit logs and security
- * - Settings: Configuration
- */
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun AdminDashboard(
-    onBack: () -> Unit,
-    viewModel: AdminViewModel = koinInject()
+class BiometricRepository(
+    private val apiClient: BiometricApiClient
 ) {
-    val uiState by viewModel.uiState.collectAsState()
+    @OptIn(ExperimentalEncodingApi::class)
+    suspend fun enrollUser(
+        userId: Long,
+        imageBytes: ByteArray,
+        metadata: EnrollmentMetadata? = null
+    ): Result<Enrollment> {
+        val base64Image = Base64.encode(imageBytes)
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("Admin Dashboard") },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.Default.ArrowBack, "Back")
-                    }
-                }
-            )
-        }
-    ) { padding ->
-        Row(modifier = Modifier.fillMaxSize().padding(padding)) {
-            // Navigation Rail
-            AdminNavigationRail(
-                selectedTab = uiState.selectedTab,
-                onTabSelected = viewModel::selectTab
-            )
+        val request = EnrollmentRequest(
+            userId = userId,
+            image = base64Image,
+            metadata = metadata
+        )
 
-            // Content Area
-            Box(modifier = Modifier.weight(1f).fillMaxHeight()) {
-                when (uiState.selectedTab) {
-                    AdminTab.USERS -> UsersTab(viewModel)
-                    AdminTab.ANALYTICS -> AnalyticsTab(viewModel)
-                    AdminTab.SECURITY -> SecurityTab(viewModel)
-                    AdminTab.SETTINGS -> SettingsTab(viewModel)
-                }
-            }
+        return apiClient.enroll(request).map { response ->
+            Enrollment(
+                id = response.enrollmentId,
+                userId = userId,
+                status = response.status,
+                qualityScore = response.qualityScore,
+                message = response.message
+            )
         }
     }
+
+    @OptIn(ExperimentalEncodingApi::class)
+    suspend fun verifyUser(
+        imageBytes: ByteArray,
+        userId: Long? = null,
+        threshold: Float = AppConfig.Biometric.CONFIDENCE_THRESHOLD
+    ): Result<VerificationResult> {
+        val base64Image = Base64.encode(imageBytes)
+
+        val request = VerificationRequest(
+            image = base64Image,
+            userId = userId,
+            threshold = threshold
+        )
+
+        return apiClient.verify(request).map { response ->
+            VerificationResult(
+                verified = response.verified,
+                confidence = response.confidence,
+                userId = response.userId,
+                message = response.message,
+                processingTimeMs = response.processingTimeMs
+            )
+        }
+    }
+
+    @OptIn(ExperimentalEncodingApi::class)
+    suspend fun checkLiveness(
+        imageBytes: ByteArray,
+        challenge: LivenessChallenge? = null
+    ): Result<LivenessResult> {
+        val base64Image = Base64.encode(imageBytes)
+
+        val request = LivenessRequest(
+            image = base64Image,
+            challenge = challenge
+        )
+
+        return apiClient.checkLiveness(request).map { response ->
+            LivenessResult(
+                isLive = response.isLive,
+                confidence = response.confidence,
+                challengePassed = response.challengePassed,
+                message = response.message
+            )
+        }
+    }
+
+    suspend fun getEnrollments(userId: Long): Result<List<Enrollment>> {
+        return apiClient.getEnrollments(userId).map { dtos ->
+            dtos.map { it.toDomain() }
+        }
+    }
+
+    suspend fun deleteEnrollment(enrollmentId: String): Result<Unit> {
+        return apiClient.deleteEnrollment(enrollmentId)
+    }
 }
+
+data class LivenessResult(
+    val isLive: Boolean,
+    val confidence: Float,
+    val challengePassed: Boolean,
+    val message: String
+)
 ```
 
-### Verification Checklist
-
-- [ ] AdminDashboard.kt reduced to ~150 lines
-- [ ] 20+ new files created
-- [ ] All tabs working
-- [ ] All dialogs working
-- [ ] All CRUD operations working
-- [ ] Search working
-- [ ] Settings persist
-- [ ] No regressions
-- [ ] `./gradlew clean build` succeeds
-- [ ] Desktop app fully functional
-
-### Commit
-
-```bash
-git add .
-git commit -m "refactor: Break down AdminDashboard into modular components
-
-- Extracted Users, Analytics, Security, Settings tabs
-- Created 20+ organized files (avg 150 lines each)
-- Reduced AdminDashboard from 2,335 → 150 lines
-- All functionality preserved and tested
-- Improved maintainability and testability"
-
-git push origin refactor/phase-0.4-admin-dashboard
-```
-
----
-
-## Phase 0.5: Refactor KioskMode (2 Days)
-
-Similar approach to AdminDashboard but simpler (3 screens vs 4 complex tabs)
-
-### Target Structure
-
-```
-desktopApp/src/desktopMain/kotlin/com/fivucsas/desktop/ui/kiosk/
-├── KioskMode.kt (100 lines - container)
-├── screens/
-│   ├── WelcomeScreen.kt
-│   ├── enrollment/
-│   │   ├── EnrollmentScreen.kt
-│   │   └── components/
-│   │       ├── EnrollmentForm.kt
-│   │       └── CameraPreviewCard.kt
-│   └── verification/
-│       ├── VerificationScreen.kt
-│       └── components/
-│           ├── VerificationCamera.kt
-│           ├── VerificationSuccess.kt
-│           └── VerificationFailure.kt
-└── components/
-    └── KioskCard.kt
-```
-
-### Day 1: Extract Screens (4 hours)
-
-1. Create WelcomeScreen.kt
-2. Create EnrollmentScreen.kt
-3. Create VerificationScreen.kt
-4. Test navigation
-
-### Day 2: Extract Components & Integration (4 hours)
-
-1. Extract enrollment components
-2. Extract verification components
-3. Refactor KioskMode.kt to container
-4. Test end-to-end flows
-5. Commit
-
-**(Detailed steps similar to AdminDashboard - omitted for brevity)**
-
-### Verification Checklist
-
-- [ ] KioskMode.kt reduced to ~100 lines
-- [ ] 12+ new files created
-- [ ] Welcome screen working
-- [ ] Enrollment flow working
-- [ ] Verification flow working
-- [ ] Camera integration working
-- [ ] Success/failure states working
-- [ ] No regressions
-
-### Commit
-
-```bash
-git add .
-git commit -m "refactor: Break down KioskMode into modular screens
-
-- Extracted Welcome, Enrollment, Verification screens
-- Created 12+ organized files
-- Reduced KioskMode from 1,756 → 100 lines
-- All functionality preserved
-- Improved navigation and maintainability"
-
-git push origin refactor/phase-0.5-kiosk-mode
-```
-
----
-
-## Phase 0.6: Platform Abstractions (2 Days)
-
-### Goal
-
-Create interfaces for platform-specific code (camera, logger, storage)
-
-### Day 1: Define Interfaces
-
-**Create: `shared/src/commonMain/kotlin/com/fivucsas/shared/platform/camera/ICameraService.kt`**
+#### 2.6 Update Koin DI Module
 
 ```kotlin
+// shared/src/commonMain/kotlin/com/fivucsas/shared/di/AppModule.kt
+package com.fivucsas.shared.di
+
+import com.fivucsas.shared.data.api.*
+import com.fivucsas.shared.data.local.TokenStorage
+import com.fivucsas.shared.data.repository.*
+import com.fivucsas.shared.domain.usecase.auth.*
+import com.fivucsas.shared.domain.usecase.biometric.*
+import com.fivucsas.shared.presentation.viewmodel.*
+import org.koin.core.module.dsl.factoryOf
+import org.koin.core.module.dsl.singleOf
+import org.koin.dsl.module
+
+val networkModule = module {
+    single { HttpClientFactory(get()).create() }
+    singleOf(::IdentityApiClient)
+    singleOf(::BiometricApiClient)
+}
+
+val repositoryModule = module {
+    singleOf(::TokenStorage)
+    singleOf(::AuthRepository)
+    singleOf(::UserRepository)
+    singleOf(::BiometricRepository)
+}
+
+val useCaseModule = module {
+    factoryOf(::LoginUseCase)
+    factoryOf(::LogoutUseCase)
+    factoryOf(::GetUsersUseCase)
+    factoryOf(::EnrollUserUseCase)
+    factoryOf(::VerifyUserUseCase)
+    factoryOf(::GetStatisticsUseCase)
+}
+
+val viewModelModule = module {
+    factoryOf(::AuthViewModel)
+    factoryOf(::AdminViewModel)
+    factoryOf(::KioskViewModel)
+}
+
+val appModules = listOf(
+    networkModule,
+    repositoryModule,
+    useCaseModule,
+    viewModelModule,
+    platformModule()  // Platform-specific bindings
+)
+```
+
+**Acceptance Criteria**:
+- [ ] Ktor HTTP client configured with auth
+- [ ] Identity API client complete
+- [ ] Biometric API client complete
+- [ ] Repositories implement domain interfaces
+- [ ] DI modules updated
+- [ ] Build succeeds without errors
+
+---
+
+### Phase 3: Camera Integration
+
+**Duration**: 4 days
+**Priority**: HIGH
+**Goal**: Implement camera capture across all platforms
+
+#### 3.1 Define Camera Interface
+
+```kotlin
+// shared/src/commonMain/kotlin/com/fivucsas/shared/platform/camera/ICameraService.kt
 package com.fivucsas.shared.platform.camera
 
-/**
- * Platform-agnostic camera service interface
- *
- * Implementations:
- * - Desktop: JavaCV or WebCam Capture
- * - Android: CameraX
- * - iOS: AVFoundation
- */
 interface ICameraService {
-    /**
-     * Initialize camera hardware
-     */
     suspend fun initialize(config: CameraConfig): Result<Unit>
-
-    /**
-     * Capture a single photo
-     * @return ByteArray of image data (JPEG format)
-     */
     suspend fun capturePhoto(): Result<ByteArray>
-
-    /**
-     * Start camera preview
-     * @param onFrame Callback for each frame
-     */
     suspend fun startPreview(onFrame: (ByteArray) -> Unit): Result<Unit>
-
-    /**
-     * Stop camera preview
-     */
     suspend fun stopPreview(): Result<Unit>
-
-    /**
-     * Release camera resources
-     */
     suspend fun release(): Result<Unit>
-
-    /**
-     * Check if camera is available
-     */
     fun isAvailable(): Boolean
 }
 
 data class CameraConfig(
     val resolution: Resolution = Resolution.HD,
     val facing: CameraFacing = CameraFacing.FRONT,
-    val enableFlash: Boolean = false,
-    val fps: Int = 30
+    val enableFlash: Boolean = false
 )
 
 enum class Resolution(val width: Int, val height: Int) {
     VGA(640, 480),
     HD(1280, 720),
-    FULL_HD(1920, 1080),
-    FOUR_K(3840, 2160)
+    FULL_HD(1920, 1080)
 }
 
 enum class CameraFacing {
     FRONT, BACK
 }
+
+sealed class CameraError : Exception() {
+    object NotAvailable : CameraError()
+    object PermissionDenied : CameraError()
+    object InitializationFailed : CameraError()
+    object CaptureFailed : CameraError()
+    data class Unknown(override val message: String?) : CameraError()
+}
 ```
 
-**Similarly create**:
-
-- `ILogger.kt`
-- `ISecureStorage.kt`
-- `IFileStorage.kt`
-
-### Day 2: Implement Desktop Versions
-
-*
-
-*Create: `shared/src/desktopMain/kotlin/com/fivucsas/shared/platform/camera/DesktopCameraService.kt`
-**
+#### 3.2 Android Camera Implementation (CameraX)
 
 ```kotlin
+// shared/src/androidMain/kotlin/com/fivucsas/shared/platform/camera/AndroidCameraService.kt
 package com.fivucsas.shared.platform.camera
 
+import android.content.Context
+import androidx.camera.core.*
+import androidx.camera.lifecycle.ProcessCameraProvider
+import androidx.core.content.ContextCompat
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
-import org.bytedeco.javacv.FrameGrabber
-import org.bytedeco.javacv.OpenCVFrameGrabber
+import java.util.concurrent.Executors
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
 
-/**
- * Desktop camera implementation using JavaCV
- */
-class DesktopCameraService(
-    private val config: CameraConfig
+class AndroidCameraService(
+    private val context: Context
 ) : ICameraService {
 
+    private var cameraProvider: ProcessCameraProvider? = null
+    private var imageCapture: ImageCapture? = null
+    private var imageAnalysis: ImageAnalysis? = null
+    private val executor = Executors.newSingleThreadExecutor()
+
+    override suspend fun initialize(config: CameraConfig): Result<Unit> = withContext(Dispatchers.Main) {
+        try {
+            val provider = suspendCancellableCoroutine<ProcessCameraProvider> { cont ->
+                ProcessCameraProvider.getInstance(context).apply {
+                    addListener({
+                        cont.resume(get())
+                    }, ContextCompat.getMainExecutor(context))
+                }
+            }
+
+            cameraProvider = provider
+
+            val cameraSelector = when (config.facing) {
+                CameraFacing.FRONT -> CameraSelector.DEFAULT_FRONT_CAMERA
+                CameraFacing.BACK -> CameraSelector.DEFAULT_BACK_CAMERA
+            }
+
+            val targetResolution = android.util.Size(
+                config.resolution.width,
+                config.resolution.height
+            )
+
+            imageCapture = ImageCapture.Builder()
+                .setTargetResolution(targetResolution)
+                .setCaptureMode(ImageCapture.CAPTURE_MODE_MAXIMIZE_QUALITY)
+                .build()
+
+            imageAnalysis = ImageAnalysis.Builder()
+                .setTargetResolution(targetResolution)
+                .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
+                .build()
+
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(CameraError.InitializationFailed)
+        }
+    }
+
+    override suspend fun capturePhoto(): Result<ByteArray> = withContext(Dispatchers.IO) {
+        val capture = imageCapture ?: return@withContext Result.failure(CameraError.NotAvailable)
+
+        try {
+            val bytes = suspendCancellableCoroutine<ByteArray> { cont ->
+                capture.takePicture(executor, object : ImageCapture.OnImageCapturedCallback() {
+                    override fun onCaptureSuccess(image: ImageProxy) {
+                        val buffer = image.planes[0].buffer
+                        val bytes = ByteArray(buffer.remaining())
+                        buffer.get(bytes)
+                        image.close()
+                        cont.resume(bytes)
+                    }
+
+                    override fun onError(exception: ImageCaptureException) {
+                        cont.resumeWithException(exception)
+                    }
+                })
+            }
+            Result.success(bytes)
+        } catch (e: Exception) {
+            Result.failure(CameraError.CaptureFailed)
+        }
+    }
+
+    override suspend fun startPreview(onFrame: (ByteArray) -> Unit): Result<Unit> {
+        imageAnalysis?.setAnalyzer(executor) { imageProxy ->
+            val buffer = imageProxy.planes[0].buffer
+            val bytes = ByteArray(buffer.remaining())
+            buffer.get(bytes)
+            onFrame(bytes)
+            imageProxy.close()
+        }
+        return Result.success(Unit)
+    }
+
+    override suspend fun stopPreview(): Result<Unit> {
+        imageAnalysis?.clearAnalyzer()
+        return Result.success(Unit)
+    }
+
+    override suspend fun release(): Result<Unit> {
+        cameraProvider?.unbindAll()
+        cameraProvider = null
+        imageCapture = null
+        imageAnalysis = null
+        return Result.success(Unit)
+    }
+
+    override fun isAvailable(): Boolean {
+        return cameraProvider?.hasCamera(CameraSelector.DEFAULT_FRONT_CAMERA) == true
+    }
+}
+```
+
+#### 3.3 Desktop Camera Implementation (JavaCV)
+
+```kotlin
+// shared/src/desktopMain/kotlin/com/fivucsas/shared/platform/camera/DesktopCameraService.kt
+package com.fivucsas.shared.platform.camera
+
+import kotlinx.coroutines.*
+import org.bytedeco.javacv.FrameGrabber
+import org.bytedeco.javacv.Java2DFrameConverter
+import org.bytedeco.javacv.OpenCVFrameGrabber
+import java.awt.image.BufferedImage
+import java.io.ByteArrayOutputStream
+import javax.imageio.ImageIO
+
+class DesktopCameraService : ICameraService {
+
     private var grabber: FrameGrabber? = null
+    private var converter: Java2DFrameConverter? = null
+    private var previewJob: Job? = null
     private var isInitialized = false
 
     override suspend fun initialize(config: CameraConfig): Result<Unit> = withContext(Dispatchers.IO) {
@@ -1610,558 +1160,960 @@ class DesktopCameraService(
                 imageHeight = config.resolution.height
                 start()
             }
+            converter = Java2DFrameConverter()
             isInitialized = true
             Result.success(Unit)
         } catch (e: Exception) {
-            Result.failure(e)
+            Result.failure(CameraError.InitializationFailed)
         }
     }
 
     override suspend fun capturePhoto(): Result<ByteArray> = withContext(Dispatchers.IO) {
+        if (!isInitialized) {
+            return@withContext Result.failure(CameraError.NotAvailable)
+        }
+
         try {
-            if (!isInitialized) {
-                return@withContext Result.failure(IllegalStateException("Camera not initialized"))
-            }
+            val frame = grabber?.grab()
+                ?: return@withContext Result.failure(CameraError.CaptureFailed)
 
-            val frame = grabber?.grab() ?: return@withContext Result.failure(
-                IllegalStateException("Failed to grab frame")
-            )
+            val image = converter?.convert(frame)
+                ?: return@withContext Result.failure(CameraError.CaptureFailed)
 
-            // Convert frame to JPEG ByteArray
-            val bytes = frameToJpeg(frame)
-            Result.success(bytes)
+            val outputStream = ByteArrayOutputStream()
+            ImageIO.write(image, "jpg", outputStream)
+            Result.success(outputStream.toByteArray())
         } catch (e: Exception) {
-            Result.failure(e)
+            Result.failure(CameraError.CaptureFailed)
         }
     }
 
     override suspend fun startPreview(onFrame: (ByteArray) -> Unit): Result<Unit> {
-        // Implementation
+        if (!isInitialized) {
+            return Result.failure(CameraError.NotAvailable)
+        }
+
+        previewJob = CoroutineScope(Dispatchers.IO).launch {
+            while (isActive) {
+                try {
+                    val frame = grabber?.grab() ?: continue
+                    val image = converter?.convert(frame) ?: continue
+
+                    val outputStream = ByteArrayOutputStream()
+                    ImageIO.write(image, "jpg", outputStream)
+                    onFrame(outputStream.toByteArray())
+
+                    delay(33) // ~30 FPS
+                } catch (e: Exception) {
+                    // Log error and continue
+                }
+            }
+        }
+
         return Result.success(Unit)
     }
 
     override suspend fun stopPreview(): Result<Unit> {
-        // Implementation
+        previewJob?.cancel()
+        previewJob = null
         return Result.success(Unit)
     }
 
     override suspend fun release(): Result<Unit> = withContext(Dispatchers.IO) {
         try {
+            stopPreview()
             grabber?.stop()
             grabber?.release()
             grabber = null
+            converter = null
             isInitialized = false
             Result.success(Unit)
         } catch (e: Exception) {
-            Result.failure(e)
+            Result.failure(CameraError.Unknown(e.message))
         }
     }
 
     override fun isAvailable(): Boolean {
         return try {
-            OpenCVFrameGrabber.list.isNotEmpty()
+            val devices = OpenCVFrameGrabber.getDeviceDescriptions()
+            devices.isNotEmpty()
         } catch (e: Exception) {
             false
         }
     }
+}
+```
 
-    private fun frameToJpeg(frame: Frame): ByteArray {
-        // Convert JavaCV Frame to JPEG bytes
-        // ... implementation
-        return byteArrayOf()
+#### 3.4 iOS Camera Stub (expect/actual)
+
+```kotlin
+// shared/src/commonMain/kotlin/com/fivucsas/shared/platform/camera/CameraServiceFactory.kt
+package com.fivucsas.shared.platform.camera
+
+expect fun createCameraService(): ICameraService
+
+// shared/src/androidMain/kotlin/.../CameraServiceFactory.kt
+actual fun createCameraService(): ICameraService {
+    return AndroidCameraService(applicationContext)
+}
+
+// shared/src/desktopMain/kotlin/.../CameraServiceFactory.kt
+actual fun createCameraService(): ICameraService {
+    return DesktopCameraService()
+}
+
+// shared/src/iosMain/kotlin/.../CameraServiceFactory.kt
+actual fun createCameraService(): ICameraService {
+    return IosCameraService()
+}
+```
+
+**Acceptance Criteria**:
+- [ ] Camera interface defined
+- [ ] Android CameraX implementation complete
+- [ ] Desktop JavaCV implementation complete
+- [ ] iOS stub created (full implementation optional)
+- [ ] Camera service registered in DI
+- [ ] Photo capture works on all platforms
+
+---
+
+### Phase 4: Biometric Flow Implementation
+
+**Duration**: 4 days
+**Priority**: HIGH
+**Goal**: Complete enrollment and verification flows
+
+#### 4.1 Update Kiosk ViewModel
+
+```kotlin
+// shared/src/commonMain/kotlin/com/fivucsas/shared/presentation/viewmodel/KioskViewModel.kt
+package com.fivucsas.shared.presentation.viewmodel
+
+import com.fivucsas.shared.config.AppConfig
+import com.fivucsas.shared.data.repository.BiometricRepository
+import com.fivucsas.shared.data.repository.UserRepository
+import com.fivucsas.shared.platform.camera.CameraConfig
+import com.fivucsas.shared.platform.camera.ICameraService
+import com.fivucsas.shared.presentation.state.KioskUiState
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+
+class KioskViewModel(
+    private val biometricRepository: BiometricRepository,
+    private val userRepository: UserRepository,
+    private val cameraService: ICameraService
+) {
+    private val scope = CoroutineScope(Dispatchers.Main)
+
+    private val _uiState = MutableStateFlow(KioskUiState())
+    val uiState: StateFlow<KioskUiState> = _uiState.asStateFlow()
+
+    fun initializeCamera() {
+        scope.launch {
+            _uiState.update { it.copy(cameraState = CameraState.Initializing) }
+
+            cameraService.initialize(CameraConfig(facing = CameraFacing.FRONT))
+                .fold(
+                    onSuccess = {
+                        _uiState.update { it.copy(cameraState = CameraState.Ready) }
+                    },
+                    onFailure = { error ->
+                        _uiState.update {
+                            it.copy(
+                                cameraState = CameraState.Error,
+                                errorMessage = error.message
+                            )
+                        }
+                    }
+                )
+        }
+    }
+
+    fun startEnrollment(
+        firstName: String,
+        lastName: String,
+        email: String
+    ) {
+        scope.launch {
+            _uiState.update { it.copy(isProcessing = true, errorMessage = null) }
+
+            // First create user
+            val userResult = userRepository.createUser(
+                firstName = firstName,
+                lastName = lastName,
+                email = email
+            )
+
+            userResult.fold(
+                onSuccess = { user ->
+                    _uiState.update {
+                        it.copy(
+                            currentUserId = user.id,
+                            enrollmentStep = EnrollmentStep.CAPTURE
+                        )
+                    }
+                },
+                onFailure = { error ->
+                    _uiState.update {
+                        it.copy(
+                            isProcessing = false,
+                            errorMessage = "Failed to create user: ${error.message}"
+                        )
+                    }
+                }
+            )
+        }
+    }
+
+    fun captureAndEnroll() {
+        scope.launch {
+            val userId = _uiState.value.currentUserId
+                ?: return@launch setError("No user selected")
+
+            _uiState.update { it.copy(enrollmentStep = EnrollmentStep.CAPTURING) }
+
+            // Step 1: Capture photo
+            val captureResult = cameraService.capturePhoto()
+            val imageBytes = captureResult.getOrElse {
+                return@launch setError("Failed to capture photo")
+            }
+
+            // Step 2: Check liveness
+            _uiState.update { it.copy(enrollmentStep = EnrollmentStep.LIVENESS_CHECK) }
+
+            val livenessResult = biometricRepository.checkLiveness(imageBytes)
+            val liveness = livenessResult.getOrElse {
+                return@launch setError("Liveness check failed")
+            }
+
+            if (!liveness.isLive || liveness.confidence < AppConfig.Biometric.LIVENESS_THRESHOLD) {
+                return@launch setError("Liveness check failed. Please try again.")
+            }
+
+            // Step 3: Enroll user
+            _uiState.update { it.copy(enrollmentStep = EnrollmentStep.ENROLLING) }
+
+            val enrollResult = biometricRepository.enrollUser(userId, imageBytes)
+
+            enrollResult.fold(
+                onSuccess = { enrollment ->
+                    if (enrollment.qualityScore >= AppConfig.Biometric.QUALITY_THRESHOLD) {
+                        _uiState.update {
+                            it.copy(
+                                enrollmentStep = EnrollmentStep.SUCCESS,
+                                isProcessing = false,
+                                successMessage = "Enrollment successful!"
+                            )
+                        }
+                    } else {
+                        setError("Image quality too low. Please try again with better lighting.")
+                    }
+                },
+                onFailure = { error ->
+                    setError("Enrollment failed: ${error.message}")
+                }
+            )
+        }
+    }
+
+    fun startVerification() {
+        scope.launch {
+            _uiState.update {
+                it.copy(
+                    verificationStep = VerificationStep.READY,
+                    errorMessage = null,
+                    successMessage = null
+                )
+            }
+        }
+    }
+
+    fun captureAndVerify() {
+        scope.launch {
+            _uiState.update { it.copy(verificationStep = VerificationStep.CAPTURING) }
+
+            // Step 1: Capture photo
+            val captureResult = cameraService.capturePhoto()
+            val imageBytes = captureResult.getOrElse {
+                return@launch setVerificationError("Failed to capture photo")
+            }
+
+            // Step 2: Check liveness
+            _uiState.update { it.copy(verificationStep = VerificationStep.LIVENESS_CHECK) }
+
+            val livenessResult = biometricRepository.checkLiveness(imageBytes)
+            val liveness = livenessResult.getOrElse {
+                return@launch setVerificationError("Liveness check failed")
+            }
+
+            if (!liveness.isLive) {
+                return@launch setVerificationError("Liveness check failed. Please try again.")
+            }
+
+            // Step 3: Verify
+            _uiState.update { it.copy(verificationStep = VerificationStep.VERIFYING) }
+
+            val verifyResult = biometricRepository.verifyUser(imageBytes)
+
+            verifyResult.fold(
+                onSuccess = { result ->
+                    if (result.verified && result.confidence >= AppConfig.Biometric.CONFIDENCE_THRESHOLD) {
+                        _uiState.update {
+                            it.copy(
+                                verificationStep = VerificationStep.SUCCESS,
+                                verifiedUserId = result.userId,
+                                verificationConfidence = result.confidence,
+                                successMessage = "Verification successful!"
+                            )
+                        }
+                    } else {
+                        setVerificationError(
+                            "Verification failed. Confidence: ${(result.confidence * 100).toInt()}%"
+                        )
+                    }
+                },
+                onFailure = { error ->
+                    setVerificationError("Verification failed: ${error.message}")
+                }
+            )
+        }
+    }
+
+    fun resetToWelcome() {
+        _uiState.update { KioskUiState() }
+    }
+
+    fun releaseCamera() {
+        scope.launch {
+            cameraService.release()
+        }
+    }
+
+    private fun setError(message: String) {
+        _uiState.update {
+            it.copy(
+                isProcessing = false,
+                errorMessage = message,
+                enrollmentStep = EnrollmentStep.ERROR
+            )
+        }
+    }
+
+    private fun setVerificationError(message: String) {
+        _uiState.update {
+            it.copy(
+                verificationStep = VerificationStep.FAILED,
+                errorMessage = message
+            )
+        }
     }
 }
 ```
 
-**Update DI Module**:
+#### 4.2 Define UI State
 
 ```kotlin
-// shared/src/commonMain/kotlin/.../di/PlatformModule.kt
-expect fun platformModule(): Module
+// shared/src/commonMain/kotlin/com/fivucsas/shared/presentation/state/KioskUiState.kt
+package com.fivucsas.shared.presentation.state
 
-// shared/src/desktopMain/kotlin/.../di/PlatformModule.kt
-actual fun platformModule() = module {
-    single<ICameraService> { DesktopCameraService(get()) }
-    single<ILogger> { DesktopLogger() }
-    single<ISecureStorage> { DesktopSecureStorage() }
-    single<IFileStorage> { DesktopFileStorage() }
+data class KioskUiState(
+    val screen: KioskScreen = KioskScreen.WELCOME,
+    val cameraState: CameraState = CameraState.NotInitialized,
+    val isProcessing: Boolean = false,
+    val errorMessage: String? = null,
+    val successMessage: String? = null,
+
+    // Enrollment
+    val currentUserId: Long? = null,
+    val enrollmentStep: EnrollmentStep = EnrollmentStep.FORM,
+
+    // Verification
+    val verificationStep: VerificationStep = VerificationStep.READY,
+    val verifiedUserId: Long? = null,
+    val verificationConfidence: Float? = null
+)
+
+enum class KioskScreen {
+    WELCOME,
+    ENROLLMENT,
+    VERIFICATION
+}
+
+enum class CameraState {
+    NotInitialized,
+    Initializing,
+    Ready,
+    Error
+}
+
+enum class EnrollmentStep {
+    FORM,
+    CAPTURE,
+    CAPTURING,
+    LIVENESS_CHECK,
+    ENROLLING,
+    SUCCESS,
+    ERROR
+}
+
+enum class VerificationStep {
+    READY,
+    CAPTURING,
+    LIVENESS_CHECK,
+    VERIFYING,
+    SUCCESS,
+    FAILED
 }
 ```
 
-### Verification Checklist
-
-- [ ] All platform interfaces defined
-- [ ] Desktop implementations complete
-- [ ] DI configured
-- [ ] Tests written for interfaces
-- [ ] Desktop app uses new abstractions
-- [ ] Ready for Android/iOS implementations
-
-### Commit
-
-```bash
-git add .
-git commit -m "feat: Add platform abstractions for multiplatform support
-
-- Created ICameraService, ILogger, ISecureStorage, IFileStorage interfaces
-- Implemented desktop versions using JavaCV
-- Updated DI with platform module
-- Ready for Android/iOS implementations"
-
-git push origin refactor/phase-0.6-platform-abstractions
-```
+**Acceptance Criteria**:
+- [ ] Enrollment flow complete with liveness check
+- [ ] Verification flow complete with liveness check
+- [ ] Camera integration working
+- [ ] Error states properly handled
+- [ ] Success/failure feedback displayed
+- [ ] Retry logic implemented
 
 ---
 
-## Phase 0.7: ViewModel Tests (2 Days)
+### Phase 5: Platform-Specific Features
 
-### Goal
+**Duration**: 3 days
+**Priority**: MEDIUM
+**Goal**: Implement platform-specific optimizations
 
-Achieve 70%+ test coverage on ViewModels
-
-### Day 1: AdminViewModel Tests (4 hours)
-
-**Create:
-`shared/src/commonTest/kotlin/com/fivucsas/shared/presentation/viewmodel/AdminViewModelTest.kt`**
+#### 5.1 Android-Specific Features
 
 ```kotlin
+// androidApp/src/main/kotlin/com/fivucsas/android/MainActivity.kt
+package com.fivucsas.android
+
+import android.Manifest
+import android.content.pm.PackageManager
+import android.os.Bundle
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.runtime.*
+import androidx.core.content.ContextCompat
+import com.fivucsas.shared.ui.theme.AppTheme
+
+class MainActivity : ComponentActivity() {
+
+    private val cameraPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            // Camera permission granted
+        } else {
+            // Show permission denied message
+        }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        checkCameraPermission()
+
+        setContent {
+            AppTheme {
+                App()
+            }
+        }
+    }
+
+    private fun checkCameraPermission() {
+        when {
+            ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.CAMERA
+            ) == PackageManager.PERMISSION_GRANTED -> {
+                // Permission already granted
+            }
+            else -> {
+                cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
+            }
+        }
+    }
+}
+```
+
+#### 5.2 Secure Storage Implementation
+
+```kotlin
+// shared/src/androidMain/kotlin/.../storage/AndroidSecureStorage.kt
+package com.fivucsas.shared.platform.storage
+
+import android.content.Context
+import androidx.security.crypto.EncryptedSharedPreferences
+import androidx.security.crypto.MasterKey
+
+class AndroidSecureStorage(context: Context) : ISecureStorage {
+
+    private val masterKey = MasterKey.Builder(context)
+        .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
+        .build()
+
+    private val sharedPreferences = EncryptedSharedPreferences.create(
+        context,
+        "fivucsas_secure_prefs",
+        masterKey,
+        EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+        EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+    )
+
+    override suspend fun saveString(key: String, value: String) {
+        sharedPreferences.edit().putString(key, value).apply()
+    }
+
+    override suspend fun getString(key: String): String? {
+        return sharedPreferences.getString(key, null)
+    }
+
+    override suspend fun delete(key: String) {
+        sharedPreferences.edit().remove(key).apply()
+    }
+
+    override suspend fun clear() {
+        sharedPreferences.edit().clear().apply()
+    }
+}
+
+// shared/src/desktopMain/kotlin/.../storage/DesktopSecureStorage.kt
+class DesktopSecureStorage : ISecureStorage {
+    private val preferences = java.util.prefs.Preferences.userNodeForPackage(
+        DesktopSecureStorage::class.java
+    )
+
+    override suspend fun saveString(key: String, value: String) {
+        preferences.put(key, value)
+    }
+
+    override suspend fun getString(key: String): String? {
+        return preferences.get(key, null)
+    }
+
+    override suspend fun delete(key: String) {
+        preferences.remove(key)
+    }
+
+    override suspend fun clear() {
+        preferences.clear()
+    }
+}
+```
+
+**Acceptance Criteria**:
+- [ ] Android permissions handled properly
+- [ ] Secure storage working on Android
+- [ ] Secure storage working on Desktop
+- [ ] Platform-specific DI bindings
+- [ ] No platform-specific code in shared module
+
+---
+
+### Phase 6: Test Coverage Expansion
+
+**Duration**: 3 days
+**Priority**: HIGH
+**Target**: 70% code coverage
+
+#### 6.1 ViewModel Tests
+
+```kotlin
+// shared/src/commonTest/kotlin/.../viewmodel/KioskViewModelTest.kt
 package com.fivucsas.shared.presentation.viewmodel
 
 import app.cash.turbine.test
-import com.fivucsas.shared.domain.model.*
-import com.fivucsas.shared.domain.usecase.admin.*
-import com.fivucsas.shared.fixtures.FakeUserRepository
+import com.fivucsas.shared.data.repository.BiometricRepository
+import com.fivucsas.shared.data.repository.UserRepository
+import com.fivucsas.shared.platform.camera.ICameraService
+import com.fivucsas.shared.presentation.state.*
+import io.mockk.*
 import kotlinx.coroutines.test.runTest
 import kotlin.test.*
 
-class AdminViewModelTest {
+class KioskViewModelTest {
 
-    private lateinit var viewModel: AdminViewModel
-    private lateinit var fakeUserRepository: FakeUserRepository
-    private lateinit var getUsersUseCase: GetUsersUseCase
-    private lateinit var deleteUserUseCase: DeleteUserUseCase
-    private lateinit var updateUserUseCase: UpdateUserUseCase
-    private lateinit var getStatisticsUseCase: GetStatisticsUseCase
+    private lateinit var viewModel: KioskViewModel
+    private lateinit var biometricRepository: BiometricRepository
+    private lateinit var userRepository: UserRepository
+    private lateinit var cameraService: ICameraService
 
     @BeforeTest
     fun setup() {
-        fakeUserRepository = FakeUserRepository()
-        getUsersUseCase = GetUsersUseCase(fakeUserRepository)
-        deleteUserUseCase = DeleteUserUseCase(fakeUserRepository)
-        updateUserUseCase = UpdateUserUseCase(fakeUserRepository)
-        getStatisticsUseCase = GetStatisticsUseCase(fakeUserRepository)
+        biometricRepository = mockk()
+        userRepository = mockk()
+        cameraService = mockk()
 
-        viewModel = AdminViewModel(
-            getUsersUseCase = getUsersUseCase,
-            deleteUserUseCase = deleteUserUseCase,
-            updateUserUseCase = updateUserUseCase,
-            getStatisticsUseCase = getStatisticsUseCase
+        viewModel = KioskViewModel(
+            biometricRepository = biometricRepository,
+            userRepository = userRepository,
+            cameraService = cameraService
         )
     }
 
     @Test
-    fun `init should load users and statistics`() = runTest {
+    fun `initializeCamera should update state to Ready on success`() = runTest {
         // Given
-        val testUsers = listOf(
-            User(id = "1", name = "John Doe", email = "john@test.com", status = UserStatus.ACTIVE),
-            User(id = "2", name = "Jane Smith", email = "jane@test.com", status = UserStatus.ACTIVE)
+        coEvery { cameraService.initialize(any()) } returns Result.success(Unit)
+
+        // When
+        viewModel.initializeCamera()
+
+        // Then
+        viewModel.uiState.test {
+            val initialState = awaitItem()
+            assertEquals(CameraState.NotInitialized, initialState.cameraState)
+
+            val initializingState = awaitItem()
+            assertEquals(CameraState.Initializing, initializingState.cameraState)
+
+            val readyState = awaitItem()
+            assertEquals(CameraState.Ready, readyState.cameraState)
+        }
+    }
+
+    @Test
+    fun `captureAndEnroll should fail if liveness check fails`() = runTest {
+        // Given
+        coEvery { cameraService.capturePhoto() } returns Result.success(byteArrayOf())
+        coEvery { biometricRepository.checkLiveness(any()) } returns Result.success(
+            LivenessResult(isLive = false, confidence = 0.3f, challengePassed = false, message = "Failed")
         )
-        fakeUserRepository.setUsers(testUsers)
 
-        // When - ViewModel initialization
+        viewModel._uiState.value = viewModel.uiState.value.copy(currentUserId = 1L)
+
+        // When
+        viewModel.captureAndEnroll()
+
+        // Then
         viewModel.uiState.test {
-            // Then
             val state = awaitItem()
-            assertEquals(testUsers.size, state.users.size)
-            assertEquals(false, state.loading)
-            assertNull(state.error)
+            assertEquals(EnrollmentStep.ERROR, state.enrollmentStep)
+            assertNotNull(state.errorMessage)
         }
     }
 
     @Test
-    fun `updateSearchQuery should filter users`() = runTest {
+    fun `captureAndVerify should succeed with valid face`() = runTest {
         // Given
-        val testUsers = listOf(
-            User(id = "1", name = "John Doe", email = "john@test.com", status = UserStatus.ACTIVE),
-            User(id = "2", name = "Jane Smith", email = "jane@test.com", status = UserStatus.ACTIVE)
+        coEvery { cameraService.capturePhoto() } returns Result.success(byteArrayOf())
+        coEvery { biometricRepository.checkLiveness(any()) } returns Result.success(
+            LivenessResult(isLive = true, confidence = 0.95f, challengePassed = true, message = "OK")
         )
-        fakeUserRepository.setUsers(testUsers)
-
-        // When
-        viewModel.updateSearchQuery("jane")
-
-        // Then
-        viewModel.uiState.test {
-            val state = awaitItem()
-            assertEquals(1, state.filteredUsers.size)
-            assertEquals("Jane Smith", state.filteredUsers.first().name)
-        }
-    }
-
-    @Test
-    fun `deleteUser should remove user from list`() = runTest {
-        // Given
-        val testUsers = listOf(
-            User(id = "1", name = "John Doe", email = "john@test.com", status = UserStatus.ACTIVE),
-            User(id = "2", name = "Jane Smith", email = "jane@test.com", status = UserStatus.ACTIVE)
+        coEvery { biometricRepository.verifyUser(any()) } returns Result.success(
+            VerificationResult(verified = true, confidence = 0.92f, userId = 1L, message = "Match", processingTimeMs = 150)
         )
-        fakeUserRepository.setUsers(testUsers.toMutableList())
-        viewModel.loadUsers()
 
         // When
-        viewModel.deleteUser("1")
+        viewModel.captureAndVerify()
 
         // Then
         viewModel.uiState.test {
+            skipItems(3) // Skip intermediate states
             val state = awaitItem()
-            assertEquals(1, state.users.size)
-            assertEquals("Jane Smith", state.users.first().name)
+            assertEquals(VerificationStep.SUCCESS, state.verificationStep)
+            assertEquals(1L, state.verifiedUserId)
         }
     }
 
-    @Test
-    fun `loadUsers should set error state on failure`() = runTest {
-        // Given
-        fakeUserRepository.setShouldFail(true)
-
-        // When
-        viewModel.loadUsers()
-
-        // Then
-        viewModel.uiState.test {
-            val state = awaitItem()
-            assertTrue(state.users.isEmpty())
-            assertFalse(state.loading)
-            assertNotNull(state.error)
-        }
-    }
-
-    @Test
-    fun `selectTab should update selected tab`() = runTest {
-        // When
-        viewModel.selectTab(AdminTab.ANALYTICS)
-
-        // Then
-        viewModel.uiState.test {
-            val state = awaitItem()
-            assertEquals(AdminTab.ANALYTICS, state.selectedTab)
-        }
-    }
-
-    // Add 10+ more tests for other operations
+    // Add more tests...
 }
 ```
 
-**Write Tests For**:
+#### 6.2 Repository Tests
 
-1. Loading users (success/failure)
-2. Creating users
-3. Updating users
-4. Deleting users
-5. Searching/filtering
-6. Tab navigation
-7. Statistics loading
-8. Error handling
-9. State transitions
-10. Edge cases
+```kotlin
+// shared/src/commonTest/kotlin/.../repository/BiometricRepositoryTest.kt
+package com.fivucsas.shared.data.repository
 
-### Day 2: KioskViewModel Tests (4 hours)
+import com.fivucsas.shared.data.api.BiometricApiClient
+import com.fivucsas.shared.data.api.dto.*
+import io.mockk.*
+import kotlinx.coroutines.test.runTest
+import kotlin.test.*
 
-**Create:
-`shared/src/commonTest/kotlin/com/fivucsas/shared/presentation/viewmodel/KioskViewModelTest.kt`**
+class BiometricRepositoryTest {
 
-Write similar comprehensive tests for KioskViewModel:
+    private lateinit var repository: BiometricRepository
+    private lateinit var apiClient: BiometricApiClient
 
-1. Enrollment flow
-2. Verification flow
-3. Camera state management
-4. Error handling
-5. Success/failure states
-6. Navigation
-7. Form validation
-8. Edge cases
+    @BeforeTest
+    fun setup() {
+        apiClient = mockk()
+        repository = BiometricRepository(apiClient)
+    }
 
-### Run Coverage Report
+    @Test
+    fun `enrollUser should return enrollment on success`() = runTest {
+        // Given
+        val userId = 1L
+        val imageBytes = byteArrayOf(1, 2, 3)
+
+        coEvery { apiClient.enroll(any()) } returns Result.success(
+            EnrollmentResponse(
+                enrollmentId = "enroll-123",
+                status = EnrollmentStatus.COMPLETED,
+                qualityScore = 0.92f,
+                message = "Success"
+            )
+        )
+
+        // When
+        val result = repository.enrollUser(userId, imageBytes)
+
+        // Then
+        assertTrue(result.isSuccess)
+        val enrollment = result.getOrThrow()
+        assertEquals("enroll-123", enrollment.id)
+        assertEquals(0.92f, enrollment.qualityScore)
+    }
+
+    @Test
+    fun `verifyUser should return verification result`() = runTest {
+        // Given
+        val imageBytes = byteArrayOf(1, 2, 3)
+
+        coEvery { apiClient.verify(any()) } returns Result.success(
+            VerificationResponse(
+                verified = true,
+                confidence = 0.95f,
+                userId = 1L,
+                message = "Match found",
+                processingTimeMs = 150
+            )
+        )
+
+        // When
+        val result = repository.verifyUser(imageBytes)
+
+        // Then
+        assertTrue(result.isSuccess)
+        val verification = result.getOrThrow()
+        assertTrue(verification.verified)
+        assertEquals(0.95f, verification.confidence)
+    }
+}
+```
+
+**Acceptance Criteria**:
+- [ ] ViewModel tests: 80% coverage
+- [ ] Repository tests: 90% coverage
+- [ ] Use case tests: 90% coverage
+- [ ] All tests passing
+- [ ] Coverage reports generated
+
+---
+
+### Phase 7: Production Readiness
+
+**Duration**: 1 day
+**Priority**: HIGH
+**Goal**: Final polish and production configuration
+
+#### 7.1 Environment Configuration
+
+```kotlin
+// shared/src/commonMain/kotlin/com/fivucsas/shared/config/Environment.kt
+package com.fivucsas.shared.config
+
+enum class Environment {
+    DEVELOPMENT,
+    STAGING,
+    PRODUCTION
+}
+
+object EnvironmentConfig {
+    var current: Environment = Environment.DEVELOPMENT
+        private set
+
+    fun configure(environment: Environment) {
+        current = environment
+    }
+
+    val identityBaseUrl: String
+        get() = when (current) {
+            Environment.DEVELOPMENT -> "http://localhost:8080/api/v1"
+            Environment.STAGING -> "https://staging-api.fivucsas.com/api/v1"
+            Environment.PRODUCTION -> "https://api.fivucsas.com/api/v1"
+        }
+
+    val biometricBaseUrl: String
+        get() = when (current) {
+            Environment.DEVELOPMENT -> "http://localhost:8001/api/v1"
+            Environment.STAGING -> "https://staging-biometric.fivucsas.com/api/v1"
+            Environment.PRODUCTION -> "https://biometric.fivucsas.com/api/v1"
+        }
+
+    val enableLogging: Boolean
+        get() = current != Environment.PRODUCTION
+
+    val useMockApi: Boolean
+        get() = false  // Set to false for production
+}
+```
+
+#### 7.2 Error Handling
+
+```kotlin
+// shared/src/commonMain/kotlin/com/fivucsas/shared/domain/error/AppError.kt
+package com.fivucsas.shared.domain.error
+
+sealed class AppError : Exception() {
+    data class Network(override val message: String?) : AppError()
+    data class Authentication(override val message: String?) : AppError()
+    data class Authorization(override val message: String?) : AppError()
+    data class Validation(override val message: String?, val fields: Map<String, String>? = null) : AppError()
+    data class NotFound(override val message: String?) : AppError()
+    data class Server(override val message: String?) : AppError()
+    data class Unknown(override val message: String?) : AppError()
+}
+
+fun Throwable.toAppError(): AppError {
+    return when (this) {
+        is AppError -> this
+        is java.net.UnknownHostException -> AppError.Network("No internet connection")
+        is java.net.SocketTimeoutException -> AppError.Network("Connection timeout")
+        else -> AppError.Unknown(message)
+    }
+}
+```
+
+**Acceptance Criteria**:
+- [ ] Environment configuration complete
+- [ ] Error handling comprehensive
+- [ ] Logging configured per environment
+- [ ] Release builds tested
+- [ ] No hardcoded development URLs
+
+---
+
+## Integration Points
+
+### With Identity Core API
+
+```
+Client Apps                   Identity Core API
+     │                              │
+     ├── POST /auth/login ─────────►│
+     │◄──── JWT tokens ─────────────┤
+     │                              │
+     ├── GET /users ───────────────►│
+     │   (Bearer token)             │
+     │◄──── Paginated users ────────┤
+     │                              │
+     ├── POST /users ──────────────►│
+     │◄──── Created user ───────────┤
+```
+
+### With Biometric Processor
+
+```
+Client Apps                 Biometric Processor
+     │                              │
+     ├── POST /enrollments ────────►│
+     │   (Base64 image)             │
+     │◄──── Enrollment result ──────┤
+     │                              │
+     ├── POST /verify ─────────────►│
+     │   (Base64 image)             │
+     │◄──── Verification result ────┤
+     │                              │
+     ├── POST /liveness ───────────►│
+     │   (Base64 image)             │
+     │◄──── Liveness result ────────┤
+```
+
+---
+
+## Testing Strategy
+
+### Test Types
+
+| Type | Coverage Target | Tools |
+|------|-----------------|-------|
+| Unit Tests | ≥80% | kotlin.test + MockK |
+| Integration Tests | Critical paths | Ktor MockEngine |
+| UI Tests | Happy paths | Compose Testing |
+
+### Test Commands
 
 ```bash
+# Run all tests
+./gradlew test
+
+# Run with coverage
 ./gradlew koverReport
 
-# Open report
-open shared/build/reports/kover/html/index.html
-```
+# Run desktop app
+./gradlew desktopApp:run
 
-**Target**: 70%+ coverage on ViewModels
-
-### Verification Checklist
-
-- [ ] AdminViewModel: 15+ tests written
-- [ ] KioskViewModel: 15+ tests written
-- [ ] All tests passing
-- [ ] Coverage ≥ 70% on ViewModels
-- [ ] Coverage report generated
-- [ ] CI/CD updated with coverage check
-
-### Commit
-
-```bash
-git add .
-git commit -m "test: Add comprehensive ViewModel tests
-
-- Added 30+ ViewModel tests
-- Achieved 70%+ test coverage
-- Tested success/failure scenarios
-- Tested state transitions
-- Added coverage reporting"
-
-git push origin refactor/phase-0.7-tests
+# Run Android app (requires emulator/device)
+./gradlew androidApp:installDebug
 ```
 
 ---
 
-## Phase 0.8: Documentation (1 Day)
+## Deployment Checklist
 
-### Goal
+### Pre-Release
 
-Document all changes and create migration guides
+- [ ] All tests pass
+- [ ] Build succeeds on all platforms
+- [ ] Mock API disabled
+- [ ] Environment configured for production
+- [ ] Camera permissions handled
+- [ ] Error handling tested
 
-### Tasks
-
-#### 1. Update README (1 hour)
-
-- Document new structure
-- Update getting started guide
-- Add component usage examples
-
-#### 2. Create Component Catalog (2 hours)
-
-```markdown
-# Component Catalog
-
-## Atoms
-
-### PrimaryButton
-...
-
-### StatisticCard
-...
-```
-
-#### 3. Create Migration Guide (2 hours)
-
-```markdown
-# Migration Guide
-
-## For Contributors
-
-### Old Structure
-...
-
-### New Structure
-...
-
-### How to Add New Features
-...
-```
-
-#### 4. Update Architecture Docs (1 hour)
-
-- Update architecture diagrams
-- Document package structure
-- Document testing strategy
-
-#### 5. Create Demo/Examples (2 hours)
-
-- Create component showcase app
-- Record demo video
-- Update screenshots
-
-### Verification Checklist
-
-- [ ] README updated
-- [ ] Component catalog created
-- [ ] Migration guide written
-- [ ] Architecture docs updated
-- [ ] Examples created
-- [ ] Demo video recorded
-
-### Commit
+### Build Commands
 
 ```bash
-git add .
-git commit -m "docs: Complete refactoring documentation
+# Desktop
+./gradlew desktopApp:packageDistributionForCurrentOS
 
-- Updated README with new structure
-- Created component catalog
-- Wrote migration guide for contributors
-- Updated architecture documentation
-- Added usage examples"
+# Android
+./gradlew androidApp:assembleRelease
 
-git push origin refactor/phase-0.8-documentation
+# iOS (requires macOS)
+./gradlew iosApp:linkReleaseFrameworkIosArm64
 ```
 
 ---
 
-## Testing Checklist
+## Timeline Summary
 
-### After Each Phase
-
-- [ ] Code compiles: `./gradlew clean build`
-- [ ] Tests pass: `./gradlew test`
-- [ ] Desktop app runs: `./gradlew desktopApp:run`
-- [ ] No console errors
-- [ ] All features work as before
-
-### Final Integration Testing
-
-- [ ] **Users Tab**
-    - [ ] View users list
-    - [ ] Search users
-    - [ ] Add new user
-    - [ ] Edit user
-    - [ ] Delete user
-    - [ ] Statistics update correctly
-
-- [ ] **Analytics Tab**
-    - [ ] View statistics
-    - [ ] Charts render
-    - [ ] Recent verifications list
-    - [ ] Data refreshes
-
-- [ ] **Security Tab**
-    - [ ] Security alerts display
-    - [ ] Audit logs table
-    - [ ] Expandable details
-    - [ ] Filtering works
-
-- [ ] **Settings Tab**
-    - [ ] All 6 sections accessible
-    - [ ] Profile settings update
-    - [ ] Security settings update
-    - [ ] Biometric settings update
-    - [ ] System settings update
-    - [ ] Notification settings update
-    - [ ] Appearance settings update
-    - [ ] Settings persist
-
-- [ ] **Kiosk Mode**
-    - [ ] Welcome screen displays
-    - [ ] Navigate to enrollment
-    - [ ] Enrollment form works
-    - [ ] Camera preview (if available)
-    - [ ] Submit enrollment
-    - [ ] Navigate to verification
-    - [ ] Verification flow works
-    - [ ] Success state displays
-    - [ ] Failure state displays
-    - [ ] Back navigation works
-
-- [ ] **Performance**
-    - [ ] App startup time < 2 seconds
-    - [ ] Tab switching instant
-    - [ ] Search responsive
-    - [ ] No UI lag
-    - [ ] Memory usage normal
+| Phase | Duration | Dependencies |
+|-------|----------|--------------|
+| Phase 1: Package Cleanup | 2 days | None |
+| Phase 2: Backend Integration | 4 days | Identity API, Biometric API |
+| Phase 3: Camera Integration | 4 days | Platform SDKs |
+| Phase 4: Biometric Flow | 4 days | Phases 2, 3 |
+| Phase 5: Platform Features | 3 days | Phases 1-4 |
+| Phase 6: Test Coverage | 3 days | All features |
+| Phase 7: Production Ready | 1 day | All phases |
+| **Total** | **21 days** | |
 
 ---
 
-## Rollback Procedures
+## Success Criteria
 
-### If Issues Arise During Any Phase
-
-#### Option 1: Rollback Phase
-
-```bash
-# Rollback to previous phase
-git reset --hard HEAD~1
-
-# Or rollback to specific tag
-git reset --hard backup-before-refactor
-```
-
-#### Option 2: Fix Forward
-
-1. Identify issue
-2. Create fix branch
-3. Apply fix
-4. Test
-5. Merge
-
-#### Option 3: Partial Rollback
-
-```bash
-# Rollback specific files
-git checkout HEAD~1 -- path/to/file.kt
-```
-
-### Emergency Rollback (Critical Production Issue)
-
-```bash
-# Full rollback to backup
-git reset --hard backup-before-refactor
-git push --force origin main
-```
+| Metric | Target |
+|--------|--------|
+| Feature Completion | 100% |
+| Test Coverage | ≥70% |
+| Build Time | <5 min |
+| Android APK Size | <50MB |
+| Desktop App Size | <100MB |
 
 ---
 
-## Success Metrics
-
-### Code Quality
-
-- ✅ Largest file: 2,335 lines → < 500 lines
-- ✅ Test coverage: 10% → 70%+
-- ✅ Package structure: 2 duplicates → 1 clean
-- ✅ Reusable components: 0 → 20+
-- ✅ Platform abstractions: 0 → 4+
-
-### Developer Experience
-
-- ✅ Time to find code: ~5 min → < 30 sec
-- ✅ Time to add feature: High → Low
-- ✅ Merge conflicts: Frequent → Rare
-- ✅ Onboarding time: 3 days → 1 day
-
-### SOLID Compliance
-
-- ✅ SRP: 60% → 95%
-- ✅ OCP: 90% → 95%
-- ✅ LSP: 95% → 95%
-- ✅ ISP: 85% → 90%
-- ✅ DIP: 95% → 95%
-
----
-
-## Next Steps After Phase 0
-
-Once refactoring is complete:
-
-1. **Merge to Main**
-
-```bash
-git checkout main
-git merge refactor/professional-architecture
-git tag v1.0-refactored
-git push origin main --tags
-```
-
-2. **Start Phase 1: Backend Integration**
-
-- See MODULE_PLAN.md Phase 1
-- Easier to implement with clean codebase
-
-3. **Start Phase 2: Camera Integration**
-
-- Use new ICameraService abstraction
-- Implement for each platform
-
-4. **Start Phase 3: Mobile Development**
-
-- Reuse shared components
-- Parallel development possible
-
----
-
-**Document Version**: 1.0
-**Created**: 2025-11-17
-**Status**: READY TO IMPLEMENT
-**Estimated Duration**: 14 working days
-**Expected Outcome**: Professional A+ codebase
+**Document Status**: Ready for Implementation
+**Last Updated**: January 2026
+**Next Review**: After Phase 7 completion
