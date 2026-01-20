@@ -21,21 +21,45 @@ object ApiConfig {
     var currentEnvironment: Environment = Environment.DEVELOPMENT
 
     /**
-     * Base URLs per environment
+     * Identity Core API URLs per environment (Auth, Users, RBAC)
      */
-    private const val DEV_BASE_URL = "http://localhost:8080/api/v1"
-    private const val STAGING_BASE_URL = "https://staging.fivucsas.com/api/v1"
-    private const val PROD_BASE_URL = "https://api.fivucsas.com/api/v1"
+    private const val DEV_IDENTITY_URL = "http://localhost:8080/api/v1"
+    private const val STAGING_IDENTITY_URL = "https://staging.fivucsas.com/api/v1"
+    private const val PROD_IDENTITY_URL = "https://api.fivucsas.com/api/v1"
 
     /**
-     * Get base URL for current environment
+     * Biometric Processor API URLs per environment (Face detection, Verification)
+     */
+    private const val DEV_BIOMETRIC_URL = "http://localhost:8001/api/v1"
+    private const val STAGING_BIOMETRIC_URL = "https://staging.fivucsas.com/biometric/api/v1"
+    private const val PROD_BIOMETRIC_URL = "https://biometric.fivucsas.com/api/v1"
+
+    /**
+     * Get Identity Core API base URL for current environment
+     */
+    val identityBaseUrl: String
+        get() = when (currentEnvironment) {
+            Environment.DEVELOPMENT -> DEV_IDENTITY_URL
+            Environment.STAGING -> STAGING_IDENTITY_URL
+            Environment.PRODUCTION -> PROD_IDENTITY_URL
+        }
+
+    /**
+     * Get Biometric Processor API base URL for current environment
+     */
+    val biometricBaseUrl: String
+        get() = when (currentEnvironment) {
+            Environment.DEVELOPMENT -> DEV_BIOMETRIC_URL
+            Environment.STAGING -> STAGING_BIOMETRIC_URL
+            Environment.PRODUCTION -> PROD_BIOMETRIC_URL
+        }
+
+    /**
+     * Legacy: Get base URL (defaults to Identity API)
+     * @deprecated Use identityBaseUrl or biometricBaseUrl instead
      */
     val baseUrl: String
-        get() = when (currentEnvironment) {
-            Environment.DEVELOPMENT -> DEV_BASE_URL
-            Environment.STAGING -> STAGING_BASE_URL
-            Environment.PRODUCTION -> PROD_BASE_URL
-        }
+        get() = identityBaseUrl
 
     /**
      * Timeout configuration (milliseconds)

@@ -3,12 +3,12 @@ package com.fivucsas.shared.data.remote.dto
 import com.fivucsas.shared.domain.model.BiometricData
 import com.fivucsas.shared.domain.model.LivenessResult
 import com.fivucsas.shared.domain.model.VerificationResult
+import kotlinx.serialization.Serializable
 
 /**
  * Data Transfer Object for Biometric Data
- *
- * TODO: Add @Serializable when Ktor is added (Week 2)
  */
+@Serializable
 data class BiometricDto(
     val id: String,
     val userId: String,
@@ -49,6 +49,7 @@ fun BiometricData.toDto(): BiometricDto {
 /**
  * Verification Response DTO
  */
+@Serializable
 data class VerificationResponseDto(
     val isVerified: Boolean,
     val userId: String?,
@@ -83,6 +84,7 @@ fun VerificationResult.toDto(): VerificationResponseDto {
 /**
  * Liveness Response DTO
  */
+@Serializable
 data class LivenessResponseDto(
     val isLive: Boolean,
     val confidence: Float,

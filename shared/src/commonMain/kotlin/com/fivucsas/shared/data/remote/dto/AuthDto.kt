@@ -1,22 +1,32 @@
 package com.fivucsas.shared.data.remote.dto
 
 import com.fivucsas.shared.domain.repository.AuthTokens
+import kotlinx.serialization.Serializable
 
 /**
  * Login Request DTO
- *
- * TODO: Add @Serializable when Ktor is added (Week 2)
  */
+@Serializable
 data class LoginRequestDto(
     val email: String,
     val password: String
 )
 
 /**
- * Auth Response DTO
- *
- * TODO: Add @Serializable when Ktor is added (Week 2)
+ * Register Request DTO
  */
+@Serializable
+data class RegisterRequestDto(
+    val email: String,
+    val password: String,
+    val firstName: String,
+    val lastName: String
+)
+
+/**
+ * Auth Response DTO
+ */
+@Serializable
 data class AuthResponseDto(
     val accessToken: String,
     val refreshToken: String,

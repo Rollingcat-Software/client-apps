@@ -2,6 +2,7 @@ package com.fivucsas.shared.data.remote.dto
 
 import com.fivucsas.shared.domain.model.User
 import com.fivucsas.shared.domain.model.UserStatus
+import kotlinx.serialization.Serializable
 
 /**
  * Data Transfer Object for User
@@ -11,9 +12,8 @@ import com.fivucsas.shared.domain.model.UserStatus
  * - Allow API changes without affecting domain
  * - Handle nullable/optional fields from API
  * - Add serialization annotations
- *
- * TODO: Add @Serializable annotation when Ktor is added (Week 2)
  */
+@Serializable
 data class UserDto(
     val id: String,
     val name: String,

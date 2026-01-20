@@ -1,12 +1,12 @@
 package com.fivucsas.shared.data.remote.dto
 
 import com.fivucsas.shared.domain.model.Statistics
+import kotlinx.serialization.Serializable
 
 /**
  * Data Transfer Object for Statistics
- *
- * TODO: Add @Serializable when Ktor is added (Week 2)
  */
+@Serializable
 data class StatisticsDto(
     val totalUsers: Int,
     val activeUsers: Int,

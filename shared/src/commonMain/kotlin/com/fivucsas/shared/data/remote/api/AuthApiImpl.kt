@@ -2,6 +2,7 @@ package com.fivucsas.shared.data.remote.api
 
 import com.fivucsas.shared.data.remote.dto.AuthResponseDto
 import com.fivucsas.shared.data.remote.dto.LoginRequestDto
+import com.fivucsas.shared.data.remote.dto.RegisterRequestDto
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.post
@@ -23,6 +24,13 @@ class AuthApiImpl(
 
     override suspend fun login(request: LoginRequestDto): AuthResponseDto {
         return client.post("$BASE_PATH/login") {
+            contentType(ContentType.Application.Json)
+            setBody(request)
+        }.body()
+    }
+
+    override suspend fun register(request: RegisterRequestDto): AuthResponseDto {
+        return client.post("$BASE_PATH/register") {
             contentType(ContentType.Application.Json)
             setBody(request)
         }.body()

@@ -1,6 +1,7 @@
 package com.fivucsas.shared.di
 
 import com.fivucsas.shared.data.local.TokenManager
+import com.fivucsas.shared.data.local.TokenStorage
 import com.fivucsas.shared.data.remote.api.AuthApi
 import com.fivucsas.shared.data.remote.api.AuthApiImpl
 import com.fivucsas.shared.data.remote.api.BiometricApi
@@ -22,22 +23,38 @@ import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 import org.koin.core.module.dsl.bind
 import org.koin.core.module.dsl.singleOf
+import org.koin.core.qualifier.named
 import org.koin.dsl.module
 
 /**
- * Network module - Provides HTTP client and API clients
+ * Network module - Provides HTTP clients and API clients
+ *
+ * Provides two separate HTTP clients:
+ * - identityClient: For Identity Core API (auth, users, RBAC)
+ * - biometricClient: For Biometric Processor API (face detection, verification)
  */
 val networkModule = module {
-    // HTTP Client (singleton)
+    // Token Manager (singleton) - must be created before HttpClient
+    single { TokenManager(get<TokenStorage>()) }
+
+    // Shared JSON configuration
     single {
+        Json {
+            prettyPrint = true
+            isLenient = true
+            ignoreUnknownKeys = true
+            encodeDefaults = true
+        }
+    }
+
+    // Identity Core API HTTP Client (port 8080)
+    single(named("identityClient")) {
+        val tokenManager = get<TokenManager>()
+        val json = get<Json>()
+
         HttpClient {
             install(ContentNegotiation) {
-                json(Json {
-                    prettyPrint = true
-                    isLenient = true
-                    ignoreUnknownKeys = true
-                    encodeDefaults = true
-                })
+                json(json)
             }
 
             install(Logging) {
@@ -52,10 +69,9 @@ val networkModule = module {
             }
 
             defaultRequest {
-                url(ApiConfig.baseUrl + "/")
+                url(ApiConfig.identityBaseUrl + "/")
 
                 // Add JWT token to all requests (except auth endpoints)
-                val tokenManager = get<TokenManager>()
                 val accessToken = tokenManager.getAccessToken()
 
                 if (accessToken != null &&
@@ -67,8 +83,42 @@ val networkModule = module {
         }
     }
 
-    // API Implementations (singletons)
-    singleOf(::AuthApiImpl) { bind<AuthApi>() }
-    singleOf(::BiometricApiImpl) { bind<BiometricApi>() }
-    singleOf(::IdentityApiImpl) { bind<IdentityApi>() }
+    // Biometric Processor API HTTP Client (port 8001)
+    single(named("biometricClient")) {
+        val tokenManager = get<TokenManager>()
+        val json = get<Json>()
+
+        HttpClient {
+            install(ContentNegotiation) {
+                json(json)
+            }
+
+            install(Logging) {
+                logger = Logger.DEFAULT
+                level = if (ApiConfig.isLoggingEnabled) LogLevel.INFO else LogLevel.NONE
+            }
+
+            install(HttpTimeout) {
+                // Biometric operations may take longer
+                requestTimeoutMillis = ApiConfig.REQUEST_TIMEOUT_MS * 2
+                connectTimeoutMillis = ApiConfig.CONNECT_TIMEOUT_MS
+                socketTimeoutMillis = ApiConfig.SOCKET_TIMEOUT_MS
+            }
+
+            defaultRequest {
+                url(ApiConfig.biometricBaseUrl + "/")
+
+                // Add JWT token for authenticated biometric operations
+                val accessToken = tokenManager.getAccessToken()
+                if (accessToken != null) {
+                    header(HttpHeaders.Authorization, "Bearer $accessToken")
+                }
+            }
+        }
+    }
+
+    // API Implementations with specific HTTP clients
+    single<AuthApi> { AuthApiImpl(get(named("identityClient"))) }
+    single<IdentityApi> { IdentityApiImpl(get(named("identityClient"))) }
+    single<BiometricApi> { BiometricApiImpl(get(named("biometricClient"))) }
 }
