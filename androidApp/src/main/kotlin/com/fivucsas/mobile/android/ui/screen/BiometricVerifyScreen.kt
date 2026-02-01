@@ -10,8 +10,6 @@ import androidx.camera.core.ImageProxy
 import androidx.camera.view.CameraController
 import androidx.camera.view.LifecycleCameraController
 import androidx.camera.view.PreviewView
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -23,7 +21,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -35,8 +32,8 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
@@ -50,11 +47,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.text.font.FontWeight
@@ -62,10 +60,18 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
+import com.fivucsas.shared.platform.ImageProcessor
+import com.fivucsas.shared.platform.OpenAppSettingsButton
 import com.fivucsas.shared.presentation.viewmodel.auth.BiometricViewModel
+import com.fivucsas.shared.ui.components.organisms.FaceBounds
+import com.fivucsas.shared.ui.components.organisms.FaceDetectionOverlay
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
+import com.google.accompanist.permissions.shouldShowRationale
+import com.google.mlkit.vision.common.InputImage
+import com.google.mlkit.vision.face.FaceDetection
+import com.google.mlkit.vision.face.FaceDetectorOptions
 import kotlinx.coroutines.launch
 import java.io.ByteArrayOutputStream
 
@@ -82,17 +88,77 @@ fun BiometricVerifyScreen(
     val state by viewModel.state.collectAsState()
 
     val cameraPermissionState = rememberPermissionState(Manifest.permission.CAMERA)
+    var hasRequestedPermission by remember { mutableStateOf(false) }
+    var permissionPermanentlyDenied by remember { mutableStateOf(false) }
+
+    // Face detection state
+    var faceBounds by remember { mutableStateOf<FaceBounds?>(null) }
+
     val cameraController = remember {
         LifecycleCameraController(context).apply {
-            setEnabledUseCases(CameraController.IMAGE_CAPTURE)
+            setEnabledUseCases(CameraController.IMAGE_CAPTURE or CameraController.IMAGE_ANALYSIS)
             cameraSelector = CameraSelector.DEFAULT_FRONT_CAMERA
+        }
+    }
+
+    // Set up ML Kit face detection analyzer
+    val faceDetector = remember {
+        val options = FaceDetectorOptions.Builder()
+            .setPerformanceMode(FaceDetectorOptions.PERFORMANCE_MODE_FAST)
+            .setMinFaceSize(0.15f)
+            .build()
+        FaceDetection.getClient(options)
+    }
+
+    LaunchedEffect(cameraPermissionState.status.isGranted) {
+        if (cameraPermissionState.status.isGranted) {
+            cameraController.setImageAnalysisAnalyzer(
+                ContextCompat.getMainExecutor(context)
+            ) @androidx.camera.core.ExperimentalGetImage { imageProxy ->
+                val mediaImage = imageProxy.image
+                if (mediaImage != null) {
+                    val inputImage = InputImage.fromMediaImage(
+                        mediaImage,
+                        imageProxy.imageInfo.rotationDegrees
+                    )
+                    faceDetector.process(inputImage)
+                        .addOnSuccessListener { faces ->
+                            val face = faces.firstOrNull()
+                            faceBounds = if (face != null) {
+                                val imgWidth = imageProxy.width.toFloat()
+                                val imgHeight = imageProxy.height.toFloat()
+                                val rect = face.boundingBox
+                                FaceBounds(
+                                    left = rect.left / imgWidth,
+                                    top = rect.top / imgHeight,
+                                    right = rect.right / imgWidth,
+                                    bottom = rect.bottom / imgHeight
+                                )
+                            } else null
+                        }
+                        .addOnCompleteListener { imageProxy.close() }
+                } else {
+                    imageProxy.close()
+                }
+            }
         }
     }
 
     LaunchedEffect(Unit) {
         viewModel.clearState()
         if (!cameraPermissionState.status.isGranted) {
+            hasRequestedPermission = true
             cameraPermissionState.launchPermissionRequest()
+        }
+    }
+
+    // Detect permanently denied after returning from permission dialog
+    LaunchedEffect(cameraPermissionState.status) {
+        if (hasRequestedPermission &&
+            !cameraPermissionState.status.isGranted &&
+            !cameraPermissionState.status.shouldShowRationale
+        ) {
+            permissionPermanentlyDenied = true
         }
     }
 
@@ -137,6 +203,14 @@ fun BiometricVerifyScreen(
                     },
                     modifier = Modifier.fillMaxSize()
                 )
+
+                // Face Detection Overlay (replaces static circle guide)
+                if (!state.isSuccess && !state.isLoading) {
+                    FaceDetectionOverlay(
+                        showGuide = true,
+                        faceRect = faceBounds
+                    )
+                }
 
                 // Instructions Overlay at Top
                 if (!state.isSuccess && state.error == null && !state.isLoading) {
@@ -212,19 +286,6 @@ fun BiometricVerifyScreen(
                             )
                         }
                     }
-                }
-
-                // Face Frame Guide
-                if (!state.isSuccess && !state.isLoading) {
-                    Box(
-                        modifier = Modifier
-                            .align(Alignment.Center)
-                            .size(280.dp)
-                            .border(
-                                BorderStroke(3.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.8f)),
-                                shape = CircleShape
-                            )
-                    )
                 }
 
                 // Bottom Content
@@ -318,7 +379,7 @@ fun BiometricVerifyScreen(
 
                                 if (isVerified) {
                                     Spacer(modifier = Modifier.height(12.dp))
-                                    Divider(
+                                    HorizontalDivider(
                                         modifier = Modifier.padding(vertical = 8.dp),
                                         color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.3f)
                                     )
@@ -348,7 +409,7 @@ fun BiometricVerifyScreen(
                                                 color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
                                             )
                                             Text(
-                                                text = verifyResult?.result?.userName ?: "Unknown",
+                                                text = verifyResult?.result?.userId ?: "Unknown",
                                                 style = MaterialTheme.typography.titleMedium,
                                                 fontWeight = FontWeight.Bold,
                                                 color = MaterialTheme.colorScheme.onPrimaryContainer
@@ -391,16 +452,17 @@ fun BiometricVerifyScreen(
                                                 bitmap,
                                                 image.imageInfo.rotationDegrees.toFloat()
                                             )
-                                            val imageBytes = bitmapToByteArray(rotatedBitmap)
+                                            val rawBytes = bitmapToByteArray(rotatedBitmap)
+                                            val processedBytes = ImageProcessor.processForBiometric(rawBytes)
 
                                             scope.launch {
-                                                viewModel.verifyFace(imageBytes)
+                                                viewModel.verifyFace(processedBytes)
                                             }
                                             image.close()
                                         }
 
                                         override fun onError(exception: ImageCaptureException) {
-                                            // Handle error silently or show a snackbar
+                                            // Handle error silently
                                         }
                                     }
                                 )
@@ -436,6 +498,38 @@ fun BiometricVerifyScreen(
                         }
                     }
                 }
+            } else if (permissionPermanentlyDenied) {
+                // Permanently denied — show settings prompt
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(24.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Face,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(80.dp)
+                    )
+                    Spacer(modifier = Modifier.height(24.dp))
+                    Text(
+                        text = "Camera Permission Required",
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.Center
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = "Camera permission was permanently denied. Please enable it in app settings to use face verification.",
+                        style = MaterialTheme.typography.bodyMedium,
+                        textAlign = TextAlign.Center,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Spacer(modifier = Modifier.height(24.dp))
+                    OpenAppSettingsButton(modifier = Modifier.fillMaxWidth())
+                }
             } else {
                 // Permission Request Screen
                 Column(
@@ -467,7 +561,10 @@ fun BiometricVerifyScreen(
                     )
                     Spacer(modifier = Modifier.height(24.dp))
                     Button(
-                        onClick = { cameraPermissionState.launchPermissionRequest() },
+                        onClick = {
+                            hasRequestedPermission = true
+                            cameraPermissionState.launchPermissionRequest()
+                        },
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Text("Grant Camera Permission")

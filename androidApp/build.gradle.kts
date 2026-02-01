@@ -59,6 +59,7 @@ dependencies {
     implementation("androidx.compose.ui:ui-graphics")
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.compose.material3:material3")
+    implementation("androidx.compose.material:material-icons-extended")
     implementation("androidx.activity:activity-compose:1.8.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.2")
@@ -75,6 +76,9 @@ dependencies {
 
     // Accompanist (permissions)
     implementation("com.google.accompanist:accompanist-permissions:0.32.0")
+
+    // ML Kit Face Detection
+    implementation("com.google.mlkit:face-detection:16.1.5")
 
     // Koin for Android
     implementation("io.insert-koin:koin-android:3.5.3")

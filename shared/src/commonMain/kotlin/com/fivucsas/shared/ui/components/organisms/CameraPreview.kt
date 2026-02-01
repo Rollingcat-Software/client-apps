@@ -1,5 +1,6 @@
 package com.fivucsas.shared.ui.components.organisms
 
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -12,7 +13,10 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.dp
 import com.fivucsas.shared.platform.CameraState
 import com.fivucsas.shared.ui.theme.AppColors
@@ -137,7 +141,7 @@ fun CameraPreviewContainer(
                     .size(72.dp),
                 enabled = cameraState == CameraState.Previewing,
                 colors = IconButtonDefaults.filledIconButtonColors(
-                    containerColor = AppColors.primary,
+                    containerColor = AppColors.Primary,
                     disabledContainerColor = Color.Gray
                 )
             ) {
@@ -167,7 +171,7 @@ private fun CameraStateMessage(message: String) {
             verticalArrangement = Arrangement.Center
         ) {
             CircularProgressIndicator(
-                color = AppColors.primary,
+                color = AppColors.Primary,
                 modifier = Modifier.size(48.dp)
             )
             Spacer(modifier = Modifier.height(16.dp))
@@ -198,14 +202,14 @@ private fun CameraErrorMessage(message: String) {
             Icon(
                 imageVector = Icons.Default.Close,
                 contentDescription = "Error",
-                tint = AppColors.error,
+                tint = AppColors.Error,
                 modifier = Modifier.size(64.dp)
             )
             Spacer(modifier = Modifier.height(16.dp))
             Text(
                 text = "Camera Error",
                 style = MaterialTheme.typography.headlineSmall,
-                color = AppColors.error
+                color = AppColors.Error
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
@@ -221,22 +225,41 @@ private fun CameraErrorMessage(message: String) {
  * Face Detection Overlay
  *
  * Provides visual guidance for face positioning during capture.
- * Shows an oval guide that helps users center their face.
+ * When a detected face bounding box is provided, draws a green rectangle.
+ * Otherwise falls back to the static oval guide.
  *
  * @param showGuide Whether to show the face positioning guide
  * @param guidanceText Optional text to guide the user
+ * @param faceRect Normalized face bounding box (values 0..1 relative to preview).
+ *                 Null means no face detected.
  */
 @Composable
 fun FaceDetectionOverlay(
     showGuide: Boolean = true,
-    guidanceText: String? = null
+    guidanceText: String? = null,
+    faceRect: FaceBounds? = null
 ) {
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
-        if (showGuide) {
-            // Oval face guide
+        if (faceRect != null) {
+            // Draw green bounding box for detected face
+            Canvas(modifier = Modifier.fillMaxSize()) {
+                val left = faceRect.left * size.width
+                val top = faceRect.top * size.height
+                val right = faceRect.right * size.width
+                val bottom = faceRect.bottom * size.height
+
+                drawRect(
+                    color = Color.Green,
+                    topLeft = Offset(left, top),
+                    size = Size(right - left, bottom - top),
+                    style = Stroke(width = 4f)
+                )
+            }
+        } else if (showGuide) {
+            // Fallback: static oval face guide
             Box(
                 modifier = Modifier
                     .size(280.dp, 360.dp)
@@ -244,7 +267,6 @@ fun FaceDetectionOverlay(
                     .background(Color.Transparent)
                     .padding(4.dp)
             ) {
-                // Border
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
@@ -263,7 +285,8 @@ fun FaceDetectionOverlay(
         }
 
         // Guidance text at the top
-        if (guidanceText != null) {
+        val displayText = guidanceText ?: faceRect?.let { deriveFaceGuidance(it) }
+        if (displayText != null) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -277,7 +300,7 @@ fun FaceDetectionOverlay(
                     )
                 ) {
                     Text(
-                        text = guidanceText,
+                        text = displayText,
                         style = MaterialTheme.typography.bodyMedium,
                         color = Color.White,
                         modifier = Modifier.padding(16.dp)
@@ -285,5 +308,36 @@ fun FaceDetectionOverlay(
                 }
             }
         }
+    }
+}
+
+/**
+ * Normalized face bounding box with values in 0..1 range
+ * relative to the camera preview dimensions.
+ */
+data class FaceBounds(
+    val left: Float,
+    val top: Float,
+    val right: Float,
+    val bottom: Float
+)
+
+/**
+ * Derive guidance text from detected face position.
+ */
+private fun deriveFaceGuidance(face: FaceBounds): String? {
+    val centerX = (face.left + face.right) / 2f
+    val centerY = (face.top + face.bottom) / 2f
+    val faceWidth = face.right - face.left
+    val faceHeight = face.bottom - face.top
+
+    return when {
+        faceWidth > 0.7f || faceHeight > 0.7f -> "Move farther away"
+        faceWidth < 0.15f || faceHeight < 0.15f -> "Move closer"
+        centerX < 0.3f -> "Move right"
+        centerX > 0.7f -> "Move left"
+        centerY < 0.3f -> "Move down"
+        centerY > 0.7f -> "Move up"
+        else -> null // Face is well-centered
     }
 }

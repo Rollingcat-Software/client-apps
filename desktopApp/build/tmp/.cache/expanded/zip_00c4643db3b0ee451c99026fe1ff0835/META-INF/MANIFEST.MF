@@ -1,9 +1,0 @@
-Manifest-Version: 1.0
-Multi-Release: true
-Class-Path: javacpp.jar javacpp-linux-armhf.jar javacpp-linux-arm64.ja
- r javacpp-linux-ppc64le.jar javacpp-linux-x86.jar javacpp-linux-x86_6
- 4.jar javacpp-macosx-arm64.jar javacpp-macosx-x86_64.jar javacpp-wind
- ows-x86.jar javacpp-windows-x86_64.jar
-Build-Jdk-Spec: 1.8
-Created-By: Maven Jar Plugin 3.2.0
-
