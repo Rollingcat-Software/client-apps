@@ -9,6 +9,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.input.VisualTransformation
 import com.fivucsas.shared.ui.theme.AppColors
 import com.fivucsas.shared.ui.theme.AppShapes
 import com.fivucsas.shared.ui.theme.AppTypography
@@ -44,7 +45,8 @@ fun AppTextField(
     errorMessage: String? = null,
     enabled: Boolean = true,
     singleLine: Boolean = true,
-    maxLines: Int = 1
+    maxLines: Int = 1,
+    visualTransformation: VisualTransformation = VisualTransformation.None
 ) {
     Column(modifier = modifier) {
         OutlinedTextField(
@@ -72,6 +74,7 @@ fun AppTextField(
             enabled = enabled,
             singleLine = singleLine,
             maxLines = if (singleLine) 1 else maxLines,
+            visualTransformation = visualTransformation,
             modifier = Modifier.fillMaxWidth(),
             shape = AppShapes.TextField,
             textStyle = AppTypography.BodyMedium,

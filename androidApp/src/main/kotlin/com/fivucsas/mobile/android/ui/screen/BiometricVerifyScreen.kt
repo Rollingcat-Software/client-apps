@@ -343,12 +343,12 @@ fun BiometricVerifyScreen(
 
                                         Column(horizontalAlignment = Alignment.End) {
                                             Text(
-                                                text = "User",
+                                                text = "User ID",
                                                 style = MaterialTheme.typography.bodySmall,
                                                 color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
                                             )
                                             Text(
-                                                text = verifyResult?.result?.userName ?: "Unknown",
+                                                text = verifyResult?.result?.userId ?: "Unknown",
                                                 style = MaterialTheme.typography.titleMedium,
                                                 fontWeight = FontWeight.Bold,
                                                 color = MaterialTheme.colorScheme.onPrimaryContainer
