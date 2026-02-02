@@ -71,6 +71,14 @@ class BiometricViewModel(
         )
     }
 
+    /**
+     * Reports a camera capture error to the UI state.
+     * Called by the platform-specific capture callback on failure.
+     */
+    fun onCaptureError(message: String) {
+        _state.value = BiometricState(error = message)
+    }
+
     fun clearState() {
         _state.value = BiometricState()
     }
