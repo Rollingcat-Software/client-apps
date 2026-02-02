@@ -130,22 +130,28 @@ class EnrollUserUseCase(
      * @return Error message if invalid, null if valid
      */
     private fun validateEnrollmentData(data: EnrollmentData): String? {
-        // Validate full name
-        val nameValidation = ValidationRules.validateFullName(data.fullName)
-        if (nameValidation is ValidationResult.Error) {
-            return nameValidation.message
+        // Validate full name (if provided)
+        if (data.fullName.isNotBlank()) {
+            val nameValidation = ValidationRules.validateFullName(data.fullName)
+            if (nameValidation is ValidationResult.Error) {
+                return nameValidation.message
+            }
         }
 
-        // Validate email
-        val emailValidation = ValidationRules.validateEmail(data.email)
-        if (emailValidation is ValidationResult.Error) {
-            return emailValidation.message
+        // Validate email (if provided)
+        if (data.email.isNotBlank()) {
+            val emailValidation = ValidationRules.validateEmail(data.email)
+            if (emailValidation is ValidationResult.Error) {
+                return emailValidation.message
+            }
         }
 
-        // Validate national ID
-        val idValidation = ValidationRules.validateNationalId(data.idNumber)
-        if (idValidation is ValidationResult.Error) {
-            return idValidation.message
+        // Validate national ID (optional)
+        if (data.idNumber.isNotBlank()) {
+            val idValidation = ValidationRules.validateNationalId(data.idNumber)
+            if (idValidation is ValidationResult.Error) {
+                return idValidation.message
+            }
         }
 
         // Validate phone (if provided)
