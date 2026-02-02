@@ -33,6 +33,7 @@ import kotlinx.coroutines.launch
 fun LoginScreen(
     viewModel: LoginViewModel,
     onNavigateToRegister: () -> Unit,
+    onNavigateToForgotPassword: () -> Unit,
     onLoginSuccess: () -> Unit
 ) {
     var email by remember { mutableStateOf("") }
@@ -87,6 +88,13 @@ fun LoginScreen(
         )
 
         Spacer(modifier = Modifier.height(8.dp))
+
+        TextButton(
+            onClick = onNavigateToForgotPassword,
+            enabled = !state.isLoading
+        ) {
+            Text("Forgot password?")
+        }
 
         if (state.error != null) {
             Text(

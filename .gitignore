@@ -36,6 +36,13 @@ migrate_working_dir/
 .pub/
 /build/
 
+# Gradle / Android / KMP build outputs (all modules)
+**/build/
+**/.gradle/
+.gradle/
+local.properties
+
+
 # Symbolication related
 app.*.symbols
 

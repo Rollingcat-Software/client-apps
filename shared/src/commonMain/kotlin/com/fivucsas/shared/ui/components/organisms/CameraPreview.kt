@@ -137,7 +137,7 @@ fun CameraPreviewContainer(
                     .size(72.dp),
                 enabled = cameraState == CameraState.Previewing,
                 colors = IconButtonDefaults.filledIconButtonColors(
-                    containerColor = AppColors.primary,
+                    containerColor = AppColors.Primary,
                     disabledContainerColor = Color.Gray
                 )
             ) {
@@ -167,7 +167,7 @@ private fun CameraStateMessage(message: String) {
             verticalArrangement = Arrangement.Center
         ) {
             CircularProgressIndicator(
-                color = AppColors.primary,
+                color = AppColors.Primary,
                 modifier = Modifier.size(48.dp)
             )
             Spacer(modifier = Modifier.height(16.dp))
@@ -198,14 +198,14 @@ private fun CameraErrorMessage(message: String) {
             Icon(
                 imageVector = Icons.Default.Close,
                 contentDescription = "Error",
-                tint = AppColors.error,
+                tint = AppColors.Error,
                 modifier = Modifier.size(64.dp)
             )
             Spacer(modifier = Modifier.height(16.dp))
             Text(
                 text = "Camera Error",
                 style = MaterialTheme.typography.headlineSmall,
-                color = AppColors.error
+                color = AppColors.Error
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
