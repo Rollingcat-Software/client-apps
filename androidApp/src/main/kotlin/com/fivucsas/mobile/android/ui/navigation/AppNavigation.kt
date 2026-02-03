@@ -3,11 +3,6 @@ package com.fivucsas.mobile.android.ui.navigation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
-import androidx.navigation.NavType
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
 import com.fivucsas.mobile.android.data.AppPreferences
 import com.fivucsas.mobile.android.ui.screen.AboutScreen
 import com.fivucsas.mobile.android.ui.screen.ActivityHistoryScreen
@@ -18,240 +13,159 @@ import com.fivucsas.mobile.android.ui.screen.DashboardScreen
 import com.fivucsas.mobile.android.ui.screen.EditProfileScreen
 import com.fivucsas.mobile.android.ui.screen.ForgotPasswordScreen
 import com.fivucsas.mobile.android.ui.screen.HelpScreen
-import com.fivucsas.mobile.android.ui.screen.LoginScreen
 import com.fivucsas.mobile.android.ui.screen.NotificationsScreen
-import com.fivucsas.mobile.android.ui.screen.OnboardingScreen
 import com.fivucsas.mobile.android.ui.screen.ProfileScreen
-import com.fivucsas.mobile.android.ui.screen.RegisterScreen
+import com.fivucsas.mobile.android.ui.screen.QrLoginScanScreen
 import com.fivucsas.mobile.android.ui.screen.SettingsScreen
-import com.fivucsas.mobile.android.ui.screen.SplashScreen
 import com.fivucsas.shared.data.local.TokenManager
 import com.fivucsas.shared.presentation.viewmodel.auth.BiometricViewModel
 import com.fivucsas.shared.presentation.viewmodel.auth.LoginViewModel
 import com.fivucsas.shared.presentation.viewmodel.auth.RegisterViewModel
+import com.fivucsas.shared.ui.navigation.AppRoute
+import com.fivucsas.shared.ui.navigation.AppStartState
+import com.fivucsas.shared.ui.navigation.RouteContent
+import com.fivucsas.shared.ui.navigation.SharedAppRoot
 import org.koin.compose.koinInject
-
-sealed class Screen(val route: String) {
-    object Splash : Screen("splash")
-    object Onboarding : Screen("onboarding")
-    object Login : Screen("login")
-    object Register : Screen("register")
-    object ForgotPassword : Screen("forgot-password")
-    object Dashboard : Screen("dashboard")
-    object ActivityHistory : Screen("activity-history")
-    object Profile : Screen("profile")
-    object EditProfile : Screen("edit-profile")
-    object ChangePassword : Screen("change-password")
-    object Settings : Screen("settings")
-    object Notifications : Screen("notifications")
-    object Help : Screen("help")
-    object About : Screen("about")
-
-    object BiometricEnroll : Screen("biometric/enroll/{userId}") {
-        fun createRoute(userId: String) = "biometric/enroll/$userId"
-    }
-
-    object BiometricVerify : Screen("biometric/verify/{userId}") {
-        fun createRoute(userId: String) = "biometric/verify/$userId"
-    }
-}
 
 @Composable
 fun AppNavigation() {
-    val navController = rememberNavController()
     val context = LocalContext.current
     val preferences = remember { AppPreferences(context) }
     val tokenManager = koinInject<TokenManager>()
+    val loginViewModel = koinInject<LoginViewModel>()
+    val registerViewModel = koinInject<RegisterViewModel>()
 
-    NavHost(
-        navController = navController,
-        startDestination = Screen.Splash.route
-    ) {
-        composable(Screen.Splash.route) {
-            SplashScreen(
-                isFirstLaunch = preferences.isFirstLaunch(),
-                isAuthenticated = tokenManager.isAuthenticated(),
-                onNavigateToOnboarding = {
-                    navController.navigate(Screen.Onboarding.route) {
-                        popUpTo(Screen.Splash.route) { inclusive = true }
-                    }
-                },
-                onNavigateToLogin = {
-                    navController.navigate(Screen.Login.route) {
-                        popUpTo(Screen.Splash.route) { inclusive = true }
-                    }
-                },
-                onNavigateToDashboard = {
-                    navController.navigate(Screen.Dashboard.route) {
-                        popUpTo(Screen.Splash.route) { inclusive = true }
-                    }
-                }
-            )
-        }
+    val startState = remember(preferences, tokenManager) {
+        AppStartState(
+            isFirstLaunch = preferences.isFirstLaunch(),
+            isAuthenticated = tokenManager.isAuthenticated()
+        )
+    }
 
-        composable(Screen.Onboarding.route) {
-            OnboardingScreen(
-                onComplete = {
-                    preferences.setFirstLaunchCompleted()
-                    navController.navigate(Screen.Login.route) {
-                        popUpTo(Screen.Onboarding.route) { inclusive = true }
-                    }
-                },
-                onSkip = {
-                    preferences.setFirstLaunchCompleted()
-                    navController.navigate(Screen.Login.route) {
-                        popUpTo(Screen.Onboarding.route) { inclusive = true }
-                    }
-                }
-            )
-        }
-
-        composable(Screen.Login.route) {
-            val viewModel = koinInject<LoginViewModel>()
-            LoginScreen(
-                viewModel = viewModel,
-                onNavigateToRegister = { navController.navigate(Screen.Register.route) },
-                onNavigateToForgotPassword = { navController.navigate(Screen.ForgotPassword.route) },
-                onLoginSuccess = {
-                    navController.navigate(Screen.Dashboard.route) {
-                        popUpTo(Screen.Login.route) { inclusive = true }
-                    }
-                }
-            )
-        }
-
-        composable(Screen.Register.route) {
-            val viewModel = koinInject<RegisterViewModel>()
-            RegisterScreen(
-                viewModel = viewModel,
-                onNavigateBack = { navController.popBackStack() },
-                onRegisterSuccess = {
-                    navController.navigate(Screen.Dashboard.route) {
-                        popUpTo(Screen.Login.route) { inclusive = true }
-                    }
-                }
-            )
-        }
-
-        composable(Screen.ForgotPassword.route) {
+    val platformRoutes: Map<String, RouteContent> = mapOf(
+        AppRoute.ForgotPassword.id to { navigator, _ ->
             ForgotPasswordScreen(
-                onNavigateBack = { navController.popBackStack() },
-                onNavigateToLogin = { navController.navigate(Screen.Login.route) }
+                onNavigateBack = { navigator.pop() },
+                onNavigateToLogin = { navigator.navigate(AppRoute.Login, replace = true) }
             )
-        }
-
-        composable(Screen.Dashboard.route) {
+        },
+        AppRoute.Dashboard.id to { navigator, _ ->
             DashboardScreen(
                 userName = "Test User",
-                currentRoute = Screen.Dashboard.route,
-                onNavigateToNotifications = { navController.navigate(Screen.Notifications.route) },
-                onNavigateToProfile = { navController.navigate(Screen.Profile.route) },
-                onNavigateToEnroll = { navController.navigate(Screen.BiometricEnroll.createRoute("1")) },
-                onNavigateToVerify = { navController.navigate(Screen.BiometricVerify.createRoute("1")) },
-                onNavigateToHistory = { navController.navigate(Screen.ActivityHistory.route) },
-                onNavigateBottom = { route ->
-                    navController.navigate(route) {
-                        launchSingleTop = true
-                        restoreState = true
+                currentRoute = AppRoute.Dashboard.id,
+                onNavigateToNotifications = { navigator.navigate(AppRoute.Notifications) },
+                onNavigateToProfile = { navigator.navigate(AppRoute.Profile) },
+                onNavigateToEnroll = { navigator.navigate(AppRoute.BiometricEnroll("1")) },
+                onNavigateToVerify = { navigator.navigate(AppRoute.BiometricVerify("1")) },
+                onNavigateToQrLoginScan = { navigator.navigate(AppRoute.QrLoginScan) },
+                onNavigateToHistory = { navigator.navigate(AppRoute.ActivityHistory) },
+                onNavigateBottom = { routeId ->
+                    val route = when (routeId) {
+                        AppRoute.Dashboard.id -> AppRoute.Dashboard
+                        AppRoute.ActivityHistory.id -> AppRoute.ActivityHistory
+                        AppRoute.Profile.id -> AppRoute.Profile
+                        else -> AppRoute.Platform(routeId)
                     }
+                    navigator.navigate(route, replace = true)
                 }
             )
-        }
-
-        composable(Screen.ActivityHistory.route) {
+        },
+        AppRoute.ActivityHistory.id to { navigator, _ ->
             ActivityHistoryScreen(
-                currentRoute = Screen.ActivityHistory.route,
-                onNavigateBottom = { route ->
-                    navController.navigate(route) {
-                        launchSingleTop = true
-                        restoreState = true
+                currentRoute = AppRoute.ActivityHistory.id,
+                onNavigateBottom = { routeId ->
+                    val route = when (routeId) {
+                        AppRoute.Dashboard.id -> AppRoute.Dashboard
+                        AppRoute.ActivityHistory.id -> AppRoute.ActivityHistory
+                        AppRoute.Profile.id -> AppRoute.Profile
+                        else -> AppRoute.Platform(routeId)
                     }
+                    navigator.navigate(route, replace = true)
                 }
             )
-        }
-
-        composable(Screen.Profile.route) {
+        },
+        AppRoute.Profile.id to { navigator, _ ->
             ProfileScreen(
                 userName = "Test User",
                 userEmail = "test@fivucsas.com",
-                currentRoute = Screen.Profile.route,
-                onNavigateBottom = { route ->
-                    navController.navigate(route) {
-                        launchSingleTop = true
-                        restoreState = true
+                currentRoute = AppRoute.Profile.id,
+                onNavigateBottom = { routeId ->
+                    val route = when (routeId) {
+                        AppRoute.Dashboard.id -> AppRoute.Dashboard
+                        AppRoute.ActivityHistory.id -> AppRoute.ActivityHistory
+                        AppRoute.Profile.id -> AppRoute.Profile
+                        else -> AppRoute.Platform(routeId)
                     }
+                    navigator.navigate(route, replace = true)
                 },
-                onEditProfile = { navController.navigate(Screen.EditProfile.route) },
-                onChangePassword = { navController.navigate(Screen.ChangePassword.route) },
-                onReEnroll = { navController.navigate(Screen.BiometricEnroll.createRoute("1")) },
-                onOpenSettings = { navController.navigate(Screen.Settings.route) }
+                onEditProfile = { navigator.navigate(AppRoute.EditProfile) },
+                onChangePassword = { navigator.navigate(AppRoute.ChangePassword) },
+                onReEnroll = { navigator.navigate(AppRoute.BiometricEnroll("1")) },
+                onOpenSettings = { navigator.navigate(AppRoute.Settings) }
             )
-        }
-
-        composable(Screen.EditProfile.route) {
+        },
+        AppRoute.EditProfile.id to { navigator, _ ->
             EditProfileScreen(
                 initialFirstName = "Test",
                 initialLastName = "User",
                 email = "test@fivucsas.com",
                 initialPhone = "+1 234 567 8900",
                 idNumber = "NIC-12345678",
-                onNavigateBack = { navController.popBackStack() },
-                onSave = { _, _, _ -> navController.popBackStack() }
+                onNavigateBack = { navigator.pop() },
+                onSave = { _, _, _ -> navigator.pop() }
             )
-        }
-
-        composable(Screen.ChangePassword.route) {
+        },
+        AppRoute.ChangePassword.id to { navigator, _ ->
             ChangePasswordScreen(
-                onNavigateBack = { navController.popBackStack() },
-                onSubmit = { _, _, _ -> navController.popBackStack() }
+                onNavigateBack = { navigator.pop() },
+                onSubmit = { _, _, _ -> navigator.pop() }
             )
-        }
-
-        composable(Screen.Settings.route) {
+        },
+        AppRoute.Settings.id to { navigator, _ ->
             SettingsScreen(
-                onNavigateBack = { navController.popBackStack() },
-                onNavigateToChangePassword = { navController.navigate(Screen.ChangePassword.route) },
-                onNavigateToHelp = { navController.navigate(Screen.Help.route) },
-                onNavigateToAbout = { navController.navigate(Screen.About.route) }
+                onNavigateBack = { navigator.pop() },
+                onNavigateToChangePassword = { navigator.navigate(AppRoute.ChangePassword) },
+                onNavigateToHelp = { navigator.navigate(AppRoute.Help) },
+                onNavigateToAbout = { navigator.navigate(AppRoute.About) }
             )
-        }
-
-        composable(Screen.Notifications.route) {
-            NotificationsScreen(onNavigateBack = { navController.popBackStack() })
-        }
-
-        composable(Screen.Help.route) {
-            HelpScreen(onNavigateBack = { navController.popBackStack() })
-        }
-
-        composable(Screen.About.route) {
-            AboutScreen(onNavigateBack = { navController.popBackStack() })
-        }
-
-        composable(
-            route = Screen.BiometricEnroll.route,
-            arguments = listOf(navArgument("userId") { type = NavType.StringType })
-        ) { backStackEntry ->
-            val userId = backStackEntry.arguments?.getString("userId") ?: ""
+        },
+        AppRoute.Notifications.id to { navigator, _ ->
+            NotificationsScreen(onNavigateBack = { navigator.pop() })
+        },
+        AppRoute.Help.id to { navigator, _ ->
+            HelpScreen(onNavigateBack = { navigator.pop() })
+        },
+        AppRoute.About.id to { navigator, _ ->
+            AboutScreen(onNavigateBack = { navigator.pop() })
+        },
+        AppRoute.BIOMETRIC_ENROLL to { navigator, route ->
+            val userId = (route as? AppRoute.BiometricEnroll)?.userId ?: "1"
             val viewModel = koinInject<BiometricViewModel>()
             BiometricEnrollScreen(
                 userId = userId,
                 viewModel = viewModel,
-                onNavigateBack = { navController.popBackStack() }
+                onNavigateBack = { navigator.pop() }
             )
-        }
-
-        composable(
-            route = Screen.BiometricVerify.route,
-            arguments = listOf(navArgument("userId") { type = NavType.StringType })
-        ) { backStackEntry ->
-            val userId = backStackEntry.arguments?.getString("userId") ?: ""
+        },
+        AppRoute.BIOMETRIC_VERIFY to { navigator, route ->
+            val userId = (route as? AppRoute.BiometricVerify)?.userId ?: "1"
             val viewModel = koinInject<BiometricViewModel>()
             BiometricVerifyScreen(
                 userId = userId,
                 viewModel = viewModel,
-                onNavigateBack = { navController.popBackStack() }
+                onNavigateBack = { navigator.pop() }
             )
+        },
+        AppRoute.QrLoginScan.id to { navigator, _ ->
+            QrLoginScanScreen(onNavigateBack = { navigator.pop() })
         }
-    }
+    )
+
+    SharedAppRoot(
+        startState = startState,
+        onFirstLaunchComplete = { preferences.setFirstLaunchCompleted() },
+        loginViewModel = loginViewModel,
+        registerViewModel = registerViewModel,
+        platformRoutes = platformRoutes
+    )
 }

@@ -6,9 +6,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.asComposeImageBitmap
+import androidx.compose.ui.graphics.toComposeImageBitmap
 import androidx.compose.ui.layout.ContentScale
-import com.fivucsas.desktop.platform.DesktopCameraServiceImpl
+import com.fivucsas.shared.platform.DesktopCameraServiceImpl
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import org.jetbrains.skia.Image as SkiaImage
@@ -66,5 +66,5 @@ private fun BufferedImage.toComposeImageBitmap(): ImageBitmap {
     val outputStream = ByteArrayOutputStream()
     ImageIO.write(this, "PNG", outputStream)
     val bytes = outputStream.toByteArray()
-    return SkiaImage.makeFromEncoded(bytes).asComposeImageBitmap()
+    return SkiaImage.makeFromEncoded(bytes).toComposeImageBitmap()
 }
