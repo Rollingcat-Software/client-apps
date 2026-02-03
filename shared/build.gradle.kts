@@ -111,6 +111,8 @@ kotlin {
             dependencies {
                 implementation("io.ktor:ktor-client-cio:2.3.5")
                 implementation(compose.desktop.currentOs)
+                // Webcam capture - JavaCV (used by DesktopCameraServiceImpl)
+                implementation("org.bytedeco:javacv-platform:1.5.10")
             }
         }
 

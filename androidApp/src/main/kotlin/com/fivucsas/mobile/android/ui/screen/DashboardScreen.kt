@@ -50,12 +50,14 @@ fun DashboardScreen(
     onNavigateToProfile: () -> Unit,
     onNavigateToEnroll: () -> Unit,
     onNavigateToVerify: () -> Unit,
+    onNavigateToQrLoginScan: () -> Unit,
     onNavigateToHistory: () -> Unit,
     onNavigateBottom: (String) -> Unit
 ) {
     val quickActions = listOf(
         QuickActionItem("Enroll Face", Icons.Default.CameraAlt, onNavigateToEnroll),
         QuickActionItem("Verify Identity", Icons.Default.Security, onNavigateToVerify),
+        QuickActionItem("Scan QR Login", Icons.Default.CameraAlt, onNavigateToQrLoginScan),
         QuickActionItem("Activity History", Icons.Default.History, onNavigateToHistory),
         QuickActionItem("Profile & Settings", Icons.Default.Person, onNavigateToProfile)
     )

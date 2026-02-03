@@ -1,12 +1,12 @@
 package com.fivucsas.shared.di
 
-import com.fivucsas.desktop.platform.DesktopCameraServiceImpl
-import com.fivucsas.desktop.platform.DesktopTokenStorage
 import com.fivucsas.shared.data.local.TokenStorage
 import com.fivucsas.shared.platform.ICameraService
-import org.koin.core.module.dsl.singleOf
+import com.fivucsas.shared.platform.DesktopCameraServiceImpl
+import com.fivucsas.shared.platform.DesktopTokenStorage
 import org.koin.dsl.bind
 import org.koin.dsl.module
+import org.koin.dsl.single
 
 /**
  * Desktop Platform Module
@@ -25,9 +25,8 @@ import org.koin.dsl.module
 actual val platformModule = module {
     // Camera Service
     // Single instance using JavaCV for webcam access
-    singleOf(::DesktopCameraServiceImpl) bind ICameraService::class
-
+    single { DesktopCameraServiceImpl() } bind ICameraService::class
     // Token Storage
     // Uses Java Preferences for persistent storage
-    singleOf(::DesktopTokenStorage) bind TokenStorage::class
+    single { DesktopTokenStorage() } bind TokenStorage::class
 }

@@ -27,6 +27,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -34,9 +37,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.fivucsas.desktop.ui.components.DesktopKioskCameraOverlay
 import com.fivucsas.shared.config.UIDimens
+import com.fivucsas.shared.platform.ICameraService
 import com.fivucsas.shared.presentation.viewmodel.KioskViewModel
 import com.fivucsas.shared.ui.theme.AppColors
+import org.koin.compose.koinInject
 
 /**
  * Verify Screen Component
@@ -52,6 +58,8 @@ fun VerifyScreen(
     onBack: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val cameraService: ICameraService = koinInject()
+    var pendingVerify by remember { mutableStateOf(false) }
 
     Box(
         modifier = Modifier
@@ -202,8 +210,12 @@ fun VerifyScreen(
 
                 Button(
                     onClick = {
-                        viewModel.captureImage()
-                        viewModel.verifyWithCapturedImage()
+                        if (uiState.capturedImage == null) {
+                            pendingVerify = true
+                            viewModel.openCamera()
+                        } else {
+                            viewModel.verifyWithCapturedImage()
+                        }
                     },
                     modifier = Modifier.weight(1f),
                     enabled = !uiState.isLoading && uiState.verificationResult == null
@@ -211,6 +223,23 @@ fun VerifyScreen(
                     Text("Verify Now")
                 }
             }
+        }
+
+        if (uiState.showCamera) {
+            DesktopKioskCameraOverlay(
+                cameraService = cameraService,
+                onCapture = { imageBytes ->
+                    viewModel.setCapturedImage(imageBytes)
+                    if (pendingVerify) {
+                        pendingVerify = false
+                        viewModel.verifyWithCapturedImage()
+                    }
+                },
+                onClose = {
+                    pendingVerify = false
+                    viewModel.closeCamera()
+                }
+            )
         }
     }
 }

@@ -1,4 +1,4 @@
-package com.fivucsas.mobile.android.ui.screen
+package com.fivucsas.shared.ui.screen
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
