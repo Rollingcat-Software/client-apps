@@ -1,4 +1,4 @@
-package com.fivucsas.shared.platform
+package com.fivucsas.shared.platform.biometric
 
 import android.os.Build
 import android.security.keystore.KeyGenParameterSpec
@@ -13,6 +13,7 @@ import com.fivucsas.shared.domain.model.BiometricCapability
 import com.fivucsas.shared.domain.model.BiometricError
 import com.fivucsas.shared.domain.model.BiometricStepUpException
 import com.fivucsas.shared.domain.model.PublicKeyJwk
+import com.fivucsas.shared.platform.AndroidBiometricActivityHolder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
@@ -23,7 +24,6 @@ import java.security.KeyStore
 import java.security.PrivateKey
 import java.security.PublicKey
 import java.security.Signature
-import java.security.UnrecoverableKeyException
 import java.security.interfaces.ECPublicKey
 import java.security.spec.ECGenParameterSpec
 import kotlin.coroutines.resume
@@ -59,30 +59,41 @@ class AndroidBiometricAuthenticator(
         val privateKey = loadPrivateKey(alias) ?: run {
             ensureKeyPair(keyId)
             loadPrivateKey(alias)
-        } ?: throw BiometricStepUpException(
-            BiometricError.Failed,
-            "Private key not available."
-        )
+        } ?: throw BiometricStepUpException(BiometricError.Failed, "Private key not available.")
 
         val signature = try {
             Signature.getInstance(SIGNATURE_ALGORITHM).apply { initSign(privateKey) }
-        } catch (e: Exception) {
-            if (e is KeyPermanentlyInvalidatedException || e is InvalidKeyException || e is UnrecoverableKeyException) {
-                deleteAlias(alias)
-                ensureKeyPair(keyId)
-                throw BiometricStepUpException(BiometricError.KeyInvalidated, "Biometric key invalidated.", e)
-            }
-            throw e
+        } catch (e: KeyPermanentlyInvalidatedException) {
+            deleteAlias(alias)
+            ensureKeyPair(keyId)
+            throw BiometricStepUpException(BiometricError.KeyInvalidated, "Biometric key invalidated.", e)
+        } catch (e: InvalidKeyException) {
+            deleteAlias(alias)
+            ensureKeyPair(keyId)
+            throw BiometricStepUpException(BiometricError.KeyInvalidated, "Biometric key invalidated.", e)
         }
 
         val unlockedSignature = authenticateWithBiometric(signature, reason)
-        unlockedSignature.update(nonce)
-        unlockedSignature.sign()
+        try {
+            unlockedSignature.update(nonce)
+            unlockedSignature.sign()
+        } catch (e: KeyPermanentlyInvalidatedException) {
+            deleteAlias(alias)
+            ensureKeyPair(keyId)
+            throw BiometricStepUpException(BiometricError.KeyInvalidated, "Biometric key invalidated.", e)
+        } catch (e: InvalidKeyException) {
+            deleteAlias(alias)
+            ensureKeyPair(keyId)
+            throw BiometricStepUpException(BiometricError.KeyInvalidated, "Biometric key invalidated.", e)
+        }
     }
 
     private suspend fun authenticateWithBiometric(signature: Signature, reason: String): Signature {
-        val activity = AndroidBiometricActivityHolder.currentActivity
-            ?: throw BiometricStepUpException(BiometricError.Unknown("No active activity."), "No active activity.")
+        val activity = AndroidBiometricActivityHolder.getCurrentActivity()
+            ?: throw BiometricStepUpException(
+                BiometricError.Unknown("No active activity."),
+                "No active activity."
+            )
         val executor = ContextCompat.getMainExecutor(activity)
 
         return suspendCancellableCoroutine { continuation ->
@@ -108,10 +119,6 @@ class AndroidBiometricAuthenticator(
                         )
                     }
                 }
-
-                override fun onAuthenticationFailed() {
-                    // Wait for success/error callbacks from prompt.
-                }
             }
 
             val prompt = BiometricPrompt(activity, executor, callback)
@@ -131,12 +138,11 @@ class AndroidBiometricAuthenticator(
             BiometricPrompt.ERROR_USER_CANCELED,
             BiometricPrompt.ERROR_CANCELED,
             BiometricPrompt.ERROR_NEGATIVE_BUTTON -> BiometricError.Canceled
-
             BiometricPrompt.ERROR_LOCKOUT,
             BiometricPrompt.ERROR_LOCKOUT_PERMANENT -> BiometricError.Lockout
-
             BiometricPrompt.ERROR_NO_BIOMETRICS -> BiometricError.NotEnrolled
-            BiometricPrompt.ERROR_HW_NOT_PRESENT -> BiometricError.NoHardware
+            BiometricPrompt.ERROR_HW_NOT_PRESENT,
+            BiometricPrompt.ERROR_HW_UNAVAILABLE -> BiometricError.NoHardware
             else -> BiometricError.Unknown(message)
         }
     }
@@ -163,7 +169,7 @@ class AndroidBiometricAuthenticator(
             )
         } else {
             @Suppress("DEPRECATION")
-            specBuilder.setUserAuthenticationValidityDurationSeconds(-1)
+            specBuilder.setUserAuthenticationValidityDurationSeconds(0)
         }
 
         keyPairGenerator.initialize(specBuilder.build())
@@ -188,9 +194,7 @@ class AndroidBiometricAuthenticator(
         }
     }
 
-    private fun keyStore(): KeyStore {
-        return KeyStore.getInstance(ANDROID_KEYSTORE).apply { load(null) }
-    }
+    private fun keyStore(): KeyStore = KeyStore.getInstance(ANDROID_KEYSTORE).apply { load(null) }
 
     private fun aliasFor(keyId: String): String = "$ALIAS_PREFIX$keyId"
 

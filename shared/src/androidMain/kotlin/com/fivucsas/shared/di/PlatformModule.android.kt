@@ -4,10 +4,10 @@ import androidx.biometric.BiometricManager
 import com.fivucsas.shared.data.local.BiometricStepUpLocalStore
 import com.fivucsas.shared.domain.biometric.BiometricAuthenticator
 import com.fivucsas.shared.platform.AndroidCameraService
-import com.fivucsas.shared.platform.AndroidBiometricAuthenticator
 import com.fivucsas.shared.platform.AndroidBiometricStepUpLocalStore
 import com.fivucsas.shared.platform.AndroidTokenStorage
 import com.fivucsas.shared.platform.ICameraService
+import com.fivucsas.shared.platform.biometric.AndroidBiometricAuthenticator
 import com.fivucsas.shared.data.local.TokenStorage
 import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.bind

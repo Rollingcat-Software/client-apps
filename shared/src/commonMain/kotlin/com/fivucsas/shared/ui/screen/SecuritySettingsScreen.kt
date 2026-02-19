@@ -110,7 +110,7 @@ fun SecuritySettingsScreen(
 
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = "This screen uses mock step-up API (no backend call).",
+                text = "This screen uses real step-up API (backend call).",
                 style = MaterialTheme.typography.bodySmall
             )
         }

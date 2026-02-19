@@ -5,6 +5,7 @@ import com.fivucsas.shared.data.remote.api.BiometricStepUpApi
 import com.fivucsas.shared.domain.biometric.BiometricAuthenticator
 import com.fivucsas.shared.domain.model.BiometricCapability
 import com.fivucsas.shared.domain.model.StepUpDto
+import kotlinx.datetime.Clock
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 import kotlin.random.Random
@@ -25,6 +26,8 @@ class BiometricStepUpUseCase(
             publicKeyJwk = publicKeyJwk,
             deviceLabel = deviceLabel
         )
+        // Persist keyId as part of successful registration flow contract.
+        localStore.saveKeyId(keyId)
         localStore.setDeviceRegistered(true)
         return true
     }
@@ -51,6 +54,11 @@ class BiometricStepUpUseCase(
     fun isDeviceRegistered(): Boolean = localStore.isDeviceRegistered()
 
     fun getCurrentStepUpToken(): StepUpDto? = localStore.getStepUpTokenInMemory()
+
+    fun getValidStepUpToken(): String? {
+        val current = localStore.getStepUpTokenInMemory() ?: return null
+        return if (current.expiresAt > Clock.System.now()) current.stepUpToken else null
+    }
 
     private fun ensureKeyId(): String {
         val existing = localStore.getKeyId()

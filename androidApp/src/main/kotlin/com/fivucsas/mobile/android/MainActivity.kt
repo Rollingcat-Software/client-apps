@@ -29,13 +29,11 @@ class MainActivity : FragmentActivity() {
 
     override fun onResume() {
         super.onResume()
-        AndroidBiometricActivityHolder.currentActivity = this
+        AndroidBiometricActivityHolder.setCurrentActivity(this)
     }
 
     override fun onPause() {
-        if (AndroidBiometricActivityHolder.currentActivity === this) {
-            AndroidBiometricActivityHolder.currentActivity = null
-        }
+        AndroidBiometricActivityHolder.clearCurrentActivity(this)
         super.onPause()
     }
 }

@@ -7,9 +7,9 @@ import com.fivucsas.shared.data.remote.api.AuthApiImpl
 import com.fivucsas.shared.data.remote.api.BiometricApi
 import com.fivucsas.shared.data.remote.api.BiometricApiImpl
 import com.fivucsas.shared.data.remote.api.BiometricStepUpApi
+import com.fivucsas.shared.data.remote.api.BiometricStepUpApiImpl
 import com.fivucsas.shared.data.remote.api.IdentityApi
 import com.fivucsas.shared.data.remote.api.IdentityApiImpl
-import com.fivucsas.shared.data.remote.api.MockBiometricStepUpApi
 import com.fivucsas.shared.data.remote.config.ApiConfig
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.HttpTimeout
@@ -122,6 +122,13 @@ val networkModule = module {
     // API Implementations with specific HTTP clients
     single<AuthApi> { AuthApiImpl(get(named("identityClient"))) }
     single<IdentityApi> { IdentityApiImpl(get(named("identityClient"))) }
-    single<BiometricApi> { BiometricApiImpl(get(named("biometricClient"))) }
-    single<BiometricStepUpApi> { MockBiometricStepUpApi() }
+    single<BiometricApi> {
+        BiometricApiImpl(
+            identityClient = get(named("identityClient")),
+            biometricClient = get(named("biometricClient")),
+            stepUpLocalStore = get(),
+            stepUpUseCase = get()
+        )
+    }
+    single<BiometricStepUpApi> { BiometricStepUpApiImpl(get(named("biometricClient")), get()) }
 }
