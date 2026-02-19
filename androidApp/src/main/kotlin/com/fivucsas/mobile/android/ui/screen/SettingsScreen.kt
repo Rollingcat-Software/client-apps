@@ -37,6 +37,7 @@ import com.fivucsas.shared.ui.theme.AppColors
 @Composable
 fun SettingsScreen(
     onNavigateBack: () -> Unit,
+    onNavigateToSecurity: () -> Unit,
     onNavigateToChangePassword: () -> Unit,
     onNavigateToHelp: () -> Unit,
     onNavigateToAbout: () -> Unit
@@ -120,6 +121,15 @@ fun SettingsScreen(
                 }
 
                 Spacer(modifier = Modifier.size(12.dp))
+                Text(
+                    text = "Biometric Step-up Security",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = AppColors.Primary,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 4.dp)
+                        .clickable { onNavigateToSecurity() }
+                )
                 Text(
                     text = "Change Password",
                     style = MaterialTheme.typography.bodyMedium,

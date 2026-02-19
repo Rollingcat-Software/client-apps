@@ -1,6 +1,10 @@
 package com.fivucsas.shared.di
 
+import com.fivucsas.shared.data.local.BiometricStepUpLocalStore
 import com.fivucsas.shared.data.local.TokenStorage
+import com.fivucsas.shared.domain.biometric.BiometricAuthenticator
+import com.fivucsas.shared.platform.DesktopBiometricAuthenticator
+import com.fivucsas.shared.platform.DesktopBiometricStepUpLocalStore
 import com.fivucsas.shared.platform.ICameraService
 import com.fivucsas.shared.platform.DesktopCameraServiceImpl
 import com.fivucsas.shared.platform.DesktopTokenStorage
@@ -29,4 +33,6 @@ actual val platformModule = module {
     // Token Storage
     // Uses Java Preferences for persistent storage
     single { DesktopTokenStorage() } bind TokenStorage::class
+    single { DesktopBiometricAuthenticator() } bind BiometricAuthenticator::class
+    single { DesktopBiometricStepUpLocalStore() } bind BiometricStepUpLocalStore::class
 }

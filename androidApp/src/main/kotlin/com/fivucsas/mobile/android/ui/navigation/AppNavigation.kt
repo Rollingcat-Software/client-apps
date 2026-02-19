@@ -18,6 +18,7 @@ import com.fivucsas.mobile.android.ui.screen.ProfileScreen
 import com.fivucsas.mobile.android.ui.screen.QrLoginScanScreen
 import com.fivucsas.mobile.android.ui.screen.SettingsScreen
 import com.fivucsas.shared.data.local.TokenManager
+import com.fivucsas.shared.presentation.viewmodel.SecuritySettingsViewModel
 import com.fivucsas.shared.presentation.viewmodel.auth.BiometricViewModel
 import com.fivucsas.shared.presentation.viewmodel.auth.LoginViewModel
 import com.fivucsas.shared.presentation.viewmodel.auth.RegisterViewModel
@@ -25,6 +26,7 @@ import com.fivucsas.shared.ui.navigation.AppRoute
 import com.fivucsas.shared.ui.navigation.AppStartState
 import com.fivucsas.shared.ui.navigation.RouteContent
 import com.fivucsas.shared.ui.navigation.SharedAppRoot
+import com.fivucsas.shared.ui.screen.SecuritySettingsScreen
 import org.koin.compose.koinInject
 
 @Composable
@@ -124,9 +126,17 @@ fun AppNavigation() {
         AppRoute.Settings.id to { navigator, _ ->
             SettingsScreen(
                 onNavigateBack = { navigator.pop() },
+                onNavigateToSecurity = { navigator.navigate(AppRoute.SecuritySettings) },
                 onNavigateToChangePassword = { navigator.navigate(AppRoute.ChangePassword) },
                 onNavigateToHelp = { navigator.navigate(AppRoute.Help) },
                 onNavigateToAbout = { navigator.navigate(AppRoute.About) }
+            )
+        },
+        AppRoute.SecuritySettings.id to { navigator, _ ->
+            val viewModel = koinInject<SecuritySettingsViewModel>()
+            SecuritySettingsScreen(
+                viewModel = viewModel,
+                onNavigateBack = { navigator.pop() }
             )
         },
         AppRoute.Notifications.id to { navigator, _ ->
