@@ -1,7 +1,6 @@
 package com.fivucsas.shared.data.remote.dto
 
 import com.fivucsas.shared.domain.model.User
-import com.fivucsas.shared.domain.model.UserRole
 import com.fivucsas.shared.domain.model.UserStatus
 import kotlinx.serialization.Serializable
 
@@ -23,8 +22,7 @@ data class UserDto(
     val phoneNumber: String? = null,
     val status: String,
     val enrollmentDate: String,
-    val hasBiometric: Boolean = false,
-    val role: String? = null
+    val hasBiometric: Boolean = false
 )
 
 /**
@@ -39,8 +37,7 @@ fun UserDto.toModel(): User {
         phoneNumber = phoneNumber ?: "",
         status = UserStatus.valueOf(status),
         enrollmentDate = enrollmentDate,
-        hasBiometric = hasBiometric,
-        role = UserRole.fromString(role ?: "USER")
+        hasBiometric = hasBiometric
     )
 }
 
@@ -56,8 +53,7 @@ fun User.toDto(): UserDto {
         phoneNumber = phoneNumber.takeIf { it.isNotBlank() },
         status = status.name,
         enrollmentDate = enrollmentDate,
-        hasBiometric = hasBiometric,
-        role = role.name
+        hasBiometric = hasBiometric
     )
 }
 
