@@ -12,6 +12,7 @@ sealed class AppRoute(val id: String) {
     object EditProfile : AppRoute("edit-profile")
     object ChangePassword : AppRoute("change-password")
     object Settings : AppRoute("settings")
+    object SecuritySettings : AppRoute("settings/security")
     object Notifications : AppRoute("notifications")
     object Help : AppRoute("help")
     object About : AppRoute("about")

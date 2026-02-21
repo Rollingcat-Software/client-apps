@@ -1,4 +1,4 @@
-package com.fivucsas.shared.di
+﻿package com.fivucsas.shared.di
 
 import com.fivucsas.shared.data.local.TokenManager
 import com.fivucsas.shared.data.local.TokenStorage
@@ -6,6 +6,8 @@ import com.fivucsas.shared.data.remote.api.AuthApi
 import com.fivucsas.shared.data.remote.api.AuthApiImpl
 import com.fivucsas.shared.data.remote.api.BiometricApi
 import com.fivucsas.shared.data.remote.api.BiometricApiImpl
+import com.fivucsas.shared.data.remote.api.BiometricStepUpApi
+import com.fivucsas.shared.data.remote.api.BiometricStepUpApiImpl
 import com.fivucsas.shared.data.remote.api.IdentityApi
 import com.fivucsas.shared.data.remote.api.IdentityApiImpl
 import com.fivucsas.shared.data.remote.config.ApiConfig
@@ -71,12 +73,13 @@ val networkModule = module {
             defaultRequest {
                 url(ApiConfig.identityBaseUrl + "/")
 
-                // Add JWT token to all requests (except auth endpoints)
+                // Add JWT token to protected endpoints.
                 val accessToken = tokenManager.getAccessToken()
+                val isPublicAuthEndpoint =
+                    url.toString().contains("/auth/login") || url.toString().contains("/auth/register")
+                val shouldAttachAuthHeader = accessToken != null && !isPublicAuthEndpoint
 
-                if (accessToken != null &&
-                    !url.toString().contains("/auth/login") &&
-                    !url.toString().contains("/auth/register")) {
+                if (shouldAttachAuthHeader) {
                     header(HttpHeaders.Authorization, "Bearer $accessToken")
                 }
             }
@@ -110,7 +113,9 @@ val networkModule = module {
 
                 // Add JWT token for authenticated biometric operations
                 val accessToken = tokenManager.getAccessToken()
-                if (accessToken != null) {
+                val shouldAttachAuthHeader = accessToken != null
+
+                if (shouldAttachAuthHeader) {
                     header(HttpHeaders.Authorization, "Bearer $accessToken")
                 }
             }
@@ -120,5 +125,14 @@ val networkModule = module {
     // API Implementations with specific HTTP clients
     single<AuthApi> { AuthApiImpl(get(named("identityClient"))) }
     single<IdentityApi> { IdentityApiImpl(get(named("identityClient"))) }
-    single<BiometricApi> { BiometricApiImpl(get(named("biometricClient"))) }
+    single<BiometricApi> {
+        BiometricApiImpl(
+            identityClient = get(named("identityClient")),
+            biometricClient = get(named("biometricClient")),
+            stepUpLocalStore = get(),
+            stepUpUseCase = get()
+        )
+    }
+    single<BiometricStepUpApi> { BiometricStepUpApiImpl(get(named("identityClient")), get()) }
 }
+
