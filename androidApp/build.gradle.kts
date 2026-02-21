@@ -32,9 +32,6 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
             excludes += "META-INF/versions/9/previous-compilation-data.bin"
         }
-        jniLibs {
-            useLegacyPackaging = true
-        }
     }
 
     buildTypes {
@@ -68,11 +65,11 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.2")
     implementation("androidx.navigation:navigation-compose:2.7.5")
 
-    // CameraX (1.4.1+ required for 16KB page size alignment on Android 15+)
-    implementation("androidx.camera:camera-core:1.4.1")
-    implementation("androidx.camera:camera-camera2:1.4.1")
-    implementation("androidx.camera:camera-lifecycle:1.4.1")
-    implementation("androidx.camera:camera-view:1.4.1")
+    // CameraX
+    implementation("androidx.camera:camera-core:1.3.0")
+    implementation("androidx.camera:camera-camera2:1.3.0")
+    implementation("androidx.camera:camera-lifecycle:1.3.0")
+    implementation("androidx.camera:camera-view:1.3.0")
 
     // Coil (image loading)
     implementation("io.coil-kt:coil-compose:2.5.0")

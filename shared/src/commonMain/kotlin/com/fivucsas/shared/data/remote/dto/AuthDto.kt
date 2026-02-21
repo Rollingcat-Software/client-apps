@@ -31,8 +31,7 @@ data class AuthResponseDto(
     val accessToken: String,
     val refreshToken: String,
     val expiresIn: Long,
-    val tokenType: String = "Bearer",
-    val role: String? = null
+    val tokenType: String = "Bearer"
 )
 
 /**
@@ -42,8 +41,7 @@ fun AuthResponseDto.toModel(): AuthTokens {
     return AuthTokens(
         accessToken = accessToken,
         refreshToken = refreshToken,
-        expiresIn = expiresIn,
-        role = role ?: "USER"
+        expiresIn = expiresIn
     )
 }
 
@@ -54,7 +52,6 @@ fun AuthTokens.toDto(): AuthResponseDto {
     return AuthResponseDto(
         accessToken = accessToken,
         refreshToken = refreshToken,
-        expiresIn = expiresIn,
-        role = role
+        expiresIn = expiresIn
     )
 }

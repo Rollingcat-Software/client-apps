@@ -34,9 +34,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.fivucsas.shared.config.UIDimens
-import com.fivucsas.shared.domain.model.Permission
-import com.fivucsas.shared.domain.model.UserRole
-import com.fivucsas.shared.domain.model.hasPermission
 import com.fivucsas.shared.ui.components.atoms.SectionHeader
 import com.fivucsas.shared.ui.components.atoms.StatusBadgeType
 import com.fivucsas.shared.ui.components.molecules.ActivityItem
@@ -50,7 +47,6 @@ import com.fivucsas.shared.ui.theme.AppColors
 @Composable
 fun DashboardScreen(
     userName: String,
-    userRole: UserRole = UserRole.USER,
     currentRoute: String,
     onNavigateToNotifications: () -> Unit,
     onNavigateToProfile: () -> Unit,
@@ -60,17 +56,13 @@ fun DashboardScreen(
     onNavigateToHistory: () -> Unit,
     onNavigateBottom: (String) -> Unit
 ) {
-    val quickActions = buildList {
-        if (userRole.hasPermission(Permission.ENROLL_FACE)) {
-            add(QuickActionItem("Enroll Face", Icons.Default.CameraAlt, onNavigateToEnroll))
-        }
-        if (userRole.hasPermission(Permission.VERIFY_FACE)) {
-            add(QuickActionItem("Verify Identity", Icons.Default.Security, onNavigateToVerify))
-        }
-        add(QuickActionItem("Scan QR Login", Icons.Default.CameraAlt, onNavigateToQrLoginScan))
-        add(QuickActionItem("Activity History", Icons.Default.History, onNavigateToHistory))
-        add(QuickActionItem("Profile & Settings", Icons.Default.Person, onNavigateToProfile))
-    }
+    val quickActions = listOf(
+        QuickActionItem("Enroll Face", Icons.Default.CameraAlt, onNavigateToEnroll),
+        QuickActionItem("Verify Identity", Icons.Default.Security, onNavigateToVerify),
+        QuickActionItem("Scan QR Login", Icons.Default.CameraAlt, onNavigateToQrLoginScan),
+        QuickActionItem("Activity History", Icons.Default.History, onNavigateToHistory),
+        QuickActionItem("Profile & Settings", Icons.Default.Person, onNavigateToProfile)
+    )
 
     val activityItems = listOf(
         ActivityItemData(

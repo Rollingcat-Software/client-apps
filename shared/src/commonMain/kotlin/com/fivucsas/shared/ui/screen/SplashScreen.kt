@@ -32,12 +32,9 @@ import kotlinx.coroutines.delay
 fun SplashScreen(
     isFirstLaunch: Boolean,
     isAuthenticated: Boolean,
-    userRole: String?,
     onNavigateToOnboarding: () -> Unit,
     onNavigateToLogin: () -> Unit,
-    onNavigateToDashboard: () -> Unit,
-    onNavigateToAdminDashboard: () -> Unit,
-    onNavigateToOperatorDashboard: () -> Unit
+    onNavigateToDashboard: () -> Unit
 ) {
     var startAnimation by remember { mutableStateOf(false) }
     val scale by animateFloatAsState(targetValue = if (startAnimation) 1f else 0.8f, label = "logoScale")
@@ -47,13 +44,7 @@ fun SplashScreen(
         delay(1500)
         when {
             isFirstLaunch -> onNavigateToOnboarding()
-            isAuthenticated -> {
-                when (userRole) {
-                    "SUPERADMIN", "ORG_ADMIN" -> onNavigateToAdminDashboard()
-                    "OPERATOR" -> onNavigateToOperatorDashboard()
-                    else -> onNavigateToDashboard()
-                }
-            }
+            isAuthenticated -> onNavigateToDashboard()
             else -> onNavigateToLogin()
         }
     }

@@ -11,8 +11,7 @@ import com.fivucsas.shared.ui.screen.SplashScreen
 
 data class AppStartState(
     val isFirstLaunch: Boolean,
-    val isAuthenticated: Boolean,
-    val userRole: String? = null
+    val isAuthenticated: Boolean
 )
 
 typealias RouteContent = @Composable (AppNavigator, AppRoute) -> Unit
@@ -52,16 +51,9 @@ private fun AppNavigation(
         AppRoute.Splash -> SplashScreen(
             isFirstLaunch = startState.isFirstLaunch,
             isAuthenticated = startState.isAuthenticated,
-            userRole = startState.userRole,
             onNavigateToOnboarding = { navigator.navigate(AppRoute.Onboarding, clearBackStack = true) },
             onNavigateToLogin = { navigator.navigate(AppRoute.Login, clearBackStack = true) },
-            onNavigateToDashboard = { navigator.navigate(AppRoute.Dashboard, clearBackStack = true) },
-            onNavigateToAdminDashboard = {
-                navigator.navigate(AppRoute.Platform("admin-dashboard"), clearBackStack = true)
-            },
-            onNavigateToOperatorDashboard = {
-                navigator.navigate(AppRoute.Platform("operator-dashboard"), clearBackStack = true)
-            }
+            onNavigateToDashboard = { navigator.navigate(AppRoute.Dashboard, clearBackStack = true) }
         )
 
         AppRoute.Onboarding -> OnboardingScreen(
