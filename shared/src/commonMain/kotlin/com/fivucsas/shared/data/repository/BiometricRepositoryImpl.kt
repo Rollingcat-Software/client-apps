@@ -36,13 +36,13 @@ class BiometricRepositoryImpl(
     }
 
     @OptIn(ExperimentalEncodingApi::class)
-    override suspend fun verifyFace(imageData: ByteArray): Result<VerificationResult> {
+    override suspend fun verifyFace(userId: String, imageData: ByteArray): Result<VerificationResult> {
         return try {
             // Convert image to Base64 for API transmission
             val base64Image = Base64.encode(imageData)
 
             // Call real API
-            val response = biometricApi.verifyFace(base64Image)
+            val response = biometricApi.verifyFace(userId, base64Image)
 
             Result.success(response.toModel())
         } catch (e: Exception) {

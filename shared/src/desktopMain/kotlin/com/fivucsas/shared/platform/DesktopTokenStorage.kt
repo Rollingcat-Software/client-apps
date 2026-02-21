@@ -1,14 +1,12 @@
-package com.fivucsas.desktop.platform
+package com.fivucsas.shared.platform
 
 import com.fivucsas.shared.data.local.TokenStorage
-import java.io.File
 import java.util.prefs.Preferences
 
 /**
  * Desktop Token Storage Implementation
  *
  * Uses Java Preferences API for persistent token storage.
- * For production, consider using encrypted storage.
  */
 class DesktopTokenStorage : TokenStorage {
 

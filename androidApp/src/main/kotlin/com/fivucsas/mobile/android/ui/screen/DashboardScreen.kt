@@ -8,6 +8,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.History
@@ -54,6 +56,7 @@ fun DashboardScreen(
     onNavigateToProfile: () -> Unit,
     onNavigateToEnroll: () -> Unit,
     onNavigateToVerify: () -> Unit,
+    onNavigateToQrLoginScan: () -> Unit,
     onNavigateToHistory: () -> Unit,
     onNavigateBottom: (String) -> Unit
 ) {
@@ -64,6 +67,7 @@ fun DashboardScreen(
         if (userRole.hasPermission(Permission.VERIFY_FACE)) {
             add(QuickActionItem("Verify Identity", Icons.Default.Security, onNavigateToVerify))
         }
+        add(QuickActionItem("Scan QR Login", Icons.Default.CameraAlt, onNavigateToQrLoginScan))
         add(QuickActionItem("Activity History", Icons.Default.History, onNavigateToHistory))
         add(QuickActionItem("Profile & Settings", Icons.Default.Person, onNavigateToProfile))
     }
@@ -149,7 +153,8 @@ fun DashboardScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .padding(UIDimens.SpacingMedium),
+                .padding(UIDimens.SpacingMedium)
+                .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(UIDimens.SpacingMedium)
         ) {
             Card(

@@ -1,5 +1,6 @@
 package com.fivucsas.desktop.platform
 
+import com.fivucsas.shared.platform.DesktopCameraServiceImpl
 import com.fivucsas.shared.platform.ICameraService
 import com.fivucsas.shared.platform.ILogger
 import com.fivucsas.shared.platform.ISecureStorage

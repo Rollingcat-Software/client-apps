@@ -24,7 +24,7 @@ interface BiometricRepository {
      * @param imageData Face image as byte array
      * @return Result with verification result or error
      */
-    suspend fun verifyFace(imageData: ByteArray): Result<VerificationResult>
+    suspend fun verifyFace(userId: String, imageData: ByteArray): Result<VerificationResult>
 
     /**
      * Check liveness (anti-spoofing)

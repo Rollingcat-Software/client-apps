@@ -28,19 +28,25 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.fivucsas.desktop.ui.components.DesktopKioskCameraOverlay
 import com.fivucsas.shared.config.UIDimens
+import com.fivucsas.shared.platform.ICameraService
 import com.fivucsas.shared.presentation.viewmodel.KioskViewModel
 import com.fivucsas.shared.ui.components.atoms.AppTextField
 import com.fivucsas.shared.ui.components.atoms.VerticalSpacerMedium
 import com.fivucsas.shared.ui.components.molecules.ErrorMessage
 import com.fivucsas.shared.ui.components.molecules.SuccessMessage
 import com.fivucsas.shared.ui.theme.AppColors
+import org.koin.compose.koinInject
 
 /**
  * Enroll Screen Component
@@ -57,6 +63,8 @@ fun EnrollScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val enrollmentData by viewModel.enrollmentData.collectAsState()
+    val cameraService: ICameraService = koinInject()
+    var pendingSubmit by remember { mutableStateOf(false) }
 
     Box(
         modifier = Modifier
@@ -205,9 +213,11 @@ fun EnrollScreen(
                 Button(
                     onClick = {
                         if (uiState.capturedImage == null) {
-                            viewModel.captureImage()
+                            pendingSubmit = true
+                            viewModel.openCamera()
+                        } else {
+                            viewModel.submitEnrollment()
                         }
-                        viewModel.submitEnrollment()
                     },
                     modifier = Modifier.weight(1f),
                     enabled = !uiState.isLoading
@@ -215,6 +225,23 @@ fun EnrollScreen(
                     Text(if (uiState.isLoading) "Processing..." else "Submit Enrollment")
                 }
             }
+        }
+
+        if (uiState.showCamera) {
+            DesktopKioskCameraOverlay(
+                cameraService = cameraService,
+                onCapture = { imageBytes ->
+                    viewModel.setCapturedImage(imageBytes)
+                    if (pendingSubmit) {
+                        pendingSubmit = false
+                        viewModel.submitEnrollment()
+                    }
+                },
+                onClose = {
+                    pendingSubmit = false
+                    viewModel.closeCamera()
+                }
+            )
         }
     }
 }

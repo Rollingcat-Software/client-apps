@@ -92,6 +92,7 @@ kotlin {
                 // Android specific
                 implementation("androidx.security:security-crypto:1.1.0-alpha06")
                 implementation("androidx.activity:activity-compose:1.8.1")
+                implementation("androidx.biometric:biometric:1.1.0")
 
                 // CameraX (used by AndroidCameraService + preview)
                 implementation("androidx.camera:camera-core:1.3.0")
@@ -111,6 +112,8 @@ kotlin {
             dependencies {
                 implementation("io.ktor:ktor-client-cio:2.3.5")
                 implementation(compose.desktop.currentOs)
+                // Webcam capture - JavaCV (used by DesktopCameraServiceImpl)
+                implementation("org.bytedeco:javacv-platform:1.5.10")
             }
         }
 
