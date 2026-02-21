@@ -36,7 +36,8 @@ import com.fivucsas.shared.ui.theme.AppColors
 @Composable
 fun ActivityHistoryScreen(
     currentRoute: String,
-    onNavigateBottom: (String) -> Unit
+    onNavigateBottom: (String) -> Unit,
+    navItems: List<com.fivucsas.shared.ui.components.organisms.BottomNavItem> = com.fivucsas.mobile.android.ui.navigation.BottomNavDestinations.items
 ) {
     val filters = listOf(
         FilterChipItem("All", "all"),
@@ -111,7 +112,7 @@ fun ActivityHistoryScreen(
         },
         bottomBar = {
             BottomNavBar(
-                items = com.fivucsas.mobile.android.ui.navigation.BottomNavDestinations.items,
+                items = navItems,
                 currentRoute = currentRoute,
                 onItemSelected = { onNavigateBottom(it.route) }
             )

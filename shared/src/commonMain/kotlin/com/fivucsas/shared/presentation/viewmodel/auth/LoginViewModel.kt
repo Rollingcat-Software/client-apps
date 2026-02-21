@@ -1,5 +1,6 @@
 package com.fivucsas.shared.presentation.viewmodel.auth
 
+import com.fivucsas.shared.domain.model.UserRole
 import com.fivucsas.shared.domain.repository.AuthTokens
 import com.fivucsas.shared.domain.usecase.auth.LoginUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -10,7 +11,8 @@ data class LoginState(
     val isLoading: Boolean = false,
     val error: String? = null,
     val tokens: AuthTokens? = null,
-    val isSuccess: Boolean = false
+    val isSuccess: Boolean = false,
+    val role: UserRole? = null
 )
 
 class LoginViewModel(
@@ -19,6 +21,10 @@ class LoginViewModel(
     private val _state = MutableStateFlow(LoginState())
     val state: StateFlow<LoginState> = _state.asStateFlow()
 
+    companion object {
+        var devMockRole: UserRole = UserRole.SUPERADMIN
+    }
+
     suspend fun login(email: String, password: String) {
         _state.value = LoginState(isLoading = true)
 //        loginUseCase(email, password).fold(
@@ -26,7 +32,8 @@ class LoginViewModel(
 //                _state.value = LoginState(
 //                    isLoading = false,
 //                    tokens = tokens,
-//                    isSuccess = true
+//                    isSuccess = true,
+//                    role = UserRole.fromString(tokens.role)
 //                )
 //            },
 //            onFailure = { error ->
@@ -42,9 +49,11 @@ class LoginViewModel(
             tokens = AuthTokens(
                 accessToken = "dev-token",
                 refreshToken = "dev-refresh",
-                expiresIn = 3600
+                expiresIn = 3600,
+                role = devMockRole.name
             ),
-            isSuccess = true
+            isSuccess = true,
+            role = devMockRole
         )
     }
 

@@ -45,7 +45,9 @@ import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import com.fivucsas.desktop.ui.admin.AdminDashboard
 import com.fivucsas.desktop.ui.kiosk.KioskMode
+import com.fivucsas.shared.data.local.TokenManager
 import com.fivucsas.shared.di.getAppModules
+import org.koin.java.KoinJavaComponent.inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -157,19 +159,33 @@ private fun AppContent(
     currentMode: AppMode,
     onNavigate: (AppMode) -> Unit
 ) {
+    val tokenManager: TokenManager by inject(TokenManager::class.java)
+    val persistedRole = tokenManager.getRole()
+    val adminAllowed = persistedRole == null ||
+            persistedRole == "SUPERADMIN" ||
+            persistedRole == "ORG_ADMIN"
+
     when (currentMode) {
         AppMode.LAUNCHER -> LauncherScreen(
             onKioskSelected = { onNavigate(AppMode.KIOSK) },
-            onAdminSelected = { onNavigate(AppMode.ADMIN) }
+            onAdminSelected = {
+                if (adminAllowed) onNavigate(AppMode.ADMIN)
+            }
         )
 
         AppMode.KIOSK -> KioskMode(
             onBack = { onNavigate(AppMode.LAUNCHER) }
         )
 
-        AppMode.ADMIN -> AdminDashboard(
-            onBack = { onNavigate(AppMode.LAUNCHER) }
-        )
+        AppMode.ADMIN -> {
+            if (adminAllowed) {
+                AdminDashboard(
+                    onBack = { onNavigate(AppMode.LAUNCHER) }
+                )
+            } else {
+                onNavigate(AppMode.LAUNCHER)
+            }
+        }
     }
 }
 

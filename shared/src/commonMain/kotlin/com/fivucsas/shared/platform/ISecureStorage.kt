@@ -97,4 +97,5 @@ object StorageKeys {
     const val THEME_MODE = "theme_mode"
     const val LANGUAGE = "language"
     const val LAST_SYNC = "last_sync"
+    const val USER_ROLE = "user_role"
 }

@@ -12,4 +12,16 @@ object BottomNavDestinations {
         BottomNavItem("History", Icons.Default.History, Screen.ActivityHistory.route),
         BottomNavItem("Profile", Icons.Default.Person, Screen.Profile.route)
     )
+
+    val adminItems = listOf(
+        BottomNavItem("Dashboard", Icons.Default.Home, Screen.AdminDashboard.route),
+        BottomNavItem("History", Icons.Default.History, Screen.ActivityHistory.route),
+        BottomNavItem("Profile", Icons.Default.Person, Screen.Profile.route)
+    )
+
+    val operatorItems = listOf(
+        BottomNavItem("Dashboard", Icons.Default.Home, Screen.OperatorDashboard.route),
+        BottomNavItem("History", Icons.Default.History, Screen.ActivityHistory.route),
+        BottomNavItem("Profile", Icons.Default.Person, Screen.Profile.route)
+    )
 }
