@@ -21,7 +21,6 @@ class LoginViewModel(
 
     suspend fun login(email: String, password: String) {
         _state.value = LoginState(isLoading = true)
-
         loginUseCase(email, password).fold(
             onSuccess = { tokens ->
                 _state.value = LoginState(
