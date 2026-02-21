@@ -21,30 +21,21 @@ class LoginViewModel(
 
     suspend fun login(email: String, password: String) {
         _state.value = LoginState(isLoading = true)
-//        loginUseCase(email, password).fold(
-//            onSuccess = { tokens ->
-//                _state.value = LoginState(
-//                    isLoading = false,
-//                    tokens = tokens,
-//                    isSuccess = true
-//                )
-//            },
-//            onFailure = { error ->
-//                _state.value = LoginState(
-//                    isLoading = false,
-//                    error = error.message ?: "Login failed"
-//                )
-//            }
-//        )
-        // TODO: Geçici olarak doğrulama atlanıyor - backend hazır olduğunda kaldırılacak
-        _state.value = LoginState(
-            isLoading = false,
-            tokens = AuthTokens(
-                accessToken = "dev-token",
-                refreshToken = "dev-refresh",
-                expiresIn = 3600
-            ),
-            isSuccess = true
+
+        loginUseCase(email, password).fold(
+            onSuccess = { tokens ->
+                _state.value = LoginState(
+                    isLoading = false,
+                    tokens = tokens,
+                    isSuccess = true
+                )
+            },
+            onFailure = { error ->
+                _state.value = LoginState(
+                    isLoading = false,
+                    error = error.message ?: "Login failed"
+                )
+            }
         )
     }
 

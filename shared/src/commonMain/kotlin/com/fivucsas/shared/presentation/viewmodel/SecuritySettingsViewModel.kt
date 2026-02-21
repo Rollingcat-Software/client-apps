@@ -55,6 +55,7 @@ class SecuritySettingsViewModel(
                 )
             }
             .onFailure { throwable ->
+                println("StepUp registerDevice error: ${throwable.message}")
                 _state.value = _state.value.copy(
                     isLoading = false,
                     error = resolveErrorMessage(throwable)
@@ -73,6 +74,7 @@ class SecuritySettingsViewModel(
                 )
             }
             .onFailure { throwable ->
+                println("StepUp stepUp error: ${throwable.message}")
                 _state.value = _state.value.copy(
                     isLoading = false,
                     error = resolveErrorMessage(throwable)

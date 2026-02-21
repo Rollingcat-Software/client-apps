@@ -1,4 +1,4 @@
-package com.fivucsas.shared.di
+﻿package com.fivucsas.shared.di
 
 import com.fivucsas.shared.data.local.TokenManager
 import com.fivucsas.shared.data.local.TokenStorage
@@ -73,12 +73,13 @@ val networkModule = module {
             defaultRequest {
                 url(ApiConfig.identityBaseUrl + "/")
 
-                // Add JWT token to all requests (except auth endpoints)
+                // Add JWT token to protected endpoints.
                 val accessToken = tokenManager.getAccessToken()
+                val isPublicAuthEndpoint =
+                    url.toString().contains("/auth/login") || url.toString().contains("/auth/register")
+                val shouldAttachAuthHeader = accessToken != null && !isPublicAuthEndpoint
 
-                if (accessToken != null &&
-                    !url.toString().contains("/auth/login") &&
-                    !url.toString().contains("/auth/register")) {
+                if (shouldAttachAuthHeader) {
                     header(HttpHeaders.Authorization, "Bearer $accessToken")
                 }
             }
@@ -112,7 +113,9 @@ val networkModule = module {
 
                 // Add JWT token for authenticated biometric operations
                 val accessToken = tokenManager.getAccessToken()
-                if (accessToken != null) {
+                val shouldAttachAuthHeader = accessToken != null
+
+                if (shouldAttachAuthHeader) {
                     header(HttpHeaders.Authorization, "Bearer $accessToken")
                 }
             }
@@ -130,5 +133,6 @@ val networkModule = module {
             stepUpUseCase = get()
         )
     }
-    single<BiometricStepUpApi> { BiometricStepUpApiImpl(get(named("biometricClient")), get()) }
+    single<BiometricStepUpApi> { BiometricStepUpApiImpl(get(named("identityClient")), get()) }
 }
+

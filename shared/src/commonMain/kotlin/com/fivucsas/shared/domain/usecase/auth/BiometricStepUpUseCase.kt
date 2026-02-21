@@ -36,7 +36,8 @@ class BiometricStepUpUseCase(
     suspend fun stepUp(reason: String): StepUpDto {
         val keyId = ensureKeyId()
         val challenge = api.createChallenge()
-        val nonceBytes = Base64.decode(challenge.nonceBase64)
+        val nonceBytes = runCatching { Base64.decode(challenge.nonceBase64) }
+            .getOrElse { challenge.nonceBase64.encodeToByteArray() }
         val signatureBytes = authenticator.signNonceWithBiometric(
             keyId = keyId,
             nonce = nonceBytes,

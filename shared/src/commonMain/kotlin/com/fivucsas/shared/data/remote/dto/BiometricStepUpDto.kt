@@ -9,12 +9,9 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class RegisterDeviceRequestDto(
-    @SerialName("key_id")
     val keyId: String,
     val platform: String,
-    @SerialName("public_key_jwk")
     val publicKeyJwk: PublicKeyJwkRequestDto,
-    @SerialName("device_label")
     val deviceLabel: String? = null
 )
 
@@ -49,11 +46,8 @@ data class CreateChallengeResponseDto(
 
 @Serializable
 data class VerifyChallengeRequestDto(
-    @SerialName("challenge_id")
     val challengeId: String,
-    @SerialName("key_id")
     val keyId: String,
-    @SerialName("signature_base64")
     val signatureBase64: String
 )
 
