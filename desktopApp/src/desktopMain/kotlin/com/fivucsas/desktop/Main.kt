@@ -25,6 +25,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -41,18 +44,14 @@ import androidx.compose.ui.window.WindowPlacement
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import com.fivucsas.desktop.ui.admin.AdminDashboard
-import com.fivucsas.desktop.ui.auth.QrLoginScreen
 import com.fivucsas.desktop.ui.kiosk.KioskMode
 import com.fivucsas.shared.data.local.TokenManager
 import com.fivucsas.shared.di.getAppModules
-import com.fivucsas.shared.presentation.viewmodel.auth.LoginViewModel
-import com.fivucsas.shared.presentation.viewmodel.auth.RegisterViewModel
-import com.fivucsas.shared.ui.navigation.AppRoute
-import com.fivucsas.shared.ui.navigation.AppStartState
-import com.fivucsas.shared.ui.navigation.RouteContent
-import com.fivucsas.shared.ui.navigation.SharedAppRoot
+import org.koin.java.KoinJavaComponent.inject
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import org.koin.core.context.startKoin
-import org.koin.compose.koinInject
 
 /**
  * FIVUCSAS Desktop Application
@@ -97,6 +96,19 @@ private object Dimens {
 }
 
 /**
+ * Application State Manager
+ * Implements Single Responsibility Principle - only manages navigation state
+ */
+class AppStateManager {
+    private val _currentMode = MutableStateFlow(AppMode.LAUNCHER)
+    val currentMode: StateFlow<AppMode> = _currentMode.asStateFlow()
+
+    fun navigateTo(mode: AppMode) {
+        _currentMode.value = mode
+    }
+}
+
+/**
  * Main entry point with proper separation of concerns
  */
 fun main() {
@@ -106,6 +118,10 @@ fun main() {
     }
 
     application {
+        // State management separated from UI
+        val stateManager = remember { AppStateManager() }
+        val currentMode by stateManager.currentMode.collectAsState()
+
         Window(
             onCloseRequest = ::exitApplication,
             title = AppConfig.WINDOW_TITLE,
@@ -118,7 +134,10 @@ fun main() {
             MaterialTheme(
                 colorScheme = darkColorScheme()
             ) {
-                DesktopAppRoot()
+                AppContent(
+                    currentMode = currentMode,
+                    onNavigate = stateManager::navigateTo
+                )
             }
         }
 
@@ -132,50 +151,42 @@ fun main() {
 }
 
 /**
- * Desktop app root - shared navigation with desktop-specific routes.
+ * Main application content - follows Open/Closed Principle
+ * Easy to add new modes without modifying existing code
  */
 @Composable
-private fun DesktopAppRoot() {
-    val tokenManager = koinInject<TokenManager>()
-    val loginViewModel = koinInject<LoginViewModel>()
-    val registerViewModel = koinInject<RegisterViewModel>()
+private fun AppContent(
+    currentMode: AppMode,
+    onNavigate: (AppMode) -> Unit
+) {
+    val tokenManager: TokenManager by inject(TokenManager::class.java)
+    val persistedRole = tokenManager.getRole()
+    val adminAllowed = persistedRole == null ||
+            persistedRole == "SUPERADMIN" ||
+            persistedRole == "ORG_ADMIN"
 
-    val platformRoutes: Map<String, RouteContent> = mapOf(
-        AppRoute.Dashboard.id to { navigator, _ ->
-            LauncherScreen(
-                onKioskSelected = { navigator.navigate(AppRoute.Platform(DesktopRoutes.KIOSK)) },
-                onAdminSelected = { navigator.navigate(AppRoute.Platform(DesktopRoutes.ADMIN)) }
-            )
-        },
-        DesktopRoutes.KIOSK to { navigator, _ ->
-            KioskMode(onBack = { navigator.pop() })
-        },
-        DesktopRoutes.ADMIN to { navigator, _ ->
-            AdminDashboard(onBack = { navigator.pop() })
-        },
-        DesktopRoutes.QR_LOGIN to { navigator, _ ->
-            QrLoginScreen(
-                onContinue = {
-                    navigator.navigate(AppRoute.Dashboard, clearBackStack = true)
-                },
-                onBackToLogin = {
-                    navigator.navigate(AppRoute.Login, clearBackStack = true)
-                }
-            )
+    when (currentMode) {
+        AppMode.LAUNCHER -> LauncherScreen(
+            onKioskSelected = { onNavigate(AppMode.KIOSK) },
+            onAdminSelected = {
+                if (adminAllowed) onNavigate(AppMode.ADMIN)
+            }
+        )
+
+        AppMode.KIOSK -> KioskMode(
+            onBack = { onNavigate(AppMode.LAUNCHER) }
+        )
+
+        AppMode.ADMIN -> {
+            if (adminAllowed) {
+                AdminDashboard(
+                    onBack = { onNavigate(AppMode.LAUNCHER) }
+                )
+            } else {
+                onNavigate(AppMode.LAUNCHER)
+            }
         }
-    )
-
-    SharedAppRoot(
-        startState = AppStartState(
-            isFirstLaunch = false,
-            isAuthenticated = tokenManager.isAuthenticated()
-        ),
-        onFirstLaunchComplete = { },
-        loginViewModel = loginViewModel,
-        registerViewModel = registerViewModel,
-        onLoginSuccessRoute = AppRoute.Platform(DesktopRoutes.QR_LOGIN),
-        platformRoutes = platformRoutes
-    )
+    }
 }
 
 /**
@@ -428,8 +439,12 @@ fun ModeCard(
     }
 }
 
-private object DesktopRoutes {
-    const val KIOSK = "desktop.kiosk"
-    const val ADMIN = "desktop.admin"
-    const val QR_LOGIN = "desktop.qr-login"
+/**
+ * Application Mode Enum
+ * Can be moved to separate file for better organization
+ */
+enum class AppMode {
+    LAUNCHER,
+    KIOSK,
+    ADMIN
 }

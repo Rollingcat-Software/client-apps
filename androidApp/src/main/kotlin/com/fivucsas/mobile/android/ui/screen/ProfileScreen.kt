@@ -28,6 +28,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.fivucsas.shared.config.UIDimens
+import com.fivucsas.shared.domain.model.Permission
+import com.fivucsas.shared.domain.model.UserRole
+import com.fivucsas.shared.domain.model.hasPermission
 import com.fivucsas.shared.ui.components.atoms.SectionHeader
 import com.fivucsas.shared.ui.components.atoms.StatusBadge
 import com.fivucsas.shared.ui.components.atoms.StatusBadgeType
@@ -39,12 +42,14 @@ import com.fivucsas.shared.ui.theme.AppColors
 fun ProfileScreen(
     userName: String,
     userEmail: String,
+    userRole: UserRole = UserRole.USER,
     currentRoute: String,
     onNavigateBottom: (String) -> Unit,
     onEditProfile: () -> Unit,
     onChangePassword: () -> Unit,
     onReEnroll: () -> Unit,
-    onOpenSettings: () -> Unit
+    onOpenSettings: () -> Unit,
+    navItems: List<com.fivucsas.shared.ui.components.organisms.BottomNavItem> = com.fivucsas.mobile.android.ui.navigation.BottomNavDestinations.items
 ) {
     Scaffold(
         topBar = {
@@ -63,7 +68,7 @@ fun ProfileScreen(
         },
         bottomBar = {
             BottomNavBar(
-                items = com.fivucsas.mobile.android.ui.navigation.BottomNavDestinations.items,
+                items = navItems,
                 currentRoute = currentRoute,
                 onItemSelected = { onNavigateBottom(it.route) }
             )
@@ -164,8 +169,10 @@ fun ProfileScreen(
                 Button(onClick = onChangePassword, modifier = Modifier.fillMaxWidth()) {
                     Text("Change Password")
                 }
-                Button(onClick = onReEnroll, modifier = Modifier.fillMaxWidth()) {
-                    Text("Re-Enroll Face")
+                if (userRole.hasPermission(Permission.ENROLL_FACE)) {
+                    Button(onClick = onReEnroll, modifier = Modifier.fillMaxWidth()) {
+                        Text("Re-Enroll Face")
+                    }
                 }
                 Button(
                     onClick = onOpenSettings,
