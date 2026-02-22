@@ -151,7 +151,7 @@ fun BiometricVerifyScreen(
                                     val imageBytes = image.toCompressedJpegBytes()
                                     image.close()
                                     scope.launch {
-                                        viewModel.verifyFace(imageBytes)
+                                        viewModel.verifyFace(userId, imageBytes)
                                     }
                                 }
 

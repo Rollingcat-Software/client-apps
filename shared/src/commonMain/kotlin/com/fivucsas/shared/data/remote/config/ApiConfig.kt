@@ -1,4 +1,4 @@
-package com.fivucsas.shared.data.remote.config
+﻿package com.fivucsas.shared.data.remote.config
 
 /**
  * API Configuration
@@ -85,3 +85,4 @@ object ApiConfig {
      */
     var useRealApi: Boolean = true // Set to false to use mock data
 }
+
