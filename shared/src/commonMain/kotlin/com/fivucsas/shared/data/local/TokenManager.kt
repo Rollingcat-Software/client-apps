@@ -12,6 +12,7 @@ class TokenManager(
     private val tokenStorage: TokenStorage
 ) {
     private var cachedTokens: AuthTokens? = null
+    private var cachedRole: String? = null
 
     /**
      * Save authentication tokens
@@ -19,6 +20,8 @@ class TokenManager(
     fun saveTokens(tokens: AuthTokens) {
         cachedTokens = tokens
         tokenStorage.saveToken(tokens.accessToken)
+        tokenStorage.saveRole(tokens.role)
+        cachedRole = tokens.role
     }
 
     /**
@@ -43,11 +46,20 @@ class TokenManager(
     }
 
     /**
+     * Get current user role
+     */
+    fun getRole(): String? {
+        return cachedRole ?: tokenStorage.getRole()
+    }
+
+    /**
      * Clear all tokens (logout)
      */
     fun clearTokens() {
         cachedTokens = null
+        cachedRole = null
         tokenStorage.clearToken()
+        tokenStorage.clearRole()
     }
 
     /**
