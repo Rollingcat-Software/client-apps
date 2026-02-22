@@ -1,15 +1,11 @@
 package com.fivucsas.shared.di
 
-import androidx.biometric.BiometricManager
-import com.fivucsas.shared.data.local.BiometricStepUpLocalStore
-import com.fivucsas.shared.domain.biometric.BiometricAuthenticator
 import com.fivucsas.shared.platform.AndroidCameraService
-import com.fivucsas.shared.platform.AndroidBiometricStepUpLocalStore
 import com.fivucsas.shared.platform.AndroidTokenStorage
 import com.fivucsas.shared.platform.ICameraService
-import com.fivucsas.shared.platform.biometric.AndroidBiometricAuthenticator
 import com.fivucsas.shared.data.local.TokenStorage
 import org.koin.android.ext.koin.androidContext
+import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.bind
 import org.koin.dsl.module
 
@@ -41,19 +37,5 @@ actual val platformModule = module {
     // Secure storage using EncryptedSharedPreferences
     single<TokenStorage> {
         AndroidTokenStorage(androidContext())
-    }
-
-    single {
-        BiometricManager.from(androidContext())
-    }
-
-    single<BiometricAuthenticator> {
-        AndroidBiometricAuthenticator(
-            biometricManager = get()
-        )
-    }
-
-    single<BiometricStepUpLocalStore> {
-        AndroidBiometricStepUpLocalStore(androidContext())
     }
 }

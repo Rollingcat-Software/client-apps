@@ -2,7 +2,6 @@ package com.fivucsas.shared.di
 
 import com.fivucsas.shared.presentation.viewmodel.AdminViewModel
 import com.fivucsas.shared.presentation.viewmodel.KioskViewModel
-import com.fivucsas.shared.presentation.viewmodel.SecuritySettingsViewModel
 import com.fivucsas.shared.presentation.viewmodel.auth.BiometricViewModel
 import com.fivucsas.shared.presentation.viewmodel.auth.LoginViewModel
 import com.fivucsas.shared.presentation.viewmodel.auth.RegisterViewModel
@@ -19,5 +18,4 @@ val viewModelModule = module {
     factoryOf(::LoginViewModel)
     factoryOf(::RegisterViewModel)
     factoryOf(::BiometricViewModel)
-    factoryOf(::SecuritySettingsViewModel)
 }

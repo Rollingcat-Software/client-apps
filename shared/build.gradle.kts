@@ -92,7 +92,6 @@ kotlin {
                 // Android specific
                 implementation("androidx.security:security-crypto:1.1.0-alpha06")
                 implementation("androidx.activity:activity-compose:1.8.1")
-                implementation("androidx.biometric:biometric:1.1.0")
 
                 // CameraX (used by AndroidCameraService + preview)
                 implementation("androidx.camera:camera-core:1.3.0")
