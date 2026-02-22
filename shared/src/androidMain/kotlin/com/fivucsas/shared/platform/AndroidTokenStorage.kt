@@ -32,20 +32,7 @@ class AndroidTokenStorage(context: Context) : TokenStorage {
         sharedPreferences.edit().remove(KEY_TOKEN).apply()
     }
 
-    override fun saveRole(role: String) {
-        sharedPreferences.edit().putString(KEY_ROLE, role).apply()
-    }
-
-    override fun getRole(): String? {
-        return sharedPreferences.getString(KEY_ROLE, null)
-    }
-
-    override fun clearRole() {
-        sharedPreferences.edit().remove(KEY_ROLE).apply()
-    }
-
     companion object {
         private const val KEY_TOKEN = "auth_token"
-        private const val KEY_ROLE = "user_role"
     }
 }
