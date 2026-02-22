@@ -14,6 +14,7 @@ class DesktopTokenStorage : TokenStorage {
 
     companion object {
         private const val KEY_ACCESS_TOKEN = "access_token"
+        private const val KEY_ROLE = "user_role"
     }
 
     override fun saveToken(token: String) {
@@ -27,6 +28,20 @@ class DesktopTokenStorage : TokenStorage {
 
     override fun clearToken() {
         prefs.remove(KEY_ACCESS_TOKEN)
+        prefs.flush()
+    }
+
+    override fun saveRole(role: String) {
+        prefs.put(KEY_ROLE, role)
+        prefs.flush()
+    }
+
+    override fun getRole(): String? {
+        return prefs.get(KEY_ROLE, null)
+    }
+
+    override fun clearRole() {
+        prefs.remove(KEY_ROLE)
         prefs.flush()
     }
 }
