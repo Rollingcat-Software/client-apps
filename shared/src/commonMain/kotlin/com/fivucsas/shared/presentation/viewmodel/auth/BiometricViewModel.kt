@@ -51,10 +51,10 @@ class BiometricViewModel(
         )
     }
 
-    suspend fun verifyFace(userId: String, imageBytes: ByteArray) {
+    suspend fun verifyFace(imageBytes: ByteArray) {
         _state.value = BiometricState(isLoading = true)
 
-        verifyUserUseCase(userId, imageBytes).fold(
+        verifyUserUseCase(imageBytes).fold(
             onSuccess = { verificationResult ->
                 _state.value = BiometricState(
                     isLoading = false,
