@@ -16,6 +16,11 @@ sealed class AppRoute(val id: String) {
     object Help : AppRoute("help")
     object About : AppRoute("about")
     object QrLoginScan : AppRoute("qr-login-scan")
+    object QrLoginDisplay : AppRoute("qr-login-display")
+
+    data class FingerprintGate(val targetRouteId: String) : AppRoute(FINGERPRINT_GATE)
+    object FingerprintSuccess : AppRoute(FINGERPRINT_SUCCESS)
+    object FingerprintFailure : AppRoute(FINGERPRINT_FAILURE)
 
     data class BiometricEnroll(val userId: String) : AppRoute(BIOMETRIC_ENROLL)
     data class BiometricVerify(val userId: String) : AppRoute(BIOMETRIC_VERIFY)
@@ -25,5 +30,8 @@ sealed class AppRoute(val id: String) {
     companion object {
         const val BIOMETRIC_ENROLL = "biometric/enroll"
         const val BIOMETRIC_VERIFY = "biometric/verify"
+        const val FINGERPRINT_GATE = "fingerprint/gate"
+        const val FINGERPRINT_SUCCESS = "fingerprint/success"
+        const val FINGERPRINT_FAILURE = "fingerprint/failure"
     }
 }

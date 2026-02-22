@@ -2,12 +2,17 @@ package com.fivucsas.shared.di
 
 import com.fivucsas.shared.data.local.TokenManager
 import com.fivucsas.shared.data.local.TokenStorage
+import com.fivucsas.shared.data.local.StepUpTokenManager
+import com.fivucsas.shared.data.remote.api.AuthBiometricApi
+import com.fivucsas.shared.data.remote.api.AuthBiometricApiImpl
 import com.fivucsas.shared.data.remote.api.AuthApi
 import com.fivucsas.shared.data.remote.api.AuthApiImpl
 import com.fivucsas.shared.data.remote.api.BiometricApi
 import com.fivucsas.shared.data.remote.api.BiometricApiImpl
 import com.fivucsas.shared.data.remote.api.IdentityApi
 import com.fivucsas.shared.data.remote.api.IdentityApiImpl
+import com.fivucsas.shared.data.remote.api.QrLoginApi
+import com.fivucsas.shared.data.remote.api.QrLoginApiImpl
 import com.fivucsas.shared.data.remote.config.ApiConfig
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.HttpTimeout
@@ -36,6 +41,7 @@ import org.koin.dsl.module
 val networkModule = module {
     // Token Manager (singleton) - must be created before HttpClient
     single { TokenManager(get<TokenStorage>()) }
+    single { StepUpTokenManager() }
 
     // Shared JSON configuration
     single {
@@ -50,6 +56,7 @@ val networkModule = module {
     // Identity Core API HTTP Client (port 8080)
     single(named("identityClient")) {
         val tokenManager = get<TokenManager>()
+        val stepUpTokenManager = get<StepUpTokenManager>()
         val json = get<Json>()
 
         HttpClient {
@@ -79,6 +86,8 @@ val networkModule = module {
                     !url.toString().contains("/auth/register")) {
                     header(HttpHeaders.Authorization, "Bearer $accessToken")
                 }
+
+                stepUpTokenManager.getToken()?.let { header("X-Step-Up-Token", it) }
             }
         }
     }
@@ -119,6 +128,8 @@ val networkModule = module {
 
     // API Implementations with specific HTTP clients
     single<AuthApi> { AuthApiImpl(get(named("identityClient"))) }
+    single<AuthBiometricApi> { AuthBiometricApiImpl(get(named("identityClient"))) }
     single<IdentityApi> { IdentityApiImpl(get(named("identityClient"))) }
+    single<QrLoginApi> { QrLoginApiImpl(get(named("identityClient"))) }
     single<BiometricApi> { BiometricApiImpl(get(named("biometricClient"))) }
 }

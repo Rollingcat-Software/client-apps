@@ -2,7 +2,12 @@ package com.fivucsas.shared.ui.navigation
 
 import androidx.compose.runtime.Composable
 import com.fivucsas.shared.presentation.viewmodel.auth.LoginViewModel
+import com.fivucsas.shared.presentation.viewmodel.auth.FingerprintViewModel
 import com.fivucsas.shared.presentation.viewmodel.auth.RegisterViewModel
+import com.fivucsas.shared.platform.isFingerprintFlowAvailable
+import com.fivucsas.shared.ui.screen.FingerprintGateScreen
+import com.fivucsas.shared.ui.screen.FingerprintFailureScreen
+import com.fivucsas.shared.ui.screen.FingerprintSuccessScreen
 import com.fivucsas.shared.ui.screen.LoginScreen
 import com.fivucsas.shared.ui.screen.MissingRouteScreen
 import com.fivucsas.shared.ui.screen.OnboardingScreen
@@ -22,6 +27,7 @@ fun SharedAppRoot(
     onFirstLaunchComplete: () -> Unit,
     loginViewModel: LoginViewModel,
     registerViewModel: RegisterViewModel,
+    fingerprintViewModel: FingerprintViewModel? = null,
     onLoginSuccessRoute: AppRoute = AppRoute.Dashboard,
     platformRoutes: Map<String, RouteContent> = emptyMap(),
     navigator: AppNavigator = rememberAppNavigator(start = AppRoute.Splash)
@@ -32,6 +38,7 @@ fun SharedAppRoot(
         onFirstLaunchComplete = onFirstLaunchComplete,
         loginViewModel = loginViewModel,
         registerViewModel = registerViewModel,
+        fingerprintViewModel = fingerprintViewModel,
         onLoginSuccessRoute = onLoginSuccessRoute,
         platformRoutes = platformRoutes
     )
@@ -44,6 +51,7 @@ private fun AppNavigation(
     onFirstLaunchComplete: () -> Unit,
     loginViewModel: LoginViewModel,
     registerViewModel: RegisterViewModel,
+    fingerprintViewModel: FingerprintViewModel?,
     onLoginSuccessRoute: AppRoute,
     platformRoutes: Map<String, RouteContent>
 ) {
@@ -51,9 +59,12 @@ private fun AppNavigation(
         AppRoute.Splash -> SplashScreen(
             isFirstLaunch = startState.isFirstLaunch,
             isAuthenticated = startState.isAuthenticated,
+            userRole = null,
             onNavigateToOnboarding = { navigator.navigate(AppRoute.Onboarding, clearBackStack = true) },
             onNavigateToLogin = { navigator.navigate(AppRoute.Login, clearBackStack = true) },
-            onNavigateToDashboard = { navigator.navigate(AppRoute.Dashboard, clearBackStack = true) }
+            onNavigateToDashboard = { navigator.navigate(onLoginSuccessRoute, clearBackStack = true) },
+            onNavigateToAdminDashboard = { navigator.navigate(onLoginSuccessRoute, clearBackStack = true) },
+            onNavigateToOperatorDashboard = { navigator.navigate(onLoginSuccessRoute, clearBackStack = true) }
         )
 
         AppRoute.Onboarding -> OnboardingScreen(
@@ -71,7 +82,16 @@ private fun AppNavigation(
             viewModel = loginViewModel,
             onNavigateToRegister = { navigator.navigate(AppRoute.Register) },
             onNavigateToForgotPassword = { navigator.navigate(AppRoute.ForgotPassword) },
-            onLoginSuccess = { navigator.navigate(onLoginSuccessRoute, clearBackStack = true) }
+            onLoginSuccess = {
+                if (isFingerprintFlowAvailable() && fingerprintViewModel != null) {
+                    navigator.navigate(
+                        AppRoute.FingerprintGate(targetRouteId = onLoginSuccessRoute.id),
+                        clearBackStack = true
+                    )
+                } else {
+                    navigator.navigate(onLoginSuccessRoute, clearBackStack = true)
+                }
+            }
         )
 
         AppRoute.Register -> RegisterScreen(
@@ -79,6 +99,45 @@ private fun AppNavigation(
             onNavigateBack = { navigator.pop() },
             onRegisterSuccess = { navigator.navigate(AppRoute.Dashboard, clearBackStack = true) }
         )
+
+        is AppRoute.FingerprintGate -> {
+            if (isFingerprintFlowAvailable() && fingerprintViewModel != null) {
+                FingerprintGateScreen(
+                    viewModel = fingerprintViewModel,
+                    onStart = { fingerprintViewModel.startStepUp() },
+                    onSkip = { navigator.navigate(onLoginSuccessRoute, clearBackStack = true) },
+                    onBack = { navigator.pop() },
+                    onSuccess = { navigator.navigate(AppRoute.FingerprintSuccess, replace = true) },
+                    onFailure = { navigator.navigate(AppRoute.FingerprintFailure, replace = true) }
+                )
+            } else {
+                MissingRouteScreen(
+                    routeId = route.id,
+                    onBack = { navigator.pop() }
+                )
+            }
+        }
+
+        AppRoute.FingerprintSuccess -> {
+            val token = fingerprintViewModel?.state?.value
+                ?.let { it as? com.fivucsas.shared.presentation.viewmodel.auth.FingerprintUiState.Success }
+                ?.stepUpToken
+            FingerprintSuccessScreen(
+                stepUpToken = token,
+                onContinue = { navigator.navigate(onLoginSuccessRoute, clearBackStack = true) }
+            )
+        }
+
+        AppRoute.FingerprintFailure -> {
+            val failureState = fingerprintViewModel?.state?.value
+                as? com.fivucsas.shared.presentation.viewmodel.auth.FingerprintUiState.Error
+            FingerprintFailureScreen(
+                message = failureState?.message ?: "Fingerprint verification failed.",
+                recoverable = failureState?.recoverable ?: true,
+                onRetry = { navigator.pop() },
+                onBack = { navigator.pop() }
+            )
+        }
 
         else -> {
             val content = platformRoutes[route.id]

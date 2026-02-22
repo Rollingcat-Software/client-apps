@@ -3,9 +3,11 @@ package com.fivucsas.shared.di
 import com.fivucsas.shared.platform.ICameraService
 import com.fivucsas.shared.platform.ISecureStorage
 import com.fivucsas.shared.platform.ILogger
+import com.fivucsas.shared.platform.FingerprintAuthenticator
 import com.fivucsas.shared.platform.IosCameraService
 import com.fivucsas.shared.platform.IosSecureStorage
 import com.fivucsas.shared.platform.IosLogger
+import com.fivucsas.shared.platform.providePlatformFingerprintAuthenticator
 import org.koin.dsl.module
 
 /**
@@ -37,4 +39,7 @@ actual val platformModule = module {
 
     // Logger - Singleton for centralized logging
     single<ILogger> { IosLogger() }
+
+    // Fingerprint Authenticator - iOS stub for now
+    single<FingerprintAuthenticator> { providePlatformFingerprintAuthenticator() }
 }

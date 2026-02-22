@@ -110,7 +110,7 @@ private const val STEP_CAPTURE = "CAPTURE"
 private const val STEP_PREVIEW = "PREVIEW"
 
 // ---------------------------------------------------------------------------
-// Form state (local UI concern – not persisted in ViewModel)
+// Form state (local UI concern â€“ not persisted in ViewModel)
 // ---------------------------------------------------------------------------
 
 private data class EnrollmentFormState(
@@ -127,7 +127,7 @@ private data class EnrollmentFormState(
 )
 
 // ---------------------------------------------------------------------------
-// Main Screen – orchestrates Form → Capture → Preview → Success
+// Main Screen â€“ orchestrates Form â†’ Capture â†’ Preview â†’ Success
 // ---------------------------------------------------------------------------
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -138,7 +138,7 @@ fun BiometricEnrollScreen(
     onNavigateBack: () -> Unit
 ) {
     val state by viewModel.state.collectAsState()
-    var currentStep by rememberSaveable { mutableStateOf(STEP_CARD_CAPTURE) }
+    var currentStep by rememberSaveable { mutableStateOf(STEP_FORM) }
     var formState by remember { mutableStateOf(EnrollmentFormState()) }
     var capturedImageBytes by remember { mutableStateOf<ByteArray?>(null) }
     var cardFrontBytes by remember { mutableStateOf<ByteArray?>(null) }
@@ -160,11 +160,11 @@ fun BiometricEnrollScreen(
                             viewModel.clearState()
                         }
                         currentStep == STEP_CAPTURE -> {
-                            currentStep = STEP_FORM
+                            currentStep = STEP_CARD_CAPTURE
                             viewModel.clearState()
                         }
-                        currentStep == STEP_FORM -> {
-                            currentStep = STEP_CARD_CAPTURE
+                        currentStep == STEP_CARD_CAPTURE -> {
+                            currentStep = STEP_FORM
                         }
                         else -> onNavigateBack()
                     }
@@ -215,10 +215,10 @@ fun BiometricEnrollScreen(
                         onCardsCaptured = { front, back ->
                             cardFrontBytes = front
                             cardBackBytes = back
-                            currentStep = STEP_FORM
+                            currentStep = STEP_CAPTURE
                         },
                         onSkip = {
-                            currentStep = STEP_FORM
+                            currentStep = STEP_CAPTURE
                         }
                     )
                 }
@@ -226,7 +226,7 @@ fun BiometricEnrollScreen(
                     EnrollmentFormContent(
                         formState = formState,
                         onFormStateChange = { formState = it },
-                        onProceedToCapture = { currentStep = STEP_CAPTURE },
+                        onProceedToCapture = { currentStep = STEP_CARD_CAPTURE },
                         cardFrontBytes = cardFrontBytes,
                         cardBackBytes = cardBackBytes
                     )
@@ -276,7 +276,7 @@ private fun EnrollmentTopBar(
 }
 
 // ---------------------------------------------------------------------------
-// Step 1 – Enrollment Form
+// Step 1 â€“ Enrollment Form
 // ---------------------------------------------------------------------------
 
 @Composable
@@ -399,7 +399,7 @@ private fun EnrollmentFormContent(
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Validation runs on click but never blocks — errors are advisory.
+        // Validation runs on click but never blocks â€” errors are advisory.
         // This allows development/testing without filling every field.
         Button(
             onClick = {
@@ -415,7 +415,7 @@ private fun EnrollmentFormContent(
             Icon(Icons.Default.CameraAlt, contentDescription = null)
             Spacer(modifier = Modifier.width(8.dp))
             Text(
-                "Proceed to Face Capture",
+                "Continue to Card Scan",
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold
             )
@@ -444,13 +444,13 @@ private fun FormHeaderCard() {
             )
             Column {
                 Text(
-                    "Step 2: Personal Information",
+                    "Step 1: Personal Information",
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onPrimaryContainer
                 )
                 Text(
-                    "Fill in your details below, then proceed to face capture",
+                    "Fill in your details below, then continue to ID card scan",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onPrimaryContainer
                 )
@@ -460,11 +460,11 @@ private fun FormHeaderCard() {
 }
 
 // ---------------------------------------------------------------------------
-// Form validation – reuses shared ValidationRules
+// Form validation â€“ reuses shared ValidationRules
 // ---------------------------------------------------------------------------
 
 /**
- * Validates filled fields only — blank fields are accepted.
+ * Validates filled fields only â€” blank fields are accepted.
  * This makes all fields optional for development/testing while
  * still catching malformed input (e.g. invalid email format).
  */
@@ -602,7 +602,7 @@ private fun CardScannedSummary(
 }
 
 // ---------------------------------------------------------------------------
-// Step 1 – Card Capture (photograph front + back of ID card)
+// Step 1 â€“ Card Capture (photograph front + back of ID card)
 // ---------------------------------------------------------------------------
 
 private const val CARD_PHASE_CAPTURE_FRONT = "CAPTURE_FRONT"
@@ -740,7 +740,7 @@ private fun CardCaptureContent(
 }
 
 // ---------------------------------------------------------------------------
-// Card Capture Viewfinder — camera preview with rectangular card guide
+// Card Capture Viewfinder â€” camera preview with rectangular card guide
 // ---------------------------------------------------------------------------
 
 @Composable
@@ -867,7 +867,7 @@ private fun CardCaptureHeaderCard(modifier: Modifier = Modifier) {
             )
             Column {
                 Text(
-                    "Step 1: Scan Your ID Card",
+                    "Step 2: Scan Your ID Card",
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onPrimaryContainer
@@ -883,7 +883,7 @@ private fun CardCaptureHeaderCard(modifier: Modifier = Modifier) {
 }
 
 // ---------------------------------------------------------------------------
-// Card Preview — shows captured card image (front or back)
+// Card Preview â€” shows captured card image (front or back)
 // ---------------------------------------------------------------------------
 
 @Composable
@@ -985,7 +985,7 @@ private fun CardPreviewContent(
 }
 
 // ---------------------------------------------------------------------------
-// Step 3 – Face Capture (camera only, hands off bytes to preview)
+// Step 3 â€“ Face Capture (camera only, hands off bytes to preview)
 // ---------------------------------------------------------------------------
 
 @OptIn(ExperimentalPermissionsApi::class)
@@ -1183,7 +1183,7 @@ private fun InstructionsCard(modifier: Modifier = Modifier) {
             )
             Spacer(modifier = Modifier.height(4.dp))
             Text(
-                text = "• Ensure good lighting\n• Look directly at camera\n• Remove glasses if wearing",
+                text = "â€¢ Ensure good lighting\nâ€¢ Look directly at camera\nâ€¢ Remove glasses if wearing",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onPrimaryContainer,
                 textAlign = TextAlign.Center
@@ -1284,7 +1284,7 @@ private fun CaptureButton(isLoading: Boolean, onClick: () -> Unit) {
 }
 
 // ---------------------------------------------------------------------------
-// Step 3 – Photo Preview (review before sending)
+// Step 3 â€“ Photo Preview (review before sending)
 // ---------------------------------------------------------------------------
 
 @Composable
@@ -1345,7 +1345,7 @@ private fun PhotoPreviewContent(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // Photo preview — mirrored horizontally to match what the user
+        // Photo preview â€” mirrored horizontally to match what the user
         // saw in the front-camera preview. The non-mirrored bytes are
         // sent to the backend for correct biometric processing.
         if (previewBitmap != null) {

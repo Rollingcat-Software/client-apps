@@ -12,13 +12,18 @@ class AndroidTokenStorage(context: Context) : TokenStorage {
         .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
         .build()
 
-    private val sharedPreferences: SharedPreferences = EncryptedSharedPreferences.create(
-        context,
-        "fivucsas_secure_prefs",
-        masterKey,
-        EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-        EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
-    )
+    private val sharedPreferences: SharedPreferences = runCatching {
+        EncryptedSharedPreferences.create(
+            context,
+            "fivucsas_secure_prefs",
+            masterKey,
+            EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+            EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+        )
+    }.getOrElse {
+        // Fallback prevents startup crash on devices/emulators where crypto init fails.
+        context.getSharedPreferences("fivucsas_secure_prefs_fallback", Context.MODE_PRIVATE)
+    }
 
     override fun saveToken(token: String) {
         sharedPreferences.edit().putString(KEY_TOKEN, token).apply()

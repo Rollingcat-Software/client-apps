@@ -39,6 +39,11 @@ fun ActivityHistoryScreen(
     onNavigateBottom: (String) -> Unit,
     navItems: List<com.fivucsas.shared.ui.components.organisms.BottomNavItem> = com.fivucsas.mobile.android.ui.navigation.BottomNavDestinations.items
 ) {
+    data class HistoryEntry(
+        val category: String,
+        val item: ActivityItemData
+    )
+
     val filters = listOf(
         FilterChipItem("All", "all"),
         FilterChipItem("Verifications", "verification"),
@@ -48,57 +53,86 @@ fun ActivityHistoryScreen(
 
     val sections = listOf(
         "Today" to listOf(
-            ActivityItemData(
-                title = "Verification Successful",
-                description = "Confidence: 94%",
-                timestamp = "10:30 AM",
-                score = "94%",
-                status = StatusBadgeType.Success,
-                icon = Icons.Default.Security,
-                iconTint = AppColors.Success
+            HistoryEntry(
+                category = "verification",
+                item = ActivityItemData(
+                    title = "Verification Successful",
+                    description = "Confidence: 94%",
+                    timestamp = "10:30 AM",
+                    score = "94%",
+                    status = StatusBadgeType.Success,
+                    icon = Icons.Default.Security,
+                    iconTint = AppColors.Success
+                )
             ),
-            ActivityItemData(
-                title = "Verification Successful",
-                description = "Confidence: 91%",
-                timestamp = "09:15 AM",
-                score = "91%",
-                status = StatusBadgeType.Success,
-                icon = Icons.Default.Security,
-                iconTint = AppColors.Success
+            HistoryEntry(
+                category = "verification",
+                item = ActivityItemData(
+                    title = "Verification Successful",
+                    description = "Confidence: 91%",
+                    timestamp = "09:15 AM",
+                    score = "91%",
+                    status = StatusBadgeType.Success,
+                    icon = Icons.Default.Security,
+                    iconTint = AppColors.Success
+                )
             )
         ),
         "Yesterday" to listOf(
-            ActivityItemData(
-                title = "Verification Failed",
-                description = "Low confidence score",
-                timestamp = "3:14 PM",
-                score = "62%",
-                status = StatusBadgeType.Failure,
-                icon = Icons.Default.Security,
-                iconTint = AppColors.Error
+            HistoryEntry(
+                category = "verification",
+                item = ActivityItemData(
+                    title = "Verification Failed",
+                    description = "Low confidence score",
+                    timestamp = "3:14 PM",
+                    score = "62%",
+                    status = StatusBadgeType.Failure,
+                    icon = Icons.Default.Security,
+                    iconTint = AppColors.Error
+                )
             ),
-            ActivityItemData(
-                title = "Verification Successful",
-                description = "Confidence: 91%",
-                timestamp = "3:15 PM",
-                score = "91%",
-                status = StatusBadgeType.Success,
-                icon = Icons.Default.Security,
-                iconTint = AppColors.Success
+            HistoryEntry(
+                category = "verification",
+                item = ActivityItemData(
+                    title = "Verification Successful",
+                    description = "Confidence: 91%",
+                    timestamp = "3:15 PM",
+                    score = "91%",
+                    status = StatusBadgeType.Success,
+                    icon = Icons.Default.Security,
+                    iconTint = AppColors.Success
+                )
             )
         ),
         "January 28, 2026" to listOf(
-            ActivityItemData(
-                title = "Face Enrollment Completed",
-                description = "Quality score: 88%",
-                timestamp = "2:00 PM",
-                score = "88%",
-                status = StatusBadgeType.Info,
-                icon = Icons.Default.CameraAlt,
-                iconTint = AppColors.Primary
+            HistoryEntry(
+                category = "enrollment",
+                item = ActivityItemData(
+                    title = "Face Enrollment Completed",
+                    description = "Quality score: 88%",
+                    timestamp = "2:00 PM",
+                    score = "88%",
+                    status = StatusBadgeType.Info,
+                    icon = Icons.Default.CameraAlt,
+                    iconTint = AppColors.Primary
+                )
             )
         )
     )
+
+    val filteredSections = sections.mapNotNull { (title, entries) ->
+        val filteredEntries = if (selectedFilter == "all") {
+            entries
+        } else {
+            entries.filter { it.category == selectedFilter }
+        }
+
+        if (filteredEntries.isEmpty()) {
+            null
+        } else {
+            title to filteredEntries
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -135,15 +169,15 @@ fun ActivityHistoryScreen(
                 contentPadding = PaddingValues(vertical = 12.dp),
                 verticalArrangement = Arrangement.spacedBy(UIDimens.SpacingSmall)
             ) {
-                sections.forEach { (title, itemsList) ->
+                filteredSections.forEach { (title, itemsList) ->
                     item {
                         SectionHeader(
                             title = title,
                             modifier = Modifier.padding(vertical = 4.dp)
                         )
                     }
-                    items(itemsList) { item ->
-                        ActivityItem(data = item)
+                    items(itemsList) { entry ->
+                        ActivityItem(data = entry.item)
                     }
                 }
             }

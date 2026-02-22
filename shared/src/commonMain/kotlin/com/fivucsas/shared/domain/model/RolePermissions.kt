@@ -42,6 +42,8 @@ object RolePermissions {
         ),
         UserRole.USER to setOf(
             Permission.VIEW_DASHBOARD,
+            Permission.ENROLL_FACE,
+            Permission.VERIFY_FACE,
             Permission.VIEW_OWN_PROFILE
         )
     )

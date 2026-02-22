@@ -24,6 +24,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -49,17 +50,21 @@ import androidx.compose.ui.unit.dp
 import com.fivucsas.shared.platform.AndroidCameraService
 import com.fivucsas.shared.platform.CameraState
 import com.fivucsas.shared.platform.LensFacing
+import com.fivucsas.shared.presentation.viewmodel.auth.QrLoginStatus
+import com.fivucsas.shared.presentation.viewmodel.auth.QrLoginViewModel
 import com.fivucsas.shared.ui.platform.AndroidCameraPreview
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.permissions.shouldShowRationale
 import kotlinx.coroutines.launch
+import org.koin.compose.koinInject
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
-fun QrLoginScanScreen(
-    onNavigateBack: () -> Unit
+fun QRLoginScanScreen(
+    onNavigateBack: () -> Unit,
+    qrLoginViewModel: QrLoginViewModel = koinInject()
 ) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -70,6 +75,8 @@ fun QrLoginScanScreen(
         AndroidCameraService(context, lifecycleOwner)
     }
     val cameraState by cameraService.cameraState.collectAsState()
+    val qrState by qrLoginViewModel.state.collectAsState()
+    var manualQrPayload by rememberSaveable { mutableStateOf("") }
 
     LaunchedEffect(cameraPermissionState.status.isGranted) {
         if (cameraPermissionState.status.isGranted) {
@@ -239,6 +246,62 @@ fun QrLoginScanScreen(
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            OutlinedTextField(
+                value = manualQrPayload,
+                onValueChange = { manualQrPayload = it },
+                modifier = Modifier.fillMaxWidth(),
+                label = { Text("Scanned QR Payload") },
+                placeholder = { Text("fivucsas://qr-login?session=...") },
+                singleLine = true
+            )
+
+            Spacer(modifier = Modifier.height(10.dp))
+
+            Button(
+                onClick = { qrLoginViewModel.submitMobileScan(manualQrPayload) },
+                modifier = Modifier.fillMaxWidth(),
+                enabled = !qrState.isLoading && manualQrPayload.isNotBlank()
+            ) {
+                Text("Submit QR Payload")
+            }
+
+            Spacer(modifier = Modifier.height(10.dp))
+            Text(
+                text = when (qrState.status) {
+                    QrLoginStatus.IDLE -> "Ready to scan QR from desktop/web"
+                    QrLoginStatus.WAITING_FOR_MOBILE_SCAN -> "Waiting for camera scan..."
+                    QrLoginStatus.WAITING_FOR_DESKTOP_APPROVAL -> "QR accepted. Waiting for desktop..."
+                    QrLoginStatus.APPROVED -> "Login request approved. You can return."
+                    QrLoginStatus.ERROR -> qrState.error ?: "QR login error"
+                },
+                style = MaterialTheme.typography.bodySmall,
+                color = if (qrState.status == QrLoginStatus.ERROR) {
+                    MaterialTheme.colorScheme.error
+                } else {
+                    MaterialTheme.colorScheme.onSurfaceVariant
+                },
+                textAlign = TextAlign.Center
+            )
+
+            if (qrState.status == QrLoginStatus.APPROVED) {
+                Spacer(modifier = Modifier.height(10.dp))
+                Button(
+                    onClick = onNavigateBack,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text("Done")
+                }
+            }
         }
     }
+}
+
+@Composable
+fun QrLoginScanScreen(
+    onNavigateBack: () -> Unit
+) {
+    QRLoginScanScreen(onNavigateBack = onNavigateBack)
 }

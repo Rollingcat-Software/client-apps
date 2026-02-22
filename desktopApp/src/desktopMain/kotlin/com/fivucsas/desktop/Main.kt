@@ -15,6 +15,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AdminPanelSettings
+import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.Fingerprint
 import androidx.compose.material.icons.filled.TouchApp
 import androidx.compose.material3.Card
@@ -25,6 +26,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -44,22 +46,27 @@ import androidx.compose.ui.window.WindowPlacement
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import com.fivucsas.desktop.ui.admin.AdminDashboard
+import com.fivucsas.desktop.ui.auth.QrLoginScreen
 import com.fivucsas.desktop.ui.kiosk.KioskMode
 import com.fivucsas.shared.data.local.TokenManager
 import com.fivucsas.shared.di.getAppModules
+import com.fivucsas.shared.presentation.viewmodel.auth.QrLoginStatus
+import com.fivucsas.shared.presentation.viewmodel.auth.QrLoginViewModel
 import org.koin.java.KoinJavaComponent.inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import org.koin.core.context.startKoin
+import org.koin.compose.koinInject
 
 /**
  * FIVUCSAS Desktop Application
  *
  * Main entry point for the desktop application.
- * Provides two modes:
+ * Provides three modes:
  * 1. Kiosk Mode - Self-service enrollment and verification
  * 2. Admin Mode - Management dashboard
+ * 3. QR Login Mode - Desktop QR display for mobile scan
  *
  * Based on Kotlin Multiplatform + Compose Multiplatform
  * Shares 90-95% code with mobile apps
@@ -160,16 +167,28 @@ private fun AppContent(
     onNavigate: (AppMode) -> Unit
 ) {
     val tokenManager: TokenManager by inject(TokenManager::class.java)
+    val qrLoginViewModel: QrLoginViewModel = koinInject()
+    val qrState by qrLoginViewModel.state.collectAsState()
     val persistedRole = tokenManager.getRole()
     val adminAllowed = persistedRole == null ||
             persistedRole == "SUPERADMIN" ||
             persistedRole == "ORG_ADMIN"
+
+    LaunchedEffect(currentMode) {
+        if (currentMode != AppMode.QR_LOGIN) {
+            qrLoginViewModel.stopPolling()
+        }
+    }
 
     when (currentMode) {
         AppMode.LAUNCHER -> LauncherScreen(
             onKioskSelected = { onNavigate(AppMode.KIOSK) },
             onAdminSelected = {
                 if (adminAllowed) onNavigate(AppMode.ADMIN)
+            },
+            onQrLoginSelected = {
+                qrLoginViewModel.startDesktopSession()
+                onNavigate(AppMode.QR_LOGIN)
             }
         )
 
@@ -185,6 +204,28 @@ private fun AppContent(
             } else {
                 onNavigate(AppMode.LAUNCHER)
             }
+        }
+
+        AppMode.QR_LOGIN -> {
+            QrLoginScreen(
+                sessionCode = qrState.sessionId,
+                qrPayload = qrState.qrPayload,
+                status = qrState.status,
+                isLoading = qrState.isLoading,
+                errorMessage = qrState.error,
+                onContinue = {
+                    if (qrState.status != QrLoginStatus.APPROVED) {
+                        return@QrLoginScreen
+                    }
+                    if (adminAllowed) {
+                        onNavigate(AppMode.ADMIN)
+                    } else {
+                        onNavigate(AppMode.KIOSK)
+                    }
+                },
+                onBackToLogin = { onNavigate(AppMode.LAUNCHER) },
+                onRefresh = { qrLoginViewModel.startDesktopSession() }
+            )
         }
     }
 }
@@ -220,7 +261,8 @@ private fun ApplicationScope.AppSystemTray(
 @Composable
 fun LauncherScreen(
     onKioskSelected: () -> Unit,
-    onAdminSelected: () -> Unit
+    onAdminSelected: () -> Unit,
+    onQrLoginSelected: () -> Unit
 ) {
     Box(
         modifier = Modifier
@@ -248,7 +290,8 @@ fun LauncherScreen(
             // Modern Mode Cards
             ModeSelectionCards(
                 onKioskSelected = onKioskSelected,
-                onAdminSelected = onAdminSelected
+                onAdminSelected = onAdminSelected,
+                onQrLoginSelected = onQrLoginSelected
             )
 
             Spacer(modifier = Modifier.height(Dimens.SpacingXXLarge))
@@ -319,7 +362,8 @@ private fun AppLogo() {
 @Composable
 private fun ModeSelectionCards(
     onKioskSelected: () -> Unit,
-    onAdminSelected: () -> Unit
+    onAdminSelected: () -> Unit,
+    onQrLoginSelected: () -> Unit
 ) {
     Row(
         horizontalArrangement = Arrangement.spacedBy(Dimens.SpacingXLarge)
@@ -336,6 +380,13 @@ private fun ModeSelectionCards(
             description = "User management and system configuration",
             icon = Icons.Default.AdminPanelSettings,
             onClick = onAdminSelected
+        )
+
+        ModeCard(
+            title = "QR Login",
+            description = "Show QR to be scanned from mobile app",
+            icon = Icons.Default.CameraAlt,
+            onClick = onQrLoginSelected
         )
     }
 }
@@ -446,5 +497,6 @@ fun ModeCard(
 enum class AppMode {
     LAUNCHER,
     KIOSK,
-    ADMIN
+    ADMIN,
+    QR_LOGIN
 }

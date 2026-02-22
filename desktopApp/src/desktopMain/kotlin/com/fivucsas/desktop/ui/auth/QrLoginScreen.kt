@@ -14,6 +14,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
@@ -25,11 +26,18 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.fivucsas.shared.presentation.viewmodel.auth.QrLoginStatus
 
 @Composable
 fun QrLoginScreen(
+    sessionCode: String?,
+    qrPayload: String?,
+    status: QrLoginStatus,
+    isLoading: Boolean,
+    errorMessage: String?,
     onContinue: () -> Unit,
-    onBackToLogin: () -> Unit
+    onBackToLogin: () -> Unit,
+    onRefresh: () -> Unit
 ) {
     Box(
         modifier = Modifier
@@ -86,10 +94,50 @@ fun QrLoginScreen(
             Spacer(modifier = Modifier.height(24.dp))
 
             Text(
-                text = "Waiting for approval...",
+                text = when (status) {
+                    QrLoginStatus.WAITING_FOR_MOBILE_SCAN -> "Waiting for mobile scan..."
+                    QrLoginStatus.WAITING_FOR_DESKTOP_APPROVAL -> "Scan completed. Waiting for approval..."
+                    QrLoginStatus.APPROVED -> "Approved. Ready to continue."
+                    QrLoginStatus.ERROR -> "QR session error. Generate a new code."
+                    QrLoginStatus.IDLE -> "Preparing QR session..."
+                },
                 style = MaterialTheme.typography.titleMedium,
                 color = Color.White.copy(alpha = 0.9f)
             )
+
+            if (status == QrLoginStatus.WAITING_FOR_MOBILE_SCAN || status == QrLoginStatus.IDLE) {
+                Spacer(modifier = Modifier.height(12.dp))
+                CircularProgressIndicator(color = Color.White)
+            }
+
+            sessionCode?.let {
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    text = "Session: $it",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color.White.copy(alpha = 0.85f)
+                )
+            }
+
+            qrPayload?.let {
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = it,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = Color.White.copy(alpha = 0.65f),
+                    textAlign = TextAlign.Center
+                )
+            }
+
+            errorMessage?.let {
+                Spacer(modifier = Modifier.height(12.dp))
+                Text(
+                    text = it,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color(0xFFFFCDD2),
+                    textAlign = TextAlign.Center
+                )
+            }
 
             Spacer(modifier = Modifier.height(32.dp))
 
@@ -97,7 +145,13 @@ fun QrLoginScreen(
                 OutlinedButton(onClick = onBackToLogin) {
                     Text("Back to Login")
                 }
-                Button(onClick = onContinue) {
+                OutlinedButton(onClick = onRefresh, enabled = !isLoading) {
+                    Text("Regenerate QR")
+                }
+                Button(
+                    onClick = onContinue,
+                    enabled = status == QrLoginStatus.APPROVED && !isLoading
+                ) {
                     Text("Continue to Dashboard")
                 }
             }

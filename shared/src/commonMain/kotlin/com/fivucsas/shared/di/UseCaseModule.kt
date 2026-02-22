@@ -7,6 +7,9 @@ import com.fivucsas.shared.domain.usecase.admin.SearchUsersUseCase
 import com.fivucsas.shared.domain.usecase.admin.UpdateUserUseCase
 import com.fivucsas.shared.domain.usecase.auth.LoginUseCase
 import com.fivucsas.shared.domain.usecase.auth.RegisterUseCase
+import com.fivucsas.shared.domain.usecase.auth.qr.ApproveQrLoginSessionUseCase
+import com.fivucsas.shared.domain.usecase.auth.qr.GetQrLoginSessionUseCase
+import com.fivucsas.shared.domain.usecase.auth.qr.StartQrLoginSessionUseCase
 import com.fivucsas.shared.domain.usecase.enrollment.EnrollUserUseCase
 import com.fivucsas.shared.domain.usecase.verification.CheckLivenessUseCase
 import com.fivucsas.shared.domain.usecase.verification.VerifyUserUseCase
@@ -20,6 +23,9 @@ val useCaseModule = module {
     // Auth Use Cases
     factoryOf(::LoginUseCase)
     factoryOf(::RegisterUseCase)
+    factoryOf(::StartQrLoginSessionUseCase)
+    factoryOf(::GetQrLoginSessionUseCase)
+    factoryOf(::ApproveQrLoginSessionUseCase)
 
     // Admin Use Cases (factories - new instance per injection)
     factoryOf(::GetUsersUseCase)

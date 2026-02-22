@@ -1,8 +1,10 @@
 package com.fivucsas.shared.di
 
 import com.fivucsas.shared.platform.AndroidCameraService
+import com.fivucsas.shared.platform.FingerprintAuthenticator
 import com.fivucsas.shared.platform.AndroidTokenStorage
 import com.fivucsas.shared.platform.ICameraService
+import com.fivucsas.shared.platform.providePlatformFingerprintAuthenticator
 import com.fivucsas.shared.data.local.TokenStorage
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.singleOf
@@ -38,4 +40,6 @@ actual val platformModule = module {
     single<TokenStorage> {
         AndroidTokenStorage(androidContext())
     }
+
+    single<FingerprintAuthenticator> { providePlatformFingerprintAuthenticator() }
 }

@@ -4,6 +4,8 @@ import com.fivucsas.shared.data.local.TokenStorage
 import com.fivucsas.shared.platform.ICameraService
 import com.fivucsas.shared.platform.DesktopCameraServiceImpl
 import com.fivucsas.shared.platform.DesktopTokenStorage
+import com.fivucsas.shared.platform.FingerprintAuthenticator
+import com.fivucsas.shared.platform.providePlatformFingerprintAuthenticator
 import org.koin.dsl.bind
 import org.koin.dsl.module
 import org.koin.dsl.single
@@ -29,4 +31,5 @@ actual val platformModule = module {
     // Token Storage
     // Uses Java Preferences for persistent storage
     single { DesktopTokenStorage() } bind TokenStorage::class
+    single<FingerprintAuthenticator> { providePlatformFingerprintAuthenticator() }
 }

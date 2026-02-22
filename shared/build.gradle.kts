@@ -1,4 +1,4 @@
-plugins {
+﻿plugins {
     kotlin("multiplatform")
     kotlin("plugin.serialization")
     id("com.android.library")
@@ -9,7 +9,7 @@ kotlin {
     androidTarget {
         compilations.all {
             kotlinOptions {
-                jvmTarget = "11"
+                jvmTarget = "25"
             }
         }
     }
@@ -17,7 +17,7 @@ kotlin {
     jvm("desktop") {
         compilations.all {
             kotlinOptions {
-                jvmTarget = "21"
+                jvmTarget = "25"
             }
         }
     }
@@ -104,6 +104,9 @@ kotlin {
 
                 // Koin for Android
                 implementation("io.insert-koin:koin-android:3.5.0")
+
+                // BiometricPrompt support
+                implementation("androidx.biometric:biometric:1.1.0")
             }
         }
 
@@ -141,8 +144,8 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_25
+        targetCompatibility = JavaVersion.VERSION_25
     }
 
     buildFeatures {
@@ -153,3 +156,4 @@ android {
         kotlinCompilerExtensionVersion = "1.5.8"
     }
 }
+

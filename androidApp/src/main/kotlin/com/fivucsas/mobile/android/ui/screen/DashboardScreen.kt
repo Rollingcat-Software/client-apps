@@ -1,5 +1,7 @@
 package com.fivucsas.mobile.android.ui.screen
 
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -54,6 +56,7 @@ fun DashboardScreen(
     onNavigateToProfile: () -> Unit,
     onNavigateToEnroll: () -> Unit,
     onNavigateToVerify: () -> Unit,
+    onNavigateToQrScan: () -> Unit,
     onNavigateToHistory: () -> Unit,
     onNavigateBottom: (String) -> Unit
 ) {
@@ -64,6 +67,7 @@ fun DashboardScreen(
         if (userRole.hasPermission(Permission.VERIFY_FACE)) {
             add(QuickActionItem("Verify Identity", Icons.Default.Security, onNavigateToVerify))
         }
+        add(QuickActionItem("QR Scan", Icons.Default.CameraAlt, onNavigateToQrScan))
         add(QuickActionItem("Activity History", Icons.Default.History, onNavigateToHistory))
         add(QuickActionItem("Profile & Settings", Icons.Default.Person, onNavigateToProfile))
     }
@@ -149,7 +153,8 @@ fun DashboardScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .padding(UIDimens.SpacingMedium),
+                .padding(UIDimens.SpacingMedium)
+                .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(UIDimens.SpacingMedium)
         ) {
             Card(
