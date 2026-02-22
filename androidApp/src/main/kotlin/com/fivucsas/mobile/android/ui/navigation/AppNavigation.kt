@@ -4,7 +4,6 @@ import android.widget.Toast
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
 import com.fivucsas.mobile.android.data.AppPreferences
 import com.fivucsas.mobile.android.ui.screen.AboutScreen
@@ -46,6 +45,7 @@ import org.koin.compose.koinInject
 private const val ROUTE_ADMIN_DASHBOARD = "admin-dashboard"
 private const val ROUTE_OPERATOR_DASHBOARD = "operator-dashboard"
 private const val ROUTE_USERS_MANAGEMENT = "users-management"
+import org.koin.compose.koinInject
 
 @Composable
 fun AppNavigation() {
@@ -54,8 +54,6 @@ fun AppNavigation() {
     val tokenManager = koinInject<TokenManager>()
     val loginViewModel = koinInject<LoginViewModel>()
     val registerViewModel = koinInject<RegisterViewModel>()
-    val stepUpUseCase = koinInject<BiometricStepUpUseCase>()
-    val scope = rememberCoroutineScope()
 
     // Role-based features
     val userRole = tokenManager.getRole()?.let { UserRole.fromString(it) } ?: UserRole.USER
@@ -91,42 +89,8 @@ fun AppNavigation() {
                 currentRoute = AppRoute.Dashboard.id,
                 onNavigateToNotifications = { navigator.navigate(AppRoute.Notifications) },
                 onNavigateToProfile = { navigator.navigate(AppRoute.Profile) },
-                onNavigateToEnroll = {
-                    scope.launch {
-                        runCatching {
-                            if (!stepUpUseCase.isDeviceRegistered()) {
-                                stepUpUseCase.ensureRegisteredDevice(deviceLabel = "Android Device")
-                            }
-                            stepUpUseCase.stepUp(reason = "Confirm with fingerprint")
-                        }.onSuccess {
-                            navigator.navigate(AppRoute.BiometricEnroll("1"))
-                        }.onFailure { throwable ->
-                            Toast.makeText(
-                                context,
-                                mapStepUpErrorMessage(throwable),
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        }
-                    }
-                },
-                onNavigateToVerify = {
-                    scope.launch {
-                        runCatching {
-                            if (!stepUpUseCase.isDeviceRegistered()) {
-                                stepUpUseCase.ensureRegisteredDevice(deviceLabel = "Android Device")
-                            }
-                            stepUpUseCase.stepUp(reason = "Confirm with fingerprint")
-                        }.onSuccess {
-                            navigator.navigate(AppRoute.BiometricVerify("1"))
-                        }.onFailure { throwable ->
-                            Toast.makeText(
-                                context,
-                                mapStepUpErrorMessage(throwable),
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        }
-                    }
-                },
+                onNavigateToEnroll = { navigator.navigate(AppRoute.BiometricEnroll("1")) },
+                onNavigateToVerify = { navigator.navigate(AppRoute.BiometricVerify("1")) },
                 onNavigateToQrLoginScan = { navigator.navigate(AppRoute.QrLoginScan) },
                 onNavigateToHistory = { navigator.navigate(AppRoute.ActivityHistory) },
                 onNavigateBottom = { routeId ->
@@ -297,17 +261,9 @@ fun AppNavigation() {
         AppRoute.Settings.id to { navigator, _ ->
             SettingsScreen(
                 onNavigateBack = { navigator.pop() },
-                onNavigateToSecurity = { navigator.navigate(AppRoute.SecuritySettings) },
                 onNavigateToChangePassword = { navigator.navigate(AppRoute.ChangePassword) },
                 onNavigateToHelp = { navigator.navigate(AppRoute.Help) },
                 onNavigateToAbout = { navigator.navigate(AppRoute.About) }
-            )
-        },
-        AppRoute.SecuritySettings.id to { navigator, _ ->
-            val viewModel = koinInject<SecuritySettingsViewModel>()
-            SecuritySettingsScreen(
-                viewModel = viewModel,
-                onNavigateBack = { navigator.pop() }
             )
         },
         AppRoute.Notifications.id to { navigator, _ ->
@@ -349,18 +305,4 @@ fun AppNavigation() {
         registerViewModel = registerViewModel,
         platformRoutes = platformRoutes
     )
-}
-
-private fun mapStepUpErrorMessage(throwable: Throwable): String {
-    val error = (throwable as? BiometricStepUpException)?.error
-    return when (error) {
-        BiometricError.Canceled -> "Islem iptal edildi"
-        BiometricError.NotEnrolled -> "Cihaz ayarlarindan parmak izi ekleyin"
-        BiometricError.Lockout -> "Cok fazla deneme, biraz sonra tekrar deneyin"
-        BiometricError.NoHardware -> "Bu cihaz biyometrik desteklemiyor"
-        BiometricError.KeyInvalidated -> "Biyometrik degisti, yeniden kayit gerekiyor"
-        BiometricError.Failed -> "Biyometrik dogrulama basarisiz"
-        is BiometricError.Unknown -> error.message ?: "Beklenmeyen bir hata olustu"
-        null -> throwable.message ?: "Beklenmeyen bir hata olustu"
-    }
 }

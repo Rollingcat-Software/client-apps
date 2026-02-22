@@ -9,8 +9,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Notifications
@@ -39,7 +37,6 @@ import com.fivucsas.shared.ui.theme.AppColors
 @Composable
 fun SettingsScreen(
     onNavigateBack: () -> Unit,
-    onNavigateToSecurity: () -> Unit,
     onNavigateToChangePassword: () -> Unit,
     onNavigateToHelp: () -> Unit,
     onNavigateToAbout: () -> Unit
@@ -68,8 +65,7 @@ fun SettingsScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .padding(UIDimens.SpacingMedium)
-                .verticalScroll(rememberScrollState()),
+                .padding(UIDimens.SpacingMedium),
             verticalArrangement = Arrangement.spacedBy(UIDimens.SpacingMedium)
         ) {
             ExpandableCard(
@@ -124,15 +120,6 @@ fun SettingsScreen(
                 }
 
                 Spacer(modifier = Modifier.size(12.dp))
-                Text(
-                    text = "Biometric Step-up Security",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = AppColors.Primary,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 4.dp)
-                        .clickable { onNavigateToSecurity() }
-                )
                 Text(
                     text = "Change Password",
                     style = MaterialTheme.typography.bodyMedium,

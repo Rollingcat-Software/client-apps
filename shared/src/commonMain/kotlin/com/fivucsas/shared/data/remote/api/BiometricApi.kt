@@ -36,7 +36,7 @@ interface BiometricApi {
      *
      * @param imageData Base64-encoded image
      */
-    suspend fun verifyFace(userId: String, imageData: String): VerificationResponseDto
+    suspend fun verifyFace(imageData: String): VerificationResponseDto
 
     /**
      * Check liveness
