@@ -1,17 +1,16 @@
 package com.fivucsas.mobile.android
 
 import android.os.Bundle
+import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
-import androidx.fragment.app.FragmentActivity
 import com.fivucsas.mobile.android.ui.navigation.AppNavigation
 import com.fivucsas.mobile.android.ui.theme.FIVUCSASTheme
-import com.fivucsas.shared.platform.AndroidBiometricActivityHolder
 
-class MainActivity : FragmentActivity() {
+class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -25,15 +24,5 @@ class MainActivity : FragmentActivity() {
                 }
             }
         }
-    }
-
-    override fun onResume() {
-        super.onResume()
-        AndroidBiometricActivityHolder.setCurrentActivity(this)
-    }
-
-    override fun onPause() {
-        AndroidBiometricActivityHolder.clearCurrentActivity(this)
-        super.onPause()
     }
 }
