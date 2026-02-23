@@ -2,17 +2,37 @@ package com.fivucsas.shared.domain.model
 
 /**
  * User role enumeration
+ *
+ * Roles:
+ * - GUEST: Pre-auth user, can only do face check (not stored as a role in DB)
+ * - USER: Registered account not yet assigned to any tenant
+ * - TENANT_MEMBER: User who is a member of a tenant (enrolled/active)
+ * - TENANT_ADMIN: Full tenant management + all member capabilities
+ * - ROOT: Platform-level admin, has all permissions
  */
 enum class UserRole {
-    SUPERADMIN,
-    ORG_ADMIN,
-    OPERATOR,
-    ENROLLED_USER,
-    USER;
+    GUEST,
+    USER,
+    TENANT_MEMBER,
+    TENANT_ADMIN,
+    ROOT;
 
     companion object {
         fun fromString(value: String): UserRole {
-            return entries.firstOrNull { it.name.equals(value, ignoreCase = true) } ?: USER
+            return when (value.uppercase().trim()) {
+                // New role names
+                "ROOT" -> ROOT
+                "TENANT_ADMIN" -> TENANT_ADMIN
+                "TENANT_MEMBER" -> TENANT_MEMBER
+                "USER" -> USER
+                "GUEST" -> GUEST
+                // Backward compatibility with old role names
+                "SUPERADMIN", "SUPER_ADMIN" -> ROOT
+                "ORG_ADMIN", "ADMIN" -> TENANT_ADMIN
+                "OPERATOR" -> TENANT_ADMIN
+                "ENROLLED_USER" -> TENANT_MEMBER
+                else -> USER
+            }
         }
     }
 }

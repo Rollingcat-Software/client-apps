@@ -35,7 +35,7 @@ import com.fivucsas.shared.domain.validation.ValidationRules
  * }
  * ```
  */
-class EnrollUserUseCase(
+open class EnrollUserUseCase(
     private val userRepository: UserRepository,
     private val biometricRepository: BiometricRepository
 ) {
@@ -46,7 +46,7 @@ class EnrollUserUseCase(
      * @param faceImage Captured face image (as byte array)
      * @return Result with enrolled user or error
      */
-    suspend operator fun invoke(
+    open suspend operator fun invoke(
         enrollmentData: EnrollmentData,
         faceImage: ByteArray
     ): Result<User> {

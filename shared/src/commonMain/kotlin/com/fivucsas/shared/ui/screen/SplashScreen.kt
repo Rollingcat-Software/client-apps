@@ -37,7 +37,6 @@ fun SplashScreen(
     onNavigateToLogin: () -> Unit,
     onNavigateToDashboard: () -> Unit,
     onNavigateToAdminDashboard: () -> Unit,
-    onNavigateToOperatorDashboard: () -> Unit
 ) {
     var startAnimation by remember { mutableStateOf(false) }
     val scale by animateFloatAsState(targetValue = if (startAnimation) 1f else 0.8f, label = "logoScale")
@@ -49,8 +48,7 @@ fun SplashScreen(
             isFirstLaunch -> onNavigateToOnboarding()
             isAuthenticated -> {
                 when (userRole) {
-                    "SUPERADMIN", "ORG_ADMIN" -> onNavigateToAdminDashboard()
-                    "OPERATOR" -> onNavigateToOperatorDashboard()
+                    "ROOT", "TENANT_ADMIN" -> onNavigateToAdminDashboard()
                     else -> onNavigateToDashboard()
                 }
             }

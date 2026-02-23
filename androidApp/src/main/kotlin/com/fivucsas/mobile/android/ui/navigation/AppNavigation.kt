@@ -100,8 +100,7 @@ fun AppNavigation() {
     val userRole = roleValue?.let { UserRole.fromString(it) } ?: UserRole.USER
     val isAuthenticated = runCatching { tokenManager?.isAuthenticated() == true }.getOrDefault(false)
     val navItemsForRole = when (userRole) {
-        UserRole.SUPERADMIN, UserRole.ORG_ADMIN -> BottomNavDestinations.adminItems
-        UserRole.OPERATOR -> BottomNavDestinations.operatorItems
+        UserRole.ROOT, UserRole.TENANT_ADMIN -> BottomNavDestinations.adminItems
         else -> BottomNavDestinations.items
     }
 
@@ -131,11 +130,6 @@ fun AppNavigation() {
                 },
                 onNavigateToAdminDashboard = {
                     navController.navigate(Screen.AdminDashboard.route) {
-                        popUpTo(Screen.Splash.route) { inclusive = true }
-                    }
-                },
-                onNavigateToOperatorDashboard = {
-                    navController.navigate(Screen.OperatorDashboard.route) {
                         popUpTo(Screen.Splash.route) { inclusive = true }
                     }
                 }
@@ -168,8 +162,7 @@ fun AppNavigation() {
                 onLoginSuccess = {
                     val loginRole = viewModel.state.value.role
                     val destination = when (loginRole) {
-                        UserRole.SUPERADMIN, UserRole.ORG_ADMIN -> Screen.AdminDashboard.route
-                        UserRole.OPERATOR -> Screen.OperatorDashboard.route
+                        UserRole.ROOT, UserRole.TENANT_ADMIN -> Screen.AdminDashboard.route
                         else -> Screen.Dashboard.route
                     }
                     navController.navigate(Screen.FingerprintGate.createRoute(destination)) {
@@ -238,7 +231,7 @@ fun AppNavigation() {
         }
 
         composable(Screen.UsersManagement.route) {
-            if (!userRole.hasPermission(Permission.MANAGE_USERS)) {
+            if (!userRole.hasPermission(Permission.TENANT_USERS_READ)) {
                 LaunchedEffect(Unit) {
                     if (!navController.popBackStack()) {
                         navController.navigate(Screen.Dashboard.route) {
@@ -358,7 +351,7 @@ fun AppNavigation() {
             route = Screen.BiometricEnroll.route,
             arguments = listOf(navArgument("userId") { type = NavType.StringType })
         ) { backStackEntry ->
-            if (!userRole.hasPermission(Permission.ENROLL_FACE)) {
+            if (!userRole.hasPermission(Permission.ENROLL_SELF_CREATE)) {
                 LaunchedEffect(Unit) {
                     if (!navController.popBackStack()) {
                         navController.navigate(Screen.Dashboard.route) {
@@ -381,7 +374,7 @@ fun AppNavigation() {
             route = Screen.BiometricVerify.route,
             arguments = listOf(navArgument("userId") { type = NavType.StringType })
         ) { backStackEntry ->
-            if (!userRole.hasPermission(Permission.VERIFY_FACE)) {
+            if (!userRole.hasPermission(Permission.VERIFY_SELF)) {
                 LaunchedEffect(Unit) {
                     if (!navController.popBackStack()) {
                         navController.navigate(Screen.Dashboard.route) {

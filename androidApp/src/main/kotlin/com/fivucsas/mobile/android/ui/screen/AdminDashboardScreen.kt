@@ -195,14 +195,14 @@ fun AdminDashboardScreen(
             // [C] Quick Actions
             SectionHeader(title = "Quick Actions")
             val adminQuickActions = buildList {
-                if (userRole.hasPermission(Permission.MANAGE_USERS)) {
+                if (userRole.hasPermission(Permission.TENANT_USERS_READ)) {
                     add(QuickActionItem("Manage Users", Icons.Default.Group, onNavigateToUsers))
                 }
-                if (userRole.hasPermission(Permission.VIEW_STATISTICS)) {
+                if (userRole.hasPermission(Permission.HISTORY_READ_TENANT)) {
                     add(QuickActionItem("View Analytics", Icons.Default.Analytics, onNavigateToHistory))
                 }
                 add(QuickActionItem("Activity Log", Icons.Default.History, onNavigateToHistory))
-                if (userRole.hasPermission(Permission.PLATFORM_SETTINGS)) {
+                if (userRole.hasPermission(Permission.TENANT_SETTINGS_READ)) {
                     add(QuickActionItem("Settings", Icons.Default.Settings, onNavigateToSettings))
                 }
             }

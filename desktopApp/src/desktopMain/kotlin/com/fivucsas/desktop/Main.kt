@@ -171,8 +171,8 @@ private fun AppContent(
     val qrState by qrLoginViewModel.state.collectAsState()
     val persistedRole = tokenManager.getRole()
     val adminAllowed = persistedRole == null ||
-            persistedRole == "SUPERADMIN" ||
-            persistedRole == "ORG_ADMIN"
+            persistedRole == "ROOT" ||
+            persistedRole == "TENANT_ADMIN"
 
     LaunchedEffect(currentMode) {
         if (currentMode != AppMode.QR_LOGIN) {

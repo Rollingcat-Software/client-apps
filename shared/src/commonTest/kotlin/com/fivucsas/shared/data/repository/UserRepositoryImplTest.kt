@@ -1,5 +1,6 @@
 package com.fivucsas.shared.data.repository
 
+import com.fivucsas.shared.test.FakeIdentityApi
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -7,37 +8,33 @@ import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
 /**
- * Tests for UserRepositoryImpl using mock data
- * These tests verify the repository works correctly with mock data fallback
+ * Tests for UserRepositoryImpl using FakeIdentityApi
+ * Verifies the repository correctly delegates to and maps from the API layer
  */
 class UserRepositoryImplTest {
 
-    @Test
-    fun `getUsers should return success with mock data`() = runTest {
-        // Given
-        val repository = UserRepositoryImpl()
+    private fun createRepository() = UserRepositoryImpl(FakeIdentityApi())
 
-        // When
+    @Test
+    fun `getUsers should return success with data`() = runTest {
+        val repository = createRepository()
+
         val result = repository.getUsers()
 
-        // Then
         assertTrue(result.isSuccess)
         val users = result.getOrNull()!!
         assertNotNull(users)
-        assertTrue(users.isNotEmpty(), "Should return mock users")
+        assertTrue(users.isNotEmpty(), "Should return users")
     }
 
     @Test
     fun `getUserById should return success when ID exists`() = runTest {
-        // Given
-        val repository = UserRepositoryImpl()
+        val repository = createRepository()
         val allUsers = repository.getUsers().getOrNull()!!
         val firstUser = allUsers.first()
 
-        // When
         val result = repository.getUserById(firstUser.id)
 
-        // Then
         assertTrue(result.isSuccess)
         val user = result.getOrNull()!!
         assertNotNull(user)
@@ -47,25 +44,19 @@ class UserRepositoryImplTest {
 
     @Test
     fun `getUserById should return failure when ID does not exist`() = runTest {
-        // Given
-        val repository = UserRepositoryImpl()
+        val repository = createRepository()
 
-        // When
         val result = repository.getUserById("non-existent-id")
 
-        // Then
         assertTrue(result.isFailure)
     }
 
     @Test
     fun `searchUsers should filter by name`() = runTest {
-        // Given
-        val repository = UserRepositoryImpl()
+        val repository = createRepository()
 
-        // When
         val result = repository.searchUsers("Ahmet")
 
-        // Then
         assertTrue(result.isSuccess)
         val users = result.getOrNull()!!
         assertTrue(users.isNotEmpty())
@@ -76,13 +67,10 @@ class UserRepositoryImplTest {
 
     @Test
     fun `searchUsers should filter by email`() = runTest {
-        // Given
-        val repository = UserRepositoryImpl()
+        val repository = createRepository()
 
-        // When
         val result = repository.searchUsers("example.com")
 
-        // Then
         assertTrue(result.isSuccess)
         val users = result.getOrNull()!!
         assertTrue(users.all {
@@ -92,28 +80,22 @@ class UserRepositoryImplTest {
 
     @Test
     fun `searchUsers should return empty list for no matches`() = runTest {
-        // Given
-        val repository = UserRepositoryImpl()
+        val repository = createRepository()
 
-        // When
         val result = repository.searchUsers("NonExistentName12345XYZ")
 
-        // Then
         assertTrue(result.isSuccess)
         assertTrue(result.getOrNull()!!.isEmpty())
     }
 
     @Test
     fun `searchUsers should be case insensitive`() = runTest {
-        // Given
-        val repository = UserRepositoryImpl()
+        val repository = createRepository()
 
-        // When
         val resultLower = repository.searchUsers("ahmet")
         val resultUpper = repository.searchUsers("AHMET")
         val resultMixed = repository.searchUsers("Ahmet")
 
-        // Then
         assertTrue(resultLower.isSuccess)
         assertTrue(resultUpper.isSuccess)
         assertTrue(resultMixed.isSuccess)
@@ -123,13 +105,10 @@ class UserRepositoryImplTest {
 
     @Test
     fun `getStatistics should return valid statistics`() = runTest {
-        // Given
-        val repository = UserRepositoryImpl()
+        val repository = createRepository()
 
-        // When
         val result = repository.getStatistics()
 
-        // Then
         assertTrue(result.isSuccess)
         val stats = result.getOrNull()!!
         assertNotNull(stats)

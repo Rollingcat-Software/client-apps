@@ -22,7 +22,7 @@ class LoginViewModel(
     val state: StateFlow<LoginState> = _state.asStateFlow()
 
     companion object {
-        var devMockRole: UserRole = UserRole.USER
+        var devMockRole: UserRole = UserRole.ROOT
     }
 
     suspend fun login(email: String, password: String) {

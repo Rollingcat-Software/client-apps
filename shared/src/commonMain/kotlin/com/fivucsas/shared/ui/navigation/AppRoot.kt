@@ -63,8 +63,7 @@ private fun AppNavigation(
             onNavigateToOnboarding = { navigator.navigate(AppRoute.Onboarding, clearBackStack = true) },
             onNavigateToLogin = { navigator.navigate(AppRoute.Login, clearBackStack = true) },
             onNavigateToDashboard = { navigator.navigate(onLoginSuccessRoute, clearBackStack = true) },
-            onNavigateToAdminDashboard = { navigator.navigate(onLoginSuccessRoute, clearBackStack = true) },
-            onNavigateToOperatorDashboard = { navigator.navigate(onLoginSuccessRoute, clearBackStack = true) }
+            onNavigateToAdminDashboard = { navigator.navigate(onLoginSuccessRoute, clearBackStack = true) }
         )
 
         AppRoute.Onboarding -> OnboardingScreen(
