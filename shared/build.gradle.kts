@@ -6,21 +6,11 @@
 }
 
 kotlin {
-    androidTarget {
-        compilations.all {
-            kotlinOptions {
-                jvmTarget = "25"
-            }
-        }
-    }
+    jvmToolchain(21)
 
-    jvm("desktop") {
-        compilations.all {
-            kotlinOptions {
-                jvmTarget = "25"
-            }
-        }
-    }
+    androidTarget()
+
+    jvm("desktop")
 
     listOf(
         iosX64(),
@@ -144,8 +134,8 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_25
-        targetCompatibility = JavaVersion.VERSION_25
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
     }
 
     buildFeatures {

@@ -9,7 +9,7 @@ group = "com.fivucsas.desktop"
 version = "1.0.0"
 
 kotlin {
-    jvmToolchain(25)
+    jvmToolchain(21)
 
     sourceSets {
         val main by getting {
@@ -19,8 +19,8 @@ kotlin {
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_25
-    targetCompatibility = JavaVersion.VERSION_25
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
 }
 
 dependencies {
@@ -69,4 +69,3 @@ compose.desktop {
         }
     }
 }
-
