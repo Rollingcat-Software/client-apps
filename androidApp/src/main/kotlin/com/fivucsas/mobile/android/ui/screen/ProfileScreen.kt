@@ -58,8 +58,10 @@ fun ProfileScreen(
             TopAppBar(
                 title = { Text("My Profile") },
                 actions = {
-                    IconButton(onClick = onEditProfile) {
-                        Icon(imageVector = Icons.Default.Edit, contentDescription = "Edit profile")
+                    if (userRole.hasPermission(Permission.PROFILE_UPDATE_SELF)) {
+                        IconButton(onClick = onEditProfile) {
+                            Icon(imageVector = Icons.Default.Edit, contentDescription = "Edit profile")
+                        }
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -135,35 +137,37 @@ fun ProfileScreen(
                 }
             }
 
-            SectionHeader(title = "Biometric Status")
-            Card(
-                colors = CardDefaults.cardColors(containerColor = AppColors.Surface)
-            ) {
-                Column(modifier = Modifier.padding(UIDimens.SpacingMedium)) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text("Face Enrolled", style = MaterialTheme.typography.bodyMedium)
-                        StatusBadge(text = "Active", type = StatusBadgeType.Success)
+            if (userRole.hasPermission(Permission.ENROLL_SELF_CREATE)) {
+                SectionHeader(title = "Biometric Status")
+                Card(
+                    colors = CardDefaults.cardColors(containerColor = AppColors.Surface)
+                ) {
+                    Column(modifier = Modifier.padding(UIDimens.SpacingMedium)) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text("Face Enrolled", style = MaterialTheme.typography.bodyMedium)
+                            StatusBadge(text = "Active", type = StatusBadgeType.Success)
+                        }
+                        Spacer(modifier = Modifier.size(8.dp))
+                        Text(
+                            text = "Quality Score: 88%",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = AppColors.OnSurfaceVariant
+                        )
+                        Text(
+                            text = "Enrolled: Jan 28, 2026",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = AppColors.OnSurfaceVariant
+                        )
+                        Text(
+                            text = "Expires: Jul 28, 2026",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = AppColors.OnSurfaceVariant
+                        )
                     }
-                    Spacer(modifier = Modifier.size(8.dp))
-                    Text(
-                        text = "Quality Score: 88%",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = AppColors.OnSurfaceVariant
-                    )
-                    Text(
-                        text = "Enrolled: Jan 28, 2026",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = AppColors.OnSurfaceVariant
-                    )
-                    Text(
-                        text = "Expires: Jul 28, 2026",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = AppColors.OnSurfaceVariant
-                    )
                 }
             }
 
@@ -172,7 +176,7 @@ fun ProfileScreen(
                 Button(onClick = onChangePassword, modifier = Modifier.fillMaxWidth()) {
                     Text("Change Password")
                 }
-                if (userRole.hasPermission(Permission.ENROLL_FACE)) {
+                if (userRole.hasPermission(Permission.ENROLL_SELF_UPDATE)) {
                     Button(onClick = onReEnroll, modifier = Modifier.fillMaxWidth()) {
                         Text("Re-Enroll Face")
                     }

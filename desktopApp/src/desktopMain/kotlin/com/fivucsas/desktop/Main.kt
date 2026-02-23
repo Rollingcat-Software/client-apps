@@ -50,6 +50,9 @@ import com.fivucsas.desktop.ui.auth.QrLoginScreen
 import com.fivucsas.desktop.ui.kiosk.KioskMode
 import com.fivucsas.shared.data.local.TokenManager
 import com.fivucsas.shared.di.getAppModules
+import com.fivucsas.shared.domain.model.Permission
+import com.fivucsas.shared.domain.model.UserRole
+import com.fivucsas.shared.domain.model.hasPermission
 import com.fivucsas.shared.presentation.viewmodel.auth.QrLoginStatus
 import com.fivucsas.shared.presentation.viewmodel.auth.QrLoginViewModel
 import org.koin.java.KoinJavaComponent.inject
@@ -170,9 +173,10 @@ private fun AppContent(
     val qrLoginViewModel: QrLoginViewModel = koinInject()
     val qrState by qrLoginViewModel.state.collectAsState()
     val persistedRole = tokenManager.getRole()
-    val adminAllowed = persistedRole == null ||
-            persistedRole == "ROOT" ||
-            persistedRole == "TENANT_ADMIN"
+    val userRole = persistedRole?.let { UserRole.fromString(it) } ?: UserRole.GUEST
+    val adminAllowed = userRole.hasPermission(Permission.VIEW_ADMIN_DASHBOARD)
+    val kioskAllowed = userRole.hasPermission(Permission.ENROLL_SELF_CREATE) ||
+            userRole.hasPermission(Permission.VERIFY_SELF)
 
     LaunchedEffect(currentMode) {
         if (currentMode != AppMode.QR_LOGIN) {
@@ -182,7 +186,11 @@ private fun AppContent(
 
     when (currentMode) {
         AppMode.LAUNCHER -> LauncherScreen(
-            onKioskSelected = { onNavigate(AppMode.KIOSK) },
+            adminAllowed = adminAllowed,
+            kioskAllowed = kioskAllowed,
+            onKioskSelected = {
+                if (kioskAllowed) onNavigate(AppMode.KIOSK)
+            },
             onAdminSelected = {
                 if (adminAllowed) onNavigate(AppMode.ADMIN)
             },
@@ -260,6 +268,8 @@ private fun ApplicationScope.AppSystemTray(
  */
 @Composable
 fun LauncherScreen(
+    adminAllowed: Boolean = true,
+    kioskAllowed: Boolean = true,
     onKioskSelected: () -> Unit,
     onAdminSelected: () -> Unit,
     onQrLoginSelected: () -> Unit
@@ -289,6 +299,8 @@ fun LauncherScreen(
 
             // Modern Mode Cards
             ModeSelectionCards(
+                kioskAllowed = kioskAllowed,
+                adminAllowed = adminAllowed,
                 onKioskSelected = onKioskSelected,
                 onAdminSelected = onAdminSelected,
                 onQrLoginSelected = onQrLoginSelected
@@ -361,6 +373,8 @@ private fun AppLogo() {
  */
 @Composable
 private fun ModeSelectionCards(
+    kioskAllowed: Boolean = true,
+    adminAllowed: Boolean = true,
     onKioskSelected: () -> Unit,
     onAdminSelected: () -> Unit,
     onQrLoginSelected: () -> Unit
@@ -372,6 +386,7 @@ private fun ModeSelectionCards(
             title = "Kiosk Mode",
             description = "Self-service enrollment and verification",
             icon = Icons.Default.TouchApp,
+            enabled = kioskAllowed,
             onClick = onKioskSelected
         )
 
@@ -379,6 +394,7 @@ private fun ModeSelectionCards(
             title = "Admin Dashboard",
             description = "User management and system configuration",
             icon = Icons.Default.AdminPanelSettings,
+            enabled = adminAllowed,
             onClick = onAdminSelected
         )
 
@@ -415,17 +431,19 @@ fun ModeCard(
     description: String,
     icon: androidx.compose.ui.graphics.vector.ImageVector,
     onClick: () -> Unit,
+    enabled: Boolean = true,
     modifier: Modifier = Modifier
 ) {
+    val alpha = if (enabled) 1f else 0.4f
     Card(
-        onClick = onClick,
+        onClick = { if (enabled) onClick() },
         modifier = modifier
             .width(350.dp)
             .height(280.dp)
             .shadow(16.dp, RoundedCornerShape(24.dp)),
         shape = RoundedCornerShape(24.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Color.White
+            containerColor = Color.White.copy(alpha = alpha)
         )
     ) {
         Column(

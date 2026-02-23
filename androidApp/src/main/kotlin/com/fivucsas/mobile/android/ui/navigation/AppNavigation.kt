@@ -231,7 +231,7 @@ fun AppNavigation() {
         }
 
         composable(Screen.UsersManagement.route) {
-            if (!userRole.hasPermission(Permission.MANAGE_USERS)) {
+            if (!userRole.hasPermission(Permission.TENANT_USERS_READ)) {
                 LaunchedEffect(Unit) {
                     if (!navController.popBackStack()) {
                         navController.navigate(Screen.Dashboard.route) {
@@ -271,6 +271,16 @@ fun AppNavigation() {
         }
 
         composable(Screen.ActivityHistory.route) {
+            if (!userRole.hasPermission(Permission.HISTORY_READ_SELF)) {
+                LaunchedEffect(Unit) {
+                    if (!navController.popBackStack()) {
+                        navController.navigate(Screen.Dashboard.route) {
+                            popUpTo(0) { inclusive = true }
+                        }
+                    }
+                }
+                return@composable
+            }
             ActivityHistoryScreen(
                 currentRoute = Screen.ActivityHistory.route,
                 onNavigateBottom = { route ->
@@ -344,6 +354,16 @@ fun AppNavigation() {
         }
 
         composable(Screen.QrLoginScan.route) {
+            if (!userRole.hasPermission(Permission.QR_SCAN)) {
+                LaunchedEffect(Unit) {
+                    if (!navController.popBackStack()) {
+                        navController.navigate(Screen.Dashboard.route) {
+                            popUpTo(0) { inclusive = true }
+                        }
+                    }
+                }
+                return@composable
+            }
             QRLoginScanScreen(onNavigateBack = { navController.popBackStack() })
         }
 
@@ -351,7 +371,7 @@ fun AppNavigation() {
             route = Screen.BiometricEnroll.route,
             arguments = listOf(navArgument("userId") { type = NavType.StringType })
         ) { backStackEntry ->
-            if (!userRole.hasPermission(Permission.ENROLL_FACE)) {
+            if (!userRole.hasPermission(Permission.ENROLL_SELF_CREATE)) {
                 LaunchedEffect(Unit) {
                     if (!navController.popBackStack()) {
                         navController.navigate(Screen.Dashboard.route) {
@@ -374,7 +394,7 @@ fun AppNavigation() {
             route = Screen.BiometricVerify.route,
             arguments = listOf(navArgument("userId") { type = NavType.StringType })
         ) { backStackEntry ->
-            if (!userRole.hasPermission(Permission.VERIFY_FACE)) {
+            if (!userRole.hasPermission(Permission.VERIFY_SELF)) {
                 LaunchedEffect(Unit) {
                     if (!navController.popBackStack()) {
                         navController.navigate(Screen.Dashboard.route) {

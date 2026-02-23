@@ -18,6 +18,7 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Security
 import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Badge
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -45,6 +46,7 @@ import com.fivucsas.shared.ui.components.organisms.BottomNavBar
 import com.fivucsas.shared.ui.components.organisms.QuickActionGrid
 import com.fivucsas.shared.ui.components.organisms.QuickActionItem
 import com.fivucsas.shared.ui.theme.AppColors
+import androidx.compose.material.icons.filled.GroupAdd
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -61,14 +63,18 @@ fun DashboardScreen(
     onNavigateBottom: (String) -> Unit
 ) {
     val quickActions = buildList {
-        if (userRole.hasPermission(Permission.ENROLL_FACE)) {
+        if (userRole.hasPermission(Permission.ENROLL_SELF_CREATE)) {
             add(QuickActionItem("Enroll Face", Icons.Default.CameraAlt, onNavigateToEnroll))
         }
-        if (userRole.hasPermission(Permission.VERIFY_FACE)) {
+        if (userRole.hasPermission(Permission.VERIFY_SELF)) {
             add(QuickActionItem("Verify Identity", Icons.Default.Security, onNavigateToVerify))
         }
-        add(QuickActionItem("QR Scan", Icons.Default.CameraAlt, onNavigateToQrScan))
-        add(QuickActionItem("Activity History", Icons.Default.History, onNavigateToHistory))
+        if (userRole.hasPermission(Permission.QR_SCAN)) {
+            add(QuickActionItem("QR Scan", Icons.Default.CameraAlt, onNavigateToQrScan))
+        }
+        if (userRole.hasPermission(Permission.HISTORY_READ_SELF)) {
+            add(QuickActionItem("Activity History", Icons.Default.History, onNavigateToHistory))
+        }
         add(QuickActionItem("Profile & Settings", Icons.Default.Person, onNavigateToProfile))
     }
 
@@ -157,61 +163,102 @@ fun DashboardScreen(
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(UIDimens.SpacingMedium)
         ) {
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = AppColors.Surface),
-                elevation = CardDefaults.cardElevation(defaultElevation = UIDimens.ElevationLow)
-            ) {
-                Column(
-                    modifier = Modifier.padding(UIDimens.SpacingMedium)
+            if (userRole.hasPermission(Permission.ENROLL_SELF_CREATE)) {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(containerColor = AppColors.Surface),
+                    elevation = CardDefaults.cardElevation(defaultElevation = UIDimens.ElevationLow)
                 ) {
-                    Text(
-                        text = "Enrollment Status",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.SemiBold
-                    )
-                    Spacer(modifier = Modifier.size(8.dp))
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
+                    Column(
+                        modifier = Modifier.padding(UIDimens.SpacingMedium)
                     ) {
                         Text(
-                            text = "Enrolled",
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = AppColors.Success
+                            text = "Enrollment Status",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.SemiBold
                         )
+                        Spacer(modifier = Modifier.size(8.dp))
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = "Enrolled",
+                                style = MaterialTheme.typography.bodyLarge,
+                                color = AppColors.Success
+                            )
+                            Text(
+                                text = "Last verified: 2 hours ago",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = AppColors.OnSurfaceVariant
+                            )
+                        }
+                        Spacer(modifier = Modifier.size(6.dp))
                         Text(
-                            text = "Last verified: 2 hours ago",
+                            text = "Confidence: 94%",
                             style = MaterialTheme.typography.bodySmall,
                             color = AppColors.OnSurfaceVariant
                         )
                     }
-                    Spacer(modifier = Modifier.size(6.dp))
-                    Text(
-                        text = "Confidence: 94%",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = AppColors.OnSurfaceVariant
-                    )
+                }
+            } else {
+                // USER/GUEST: not a tenant member yet
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(containerColor = AppColors.Surface),
+                    elevation = CardDefaults.cardElevation(defaultElevation = UIDimens.ElevationLow)
+                ) {
+                    Column(
+                        modifier = Modifier.padding(UIDimens.SpacingMedium),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(UIDimens.SpacingSmall)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.GroupAdd,
+                            contentDescription = null,
+                            modifier = Modifier.size(48.dp),
+                            tint = AppColors.OnSurfaceVariant
+                        )
+                        Text(
+                            text = "You are not a tenant member yet",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                        Text(
+                            text = "Ask your organization admin for an invite to get started.",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = AppColors.OnSurfaceVariant
+                        )
+                        Button(
+                            onClick = { /* Accept invite – stub */ },
+                            enabled = false,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text("Accept Invite")
+                        }
+                    }
                 }
             }
 
             SectionHeader(title = "Quick Actions")
             QuickActionGrid(actions = quickActions)
 
-            SectionHeader(
-                title = "Recent Activity",
-                actionContent = {
-                    Text(
-                        text = "View All",
-                        style = MaterialTheme.typography.labelLarge,
-                        color = AppColors.Primary
-                    )
-                }
-            )
-            Column(verticalArrangement = Arrangement.spacedBy(UIDimens.SpacingSmall)) {
-                activityItems.forEach { item ->
-                    ActivityItem(data = item)
+            if (userRole.hasPermission(Permission.HISTORY_READ_SELF)) {
+                SectionHeader(
+                    title = "Recent Activity",
+                    actionContent = {
+                        Text(
+                            text = "View All",
+                            style = MaterialTheme.typography.labelLarge,
+                            color = AppColors.Primary
+                        )
+                    }
+                )
+                Column(verticalArrangement = Arrangement.spacedBy(UIDimens.SpacingSmall)) {
+                    activityItems.forEach { item ->
+                        ActivityItem(data = item)
+                    }
                 }
             }
         }
