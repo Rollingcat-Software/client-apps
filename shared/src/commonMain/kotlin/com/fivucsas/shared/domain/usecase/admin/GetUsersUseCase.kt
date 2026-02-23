@@ -9,10 +9,10 @@ import com.fivucsas.shared.domain.repository.UserRepository
  * Simple pass-through to repository.
  * Can add business logic here if needed (e.g., filtering, sorting).
  */
-class GetUsersUseCase(
+open class GetUsersUseCase(
     private val userRepository: UserRepository
 ) {
-    suspend operator fun invoke(): Result<List<User>> {
+    open suspend operator fun invoke(): Result<List<User>> {
         return userRepository.getUsers()
     }
 }

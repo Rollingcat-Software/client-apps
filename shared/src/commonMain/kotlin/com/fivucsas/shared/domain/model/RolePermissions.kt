@@ -15,8 +15,8 @@ enum class Permission {
 
 object RolePermissions {
     private val permissionMap: Map<UserRole, Set<Permission>> = mapOf(
-        UserRole.SUPERADMIN to Permission.entries.toSet(),
-        UserRole.ORG_ADMIN to setOf(
+        UserRole.ROOT to Permission.entries.toSet(),
+        UserRole.TENANT_ADMIN to setOf(
             Permission.VIEW_DASHBOARD,
             Permission.VIEW_ADMIN_DASHBOARD,
             Permission.MANAGE_USERS,
@@ -27,15 +27,7 @@ object RolePermissions {
             Permission.VIEW_OWN_PROFILE,
             Permission.VIEW_STATISTICS
         ),
-        UserRole.OPERATOR to setOf(
-            Permission.VIEW_DASHBOARD,
-            Permission.OPERATE_KIOSK,
-            Permission.ENROLL_FACE,
-            Permission.VERIFY_FACE,
-            Permission.VIEW_OWN_PROFILE,
-            Permission.VIEW_STATISTICS
-        ),
-        UserRole.ENROLLED_USER to setOf(
+        UserRole.TENANT_MEMBER to setOf(
             Permission.VIEW_DASHBOARD,
             Permission.VERIFY_FACE,
             Permission.VIEW_OWN_PROFILE
@@ -44,6 +36,10 @@ object RolePermissions {
             Permission.VIEW_DASHBOARD,
             Permission.ENROLL_FACE,
             Permission.VERIFY_FACE,
+            Permission.VIEW_OWN_PROFILE
+        ),
+        UserRole.GUEST to setOf(
+            Permission.VIEW_DASHBOARD,
             Permission.VIEW_OWN_PROFILE
         )
     )

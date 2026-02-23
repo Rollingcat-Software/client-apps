@@ -14,10 +14,10 @@ import com.fivucsas.shared.domain.repository.UserRepository
  * - Success rate
  * - Failed attempts
  */
-class GetStatisticsUseCase(
+open class GetStatisticsUseCase(
     private val userRepository: UserRepository
 ) {
-    suspend operator fun invoke(): Result<Statistics> {
+    open suspend operator fun invoke(): Result<Statistics> {
         return userRepository.getStatistics()
     }
 }

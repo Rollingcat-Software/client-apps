@@ -100,8 +100,7 @@ fun AppNavigation() {
     val userRole = roleValue?.let { UserRole.fromString(it) } ?: UserRole.USER
     val isAuthenticated = runCatching { tokenManager?.isAuthenticated() == true }.getOrDefault(false)
     val navItemsForRole = when (userRole) {
-        UserRole.SUPERADMIN, UserRole.ORG_ADMIN -> BottomNavDestinations.adminItems
-        UserRole.OPERATOR -> BottomNavDestinations.operatorItems
+        UserRole.ROOT, UserRole.TENANT_ADMIN -> BottomNavDestinations.adminItems
         else -> BottomNavDestinations.items
     }
 
@@ -131,11 +130,6 @@ fun AppNavigation() {
                 },
                 onNavigateToAdminDashboard = {
                     navController.navigate(Screen.AdminDashboard.route) {
-                        popUpTo(Screen.Splash.route) { inclusive = true }
-                    }
-                },
-                onNavigateToOperatorDashboard = {
-                    navController.navigate(Screen.OperatorDashboard.route) {
                         popUpTo(Screen.Splash.route) { inclusive = true }
                     }
                 }
@@ -168,8 +162,7 @@ fun AppNavigation() {
                 onLoginSuccess = {
                     val loginRole = viewModel.state.value.role
                     val destination = when (loginRole) {
-                        UserRole.SUPERADMIN, UserRole.ORG_ADMIN -> Screen.AdminDashboard.route
-                        UserRole.OPERATOR -> Screen.OperatorDashboard.route
+                        UserRole.ROOT, UserRole.TENANT_ADMIN -> Screen.AdminDashboard.route
                         else -> Screen.Dashboard.route
                     }
                     navController.navigate(Screen.FingerprintGate.createRoute(destination)) {

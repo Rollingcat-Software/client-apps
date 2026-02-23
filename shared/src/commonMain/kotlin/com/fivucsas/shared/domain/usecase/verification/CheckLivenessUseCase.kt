@@ -28,7 +28,7 @@ import com.fivucsas.shared.domain.repository.BiometricRepository
  * val result = useCase(actions)
  * ```
  */
-class CheckLivenessUseCase(
+open class CheckLivenessUseCase(
     private val biometricRepository: BiometricRepository
 ) {
     /**
@@ -37,7 +37,7 @@ class CheckLivenessUseCase(
      * @param actions List of facial actions performed
      * @return Result with liveness result or error
      */
-    suspend operator fun invoke(actions: List<FacialAction>): Result<LivenessResult> {
+    open suspend operator fun invoke(actions: List<FacialAction>): Result<LivenessResult> {
         // Validate actions list
         if (actions.isEmpty()) {
             return Result.failure(

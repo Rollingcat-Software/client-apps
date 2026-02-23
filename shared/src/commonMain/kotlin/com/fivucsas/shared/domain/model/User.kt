@@ -4,11 +4,11 @@ package com.fivucsas.shared.domain.model
  * User role enumeration
  */
 enum class UserRole {
-    SUPERADMIN,
-    ORG_ADMIN,
-    OPERATOR,
-    ENROLLED_USER,
-    USER;
+    ROOT,
+    TENANT_ADMIN,
+    TENANT_MEMBER,
+    USER,
+    GUEST;
 
     companion object {
         fun fromString(value: String): UserRole {

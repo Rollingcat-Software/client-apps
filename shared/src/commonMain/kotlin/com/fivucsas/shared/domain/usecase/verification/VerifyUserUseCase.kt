@@ -31,7 +31,7 @@ import com.fivucsas.shared.domain.repository.BiometricRepository
  * }
  * ```
  */
-class VerifyUserUseCase(
+open class VerifyUserUseCase(
     private val biometricRepository: BiometricRepository
 ) {
     /**
@@ -40,7 +40,7 @@ class VerifyUserUseCase(
      * @param faceImage Captured face image (as byte array)
      * @return Result with verification result or error
      */
-    suspend operator fun invoke(faceImage: ByteArray): Result<VerificationResult> {
+    open suspend operator fun invoke(faceImage: ByteArray): Result<VerificationResult> {
         // Validate face image
         if (faceImage.isEmpty()) {
             return Result.failure(

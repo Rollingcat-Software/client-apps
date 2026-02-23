@@ -1,7 +1,11 @@
 {
   "permissions": {
     "allow": [
-      "Bash(./gradlew :androidApp:assembleDebug:*)"
+      "Bash(./gradlew :androidApp:assembleDebug:*)",
+      "Bash(tail:*)",
+      "Bash(grep ^e::*)",
+      "Bash(cd /c/Users/hp/Documents/GitHub/Rollingcat-Software/mobile-app && ./gradlew compileKotlinDesktop 2>&1)",
+      "Bash(cd /c/Users/hp/Documents/GitHub/Rollingcat-Software/mobile-app && ./gradlew desktopTest 2>&1)"
     ]
   }
 }
