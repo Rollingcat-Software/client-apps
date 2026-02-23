@@ -68,6 +68,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import com.fivucsas.mobile.android.ui.util.toCompressedJpegBytes
+import com.fivucsas.shared.domain.model.GuestFaceCheckOutcome
+import com.fivucsas.shared.domain.model.confidenceToBand
 import com.fivucsas.shared.presentation.viewmodel.auth.BiometricResult
 import com.fivucsas.shared.presentation.viewmodel.auth.BiometricState
 import com.fivucsas.shared.presentation.viewmodel.auth.BiometricViewModel
@@ -82,6 +84,8 @@ import kotlinx.coroutines.launch
 fun BiometricVerifyScreen(
     userId: String,
     viewModel: BiometricViewModel,
+    guestMode: Boolean = false,
+    onGuestResult: ((GuestFaceCheckOutcome, com.fivucsas.shared.domain.model.ConfidenceBand?) -> Unit)? = null,
     onNavigateBack: () -> Unit
 ) {
     val context = LocalContext.current
@@ -109,6 +113,17 @@ fun BiometricVerifyScreen(
             permissionRequested = true
             cameraPermissionState.launchPermissionRequest()
         }
+    }
+
+    LaunchedEffect(state.result, state.isSuccess, guestMode) {
+        if (!guestMode || !state.isSuccess) return@LaunchedEffect
+        val result = (state.result as? BiometricResult.VerificationSuccess)?.result ?: return@LaunchedEffect
+        val outcome = if (result.isVerified) {
+            GuestFaceCheckOutcome.FOUND
+        } else {
+            GuestFaceCheckOutcome.NOT_FOUND
+        }
+        onGuestResult?.invoke(outcome, confidenceToBand(result.confidence))
     }
 
     Scaffold(
@@ -143,6 +158,7 @@ fun BiometricVerifyScreen(
                     cameraController = cameraController,
                     lifecycleOwner = lifecycleOwner,
                     biometricState = state,
+                    guestMode = guestMode,
                     onCapture = {
                         cameraController.takePicture(
                             ContextCompat.getMainExecutor(context),
@@ -199,6 +215,7 @@ private fun VerificationCameraContent(
     cameraController: LifecycleCameraController,
     lifecycleOwner: androidx.lifecycle.LifecycleOwner,
     biometricState: BiometricState,
+    guestMode: Boolean,
     onCapture: () -> Unit,
     onRetry: () -> Unit,
     onDone: () -> Unit
@@ -254,12 +271,17 @@ private fun VerificationCameraContent(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             // Error state
-            if (biometricState.error != null) {
-                VerificationErrorCard(
-                    message = biometricState.error!!,
-                    modifier = Modifier.fillMaxWidth()
-                )
-                Spacer(modifier = Modifier.height(12.dp))
+        if (biometricState.error != null) {
+            val displayMessage = if (guestMode) {
+                "Could not reach face-check service. Please check backend/DB connection and try again."
+            } else {
+                biometricState.error!!
+            }
+            VerificationErrorCard(
+                message = displayMessage,
+                modifier = Modifier.fillMaxWidth()
+            )
+            Spacer(modifier = Modifier.height(12.dp))
                 OutlinedButton(
                     onClick = onRetry,
                     modifier = Modifier.fillMaxWidth(),
@@ -273,6 +295,7 @@ private fun VerificationCameraContent(
             if (biometricState.isSuccess && biometricState.result != null) {
                 VerificationResultCard(
                     result = biometricState.result as? BiometricResult.VerificationSuccess,
+                    guestMode = guestMode,
                     onRetry = onRetry,
                     onDone = onDone
                 )
@@ -296,6 +319,7 @@ private fun VerificationCameraContent(
 @Composable
 private fun VerificationResultCard(
     result: BiometricResult.VerificationSuccess?,
+    guestMode: Boolean,
     onRetry: () -> Unit,
     onDone: () -> Unit
 ) {
@@ -327,7 +351,11 @@ private fun VerificationResultCard(
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(
-                text = if (isVerified) "Verified Successfully" else "Verification Failed",
+                text = if (isVerified) {
+                    if (guestMode) "FOUND" else "Verified Successfully"
+                } else {
+                    if (guestMode) "NOT FOUND" else "Verification Failed"
+                },
                 color = if (isVerified)
                     MaterialTheme.colorScheme.onPrimaryContainer
                 else
@@ -338,7 +366,11 @@ private fun VerificationResultCard(
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = result?.result?.message ?: "Verification complete",
+                text = if (guestMode) {
+                    "No personal identity details are shown in guest mode."
+                } else {
+                    result?.result?.message ?: "Verification complete"
+                },
                 color = if (isVerified)
                     MaterialTheme.colorScheme.onPrimaryContainer
                 else
@@ -372,18 +404,20 @@ private fun VerificationResultCard(
                         )
                     }
 
-                    Column(horizontalAlignment = Alignment.End) {
-                        Text(
-                            text = "User ID",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
-                        )
-                        Text(
-                            text = result?.result?.userId ?: "Unknown",
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onPrimaryContainer
-                        )
+                    if (!guestMode) {
+                        Column(horizontalAlignment = Alignment.End) {
+                            Text(
+                                text = "User ID",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
+                            )
+                            Text(
+                                text = result?.result?.userId ?: "Unknown",
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onPrimaryContainer
+                            )
+                        }
                     }
                 }
             }

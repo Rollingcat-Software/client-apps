@@ -63,8 +63,7 @@ private fun AppNavigation(
             onNavigateToOnboarding = { navigator.navigate(AppRoute.Onboarding, clearBackStack = true) },
             onNavigateToLogin = { navigator.navigate(AppRoute.Login, clearBackStack = true) },
             onNavigateToDashboard = { navigator.navigate(onLoginSuccessRoute, clearBackStack = true) },
-            onNavigateToAdminDashboard = { navigator.navigate(onLoginSuccessRoute, clearBackStack = true) },
-            onNavigateToOperatorDashboard = { navigator.navigate(onLoginSuccessRoute, clearBackStack = true) }
+            onNavigateToAdminDashboard = { navigator.navigate(onLoginSuccessRoute, clearBackStack = true) }
         )
 
         AppRoute.Onboarding -> OnboardingScreen(
@@ -82,6 +81,7 @@ private fun AppNavigation(
             viewModel = loginViewModel,
             onNavigateToRegister = { navigator.navigate(AppRoute.Register) },
             onNavigateToForgotPassword = { navigator.navigate(AppRoute.ForgotPassword) },
+            onNavigateToGuestFaceCheck = { },
             onLoginSuccess = {
                 if (isFingerprintFlowAvailable() && fingerprintViewModel != null) {
                     navigator.navigate(

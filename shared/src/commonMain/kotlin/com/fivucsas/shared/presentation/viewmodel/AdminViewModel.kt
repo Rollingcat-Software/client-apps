@@ -510,7 +510,7 @@ class AdminViewModel(
                 _uiState.update {
                     it.copy(
                         isLoading = false,
-                        successMessage = "✅ Logs exported to logs_export_${System.currentTimeMillis()}.txt"
+                        successMessage = "✅ Logs exported to logs_export_${kotlinx.datetime.Clock.System.now().toEpochMilliseconds()}.txt"
                     )
                 }
 

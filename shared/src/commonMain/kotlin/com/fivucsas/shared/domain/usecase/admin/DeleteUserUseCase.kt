@@ -17,7 +17,7 @@ import com.fivucsas.shared.domain.repository.UserRepository
  * 5. Delete user
  * 6. Rollback if deletion fails
  */
-class DeleteUserUseCase(
+open class DeleteUserUseCase(
     private val userRepository: UserRepository,
     private val biometricRepository: BiometricRepository
 ) {
@@ -27,7 +27,7 @@ class DeleteUserUseCase(
      * @param userId User ID to delete
      * @return Result with Unit or error
      */
-    suspend operator fun invoke(userId: String): Result<Unit> {
+    open suspend operator fun invoke(userId: String): Result<Unit> {
         // Validate ID
         if (userId.isBlank()) {
             return Result.failure(ValidationException("User ID is required"))

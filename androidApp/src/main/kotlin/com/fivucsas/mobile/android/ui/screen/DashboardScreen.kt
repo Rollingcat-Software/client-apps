@@ -61,10 +61,10 @@ fun DashboardScreen(
     onNavigateBottom: (String) -> Unit
 ) {
     val quickActions = buildList {
-        if (userRole.hasPermission(Permission.ENROLL_FACE)) {
+        if (userRole.hasPermission(Permission.ENROLL_SELF_CREATE)) {
             add(QuickActionItem("Enroll Face", Icons.Default.CameraAlt, onNavigateToEnroll))
         }
-        if (userRole.hasPermission(Permission.VERIFY_FACE)) {
+        if (userRole.hasPermission(Permission.VERIFY_SELF)) {
             add(QuickActionItem("Verify Identity", Icons.Default.Security, onNavigateToVerify))
         }
         add(QuickActionItem("QR Scan", Icons.Default.CameraAlt, onNavigateToQrScan))

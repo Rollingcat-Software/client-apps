@@ -172,7 +172,7 @@ fun ProfileScreen(
                 Button(onClick = onChangePassword, modifier = Modifier.fillMaxWidth()) {
                     Text("Change Password")
                 }
-                if (userRole.hasPermission(Permission.ENROLL_FACE)) {
+                if (userRole.hasPermission(Permission.ENROLL_SELF_UPDATE)) {
                     Button(onClick = onReEnroll, modifier = Modifier.fillMaxWidth()) {
                         Text("Re-Enroll Face")
                     }

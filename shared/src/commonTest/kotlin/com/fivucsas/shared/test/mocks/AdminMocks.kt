@@ -7,6 +7,8 @@ import com.fivucsas.shared.domain.usecase.admin.DeleteUserUseCase
 import com.fivucsas.shared.domain.usecase.admin.GetStatisticsUseCase
 import com.fivucsas.shared.domain.usecase.admin.GetUsersUseCase
 import com.fivucsas.shared.domain.usecase.admin.UpdateUserUseCase
+import com.fivucsas.shared.test.FakeBiometricRepository
+import com.fivucsas.shared.test.FakeUserRepository
 
 /**
  * Mock implementations for Admin use cases
@@ -14,10 +16,7 @@ import com.fivucsas.shared.domain.usecase.admin.UpdateUserUseCase
  * These mocks allow testing ViewModels without actual backend dependencies.
  */
 
-/**
- * Mock GetUsersUseCase
- */
-class MockGetUsersUseCase : GetUsersUseCase {
+class MockGetUsersUseCase : GetUsersUseCase(FakeUserRepository()) {
     var shouldSucceed = true
     var mockUsers = listOf(
         User(
@@ -52,10 +51,7 @@ class MockGetUsersUseCase : GetUsersUseCase {
     }
 }
 
-/**
- * Mock DeleteUserUseCase
- */
-class MockDeleteUserUseCase : DeleteUserUseCase {
+class MockDeleteUserUseCase : DeleteUserUseCase(FakeUserRepository(), FakeBiometricRepository()) {
     var shouldSucceed = true
     var deletedUserId: String? = null
     var errorMessage = "Failed to delete user"
@@ -70,15 +66,12 @@ class MockDeleteUserUseCase : DeleteUserUseCase {
     }
 }
 
-/**
- * Mock UpdateUserUseCase
- */
-class MockUpdateUserUseCase : UpdateUserUseCase {
+class MockUpdateUserUseCase : UpdateUserUseCase(FakeUserRepository()) {
     var shouldSucceed = true
     var updatedUser: User? = null
     var errorMessage = "Failed to update user"
 
-    override suspend fun invoke(userId: String, user: User): Result<User> {
+    override suspend fun invoke(id: String, user: User): Result<User> {
         updatedUser = user
         return if (shouldSucceed) {
             Result.success(user)
@@ -88,10 +81,7 @@ class MockUpdateUserUseCase : UpdateUserUseCase {
     }
 }
 
-/**
- * Mock GetStatisticsUseCase
- */
-class MockGetStatisticsUseCase : GetStatisticsUseCase {
+class MockGetStatisticsUseCase : GetStatisticsUseCase(FakeUserRepository()) {
     var shouldSucceed = true
     var mockStatistics = Statistics(
         totalUsers = 100,
