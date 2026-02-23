@@ -46,6 +46,7 @@ import androidx.compose.ui.window.WindowPlacement
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import com.fivucsas.desktop.ui.admin.AdminDashboard
+import com.fivucsas.desktop.ui.auth.GuestFaceCheckScreen
 import com.fivucsas.desktop.ui.auth.QrLoginScreen
 import com.fivucsas.desktop.ui.kiosk.KioskMode
 import com.fivucsas.shared.data.local.TokenManager
@@ -170,8 +171,7 @@ private fun AppContent(
     val qrLoginViewModel: QrLoginViewModel = koinInject()
     val qrState by qrLoginViewModel.state.collectAsState()
     val persistedRole = tokenManager.getRole()
-    val adminAllowed = persistedRole == null ||
-            persistedRole == "ROOT" ||
+    val adminAllowed = persistedRole == "ROOT" ||
             persistedRole == "TENANT_ADMIN"
 
     LaunchedEffect(currentMode) {
@@ -186,6 +186,7 @@ private fun AppContent(
             onAdminSelected = {
                 if (adminAllowed) onNavigate(AppMode.ADMIN)
             },
+            onGuestFaceCheckSelected = { onNavigate(AppMode.GUEST_FACE_CHECK) },
             onQrLoginSelected = {
                 qrLoginViewModel.startDesktopSession()
                 onNavigate(AppMode.QR_LOGIN)
@@ -227,6 +228,13 @@ private fun AppContent(
                 onRefresh = { qrLoginViewModel.startDesktopSession() }
             )
         }
+
+        AppMode.GUEST_FACE_CHECK -> {
+            GuestFaceCheckScreen(
+                onBack = { onNavigate(AppMode.LAUNCHER) },
+                onBackToLogin = { onNavigate(AppMode.LAUNCHER) }
+            )
+        }
     }
 }
 
@@ -262,6 +270,7 @@ private fun ApplicationScope.AppSystemTray(
 fun LauncherScreen(
     onKioskSelected: () -> Unit,
     onAdminSelected: () -> Unit,
+    onGuestFaceCheckSelected: () -> Unit,
     onQrLoginSelected: () -> Unit
 ) {
     Box(
@@ -291,6 +300,7 @@ fun LauncherScreen(
             ModeSelectionCards(
                 onKioskSelected = onKioskSelected,
                 onAdminSelected = onAdminSelected,
+                onGuestFaceCheckSelected = onGuestFaceCheckSelected,
                 onQrLoginSelected = onQrLoginSelected
             )
 
@@ -363,6 +373,7 @@ private fun AppLogo() {
 private fun ModeSelectionCards(
     onKioskSelected: () -> Unit,
     onAdminSelected: () -> Unit,
+    onGuestFaceCheckSelected: () -> Unit,
     onQrLoginSelected: () -> Unit
 ) {
     Row(
@@ -380,6 +391,13 @@ private fun ModeSelectionCards(
             description = "User management and system configuration",
             icon = Icons.Default.AdminPanelSettings,
             onClick = onAdminSelected
+        )
+
+        ModeCard(
+            title = "Guest Face Check",
+            description = "Pre-auth face check with FOUND/NOT FOUND result",
+            icon = Icons.Default.Fingerprint,
+            onClick = onGuestFaceCheckSelected
         )
 
         ModeCard(
@@ -498,5 +516,6 @@ enum class AppMode {
     LAUNCHER,
     KIOSK,
     ADMIN,
-    QR_LOGIN
+    QR_LOGIN,
+    GUEST_FACE_CHECK
 }

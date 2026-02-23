@@ -36,6 +36,7 @@ fun LoginScreen(
     viewModel: LoginViewModel,
     onNavigateToRegister: () -> Unit,
     onNavigateToForgotPassword: () -> Unit,
+    onNavigateToGuestFaceCheck: () -> Unit,
     onLoginSuccess: () -> Unit
 ) {
     var email by remember { mutableStateOf("") }
@@ -136,6 +137,13 @@ fun LoginScreen(
             enabled = !state.isLoading
         ) {
             Text("Don't have an account? Register")
+        }
+
+        TextButton(
+            onClick = onNavigateToGuestFaceCheck,
+            enabled = !state.isLoading
+        ) {
+            Text("Continue as Guest (Face Check)")
         }
     }
 }

@@ -26,6 +26,8 @@ import com.fivucsas.mobile.android.ui.screen.QRLoginScanScreen
 import com.fivucsas.mobile.android.ui.screen.SettingsScreen
 import com.fivucsas.mobile.android.ui.screen.UsersManagementScreen
 import com.fivucsas.shared.data.local.TokenManager
+import com.fivucsas.shared.domain.model.ConfidenceBand
+import com.fivucsas.shared.domain.model.GuestFaceCheckOutcome
 import com.fivucsas.shared.domain.model.Permission
 import com.fivucsas.shared.domain.model.UserRole
 import com.fivucsas.shared.domain.model.hasPermission
@@ -37,6 +39,7 @@ import com.fivucsas.shared.presentation.viewmodel.auth.RegisterViewModel
 import com.fivucsas.shared.ui.screen.FingerprintFailureScreen
 import com.fivucsas.shared.ui.screen.FingerprintGateScreen
 import com.fivucsas.shared.ui.screen.FingerprintSuccessScreen
+import com.fivucsas.shared.ui.screen.GuestFaceCheckResultScreen
 import com.fivucsas.shared.ui.screen.LoginScreen
 import com.fivucsas.shared.ui.screen.OnboardingScreen
 import com.fivucsas.shared.ui.screen.RegisterScreen
@@ -62,6 +65,11 @@ sealed class Screen(val route: String) {
     object Help : Screen("help")
     object About : Screen("about")
     object QrLoginScan : Screen("qr-login-scan")
+    object GuestFaceCheckCapture : Screen("guest-face-check")
+    object GuestFaceCheckResult : Screen("guest-face-check-result/{outcome}/{confidence}") {
+        fun createRoute(outcome: GuestFaceCheckOutcome, confidence: ConfidenceBand?) =
+            "guest-face-check-result/${outcome.name}/${confidence?.name ?: "NONE"}"
+    }
 
     object AdminDashboard : Screen("admin-dashboard")
     object OperatorDashboard : Screen("operator-dashboard")
@@ -97,9 +105,14 @@ fun AppNavigation() {
     }
     val tokenManager = runCatching { koinInject<TokenManager>() }.getOrNull()
     val roleValue = runCatching { tokenManager?.getRole() }.getOrNull()
-    val userRole = roleValue?.let { UserRole.fromString(it) } ?: UserRole.USER
-    val isAuthenticated = runCatching { tokenManager?.isAuthenticated() == true }.getOrDefault(false)
-    val navItemsForRole = when (userRole) {
+    fun isAuthenticated(): Boolean =
+        runCatching { tokenManager?.isAuthenticated() == true }.getOrDefault(false)
+    fun currentUserRole(): UserRole {
+        if (!isAuthenticated()) return UserRole.GUEST
+        val role = runCatching { tokenManager?.getRole() }.getOrNull()
+        return role?.let { UserRole.fromString(it) } ?: UserRole.USER
+    }
+    val navItemsForRole = when (currentUserRole()) {
         UserRole.ROOT, UserRole.TENANT_ADMIN -> BottomNavDestinations.adminItems
         else -> BottomNavDestinations.items
     }
@@ -111,7 +124,7 @@ fun AppNavigation() {
         composable(Screen.Splash.route) {
             SplashScreen(
                 isFirstLaunch = prefs.getBoolean(KEY_FIRST_LAUNCH, true),
-                isAuthenticated = isAuthenticated,
+                isAuthenticated = isAuthenticated(),
                 userRole = roleValue,
                 onNavigateToOnboarding = {
                     navController.navigate(Screen.Onboarding.route) {
@@ -159,7 +172,9 @@ fun AppNavigation() {
                 viewModel = viewModel,
                 onNavigateToRegister = { navController.navigate(Screen.Register.route) },
                 onNavigateToForgotPassword = { navController.navigate(Screen.ForgotPassword.route) },
+                onNavigateToGuestFaceCheck = { navController.navigate(Screen.GuestFaceCheckCapture.route) },
                 onLoginSuccess = {
+                    viewModel.state.value.tokens?.let { tokenManager?.saveTokens(it) }
                     val loginRole = viewModel.state.value.role
                     val destination = when (loginRole) {
                         UserRole.ROOT, UserRole.TENANT_ADMIN -> Screen.AdminDashboard.route
@@ -178,6 +193,7 @@ fun AppNavigation() {
                 viewModel = viewModel,
                 onNavigateBack = { navController.popBackStack() },
                 onRegisterSuccess = {
+                    viewModel.state.value.tokens?.let { tokenManager?.saveTokens(it) }
                     navController.navigate(Screen.Dashboard.route) {
                         popUpTo(Screen.Login.route) { inclusive = true }
                     }
@@ -193,6 +209,15 @@ fun AppNavigation() {
         }
 
         composable(Screen.Dashboard.route) {
+            if (!isAuthenticated()) {
+                LaunchedEffect(Unit) {
+                    navController.navigate(Screen.Login.route) {
+                        popUpTo(0) { inclusive = true }
+                    }
+                }
+                return@composable
+            }
+            val userRole = currentUserRole()
             DashboardScreen(
                 userName = "Test User",
                 userRole = userRole,
@@ -213,6 +238,15 @@ fun AppNavigation() {
         }
 
         composable(Screen.AdminDashboard.route) {
+            if (!isAuthenticated()) {
+                LaunchedEffect(Unit) {
+                    navController.navigate(Screen.Login.route) {
+                        popUpTo(0) { inclusive = true }
+                    }
+                }
+                return@composable
+            }
+            val userRole = currentUserRole()
             AdminDashboardScreen(
                 userRole = userRole,
                 currentRoute = Screen.AdminDashboard.route,
@@ -231,6 +265,15 @@ fun AppNavigation() {
         }
 
         composable(Screen.UsersManagement.route) {
+            if (!isAuthenticated()) {
+                LaunchedEffect(Unit) {
+                    navController.navigate(Screen.Login.route) {
+                        popUpTo(0) { inclusive = true }
+                    }
+                }
+                return@composable
+            }
+            val userRole = currentUserRole()
             if (!userRole.hasPermission(Permission.TENANT_USERS_READ)) {
                 LaunchedEffect(Unit) {
                     if (!navController.popBackStack()) {
@@ -254,6 +297,14 @@ fun AppNavigation() {
         }
 
         composable(Screen.OperatorDashboard.route) {
+            if (!isAuthenticated()) {
+                LaunchedEffect(Unit) {
+                    navController.navigate(Screen.Login.route) {
+                        popUpTo(0) { inclusive = true }
+                    }
+                }
+                return@composable
+            }
             OperatorDashboardScreen(
                 currentRoute = Screen.OperatorDashboard.route,
                 onNavigateToNotifications = { navController.navigate(Screen.Notifications.route) },
@@ -271,6 +322,14 @@ fun AppNavigation() {
         }
 
         composable(Screen.ActivityHistory.route) {
+            if (!isAuthenticated()) {
+                LaunchedEffect(Unit) {
+                    navController.navigate(Screen.Login.route) {
+                        popUpTo(0) { inclusive = true }
+                    }
+                }
+                return@composable
+            }
             ActivityHistoryScreen(
                 currentRoute = Screen.ActivityHistory.route,
                 onNavigateBottom = { route ->
@@ -284,6 +343,15 @@ fun AppNavigation() {
         }
 
         composable(Screen.Profile.route) {
+            if (!isAuthenticated()) {
+                LaunchedEffect(Unit) {
+                    navController.navigate(Screen.Login.route) {
+                        popUpTo(0) { inclusive = true }
+                    }
+                }
+                return@composable
+            }
+            val userRole = currentUserRole()
             ProfileScreen(
                 userName = "Test User",
                 userEmail = "test@fivucsas.com",
@@ -304,6 +372,14 @@ fun AppNavigation() {
         }
 
         composable(Screen.EditProfile.route) {
+            if (!isAuthenticated()) {
+                LaunchedEffect(Unit) {
+                    navController.navigate(Screen.Login.route) {
+                        popUpTo(0) { inclusive = true }
+                    }
+                }
+                return@composable
+            }
             EditProfileScreen(
                 initialFirstName = "Test",
                 initialLastName = "User",
@@ -316,6 +392,14 @@ fun AppNavigation() {
         }
 
         composable(Screen.ChangePassword.route) {
+            if (!isAuthenticated()) {
+                LaunchedEffect(Unit) {
+                    navController.navigate(Screen.Login.route) {
+                        popUpTo(0) { inclusive = true }
+                    }
+                }
+                return@composable
+            }
             ChangePasswordScreen(
                 onNavigateBack = { navController.popBackStack() },
                 onSubmit = { _, _, _ -> navController.popBackStack() }
@@ -323,6 +407,14 @@ fun AppNavigation() {
         }
 
         composable(Screen.Settings.route) {
+            if (!isAuthenticated()) {
+                LaunchedEffect(Unit) {
+                    navController.navigate(Screen.Login.route) {
+                        popUpTo(0) { inclusive = true }
+                    }
+                }
+                return@composable
+            }
             SettingsScreen(
                 onNavigateBack = { navController.popBackStack() },
                 onNavigateToChangePassword = { navController.navigate(Screen.ChangePassword.route) },
@@ -332,25 +424,132 @@ fun AppNavigation() {
         }
 
         composable(Screen.Notifications.route) {
+            if (!isAuthenticated()) {
+                LaunchedEffect(Unit) {
+                    navController.navigate(Screen.Login.route) {
+                        popUpTo(0) { inclusive = true }
+                    }
+                }
+                return@composable
+            }
             NotificationsScreen(onNavigateBack = { navController.popBackStack() })
         }
 
         composable(Screen.Help.route) {
+            if (!isAuthenticated()) {
+                LaunchedEffect(Unit) {
+                    navController.navigate(Screen.Login.route) {
+                        popUpTo(0) { inclusive = true }
+                    }
+                }
+                return@composable
+            }
             HelpScreen(onNavigateBack = { navController.popBackStack() })
         }
 
         composable(Screen.About.route) {
+            if (!isAuthenticated()) {
+                LaunchedEffect(Unit) {
+                    navController.navigate(Screen.Login.route) {
+                        popUpTo(0) { inclusive = true }
+                    }
+                }
+                return@composable
+            }
             AboutScreen(onNavigateBack = { navController.popBackStack() })
         }
 
         composable(Screen.QrLoginScan.route) {
+            if (!isAuthenticated()) {
+                LaunchedEffect(Unit) {
+                    navController.navigate(Screen.Login.route) {
+                        popUpTo(0) { inclusive = true }
+                    }
+                }
+                return@composable
+            }
             QRLoginScanScreen(onNavigateBack = { navController.popBackStack() })
+        }
+
+        composable(Screen.GuestFaceCheckCapture.route) {
+            val userRole = currentUserRole()
+            if (!userRole.hasPermission(Permission.GUEST_FACE_CHECK)) {
+                LaunchedEffect(Unit) {
+                    navController.navigate(Screen.Login.route) {
+                        popUpTo(0) { inclusive = true }
+                    }
+                }
+                return@composable
+            }
+            val viewModel = koinInject<BiometricViewModel>()
+            BiometricVerifyScreen(
+                userId = "guest",
+                viewModel = viewModel,
+                guestMode = true,
+                onGuestResult = { outcome, confidence ->
+                    navController.navigate(
+                        Screen.GuestFaceCheckResult.createRoute(
+                            outcome = outcome,
+                            confidence = confidence
+                        )
+                    )
+                },
+                onNavigateBack = { navController.popBackStack() }
+            )
+        }
+
+        composable(
+            route = Screen.GuestFaceCheckResult.route,
+            arguments = listOf(
+                navArgument("outcome") { type = NavType.StringType },
+                navArgument("confidence") { type = NavType.StringType }
+            )
+        ) { backStackEntry ->
+            val userRole = currentUserRole()
+            if (!userRole.hasPermission(Permission.GUEST_FACE_CHECK)) {
+                LaunchedEffect(Unit) {
+                    navController.navigate(Screen.Login.route) {
+                        popUpTo(0) { inclusive = true }
+                    }
+                }
+                return@composable
+            }
+
+            val outcomeValue = backStackEntry.arguments?.getString("outcome")
+            val confidenceValue = backStackEntry.arguments?.getString("confidence")
+            val outcome = runCatching { GuestFaceCheckOutcome.valueOf(outcomeValue ?: "") }
+                .getOrDefault(GuestFaceCheckOutcome.NOT_FOUND)
+            val confidenceBand = if (confidenceValue == null || confidenceValue == "NONE") {
+                null
+            } else {
+                runCatching { ConfidenceBand.valueOf(confidenceValue) }.getOrNull()
+            }
+
+            GuestFaceCheckResultScreen(
+                outcome = outcome,
+                confidenceBand = confidenceBand,
+                onRetry = { navController.navigate(Screen.GuestFaceCheckCapture.route) },
+                onLoginToContinue = {
+                    navController.navigate(Screen.Login.route) {
+                        popUpTo(Screen.GuestFaceCheckCapture.route) { inclusive = true }
+                    }
+                }
+            )
         }
 
         composable(
             route = Screen.BiometricEnroll.route,
             arguments = listOf(navArgument("userId") { type = NavType.StringType })
         ) { backStackEntry ->
+            if (!isAuthenticated()) {
+                LaunchedEffect(Unit) {
+                    navController.navigate(Screen.Login.route) {
+                        popUpTo(0) { inclusive = true }
+                    }
+                }
+                return@composable
+            }
+            val userRole = currentUserRole()
             if (!userRole.hasPermission(Permission.ENROLL_SELF_CREATE)) {
                 LaunchedEffect(Unit) {
                     if (!navController.popBackStack()) {
@@ -374,6 +573,15 @@ fun AppNavigation() {
             route = Screen.BiometricVerify.route,
             arguments = listOf(navArgument("userId") { type = NavType.StringType })
         ) { backStackEntry ->
+            if (!isAuthenticated()) {
+                LaunchedEffect(Unit) {
+                    navController.navigate(Screen.Login.route) {
+                        popUpTo(0) { inclusive = true }
+                    }
+                }
+                return@composable
+            }
+            val userRole = currentUserRole()
             if (!userRole.hasPermission(Permission.VERIFY_SELF)) {
                 LaunchedEffect(Unit) {
                     if (!navController.popBackStack()) {
@@ -397,6 +605,14 @@ fun AppNavigation() {
             route = Screen.FingerprintGate.route,
             arguments = listOf(navArgument("target") { type = NavType.StringType })
         ) { backStackEntry ->
+            if (!isAuthenticated()) {
+                LaunchedEffect(Unit) {
+                    navController.navigate(Screen.Login.route) {
+                        popUpTo(0) { inclusive = true }
+                    }
+                }
+                return@composable
+            }
             val target = backStackEntry.arguments?.getString("target") ?: Screen.Dashboard.route
             val viewModel = koinInject<FingerprintViewModel>()
             FingerprintGateScreen(
@@ -417,6 +633,14 @@ fun AppNavigation() {
             route = Screen.FingerprintSuccess.route,
             arguments = listOf(navArgument("target") { type = NavType.StringType })
         ) { backStackEntry ->
+            if (!isAuthenticated()) {
+                LaunchedEffect(Unit) {
+                    navController.navigate(Screen.Login.route) {
+                        popUpTo(0) { inclusive = true }
+                    }
+                }
+                return@composable
+            }
             val target = backStackEntry.arguments?.getString("target") ?: Screen.Dashboard.route
             val viewModel = koinInject<FingerprintViewModel>()
             val stepUpToken = (viewModel.state.value as? FingerprintUiState.Success)?.stepUpToken
@@ -434,6 +658,14 @@ fun AppNavigation() {
             route = Screen.FingerprintFailure.route,
             arguments = listOf(navArgument("target") { type = NavType.StringType })
         ) { backStackEntry ->
+            if (!isAuthenticated()) {
+                LaunchedEffect(Unit) {
+                    navController.navigate(Screen.Login.route) {
+                        popUpTo(0) { inclusive = true }
+                    }
+                }
+                return@composable
+            }
             val target = backStackEntry.arguments?.getString("target") ?: Screen.Dashboard.route
             val viewModel = koinInject<FingerprintViewModel>()
             val failureState = viewModel.state.value as? FingerprintUiState.Error
