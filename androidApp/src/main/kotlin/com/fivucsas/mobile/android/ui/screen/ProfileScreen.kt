@@ -14,17 +14,23 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -33,6 +39,8 @@ import com.fivucsas.shared.config.UIDimens
 import com.fivucsas.shared.domain.model.Permission
 import com.fivucsas.shared.domain.model.UserRole
 import com.fivucsas.shared.domain.model.hasPermission
+import com.fivucsas.shared.ui.components.molecules.ConfirmationDialog
+import com.fivucsas.shared.ui.components.molecules.SuccessMessage
 import com.fivucsas.shared.ui.components.atoms.SectionHeader
 import com.fivucsas.shared.ui.components.atoms.StatusBadge
 import com.fivucsas.shared.ui.components.atoms.StatusBadgeType
@@ -50,9 +58,12 @@ fun ProfileScreen(
     onEditProfile: () -> Unit,
     onChangePassword: () -> Unit,
     onReEnroll: () -> Unit,
+    onDeleteEnrollment: () -> Unit,
     onOpenSettings: () -> Unit,
     navItems: List<com.fivucsas.shared.ui.components.organisms.BottomNavItem> = com.fivucsas.mobile.android.ui.navigation.BottomNavDestinations.items
 ) {
+    var showDeleteDialog by remember { mutableStateOf(false) }
+    var showDeleteSuccess by remember { mutableStateOf(false) }
     Scaffold(
         topBar = {
             TopAppBar(
@@ -183,7 +194,37 @@ fun ProfileScreen(
                 ) {
                     Text("Settings")
                 }
+                if (userRole.hasPermission(Permission.ENROLL_SELF_DELETE)) {
+                    OutlinedButton(
+                        onClick = { showDeleteDialog = true },
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = ButtonDefaults.outlinedButtonColors(
+                            contentColor = AppColors.Error
+                        )
+                    ) {
+                        Text("Delete My Enrollment")
+                    }
+                }
+            }
+
+            if (showDeleteSuccess) {
+                SuccessMessage(message = "Enrollment deleted successfully.")
             }
         }
+    }
+
+    if (showDeleteDialog) {
+        ConfirmationDialog(
+            title = "Delete My Enrollment",
+            message = "This will permanently delete your biometric data. You will need to re-enroll to use face verification.",
+            confirmText = "Delete",
+            dismissText = "Cancel",
+            onConfirm = {
+                showDeleteDialog = false
+                showDeleteSuccess = true
+                onDeleteEnrollment()
+            },
+            onDismiss = { showDeleteDialog = false }
+        )
     }
 }

@@ -1,7 +1,10 @@
 package com.fivucsas.shared.di
 
 import com.fivucsas.shared.presentation.viewmodel.AdminViewModel
+import com.fivucsas.shared.presentation.viewmodel.IdentifyViewModel
+import com.fivucsas.shared.presentation.viewmodel.InviteViewModel
 import com.fivucsas.shared.presentation.viewmodel.KioskViewModel
+import com.fivucsas.shared.presentation.viewmodel.TenantSettingsViewModel
 import com.fivucsas.shared.presentation.viewmodel.auth.BiometricViewModel
 import com.fivucsas.shared.presentation.viewmodel.auth.FingerprintViewModel
 import com.fivucsas.shared.presentation.viewmodel.auth.LoginViewModel
@@ -22,4 +25,7 @@ val viewModelModule = module {
     factoryOf(::BiometricViewModel)
     factoryOf(::FingerprintViewModel)
     factoryOf(::QrLoginViewModel)
+    factoryOf(::InviteViewModel)
+    factoryOf(::IdentifyViewModel)
+    factoryOf(::TenantSettingsViewModel)
 }

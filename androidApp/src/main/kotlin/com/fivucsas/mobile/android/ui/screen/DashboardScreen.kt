@@ -12,7 +12,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CameraAlt
+import androidx.compose.material.icons.filled.CreditCard
 import androidx.compose.material.icons.filled.History
+import androidx.compose.material.icons.filled.GroupAdd
+import androidx.compose.material.icons.filled.Nfc
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Security
@@ -59,6 +62,9 @@ fun DashboardScreen(
     onNavigateToQrScan: () -> Unit,
     onNavigateToHistory: () -> Unit,
     onNavigateToInvitations: () -> Unit,
+    onNavigateToExamEntry: () -> Unit,
+    onNavigateToRequestMembership: () -> Unit,
+    onNavigateToCardScan: () -> Unit,
     onNavigateBottom: (String) -> Unit
 ) {
     val hasQrAccess = userRole.hasPermission(Permission.QR_SCAN) ||
@@ -66,6 +72,9 @@ fun DashboardScreen(
     val quickActions = buildList {
         if (userRole.hasPermission(Permission.ENROLL_SELF_CREATE)) {
             add(QuickActionItem("Enroll Face", Icons.Default.CameraAlt, onNavigateToEnroll))
+        }
+        if (userRole.hasPermission(Permission.CARD_ADD_SELF)) {
+            add(QuickActionItem("Add Card", Icons.Default.CreditCard, onNavigateToCardScan))
         }
         if (userRole.hasPermission(Permission.VERIFY_SELF)) {
             add(QuickActionItem("Verify Identity", Icons.Default.Security, onNavigateToVerify))
@@ -81,6 +90,12 @@ fun DashboardScreen(
         }
         if (userRole.hasPermission(Permission.PROFILE_READ_SELF)) {
             add(QuickActionItem("Profile", Icons.Default.Person, onNavigateToProfile))
+        }
+        if (userRole.hasPermission(Permission.ENROLL_SELF_CREATE)) {
+            add(QuickActionItem("Exam Entry", Icons.Default.Nfc, onNavigateToExamEntry))
+        }
+        if (userRole.hasPermission(Permission.TENANT_MEMBERSHIP_REQUEST)) {
+            add(QuickActionItem("Join Tenant", Icons.Default.GroupAdd, onNavigateToRequestMembership))
         }
     }
 

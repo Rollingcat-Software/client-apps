@@ -14,7 +14,6 @@ import androidx.camera.view.LifecycleCameraController
 import androidx.camera.view.PreviewView
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -38,7 +37,6 @@ import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.CreditCard
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.Face
@@ -47,7 +45,6 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.SkipNext
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -104,7 +101,6 @@ import kotlinx.coroutines.launch
 // Step tracking
 // ---------------------------------------------------------------------------
 
-private const val STEP_CARD_CAPTURE = "CARD_CAPTURE"
 private const val STEP_FORM = "FORM"
 private const val STEP_CAPTURE = "CAPTURE"
 private const val STEP_PREVIEW = "PREVIEW"
@@ -141,8 +137,6 @@ fun BiometricEnrollScreen(
     var currentStep by rememberSaveable { mutableStateOf(STEP_FORM) }
     var formState by remember { mutableStateOf(EnrollmentFormState()) }
     var capturedImageBytes by remember { mutableStateOf<ByteArray?>(null) }
-    var cardFrontBytes by remember { mutableStateOf<ByteArray?>(null) }
-    var cardBackBytes by remember { mutableStateOf<ByteArray?>(null) }
 
     LaunchedEffect(Unit) { viewModel.clearState() }
 
@@ -160,11 +154,8 @@ fun BiometricEnrollScreen(
                             viewModel.clearState()
                         }
                         currentStep == STEP_CAPTURE -> {
-                            currentStep = STEP_CARD_CAPTURE
-                            viewModel.clearState()
-                        }
-                        currentStep == STEP_CARD_CAPTURE -> {
                             currentStep = STEP_FORM
+                            viewModel.clearState()
                         }
                         else -> onNavigateBack()
                     }
@@ -210,25 +201,11 @@ fun BiometricEnrollScreen(
                         onRetry = { viewModel.clearState() }
                     )
                 }
-                currentStep == STEP_CARD_CAPTURE -> {
-                    CardCaptureContent(
-                        onCardsCaptured = { front, back ->
-                            cardFrontBytes = front
-                            cardBackBytes = back
-                            currentStep = STEP_CAPTURE
-                        },
-                        onSkip = {
-                            currentStep = STEP_CAPTURE
-                        }
-                    )
-                }
                 else -> {
                     EnrollmentFormContent(
                         formState = formState,
                         onFormStateChange = { formState = it },
-                        onProceedToCapture = { currentStep = STEP_CARD_CAPTURE },
-                        cardFrontBytes = cardFrontBytes,
-                        cardBackBytes = cardBackBytes
+                        onProceedToCapture = { currentStep = STEP_CAPTURE }
                     )
                 }
             }
@@ -251,7 +228,6 @@ private fun EnrollmentTopBar(
         isSuccess -> "Enrollment Complete"
         currentStep == STEP_PREVIEW -> "Review Photo"
         currentStep == STEP_CAPTURE -> "Capture Face"
-        currentStep == STEP_CARD_CAPTURE -> "Scan ID Card"
         else -> "Face Enrollment"
     }
 
@@ -283,9 +259,7 @@ private fun EnrollmentTopBar(
 private fun EnrollmentFormContent(
     formState: EnrollmentFormState,
     onFormStateChange: (EnrollmentFormState) -> Unit,
-    onProceedToCapture: () -> Unit,
-    cardFrontBytes: ByteArray? = null,
-    cardBackBytes: ByteArray? = null
+    onProceedToCapture: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -295,13 +269,6 @@ private fun EnrollmentFormContent(
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         FormHeaderCard()
-
-        if (cardFrontBytes != null || cardBackBytes != null) {
-            CardScannedSummary(
-                frontBytes = cardFrontBytes,
-                backBytes = cardBackBytes
-            )
-        }
 
         OutlinedTextField(
             value = formState.fullName,
@@ -415,7 +382,7 @@ private fun EnrollmentFormContent(
             Icon(Icons.Default.CameraAlt, contentDescription = null)
             Spacer(modifier = Modifier.width(8.dp))
             Text(
-                "Continue to Card Scan",
+                "Continue to Face Capture",
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold
             )
@@ -450,7 +417,7 @@ private fun FormHeaderCard() {
                     color = MaterialTheme.colorScheme.onPrimaryContainer
                 )
                 Text(
-                    "Fill in your details below, then continue to ID card scan",
+                    "Fill in your details below, then continue to face capture",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onPrimaryContainer
                 )
@@ -519,473 +486,7 @@ private fun EnrollmentFormState.toEnrollmentData(): EnrollmentData {
 }
 
 // ---------------------------------------------------------------------------
-// Card Scanned Summary (shown at top of form when card images exist)
-// ---------------------------------------------------------------------------
-
-@Composable
-private fun CardScannedSummary(
-    frontBytes: ByteArray?,
-    backBytes: ByteArray?
-) {
-    Card(
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.secondaryContainer
-        ),
-        shape = RoundedCornerShape(16.dp),
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        Row(
-            modifier = Modifier.padding(12.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            Icon(
-                Icons.Default.CreditCard,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.onSecondaryContainer,
-                modifier = Modifier.size(24.dp)
-            )
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    "ID Card Scanned",
-                    style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSecondaryContainer
-                )
-                Text(
-                    buildString {
-                        if (frontBytes != null) append("Front")
-                        if (frontBytes != null && backBytes != null) append(" + ")
-                        if (backBytes != null) append("Back")
-                        append(" captured")
-                    },
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSecondaryContainer
-                )
-            }
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                if (frontBytes != null) {
-                    val frontBitmap = remember(frontBytes) {
-                        BitmapFactory.decodeByteArray(frontBytes, 0, frontBytes.size)
-                    }
-                    if (frontBitmap != null) {
-                        Image(
-                            bitmap = frontBitmap.asImageBitmap(),
-                            contentDescription = "Front of ID card",
-                            modifier = Modifier
-                                .height(40.dp)
-                                .aspectRatio(1.586f)
-                                .clip(RoundedCornerShape(4.dp)),
-                            contentScale = ContentScale.Crop
-                        )
-                    }
-                }
-                if (backBytes != null) {
-                    val backBitmap = remember(backBytes) {
-                        BitmapFactory.decodeByteArray(backBytes, 0, backBytes.size)
-                    }
-                    if (backBitmap != null) {
-                        Image(
-                            bitmap = backBitmap.asImageBitmap(),
-                            contentDescription = "Back of ID card",
-                            modifier = Modifier
-                                .height(40.dp)
-                                .aspectRatio(1.586f)
-                                .clip(RoundedCornerShape(4.dp)),
-                            contentScale = ContentScale.Crop
-                        )
-                    }
-                }
-            }
-        }
-    }
-}
-
-// ---------------------------------------------------------------------------
-// Step 1 â€“ Card Capture (photograph front + back of ID card)
-// ---------------------------------------------------------------------------
-
-private const val CARD_PHASE_CAPTURE_FRONT = "CAPTURE_FRONT"
-private const val CARD_PHASE_PREVIEW_FRONT = "PREVIEW_FRONT"
-private const val CARD_PHASE_CAPTURE_BACK = "CAPTURE_BACK"
-private const val CARD_PHASE_PREVIEW_BACK = "PREVIEW_BACK"
-
-@OptIn(ExperimentalPermissionsApi::class)
-@Composable
-private fun CardCaptureContent(
-    onCardsCaptured: (front: ByteArray, back: ByteArray) -> Unit,
-    onSkip: () -> Unit
-) {
-    val context = LocalContext.current
-    val lifecycleOwner = LocalLifecycleOwner.current
-
-    var phase by rememberSaveable { mutableStateOf(CARD_PHASE_CAPTURE_FRONT) }
-    var frontBytes by remember { mutableStateOf<ByteArray?>(null) }
-    var backBytes by remember { mutableStateOf<ByteArray?>(null) }
-
-    val cameraPermissionState = rememberPermissionState(Manifest.permission.CAMERA)
-    var permissionRequested by rememberSaveable { mutableStateOf(false) }
-
-    val cameraController = remember {
-        LifecycleCameraController(context).apply {
-            setEnabledUseCases(CameraController.IMAGE_CAPTURE)
-            cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
-        }
-    }
-
-    DisposableEffect(Unit) {
-        onDispose { cameraController.unbind() }
-    }
-
-    LaunchedEffect(Unit) {
-        if (!cameraPermissionState.status.isGranted) {
-            permissionRequested = true
-            cameraPermissionState.launchPermissionRequest()
-        }
-    }
-
-    Column(modifier = Modifier.fillMaxSize()) {
-        if (!cameraPermissionState.status.isGranted) {
-            val permanentlyDenied = permissionRequested
-                    && !cameraPermissionState.status.shouldShowRationale
-            CameraPermissionContent(
-                permanentlyDenied = permanentlyDenied,
-                onRequestPermission = {
-                    permissionRequested = true
-                    cameraPermissionState.launchPermissionRequest()
-                },
-                onOpenSettings = {
-                    context.startActivity(
-                        Intent(
-                            Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
-                            Uri.fromParts("package", context.packageName, null)
-                        )
-                    )
-                }
-            )
-        } else {
-            when (phase) {
-                CARD_PHASE_PREVIEW_FRONT -> {
-                    CardPreviewContent(
-                        imageBytes = frontBytes!!,
-                        sideLabel = "Front of ID Card",
-                        onRetake = {
-                            frontBytes = null
-                            phase = CARD_PHASE_CAPTURE_FRONT
-                        },
-                        onConfirm = { phase = CARD_PHASE_CAPTURE_BACK }
-                    )
-                }
-                CARD_PHASE_CAPTURE_BACK -> {
-                    CardCaptureViewfinder(
-                        cameraController = cameraController,
-                        lifecycleOwner = lifecycleOwner,
-                        sideLabel = "back",
-                        onCapture = {
-                            cameraController.takePicture(
-                                ContextCompat.getMainExecutor(context),
-                                object : ImageCapture.OnImageCapturedCallback() {
-                                    override fun onCaptureSuccess(image: ImageProxy) {
-                                        backBytes = image.toCompressedJpegBytes()
-                                        image.close()
-                                        phase = CARD_PHASE_PREVIEW_BACK
-                                    }
-                                    override fun onError(exception: ImageCaptureException) {
-                                        // Stay on capture screen so user can retry
-                                    }
-                                }
-                            )
-                        },
-                        onSkip = onSkip
-                    )
-                }
-                CARD_PHASE_PREVIEW_BACK -> {
-                    CardPreviewContent(
-                        imageBytes = backBytes!!,
-                        sideLabel = "Back of ID Card",
-                        onRetake = {
-                            backBytes = null
-                            phase = CARD_PHASE_CAPTURE_BACK
-                        },
-                        onConfirm = { onCardsCaptured(frontBytes!!, backBytes!!) }
-                    )
-                }
-                else -> {
-                    // CARD_PHASE_CAPTURE_FRONT (default)
-                    CardCaptureViewfinder(
-                        cameraController = cameraController,
-                        lifecycleOwner = lifecycleOwner,
-                        sideLabel = "front",
-                        onCapture = {
-                            cameraController.takePicture(
-                                ContextCompat.getMainExecutor(context),
-                                object : ImageCapture.OnImageCapturedCallback() {
-                                    override fun onCaptureSuccess(image: ImageProxy) {
-                                        frontBytes = image.toCompressedJpegBytes()
-                                        image.close()
-                                        phase = CARD_PHASE_PREVIEW_FRONT
-                                    }
-                                    override fun onError(exception: ImageCaptureException) {
-                                        // Stay on capture screen so user can retry
-                                    }
-                                }
-                            )
-                        },
-                        onSkip = onSkip
-                    )
-                }
-            }
-        }
-    }
-}
-
-// ---------------------------------------------------------------------------
-// Card Capture Viewfinder â€” camera preview with rectangular card guide
-// ---------------------------------------------------------------------------
-
-@Composable
-private fun CardCaptureViewfinder(
-    cameraController: LifecycleCameraController,
-    lifecycleOwner: androidx.lifecycle.LifecycleOwner,
-    sideLabel: String,
-    onCapture: () -> Unit,
-    onSkip: () -> Unit
-) {
-    Box(modifier = Modifier.fillMaxSize()) {
-        AndroidView(
-            factory = { ctx ->
-                PreviewView(ctx).apply {
-                    controller = cameraController
-                    cameraController.bindToLifecycle(lifecycleOwner)
-                }
-            },
-            modifier = Modifier.fillMaxSize()
-        )
-
-        // Header card
-        CardCaptureHeaderCard(
-            modifier = Modifier
-                .align(Alignment.TopCenter)
-                .padding(16.dp)
-        )
-
-        // Instruction text
-        Text(
-            text = "Place the $sideLabel of your ID card within the frame",
-            style = MaterialTheme.typography.bodyMedium,
-            fontWeight = FontWeight.SemiBold,
-            color = MaterialTheme.colorScheme.onPrimary,
-            textAlign = TextAlign.Center,
-            modifier = Modifier
-                .align(Alignment.Center)
-                .padding(horizontal = 32.dp)
-                .padding(top = 160.dp)
-                .background(
-                    color = MaterialTheme.colorScheme.primary.copy(alpha = 0.7f),
-                    shape = RoundedCornerShape(8.dp)
-                )
-                .padding(horizontal = 12.dp, vertical = 6.dp)
-        )
-
-        // Rectangular card guide (credit-card aspect ratio ~1.586:1)
-        Box(
-            modifier = Modifier
-                .align(Alignment.Center)
-                .fillMaxWidth(0.85f)
-                .aspectRatio(1.586f)
-                .border(
-                    BorderStroke(
-                        3.dp,
-                        MaterialTheme.colorScheme.primary.copy(alpha = 0.8f)
-                    ),
-                    shape = RoundedCornerShape(12.dp)
-                )
-        )
-
-        // Bottom controls
-        Column(
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .padding(24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            Button(
-                onClick = onCapture,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp),
-                shape = RoundedCornerShape(16.dp)
-            ) {
-                Icon(Icons.Default.CameraAlt, contentDescription = null)
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(
-                    "Capture ${sideLabel.replaceFirstChar { it.uppercase() }}",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold
-                )
-            }
-
-            OutlinedButton(
-                onClick = onSkip,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(48.dp),
-                shape = RoundedCornerShape(16.dp)
-            ) {
-                Icon(Icons.Default.SkipNext, contentDescription = null)
-                Spacer(modifier = Modifier.width(8.dp))
-                Text("Skip Card Scan")
-            }
-        }
-    }
-}
-
-// ---------------------------------------------------------------------------
-// Card Capture Header Card
-// ---------------------------------------------------------------------------
-
-@Composable
-private fun CardCaptureHeaderCard(modifier: Modifier = Modifier) {
-    Card(
-        modifier = modifier.fillMaxWidth(0.9f),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.95f)
-        ),
-        shape = RoundedCornerShape(16.dp)
-    ) {
-        Row(
-            modifier = Modifier.padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            Icon(
-                Icons.Default.CreditCard,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.onPrimaryContainer,
-                modifier = Modifier.size(32.dp)
-            )
-            Column {
-                Text(
-                    "Step 2: Scan Your ID Card",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer
-                )
-                Text(
-                    "Photograph the front and back of your ID card, or skip to enter details manually",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer
-                )
-            }
-        }
-    }
-}
-
-// ---------------------------------------------------------------------------
-// Card Preview â€” shows captured card image (front or back)
-// ---------------------------------------------------------------------------
-
-@Composable
-private fun CardPreviewContent(
-    imageBytes: ByteArray,
-    sideLabel: String,
-    onRetake: () -> Unit,
-    onConfirm: () -> Unit
-) {
-    val previewBitmap = remember(imageBytes) {
-        BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
-    }
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Card(
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.secondaryContainer
-            ),
-            shape = RoundedCornerShape(16.dp),
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Row(
-                modifier = Modifier.padding(16.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                Icon(
-                    Icons.Default.CreditCard,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onSecondaryContainer,
-                    modifier = Modifier.size(28.dp)
-                )
-                Column {
-                    Text(
-                        sideLabel,
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onSecondaryContainer
-                    )
-                    Text(
-                        "Review your captured image",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSecondaryContainer
-                    )
-                }
-            }
-        }
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        if (previewBitmap != null) {
-            Image(
-                bitmap = previewBitmap.asImageBitmap(),
-                contentDescription = sideLabel,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .aspectRatio(1.586f)
-                    .clip(RoundedCornerShape(16.dp)),
-                contentScale = ContentScale.Crop
-            )
-        }
-
-        Spacer(modifier = Modifier.weight(1f))
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            OutlinedButton(
-                onClick = onRetake,
-                modifier = Modifier
-                    .weight(1f)
-                    .height(56.dp),
-                shape = RoundedCornerShape(16.dp)
-            ) {
-                Icon(Icons.Default.CameraAlt, contentDescription = null)
-                Spacer(modifier = Modifier.width(8.dp))
-                Text("Retake", fontWeight = FontWeight.SemiBold)
-            }
-
-            Button(
-                onClick = onConfirm,
-                modifier = Modifier
-                    .weight(1f)
-                    .height(56.dp),
-                shape = RoundedCornerShape(16.dp)
-            ) {
-                Icon(Icons.Default.CheckCircle, contentDescription = null)
-                Spacer(modifier = Modifier.width(8.dp))
-                Text("Confirm", fontWeight = FontWeight.SemiBold)
-            }
-        }
-    }
-}
-
-// ---------------------------------------------------------------------------
-// Step 3 â€“ Face Capture (camera only, hands off bytes to preview)
+// Step 2 â€” Face Capture (camera only, hands off bytes to preview)
 // ---------------------------------------------------------------------------
 
 @OptIn(ExperimentalPermissionsApi::class)
@@ -1284,7 +785,7 @@ private fun CaptureButton(isLoading: Boolean, onClick: () -> Unit) {
 }
 
 // ---------------------------------------------------------------------------
-// Step 3 â€“ Photo Preview (review before sending)
+// Step 3 â€” Photo Preview (review before submitting)
 // ---------------------------------------------------------------------------
 
 @Composable

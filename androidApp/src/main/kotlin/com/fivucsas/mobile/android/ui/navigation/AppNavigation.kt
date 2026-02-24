@@ -15,10 +15,12 @@ import com.fivucsas.mobile.android.ui.screen.ActivityHistoryScreen
 import com.fivucsas.mobile.android.ui.screen.AdminDashboardScreen
 import com.fivucsas.mobile.android.ui.screen.BiometricEnrollScreen
 import com.fivucsas.mobile.android.ui.screen.BiometricVerifyScreen
+import com.fivucsas.mobile.android.ui.screen.CardScanScreen
 import com.fivucsas.mobile.android.ui.screen.ChangePasswordScreen
 import com.fivucsas.mobile.android.ui.screen.DashboardScreen
 import com.fivucsas.mobile.android.ui.screen.EditProfileScreen
 import com.fivucsas.mobile.android.ui.screen.ExamEntryScreen
+import com.fivucsas.mobile.android.ui.screen.MyInvitationsScreen
 import com.fivucsas.mobile.android.ui.screen.ForgotPasswordScreen
 import com.fivucsas.mobile.android.ui.screen.HelpScreen
 import com.fivucsas.mobile.android.ui.screen.IdentifyTenantScreen
@@ -27,6 +29,7 @@ import com.fivucsas.mobile.android.ui.screen.NotificationsScreen
 import com.fivucsas.mobile.android.ui.screen.OperatorDashboardScreen
 import com.fivucsas.mobile.android.ui.screen.ProfileScreen
 import com.fivucsas.mobile.android.ui.screen.QRLoginScanScreen
+import com.fivucsas.mobile.android.ui.screen.RequestMembershipScreen
 import com.fivucsas.mobile.android.ui.screen.SettingsScreen
 import com.fivucsas.mobile.android.ui.screen.TenantSettingsScreen
 import com.fivucsas.mobile.android.ui.screen.UnauthorizedScreen
@@ -88,6 +91,9 @@ sealed class Screen(val route: String) {
     object ExamEntry : Screen("exam-entry")
     object IdentifyTenant : Screen("identify-tenant")
     object InviteManagement : Screen("invite-management")
+    object MyInvitations : Screen("my-invitations")
+    object RequestMembership : Screen("request-membership")
+    object CardScan : Screen("card-scan")
 
     object BiometricEnroll : Screen("biometric/enroll/{userId}") {
         fun createRoute(userId: String) = "biometric/enroll/$userId"
@@ -252,8 +258,10 @@ fun AppNavigation() {
                 onNavigateToVerify = { navController.navigate(Screen.BiometricVerify.createRoute("1")) },
                 onNavigateToQrScan = { navController.navigate(Screen.QrLoginScan.route) },
                 onNavigateToHistory = { navController.navigate(Screen.ActivityHistory.route) },
-                onNavigateToInvitations = { navController.navigate(Screen.Profile.route) },
+                onNavigateToInvitations = { navController.navigate(Screen.MyInvitations.route) },
                 onNavigateToExamEntry = { navController.navigate(Screen.ExamEntry.route) },
+                onNavigateToRequestMembership = { navController.navigate(Screen.RequestMembership.route) },
+                onNavigateToCardScan = { navController.navigate(Screen.CardScan.route) },
                 onNavigateBottom = { route ->
                     navController.navigate(route) {
                         launchSingleTop = true
@@ -317,12 +325,16 @@ fun AppNavigation() {
             }
             UsersManagementScreen(
                 currentRoute = Screen.UsersManagement.route,
+                userRole = userRole,
                 onNavigateBack = { navController.popBackStack() },
                 onNavigateBottom = { route ->
                     navController.navigate(route) {
                         launchSingleTop = true
                         restoreState = true
                     }
+                },
+                onNavigateToEnrollUser = { userId ->
+                    navController.navigate(Screen.BiometricEnroll.createRoute(userId))
                 }
             )
         }
@@ -434,6 +446,7 @@ fun AppNavigation() {
                 onEditProfile = { navController.navigate(Screen.EditProfile.route) },
                 onChangePassword = { navController.navigate(Screen.ChangePassword.route) },
                 onReEnroll = { navController.navigate(Screen.BiometricEnroll.createRoute("1")) },
+                onDeleteEnrollment = { /* mock: enrollment deleted */ },
                 onOpenSettings = { navController.navigate(Screen.Settings.route) },
                 navItems = navItemsForRole
             )
@@ -636,6 +649,69 @@ fun AppNavigation() {
                         popUpTo(Screen.GuestFaceCheckCapture.route) { inclusive = true }
                     }
                 }
+            )
+        }
+
+        composable(Screen.MyInvitations.route) {
+            if (!isAuthenticated()) {
+                LaunchedEffect(Unit) {
+                    navController.navigate(Screen.Login.route) {
+                        popUpTo(0) { inclusive = true }
+                    }
+                }
+                return@composable
+            }
+            val userRole = currentUserRole()
+            if (!userRole.hasPermission(Permission.TENANT_INVITE_ACCEPT)) {
+                LaunchedEffect(Unit) {
+                    navigateUnauthorized("No permission to view invitations.")
+                }
+                return@composable
+            }
+            MyInvitationsScreen(
+                onNavigateBack = { navController.popBackStack() }
+            )
+        }
+
+        composable(Screen.RequestMembership.route) {
+            if (!isAuthenticated()) {
+                LaunchedEffect(Unit) {
+                    navController.navigate(Screen.Login.route) {
+                        popUpTo(0) { inclusive = true }
+                    }
+                }
+                return@composable
+            }
+            val userRole = currentUserRole()
+            if (!userRole.hasPermission(Permission.TENANT_MEMBERSHIP_REQUEST)) {
+                LaunchedEffect(Unit) {
+                    navigateUnauthorized("No permission to request tenant membership.")
+                }
+                return@composable
+            }
+            RequestMembershipScreen(
+                onNavigateBack = { navController.popBackStack() }
+            )
+        }
+
+        composable(Screen.CardScan.route) {
+            if (!isAuthenticated()) {
+                LaunchedEffect(Unit) {
+                    navController.navigate(Screen.Login.route) {
+                        popUpTo(0) { inclusive = true }
+                    }
+                }
+                return@composable
+            }
+            val userRole = currentUserRole()
+            if (!userRole.hasPermission(Permission.CARD_ADD_SELF)) {
+                LaunchedEffect(Unit) {
+                    navigateUnauthorized("No permission to scan ID cards.")
+                }
+                return@composable
+            }
+            CardScanScreen(
+                onNavigateBack = { navController.popBackStack() }
             )
         }
 

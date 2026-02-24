@@ -5,7 +5,7 @@ package com.fivucsas.shared.domain.model
  *
  * Design principles:
  * - AUTH_LOGIN / AUTH_LOGOUT are implicit (public endpoints), not listed here.
- * - NFC / Card Scan are platform capabilities, not permissions (future work).
+ * - NFC is a platform capability (future work).
  * - Liveness requirements are tenant policies, not permissions.
  * - Notification and app-settings permissions are reserved for future work.
  */
@@ -28,6 +28,10 @@ enum class Permission {
     VERIFY_SELF,                     // main verification flow (1:1)
     IDENTIFY_TENANT,                 // 1:N identify within tenant (admin/security)
 
+    // ── Card Scan ─────────────────────────────────────────────────
+    CARD_ADD_SELF,                   // scan & add own ID card
+    CARD_ADD_TENANT,                 // scan & add card for another user (admin)
+
     // ── QR ────────────────────────────────────────────────────────
     QR_DISPLAY,
     QR_SCAN,
@@ -47,6 +51,7 @@ enum class Permission {
 
     // ── Tenant Membership ─────────────────────────────────────────
     TENANT_INVITE_ACCEPT,            // accept a tenant invitation
+    TENANT_MEMBERSHIP_REQUEST,       // request membership to another tenant
 
     // ── Root (platform scope) ─────────────────────────────────────
     TENANT_MANAGE,                   // create/delete/configure tenants
@@ -76,7 +81,8 @@ object RolePermissions {
     private val userPermissions = setOf(
         Permission.PROFILE_READ_SELF,
         Permission.PROFILE_UPDATE_SELF,
-        Permission.TENANT_INVITE_ACCEPT
+        Permission.TENANT_INVITE_ACCEPT,
+        Permission.TENANT_MEMBERSHIP_REQUEST
     )
 
     private val tenantMemberPermissions = userPermissions + setOf(
@@ -84,6 +90,7 @@ object RolePermissions {
         Permission.ENROLL_SELF_UPDATE,
         Permission.ENROLL_SELF_DELETE,
         Permission.VERIFY_SELF,
+        Permission.CARD_ADD_SELF,
         Permission.QR_DISPLAY,
         Permission.QR_SCAN,
         Permission.HISTORY_READ_SELF,
@@ -93,6 +100,7 @@ object RolePermissions {
     private val tenantAdminPermissions = tenantMemberPermissions + setOf(
         Permission.ENROLL_TENANT_CREATE,
         Permission.ENROLL_TENANT_DELETE,
+        Permission.CARD_ADD_TENANT,
         Permission.IDENTIFY_TENANT,
         Permission.HISTORY_READ_TENANT,
         Permission.HISTORY_EXPORT_TENANT,
