@@ -12,6 +12,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -28,9 +32,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import com.fivucsas.shared.domain.model.UserRole
 import com.fivucsas.shared.presentation.viewmodel.auth.LoginViewModel
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(
     viewModel: LoginViewModel,
@@ -43,6 +49,16 @@ fun LoginScreen(
     var password by remember { mutableStateOf("") }
     val state by viewModel.state.collectAsState()
     val scope = rememberCoroutineScope()
+
+    // Dev role switcher
+    val testRoles = listOf(
+        UserRole.ROOT to "Root (Global)",
+        UserRole.TENANT_ADMIN to "Tenant Admin",
+        UserRole.TENANT_MEMBER to "Tenant User",
+        UserRole.USER to "User"
+    )
+    var selectedRole by remember { mutableStateOf(LoginViewModel.devMockRole) }
+    var roleDropdownExpanded by remember { mutableStateOf(false) }
 
     LaunchedEffect(state.isSuccess) {
         if (state.isSuccess && state.tokens != null) {
@@ -90,6 +106,39 @@ fun LoginScreen(
             modifier = Modifier.fillMaxWidth(),
             enabled = !state.isLoading
         )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // DEV: Role switcher dropdown
+        ExposedDropdownMenuBox(
+            expanded = roleDropdownExpanded,
+            onExpandedChange = { roleDropdownExpanded = it }
+        ) {
+            OutlinedTextField(
+                value = testRoles.first { it.first == selectedRole }.second,
+                onValueChange = {},
+                readOnly = true,
+                label = { Text("Dev Role") },
+                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = roleDropdownExpanded) },
+                modifier = Modifier.fillMaxWidth().menuAnchor(),
+                colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors()
+            )
+            ExposedDropdownMenu(
+                expanded = roleDropdownExpanded,
+                onDismissRequest = { roleDropdownExpanded = false }
+            ) {
+                testRoles.forEach { (role, label) ->
+                    DropdownMenuItem(
+                        text = { Text(label) },
+                        onClick = {
+                            selectedRole = role
+                            LoginViewModel.devMockRole = role
+                            roleDropdownExpanded = false
+                        }
+                    )
+                }
+            }
+        }
 
         Spacer(modifier = Modifier.height(8.dp))
 
