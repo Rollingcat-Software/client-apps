@@ -18,9 +18,12 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Analytics
 import androidx.compose.material.icons.filled.Group
 import androidx.compose.material.icons.filled.History
+import androidx.compose.material.icons.filled.Mail
+import androidx.compose.material.icons.filled.Nfc
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.People
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.PersonSearch
 import androidx.compose.material.icons.filled.Security
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.VerifiedUser
@@ -74,6 +77,9 @@ fun AdminDashboardScreen(
     onNavigateToHistory: () -> Unit,
     onNavigateToUsers: () -> Unit,
     onNavigateToSettings: () -> Unit,
+    onNavigateToIdentify: () -> Unit,
+    onNavigateToInvitations: () -> Unit,
+    onNavigateToExamEntry: () -> Unit,
     onNavigateBottom: (String) -> Unit,
     viewModel: AdminViewModel = koinInject()
 ) {
@@ -205,6 +211,13 @@ fun AdminDashboardScreen(
                 if (userRole.hasPermission(Permission.TENANT_SETTINGS_READ)) {
                     add(QuickActionItem("Settings", Icons.Default.Settings, onNavigateToSettings))
                 }
+                if (userRole.hasPermission(Permission.IDENTIFY_TENANT)) {
+                    add(QuickActionItem("Identify", Icons.Default.PersonSearch, onNavigateToIdentify))
+                }
+                if (userRole.hasPermission(Permission.TENANT_INVITE_CREATE)) {
+                    add(QuickActionItem("Invitations", Icons.Default.Mail, onNavigateToInvitations))
+                }
+                add(QuickActionItem("Exam Entry", Icons.Default.Nfc, onNavigateToExamEntry))
             }
             QuickActionGrid(actions = adminQuickActions)
 

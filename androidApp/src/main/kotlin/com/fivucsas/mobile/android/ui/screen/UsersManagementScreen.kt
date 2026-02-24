@@ -15,8 +15,10 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.NoAccounts
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.PersonSearch
 import androidx.compose.material3.CircularProgressIndicator
@@ -43,8 +45,11 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.fivucsas.mobile.android.ui.navigation.BottomNavDestinations
 import com.fivucsas.shared.config.UIDimens
+import com.fivucsas.shared.domain.model.Permission
 import com.fivucsas.shared.domain.model.User
+import com.fivucsas.shared.domain.model.UserRole
 import com.fivucsas.shared.domain.model.UserStatus
+import com.fivucsas.shared.domain.model.hasPermission
 import com.fivucsas.shared.presentation.viewmodel.AdminViewModel
 import com.fivucsas.shared.ui.components.atoms.AppTextField
 import com.fivucsas.shared.ui.components.atoms.SearchTextField
@@ -63,11 +68,14 @@ import org.koin.compose.koinInject
 @Composable
 fun UsersManagementScreen(
     currentRoute: String,
+    userRole: UserRole = UserRole.TENANT_ADMIN,
     onNavigateBack: () -> Unit,
     onNavigateBottom: (String) -> Unit,
+    onNavigateToEnrollUser: (String) -> Unit = {},
     viewModel: AdminViewModel = koinInject()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    var showEnrollDeleteDialog by remember { mutableStateOf<User?>(null) }
 
     LaunchedEffect(Unit) {
         viewModel.loadUsers()
@@ -189,8 +197,11 @@ fun UsersManagementScreen(
                     ) { user ->
                         UserRow(
                             user = user,
+                            userRole = userRole,
                             onEdit = { viewModel.showEditUserDialog(user) },
-                            onDelete = { viewModel.showDeleteConfirmation(user) }
+                            onDelete = { viewModel.showDeleteConfirmation(user) },
+                            onEnrollUser = { onNavigateToEnrollUser(user.id) },
+                            onDeleteEnrollment = { showEnrollDeleteDialog = user }
                         )
                     }
                     item {
@@ -230,13 +241,31 @@ fun UsersManagementScreen(
             onDismiss = { viewModel.hideDeleteConfirmation() }
         )
     }
+
+    // Delete Enrollment Confirmation Dialog
+    showEnrollDeleteDialog?.let { user ->
+        ConfirmationDialog(
+            title = "Delete Enrollment",
+            message = "Are you sure you want to delete the biometric enrollment for ${user.name}? They will need to re-enroll.",
+            confirmText = "Delete Enrollment",
+            dismissText = "Cancel",
+            onConfirm = {
+                viewModel.updateUser(user.copy(hasBiometric = false))
+                showEnrollDeleteDialog = null
+            },
+            onDismiss = { showEnrollDeleteDialog = null }
+        )
+    }
 }
 
 @Composable
 private fun UserRow(
     user: User,
+    userRole: UserRole = UserRole.TENANT_ADMIN,
     onEdit: () -> Unit,
-    onDelete: () -> Unit
+    onDelete: () -> Unit,
+    onEnrollUser: () -> Unit = {},
+    onDeleteEnrollment: () -> Unit = {}
 ) {
     Row(
         modifier = Modifier
@@ -285,6 +314,24 @@ private fun UserRow(
                 UserStatus.SUSPENDED -> StatusBadgeType.Failure
             }
         )
+        if (!user.hasBiometric && userRole.hasPermission(Permission.ENROLL_TENANT_CREATE)) {
+            IconButton(onClick = onEnrollUser) {
+                Icon(
+                    imageVector = Icons.Default.CameraAlt,
+                    contentDescription = "Enroll user",
+                    tint = AppColors.Primary
+                )
+            }
+        }
+        if (user.hasBiometric && userRole.hasPermission(Permission.ENROLL_TENANT_DELETE)) {
+            IconButton(onClick = onDeleteEnrollment) {
+                Icon(
+                    imageVector = Icons.Default.NoAccounts,
+                    contentDescription = "Delete enrollment",
+                    tint = AppColors.Error
+                )
+            }
+        }
         IconButton(onClick = onEdit) {
             Icon(
                 imageVector = Icons.Default.Edit,
