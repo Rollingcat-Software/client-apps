@@ -1,8 +1,0 @@
-{
-  "resources": [
-    {"pattern": "META-INF/.*"},
-    {"pattern": "org/bytedeco/javacpp/properties/.*"},
-    {"pattern": ".*/libjnidc1394.so"},
-    {"pattern": ".*/libdc1394.so.25"}
-  ]
-}

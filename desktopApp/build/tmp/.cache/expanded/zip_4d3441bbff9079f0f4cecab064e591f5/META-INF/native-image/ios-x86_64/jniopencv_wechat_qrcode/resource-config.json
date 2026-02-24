@@ -1,8 +1,0 @@
-{
-  "resources": [
-    {"pattern": "META-INF/.*"},
-    {"pattern": "org/bytedeco/javacpp/properties/.*"},
-    {"pattern": ".*/jniopencv_wechat_qrcode.o"},
-    {"pattern": ".*/libopencv_wechat_qrcode.a"}
-  ]
-}

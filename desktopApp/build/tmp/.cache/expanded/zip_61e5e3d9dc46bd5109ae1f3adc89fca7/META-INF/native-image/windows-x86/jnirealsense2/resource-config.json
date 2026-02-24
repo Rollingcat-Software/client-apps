@@ -1,8 +1,0 @@
-{
-  "resources": [
-    {"pattern": "META-INF/.*"},
-    {"pattern": "org/bytedeco/javacpp/properties/.*"},
-    {"pattern": ".*/jnirealsense2.dll"},
-    {"pattern": ".*/realsense2.dll"}
-  ]
-}

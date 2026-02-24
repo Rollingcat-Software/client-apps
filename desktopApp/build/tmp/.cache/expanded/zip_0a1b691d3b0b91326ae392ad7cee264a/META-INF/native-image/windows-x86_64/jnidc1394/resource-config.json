@@ -1,9 +1,0 @@
-{
-  "resources": [
-    {"pattern": "META-INF/.*"},
-    {"pattern": "org/bytedeco/javacpp/properties/.*"},
-    {"pattern": ".*/jnidc1394.dll"},
-    {"pattern": ".*/libdc1394-25.dll"},
-    {"pattern": ".*/1394camera.dll"}
-  ]
-}

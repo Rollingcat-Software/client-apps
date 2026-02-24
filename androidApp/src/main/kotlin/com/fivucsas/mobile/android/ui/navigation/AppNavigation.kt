@@ -18,13 +18,17 @@ import com.fivucsas.mobile.android.ui.screen.BiometricVerifyScreen
 import com.fivucsas.mobile.android.ui.screen.ChangePasswordScreen
 import com.fivucsas.mobile.android.ui.screen.DashboardScreen
 import com.fivucsas.mobile.android.ui.screen.EditProfileScreen
+import com.fivucsas.mobile.android.ui.screen.ExamEntryScreen
 import com.fivucsas.mobile.android.ui.screen.ForgotPasswordScreen
 import com.fivucsas.mobile.android.ui.screen.HelpScreen
+import com.fivucsas.mobile.android.ui.screen.IdentifyTenantScreen
+import com.fivucsas.mobile.android.ui.screen.InviteManagementScreen
 import com.fivucsas.mobile.android.ui.screen.NotificationsScreen
 import com.fivucsas.mobile.android.ui.screen.OperatorDashboardScreen
 import com.fivucsas.mobile.android.ui.screen.ProfileScreen
 import com.fivucsas.mobile.android.ui.screen.QRLoginScanScreen
 import com.fivucsas.mobile.android.ui.screen.SettingsScreen
+import com.fivucsas.mobile.android.ui.screen.TenantSettingsScreen
 import com.fivucsas.mobile.android.ui.screen.UnauthorizedScreen
 import com.fivucsas.mobile.android.ui.screen.UsersManagementScreen
 import com.fivucsas.shared.data.local.TokenManager
@@ -81,6 +85,9 @@ sealed class Screen(val route: String) {
     object AdminDashboard : Screen("admin-dashboard")
     object OperatorDashboard : Screen("operator-dashboard")
     object UsersManagement : Screen("users-management")
+    object ExamEntry : Screen("exam-entry")
+    object IdentifyTenant : Screen("identify-tenant")
+    object InviteManagement : Screen("invite-management")
 
     object BiometricEnroll : Screen("biometric/enroll/{userId}") {
         fun createRoute(userId: String) = "biometric/enroll/$userId"
@@ -246,6 +253,7 @@ fun AppNavigation() {
                 onNavigateToQrScan = { navController.navigate(Screen.QrLoginScan.route) },
                 onNavigateToHistory = { navController.navigate(Screen.ActivityHistory.route) },
                 onNavigateToInvitations = { navController.navigate(Screen.Profile.route) },
+                onNavigateToExamEntry = { navController.navigate(Screen.ExamEntry.route) },
                 onNavigateBottom = { route ->
                     navController.navigate(route) {
                         launchSingleTop = true
@@ -279,6 +287,9 @@ fun AppNavigation() {
                 onNavigateToHistory = { navController.navigate(Screen.TenantHistory.route) },
                 onNavigateToUsers = { navController.navigate(Screen.UsersManagement.route) },
                 onNavigateToSettings = { navController.navigate(Screen.TenantSettings.route) },
+                onNavigateToIdentify = { navController.navigate(Screen.IdentifyTenant.route) },
+                onNavigateToInvitations = { navController.navigate(Screen.InviteManagement.route) },
+                onNavigateToExamEntry = { navController.navigate(Screen.ExamEntry.route) },
                 onNavigateBottom = { route ->
                     navController.navigate(route) {
                         launchSingleTop = true
@@ -393,7 +404,9 @@ fun AppNavigation() {
                         restoreState = true
                     }
                 },
-                navItems = BottomNavDestinations.adminItems
+                navItems = BottomNavDestinations.adminItems,
+                showExportButton = userRole.hasPermission(Permission.HISTORY_EXPORT_TENANT),
+                onExport = { /* TODO: implement export */ }
             )
         }
 
@@ -500,17 +513,8 @@ fun AppNavigation() {
                 }
                 return@composable
             }
-            SettingsScreen(
-                onNavigateBack = { navController.popBackStack() },
-                onNavigateToChangePassword = { navController.navigate(Screen.ChangePassword.route) },
-                onNavigateToHelp = { navController.navigate(Screen.Help.route) },
-                onNavigateToAbout = { navController.navigate(Screen.About.route) },
-                onLogout = {
-                    tokenManager?.clearTokens()
-                    navController.navigate(Screen.Login.route) {
-                        popUpTo(0) { inclusive = true }
-                    }
-                }
+            TenantSettingsScreen(
+                onNavigateBack = { navController.popBackStack() }
             )
         }
 
@@ -632,6 +636,62 @@ fun AppNavigation() {
                         popUpTo(Screen.GuestFaceCheckCapture.route) { inclusive = true }
                     }
                 }
+            )
+        }
+
+        composable(Screen.ExamEntry.route) {
+            if (!isAuthenticated()) {
+                LaunchedEffect(Unit) {
+                    navController.navigate(Screen.Login.route) {
+                        popUpTo(0) { inclusive = true }
+                    }
+                }
+                return@composable
+            }
+            ExamEntryScreen(
+                onNavigateBack = { navController.popBackStack() }
+            )
+        }
+
+        composable(Screen.IdentifyTenant.route) {
+            if (!isAuthenticated()) {
+                LaunchedEffect(Unit) {
+                    navController.navigate(Screen.Login.route) {
+                        popUpTo(0) { inclusive = true }
+                    }
+                }
+                return@composable
+            }
+            val userRole = currentUserRole()
+            if (!userRole.hasPermission(Permission.IDENTIFY_TENANT)) {
+                LaunchedEffect(Unit) {
+                    navigateUnauthorized("No permission for 1:N identification.")
+                }
+                return@composable
+            }
+            IdentifyTenantScreen(
+                onNavigateBack = { navController.popBackStack() }
+            )
+        }
+
+        composable(Screen.InviteManagement.route) {
+            if (!isAuthenticated()) {
+                LaunchedEffect(Unit) {
+                    navController.navigate(Screen.Login.route) {
+                        popUpTo(0) { inclusive = true }
+                    }
+                }
+                return@composable
+            }
+            val userRole = currentUserRole()
+            if (!userRole.hasPermission(Permission.TENANT_INVITE_CREATE)) {
+                LaunchedEffect(Unit) {
+                    navigateUnauthorized("No permission to manage invitations.")
+                }
+                return@composable
+            }
+            InviteManagementScreen(
+                onNavigateBack = { navController.popBackStack() }
             )
         }
 
