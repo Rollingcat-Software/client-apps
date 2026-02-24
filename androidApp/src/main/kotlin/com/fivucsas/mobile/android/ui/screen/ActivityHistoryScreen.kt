@@ -9,8 +9,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CameraAlt
+import androidx.compose.material.icons.filled.FileDownload
 import androidx.compose.material.icons.filled.Security
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -37,7 +40,9 @@ import com.fivucsas.shared.ui.theme.AppColors
 fun ActivityHistoryScreen(
     currentRoute: String,
     onNavigateBottom: (String) -> Unit,
-    navItems: List<com.fivucsas.shared.ui.components.organisms.BottomNavItem> = com.fivucsas.mobile.android.ui.navigation.BottomNavDestinations.items
+    navItems: List<com.fivucsas.shared.ui.components.organisms.BottomNavItem> = com.fivucsas.mobile.android.ui.navigation.BottomNavDestinations.items,
+    showExportButton: Boolean = false,
+    onExport: () -> Unit = {}
 ) {
     data class HistoryEntry(
         val category: String,
@@ -138,6 +143,16 @@ fun ActivityHistoryScreen(
         topBar = {
             TopAppBar(
                 title = { Text("Activity History") },
+                actions = {
+                    if (showExportButton) {
+                        IconButton(onClick = onExport) {
+                            Icon(
+                                imageVector = Icons.Default.FileDownload,
+                                contentDescription = "Export History"
+                            )
+                        }
+                    }
+                },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = AppColors.Surface,
                     titleContentColor = AppColors.OnSurface

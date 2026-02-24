@@ -1,8 +1,0 @@
-{
-  "resources": [
-    {"pattern": "META-INF/.*"},
-    {"pattern": "org/bytedeco/javacpp/properties/.*"},
-    {"pattern": ".*/jniopencv_rapid.dll"},
-    {"pattern": ".*/opencv_rapid490.dll"}
-  ]
-}

@@ -1,8 +1,0 @@
-{
-  "resources": [
-    {"pattern": "META-INF/.*"},
-    {"pattern": "org/bytedeco/javacpp/properties/.*"},
-    {"pattern": ".*/jnitesseract.dll"},
-    {"pattern": ".*/libtesseract53.dll"}
-  ]
-}

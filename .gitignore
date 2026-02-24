@@ -42,6 +42,7 @@ migrate_working_dir/
 .gradle/
 local.properties
 
+desktopAppbuild/
 
 # Symbolication related
 app.*.symbols
