@@ -25,6 +25,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.fivucsas.shared.domain.model.UserRole
 import com.fivucsas.shared.ui.theme.AppColors
 import kotlinx.coroutines.delay
 
@@ -32,7 +33,7 @@ import kotlinx.coroutines.delay
 fun SplashScreen(
     isFirstLaunch: Boolean,
     isAuthenticated: Boolean,
-    userRole: String?,
+    userRole: UserRole?,
     onNavigateToOnboarding: () -> Unit,
     onNavigateToLogin: () -> Unit,
     onNavigateToDashboard: () -> Unit,
@@ -48,7 +49,7 @@ fun SplashScreen(
             isFirstLaunch -> onNavigateToOnboarding()
             isAuthenticated -> {
                 when (userRole) {
-                    "ROOT", "TENANT_ADMIN" -> onNavigateToAdminDashboard()
+                    UserRole.ROOT, UserRole.TENANT_ADMIN -> onNavigateToAdminDashboard()
                     else -> onNavigateToDashboard()
                 }
             }

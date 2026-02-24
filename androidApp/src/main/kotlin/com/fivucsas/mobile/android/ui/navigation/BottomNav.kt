@@ -16,7 +16,7 @@ object BottomNavDestinations {
 
     val adminItems = listOf(
         BottomNavItem("Dashboard", Icons.Default.Home, Screen.AdminDashboard.route),
-        BottomNavItem("History", Icons.Default.History, Screen.ActivityHistory.route),
+        BottomNavItem("History", Icons.Default.History, Screen.TenantHistory.route),
         BottomNavItem("Profile", Icons.Default.Person, Screen.Profile.route)
     )
 

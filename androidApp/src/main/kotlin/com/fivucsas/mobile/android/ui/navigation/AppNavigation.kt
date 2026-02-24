@@ -1,5 +1,6 @@
 package com.fivucsas.mobile.android.ui.navigation
 
+import android.net.Uri
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
@@ -24,6 +25,7 @@ import com.fivucsas.mobile.android.ui.screen.OperatorDashboardScreen
 import com.fivucsas.mobile.android.ui.screen.ProfileScreen
 import com.fivucsas.mobile.android.ui.screen.QRLoginScanScreen
 import com.fivucsas.mobile.android.ui.screen.SettingsScreen
+import com.fivucsas.mobile.android.ui.screen.UnauthorizedScreen
 import com.fivucsas.mobile.android.ui.screen.UsersManagementScreen
 import com.fivucsas.shared.data.local.TokenManager
 import com.fivucsas.shared.domain.model.ConfidenceBand
@@ -65,6 +67,11 @@ sealed class Screen(val route: String) {
     object Help : Screen("help")
     object About : Screen("about")
     object QrLoginScan : Screen("qr-login-scan")
+    object TenantHistory : Screen("tenant-history")
+    object TenantSettings : Screen("tenant-settings")
+    object Unauthorized : Screen("unauthorized/{message}") {
+        fun createRoute(message: String): String = "unauthorized/${Uri.encode(message)}"
+    }
     object GuestFaceCheckCapture : Screen("guest-face-check")
     object GuestFaceCheckResult : Screen("guest-face-check-result/{outcome}/{confidence}") {
         fun createRoute(outcome: GuestFaceCheckOutcome, confidence: ConfidenceBand?) =
@@ -104,7 +111,9 @@ fun AppNavigation() {
         context.getSharedPreferences(PREFS_NAME, android.content.Context.MODE_PRIVATE)
     }
     val tokenManager = runCatching { koinInject<TokenManager>() }.getOrNull()
-    val roleValue = runCatching { tokenManager?.getRole() }.getOrNull()
+    val roleValue = runCatching { tokenManager?.getRole() }
+        .getOrNull()
+        ?.let { UserRole.fromString(it) }
     fun isAuthenticated(): Boolean =
         runCatching { tokenManager?.isAuthenticated() == true }.getOrDefault(false)
     fun currentUserRole(): UserRole {
@@ -112,6 +121,14 @@ fun AppNavigation() {
         val role = runCatching { tokenManager?.getRole() }.getOrNull()
         return role?.let { UserRole.fromString(it) } ?: UserRole.USER
     }
+    fun navigateUnauthorized(message: String) {
+        navController.navigate(Screen.Unauthorized.createRoute(message)) {
+            launchSingleTop = true
+        }
+    }
+    fun isAdminRole(role: UserRole): Boolean = role == UserRole.TENANT_ADMIN || role == UserRole.ROOT
+    fun hasQrAccess(role: UserRole): Boolean =
+        canAccessAny(role, Permission.QR_SCAN, Permission.QR_DISPLAY)
     val navItemsForRole = when (currentUserRole()) {
         UserRole.ROOT, UserRole.TENANT_ADMIN -> BottomNavDestinations.adminItems
         else -> BottomNavDestinations.items
@@ -228,6 +245,7 @@ fun AppNavigation() {
                 onNavigateToVerify = { navController.navigate(Screen.BiometricVerify.createRoute("1")) },
                 onNavigateToQrScan = { navController.navigate(Screen.QrLoginScan.route) },
                 onNavigateToHistory = { navController.navigate(Screen.ActivityHistory.route) },
+                onNavigateToInvitations = { navController.navigate(Screen.Profile.route) },
                 onNavigateBottom = { route ->
                     navController.navigate(route) {
                         launchSingleTop = true
@@ -247,14 +265,20 @@ fun AppNavigation() {
                 return@composable
             }
             val userRole = currentUserRole()
+            if (!isAdminRole(userRole)) {
+                LaunchedEffect(Unit) {
+                    navigateUnauthorized("No permission for admin dashboard.")
+                }
+                return@composable
+            }
             AdminDashboardScreen(
                 userRole = userRole,
                 currentRoute = Screen.AdminDashboard.route,
                 onNavigateToNotifications = { navController.navigate(Screen.Notifications.route) },
                 onNavigateToProfile = { navController.navigate(Screen.Profile.route) },
-                onNavigateToHistory = { navController.navigate(Screen.ActivityHistory.route) },
+                onNavigateToHistory = { navController.navigate(Screen.TenantHistory.route) },
                 onNavigateToUsers = { navController.navigate(Screen.UsersManagement.route) },
-                onNavigateToSettings = { navController.navigate(Screen.Settings.route) },
+                onNavigateToSettings = { navController.navigate(Screen.TenantSettings.route) },
                 onNavigateBottom = { route ->
                     navController.navigate(route) {
                         launchSingleTop = true
@@ -276,11 +300,7 @@ fun AppNavigation() {
             val userRole = currentUserRole()
             if (!userRole.hasPermission(Permission.TENANT_USERS_READ)) {
                 LaunchedEffect(Unit) {
-                    if (!navController.popBackStack()) {
-                        navController.navigate(Screen.Dashboard.route) {
-                            popUpTo(0) { inclusive = true }
-                        }
-                    }
+                    navigateUnauthorized("No permission to view tenant users.")
                 }
                 return@composable
             }
@@ -330,6 +350,13 @@ fun AppNavigation() {
                 }
                 return@composable
             }
+            val userRole = currentUserRole()
+            if (!userRole.hasPermission(Permission.HISTORY_READ_SELF)) {
+                LaunchedEffect(Unit) {
+                    navigateUnauthorized("No permission to view your activity history.")
+                }
+                return@composable
+            }
             ActivityHistoryScreen(
                 currentRoute = Screen.ActivityHistory.route,
                 onNavigateBottom = { route ->
@@ -339,6 +366,34 @@ fun AppNavigation() {
                     }
                 },
                 navItems = navItemsForRole
+            )
+        }
+
+        composable(Screen.TenantHistory.route) {
+            if (!isAuthenticated()) {
+                LaunchedEffect(Unit) {
+                    navController.navigate(Screen.Login.route) {
+                        popUpTo(0) { inclusive = true }
+                    }
+                }
+                return@composable
+            }
+            val userRole = currentUserRole()
+            if (!userRole.hasPermission(Permission.HISTORY_READ_TENANT)) {
+                LaunchedEffect(Unit) {
+                    navigateUnauthorized("No permission to view tenant history.")
+                }
+                return@composable
+            }
+            ActivityHistoryScreen(
+                currentRoute = Screen.TenantHistory.route,
+                onNavigateBottom = { route ->
+                    navController.navigate(route) {
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                },
+                navItems = BottomNavDestinations.adminItems
             )
         }
 
@@ -423,6 +478,30 @@ fun AppNavigation() {
             )
         }
 
+        composable(Screen.TenantSettings.route) {
+            if (!isAuthenticated()) {
+                LaunchedEffect(Unit) {
+                    navController.navigate(Screen.Login.route) {
+                        popUpTo(0) { inclusive = true }
+                    }
+                }
+                return@composable
+            }
+            val userRole = currentUserRole()
+            if (!userRole.hasPermission(Permission.TENANT_SETTINGS_READ)) {
+                LaunchedEffect(Unit) {
+                    navigateUnauthorized("No permission to view tenant settings.")
+                }
+                return@composable
+            }
+            SettingsScreen(
+                onNavigateBack = { navController.popBackStack() },
+                onNavigateToChangePassword = { navController.navigate(Screen.ChangePassword.route) },
+                onNavigateToHelp = { navController.navigate(Screen.Help.route) },
+                onNavigateToAbout = { navController.navigate(Screen.About.route) }
+            )
+        }
+
         composable(Screen.Notifications.route) {
             if (!isAuthenticated()) {
                 LaunchedEffect(Unit) {
@@ -465,6 +544,13 @@ fun AppNavigation() {
                     navController.navigate(Screen.Login.route) {
                         popUpTo(0) { inclusive = true }
                     }
+                }
+                return@composable
+            }
+            val userRole = currentUserRole()
+            if (!hasQrAccess(userRole)) {
+                LaunchedEffect(Unit) {
+                    navigateUnauthorized("No permission to scan/display QR.")
                 }
                 return@composable
             }
@@ -552,11 +638,7 @@ fun AppNavigation() {
             val userRole = currentUserRole()
             if (!userRole.hasPermission(Permission.ENROLL_SELF_CREATE)) {
                 LaunchedEffect(Unit) {
-                    if (!navController.popBackStack()) {
-                        navController.navigate(Screen.Dashboard.route) {
-                            popUpTo(0) { inclusive = true }
-                        }
-                    }
+                    navigateUnauthorized("No permission to enroll biometric data.")
                 }
                 return@composable
             }
@@ -584,11 +666,7 @@ fun AppNavigation() {
             val userRole = currentUserRole()
             if (!userRole.hasPermission(Permission.VERIFY_SELF)) {
                 LaunchedEffect(Unit) {
-                    if (!navController.popBackStack()) {
-                        navController.navigate(Screen.Dashboard.route) {
-                            popUpTo(0) { inclusive = true }
-                        }
-                    }
+                    navigateUnauthorized("No permission to verify biometric data.")
                 }
                 return@composable
             }
@@ -676,6 +754,23 @@ fun AppNavigation() {
                     navController.navigate(Screen.FingerprintGate.createRoute(target))
                 },
                 onBack = { navController.popBackStack() }
+            )
+        }
+
+        composable(
+            route = Screen.Unauthorized.route,
+            arguments = listOf(navArgument("message") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val message = backStackEntry.arguments?.getString("message") ?: "No permission."
+            UnauthorizedScreen(
+                message = message,
+                onBack = {
+                    if (!navController.popBackStack()) {
+                        navController.navigate(Screen.Dashboard.route) {
+                            popUpTo(0) { inclusive = true }
+                        }
+                    }
+                }
             )
         }
     }
