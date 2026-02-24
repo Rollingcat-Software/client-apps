@@ -17,6 +17,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AdminPanelSettings
 import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.Fingerprint
+import androidx.compose.material.icons.filled.PersonSearch
 import androidx.compose.material.icons.filled.TouchApp
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -51,6 +52,9 @@ import com.fivucsas.desktop.ui.auth.QrLoginScreen
 import com.fivucsas.desktop.ui.kiosk.KioskMode
 import com.fivucsas.shared.data.local.TokenManager
 import com.fivucsas.shared.di.getAppModules
+import com.fivucsas.shared.domain.model.Permission
+import com.fivucsas.shared.domain.model.UserRole
+import com.fivucsas.shared.domain.model.hasPermission
 import com.fivucsas.shared.presentation.viewmodel.auth.QrLoginStatus
 import com.fivucsas.shared.presentation.viewmodel.auth.QrLoginViewModel
 import org.koin.java.KoinJavaComponent.inject
@@ -170,9 +174,13 @@ private fun AppContent(
     val tokenManager: TokenManager by inject(TokenManager::class.java)
     val qrLoginViewModel: QrLoginViewModel = koinInject()
     val qrState by qrLoginViewModel.state.collectAsState()
-    val persistedRole = tokenManager.getRole()
-    val adminAllowed = persistedRole == "ROOT" ||
-            persistedRole == "TENANT_ADMIN"
+    val currentRole = tokenManager
+        .getRole()
+        ?.let { UserRole.fromString(it) }
+        ?: UserRole.GUEST
+    val adminAllowed = currentRole == UserRole.ROOT ||
+            currentRole == UserRole.TENANT_ADMIN
+    val canOpenAdmin = adminAllowed || currentRole.hasPermission(Permission.TENANT_USERS_READ)
 
     LaunchedEffect(currentMode) {
         if (currentMode != AppMode.QR_LOGIN) {
@@ -184,7 +192,7 @@ private fun AppContent(
         AppMode.LAUNCHER -> LauncherScreen(
             onKioskSelected = { onNavigate(AppMode.KIOSK) },
             onAdminSelected = {
-                if (adminAllowed) onNavigate(AppMode.ADMIN)
+                if (canOpenAdmin) onNavigate(AppMode.ADMIN)
             },
             onGuestFaceCheckSelected = { onNavigate(AppMode.GUEST_FACE_CHECK) },
             onQrLoginSelected = {
@@ -198,7 +206,7 @@ private fun AppContent(
         )
 
         AppMode.ADMIN -> {
-            if (adminAllowed) {
+            if (canOpenAdmin) {
                 AdminDashboard(
                     onBack = { onNavigate(AppMode.LAUNCHER) }
                 )
@@ -218,7 +226,7 @@ private fun AppContent(
                     if (qrState.status != QrLoginStatus.APPROVED) {
                         return@QrLoginScreen
                     }
-                    if (adminAllowed) {
+                    if (canOpenAdmin) {
                         onNavigate(AppMode.ADMIN)
                     } else {
                         onNavigate(AppMode.KIOSK)
@@ -383,6 +391,7 @@ private fun ModeSelectionCards(
             title = "Kiosk Mode",
             description = "Self-service enrollment and verification",
             icon = Icons.Default.TouchApp,
+            gradientColors = listOf(Color(0xFF1E88E5), Color(0xFF1565C0)),
             onClick = onKioskSelected
         )
 
@@ -390,13 +399,15 @@ private fun ModeSelectionCards(
             title = "Admin Dashboard",
             description = "User management and system configuration",
             icon = Icons.Default.AdminPanelSettings,
+            gradientColors = listOf(Color(0xFF8E24AA), Color(0xFF5E35B1)),
             onClick = onAdminSelected
         )
 
         ModeCard(
             title = "Guest Face Check",
             description = "Pre-auth face check with FOUND/NOT FOUND result",
-            icon = Icons.Default.Fingerprint,
+            icon = Icons.Default.PersonSearch,
+            gradientColors = listOf(Color(0xFF00897B), Color(0xFF00695C)),
             onClick = onGuestFaceCheckSelected
         )
 
@@ -404,6 +415,7 @@ private fun ModeSelectionCards(
             title = "QR Login",
             description = "Show QR to be scanned from mobile app",
             icon = Icons.Default.CameraAlt,
+            gradientColors = listOf(Color(0xFFF4511E), Color(0xFFE64A19)),
             onClick = onQrLoginSelected
         )
     }
@@ -432,6 +444,7 @@ fun ModeCard(
     title: String,
     description: String,
     icon: androidx.compose.ui.graphics.vector.ImageVector,
+    gradientColors: List<Color>,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -466,11 +479,7 @@ fun ModeCard(
                         .fillMaxSize()
                         .background(
                             brush = Brush.linearGradient(
-                                colors = if (title.contains("Kiosk")) {
-                                    listOf(Color(0xFF1976D2), Color(0xFF1565C0))
-                                } else {
-                                    listOf(Color(0xFF00ACC1), Color(0xFF0097A7))
-                                }
+                                colors = gradientColors
                             )
                         ),
                     contentAlignment = Alignment.Center

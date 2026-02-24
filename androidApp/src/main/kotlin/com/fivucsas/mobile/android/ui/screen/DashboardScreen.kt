@@ -58,8 +58,11 @@ fun DashboardScreen(
     onNavigateToVerify: () -> Unit,
     onNavigateToQrScan: () -> Unit,
     onNavigateToHistory: () -> Unit,
+    onNavigateToInvitations: () -> Unit,
     onNavigateBottom: (String) -> Unit
 ) {
+    val hasQrAccess = userRole.hasPermission(Permission.QR_SCAN) ||
+        userRole.hasPermission(Permission.QR_DISPLAY)
     val quickActions = buildList {
         if (userRole.hasPermission(Permission.ENROLL_SELF_CREATE)) {
             add(QuickActionItem("Enroll Face", Icons.Default.CameraAlt, onNavigateToEnroll))
@@ -67,9 +70,18 @@ fun DashboardScreen(
         if (userRole.hasPermission(Permission.VERIFY_SELF)) {
             add(QuickActionItem("Verify Identity", Icons.Default.Security, onNavigateToVerify))
         }
-        add(QuickActionItem("QR Scan", Icons.Default.CameraAlt, onNavigateToQrScan))
-        add(QuickActionItem("Activity History", Icons.Default.History, onNavigateToHistory))
-        add(QuickActionItem("Profile & Settings", Icons.Default.Person, onNavigateToProfile))
+        if (hasQrAccess) {
+            add(QuickActionItem("QR", Icons.Default.CameraAlt, onNavigateToQrScan))
+        }
+        if (userRole.hasPermission(Permission.HISTORY_READ_SELF)) {
+            add(QuickActionItem("Activity History", Icons.Default.History, onNavigateToHistory))
+        }
+        if (userRole.hasPermission(Permission.TENANT_INVITE_ACCEPT)) {
+            add(QuickActionItem("My Invitations", Icons.Default.Notifications, onNavigateToInvitations))
+        }
+        if (userRole.hasPermission(Permission.PROFILE_READ_SELF)) {
+            add(QuickActionItem("Profile", Icons.Default.Person, onNavigateToProfile))
+        }
     }
 
     val activityItems = listOf(
@@ -192,6 +204,20 @@ fun DashboardScreen(
                         text = "Confidence: 94%",
                         style = MaterialTheme.typography.bodySmall,
                         color = AppColors.OnSurfaceVariant
+                    )
+                }
+            }
+
+            if (userRole == UserRole.USER) {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(containerColor = AppColors.Warning.copy(alpha = 0.12f))
+                ) {
+                    Text(
+                        text = "You are not a tenant member yet. Accept invite / request access.",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = AppColors.OnSurface,
+                        modifier = Modifier.padding(UIDimens.SpacingMedium)
                     )
                 }
             }
