@@ -608,7 +608,14 @@ fun AppNavigation() {
             val userRole = currentUserRole()
             if (!NavigationPolicy.canAccessRoute(userRole, RouteIds.TENANT_HISTORY)) {
                 LaunchedEffect(Unit) {
-                    navigateUnauthorized("No permission to view tenant history.")
+                    if (NavigationPolicy.canAccessRoute(userRole, RouteIds.ACTIVITY_HISTORY)) {
+                        navController.navigate(Screen.ActivityHistory.route) {
+                            popUpTo(Screen.TenantHistory.route) { inclusive = true }
+                            launchSingleTop = true
+                        }
+                    } else {
+                        navigateUnauthorized("No permission to view tenant history.")
+                    }
                 }
                 return@composable
             }
