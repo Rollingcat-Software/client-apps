@@ -5,7 +5,8 @@
       "Bash(tail:*)",
       "Bash(ls:*)",
       "Bash(find:*)",
-      "Bash(grep:*)"
+      "Bash(grep:*)",
+      "Bash(cd \"C:\\\\Users\\\\hp\\\\Documents\\\\GitHub\\\\Rollingcat-Software\\\\mobile-app\" && ./gradlew shared:compileKotlinAndroid 2>&1)"
     ]
   }
 }
