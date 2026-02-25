@@ -13,10 +13,14 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AdminPanelSettings
+import androidx.compose.material.icons.filled.Business
 import androidx.compose.material.icons.filled.CameraAlt
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Fingerprint
 import androidx.compose.material.icons.filled.HealthAndSafety
+import androidx.compose.material.icons.automirrored.filled.HelpOutline
 import androidx.compose.material.icons.filled.History
+import androidx.compose.material.icons.filled.Mail
 import androidx.compose.material.icons.filled.ManageAccounts
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.PersonSearch
@@ -41,6 +45,13 @@ import androidx.compose.ui.window.WindowPlacement
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import com.fivucsas.desktop.ui.admin.AdminDashboard
+import com.fivucsas.desktop.ui.admin.AdminDesktopIdentifyTenantScreen
+import com.fivucsas.desktop.ui.admin.AdminDesktopAnalyticsScreen
+import com.fivucsas.desktop.ui.admin.AdminDesktopExamEntryScreen
+import com.fivucsas.desktop.ui.admin.AdminDesktopInviteManagementScreen
+import com.fivucsas.desktop.ui.admin.AdminDesktopSettingsScreen
+import com.fivucsas.desktop.ui.admin.AdminDesktopTenantHistoryScreen
+import com.fivucsas.desktop.ui.admin.AdminDesktopUsersScreen
 import com.fivucsas.desktop.ui.auth.GuestFaceCheckScreen
 import com.fivucsas.desktop.ui.auth.QrLoginScreen
 import com.fivucsas.desktop.ui.components.DesktopAppShell
@@ -48,6 +59,12 @@ import com.fivucsas.desktop.ui.components.DesktopBannerType
 import com.fivucsas.desktop.ui.components.DesktopDashboardActionCard
 import com.fivucsas.desktop.ui.components.DesktopInfoBanner
 import com.fivucsas.desktop.ui.components.DesktopSectionHeader
+import com.fivucsas.desktop.ui.member.MemberDesktopActivityHistoryScreen
+import com.fivucsas.desktop.ui.member.MemberDesktopEditProfileScreen
+import com.fivucsas.desktop.ui.member.MemberDesktopMyInvitationsScreen
+import com.fivucsas.desktop.ui.member.MemberDesktopProfileScreen
+import com.fivucsas.desktop.ui.member.MemberDesktopRequestMembershipScreen
+import com.fivucsas.desktop.ui.member.MemberDesktopSettingsHelpScreen
 import com.fivucsas.desktop.ui.root.RootDesktopAuditScreen
 import com.fivucsas.desktop.ui.root.RootDesktopConsoleScreen
 import com.fivucsas.desktop.ui.root.RootDesktopInviteManagementScreen
@@ -211,10 +228,9 @@ private fun AppContent(
             onLogoutToLauncher()
         }
         AppMode.TENANT_ADMIN_HOME -> guardedComposable(currentRole, onUnauthorized, "No permission for tenant admin dashboard.", anyPermissions = setOf(Permission.TENANT_USERS_READ)) {
-            AdminDashboard(
-                onBack = { onNavigate(AppMode.LAUNCHER) },
-                onLogout = { onLogoutToLauncher() }
-            )
+            RoleDashboard("Admin Dashboard", currentRole ?: UserRole.TENANT_ADMIN, tenantAdminActions(), onNavigate, { onNavigate(AppMode.LAUNCHER) }) {
+                onLogoutToLauncher()
+            }
         }
         AppMode.ROOT_HOME -> guardedComposable(currentRole, onUnauthorized, "No permission for root dashboard.", anyPermissions = setOf(Permission.PLATFORM_HEALTH_READ)) {
             RootDesktopConsoleScreen(
@@ -237,20 +253,88 @@ private fun AppContent(
         AppMode.VERIFY -> guardedComposable(currentRole, onUnauthorized, "No permission to verify identity.", anyPermissions = setOf(Permission.VERIFY_SELF)) {
             KioskMode(onBack = { onNavigate(modeForRole(currentRole ?: UserRole.USER)) })
         }
+        AppMode.PROFILE -> guardedComposable(currentRole, onUnauthorized, "No permission to view profile.", anyPermissions = setOf(Permission.PROFILE_READ_SELF)) {
+            MemberDesktopProfileScreen(
+                role = currentRole ?: UserRole.TENANT_MEMBER,
+                onEditProfile = { onNavigate(AppMode.EDIT_PROFILE) },
+                onChangePassword = { /* TODO: change password flow */ },
+                onReEnroll = { onNavigate(AppMode.ENROLL) },
+                onDeleteEnrollment = { /* TODO: delete enrollment */ },
+                onOpenSettings = { onNavigate(AppMode.SETTINGS_HELP) },
+                onBack = { onNavigate(modeForRole(currentRole ?: UserRole.USER)) },
+                onLogout = { onLogoutToLauncher() }
+            )
+        }
+        AppMode.EDIT_PROFILE -> guardedComposable(currentRole, onUnauthorized, "No permission to edit profile.", anyPermissions = setOf(Permission.PROFILE_UPDATE_SELF)) {
+            MemberDesktopEditProfileScreen(
+                onSave = { _, _, _ -> onNavigate(AppMode.PROFILE) },
+                onBack = { onNavigate(AppMode.PROFILE) }
+            )
+        }
+        AppMode.SETTINGS_HELP -> {
+            MemberDesktopSettingsHelpScreen(
+                onBack = { onNavigate(modeForRole(currentRole ?: UserRole.USER)) }
+            )
+        }
         AppMode.HISTORY_SELF -> guardedComposable(currentRole, onUnauthorized, "No permission to view activity history.", anyPermissions = setOf(Permission.HISTORY_READ_SELF)) {
-            PlaceholderScreen("Activity History", "Desktop history screen will be implemented here.") { onNavigate(modeForRole(currentRole ?: UserRole.USER)) }
+            MemberDesktopActivityHistoryScreen(
+                onBack = { onNavigate(modeForRole(currentRole ?: UserRole.USER)) },
+                onLogout = { onLogoutToLauncher() }
+            )
         }
         AppMode.USERS_MANAGEMENT -> guardedComposable(currentRole, onUnauthorized, "No permission to view tenant users.", anyPermissions = setOf(Permission.TENANT_USERS_READ)) {
-            PlaceholderScreen("Users Management", "Tenant users list.") { onNavigate(AppMode.TENANT_ADMIN_HOME) }
+            AdminDesktopUsersScreen(
+                onBack = { onNavigate(AppMode.TENANT_ADMIN_HOME) },
+                onLogout = { onLogoutToLauncher() }
+            )
         }
         AppMode.TENANT_SETTINGS -> guardedComposable(currentRole, onUnauthorized, "No permission to view tenant settings.", anyPermissions = setOf(Permission.TENANT_SETTINGS_READ)) {
-            PlaceholderScreen("Tenant Settings", "Tenant settings screen.") { onNavigate(AppMode.TENANT_ADMIN_HOME) }
+            AdminDesktopSettingsScreen(
+                onBack = { onNavigate(AppMode.TENANT_ADMIN_HOME) },
+                onLogout = { onLogoutToLauncher() }
+            )
         }
         AppMode.TENANT_HISTORY -> guardedComposable(currentRole, onUnauthorized, "No permission to view tenant history.", anyPermissions = setOf(Permission.HISTORY_READ_TENANT)) {
-            PlaceholderScreen("Tenant History", "Tenant history and export.") { onNavigate(AppMode.TENANT_ADMIN_HOME) }
+            AdminDesktopTenantHistoryScreen(
+                onBack = { onNavigate(AppMode.TENANT_ADMIN_HOME) },
+                onLogout = { onLogoutToLauncher() }
+            )
         }
         AppMode.IDENTIFY_TENANT -> guardedComposable(currentRole, onUnauthorized, "No permission for 1:N identification.", anyPermissions = setOf(Permission.IDENTIFY_TENANT)) {
-            PlaceholderScreen("Identify Tenant", "1:N identification.") { onNavigate(AppMode.TENANT_ADMIN_HOME) }
+            AdminDesktopIdentifyTenantScreen(
+                onBack = { onNavigate(AppMode.TENANT_ADMIN_HOME) },
+                onLogout = { onLogoutToLauncher() }
+            )
+        }
+        AppMode.ADMIN_INVITE_MANAGEMENT -> guardedComposable(currentRole, onUnauthorized, "No permission to manage invitations.", anyPermissions = setOf(Permission.TENANT_INVITE_CREATE)) {
+            AdminDesktopInviteManagementScreen(
+                onBack = { onNavigate(AppMode.TENANT_ADMIN_HOME) },
+                onLogout = { onLogoutToLauncher() }
+            )
+        }
+        AppMode.EXAM_ENTRY -> {
+            AdminDesktopExamEntryScreen(
+                onBack = { onNavigate(modeForRole(currentRole ?: UserRole.USER)) },
+                onLogout = { onLogoutToLauncher() }
+            )
+        }
+        AppMode.MY_INVITATIONS -> guardedComposable(currentRole, onUnauthorized, "No permission to view invitations.", anyPermissions = setOf(Permission.TENANT_INVITE_ACCEPT)) {
+            MemberDesktopMyInvitationsScreen(
+                onBack = { onNavigate(modeForRole(currentRole ?: UserRole.USER)) },
+                onLogout = { onLogoutToLauncher() }
+            )
+        }
+        AppMode.REQUEST_MEMBERSHIP -> guardedComposable(currentRole, onUnauthorized, "No permission to request membership.", anyPermissions = setOf(Permission.TENANT_MEMBERSHIP_REQUEST)) {
+            MemberDesktopRequestMembershipScreen(
+                onBack = { onNavigate(modeForRole(currentRole ?: UserRole.USER)) },
+                onLogout = { onLogoutToLauncher() }
+            )
+        }
+        AppMode.ANALYTICS -> guardedComposable(currentRole, onUnauthorized, "No permission to view analytics.", anyPermissions = setOf(Permission.HISTORY_READ_TENANT)) {
+            AdminDesktopAnalyticsScreen(
+                onBack = { onNavigate(AppMode.TENANT_ADMIN_HOME) },
+                onLogout = { onLogoutToLauncher() }
+            )
         }
         AppMode.TENANT_MANAGE -> guardedComposable(currentRole, onUnauthorized, "No permission to manage tenants.", anyPermissions = setOf(Permission.TENANT_MANAGE)) {
             RootDesktopTenantManagementScreen(
@@ -420,17 +504,24 @@ private fun memberActions() = listOf(
     ActionSpec("Verify", Icons.Default.Shield, AppMode.VERIFY, setOf(Permission.VERIFY_SELF)),
     ActionSpec("QR", Icons.Default.CameraAlt, AppMode.QR_LOGIN, setOf(Permission.QR_SCAN, Permission.QR_DISPLAY), any = true),
     ActionSpec("History", Icons.Default.History, AppMode.HISTORY_SELF, setOf(Permission.HISTORY_READ_SELF)),
-    ActionSpec("Profile", Icons.Default.Person, AppMode.MEMBER_HOME, setOf(Permission.PROFILE_READ_SELF))
+    ActionSpec("My Invitations", Icons.Default.Mail, AppMode.MY_INVITATIONS, setOf(Permission.TENANT_INVITE_ACCEPT)),
+    ActionSpec("Join Tenant", Icons.Default.Business, AppMode.REQUEST_MEMBERSHIP, setOf(Permission.TENANT_MEMBERSHIP_REQUEST)),
+    ActionSpec("Exam Entry", Icons.Default.CameraAlt, AppMode.EXAM_ENTRY),
+    ActionSpec("Profile", Icons.Default.Person, AppMode.PROFILE, setOf(Permission.PROFILE_READ_SELF)),
+    ActionSpec("Edit Profile", Icons.Default.Edit, AppMode.EDIT_PROFILE, setOf(Permission.PROFILE_UPDATE_SELF)),
+    ActionSpec("Settings / Help", Icons.AutoMirrored.Filled.HelpOutline, AppMode.SETTINGS_HELP)
 )
 
 private fun tenantAdminActions() = listOf(
-    ActionSpec("Admin Dashboard", Icons.Default.AdminPanelSettings, AppMode.ADMIN_DASHBOARD, setOf(Permission.TENANT_USERS_READ)),
-    ActionSpec("Users Management", Icons.Default.ManageAccounts, AppMode.USERS_MANAGEMENT, setOf(Permission.TENANT_USERS_READ)),
-    ActionSpec("Tenant Settings", Icons.Default.Settings, AppMode.TENANT_SETTINGS, setOf(Permission.TENANT_SETTINGS_READ)),
-    ActionSpec("Tenant History", Icons.Default.History, AppMode.TENANT_HISTORY, setOf(Permission.HISTORY_READ_TENANT)),
-    ActionSpec("Identify Tenant", Icons.Default.PersonSearch, AppMode.IDENTIFY_TENANT, setOf(Permission.IDENTIFY_TENANT)),
-    ActionSpec("Enroll", Icons.Default.Fingerprint, AppMode.ENROLL, setOf(Permission.ENROLL_SELF_CREATE)),
-    ActionSpec("Verify", Icons.Default.Shield, AppMode.VERIFY, setOf(Permission.VERIFY_SELF))
+    ActionSpec("Manage Users", Icons.Default.ManageAccounts, AppMode.USERS_MANAGEMENT, setOf(Permission.TENANT_USERS_READ)),
+    ActionSpec("View Analytics", Icons.Default.AdminPanelSettings, AppMode.ANALYTICS, setOf(Permission.HISTORY_READ_TENANT)),
+    ActionSpec("Activity Log", Icons.Default.History, AppMode.TENANT_HISTORY, setOf(Permission.HISTORY_READ_TENANT)),
+    ActionSpec("Settings", Icons.Default.Settings, AppMode.TENANT_SETTINGS, setOf(Permission.TENANT_SETTINGS_READ)),
+    ActionSpec("Identify", Icons.Default.PersonSearch, AppMode.IDENTIFY_TENANT, setOf(Permission.IDENTIFY_TENANT)),
+    ActionSpec("Invitations", Icons.Default.Mail, AppMode.ADMIN_INVITE_MANAGEMENT, setOf(Permission.TENANT_INVITE_CREATE)),
+    ActionSpec("Exam Entry", Icons.Default.CameraAlt, AppMode.EXAM_ENTRY, setOf(Permission.TENANT_USERS_READ)),
+    ActionSpec("Profile", Icons.Default.Person, AppMode.PROFILE, setOf(Permission.PROFILE_READ_SELF)),
+    ActionSpec("Edit Profile", Icons.Default.Edit, AppMode.EDIT_PROFILE, setOf(Permission.PROFILE_UPDATE_SELF))
 )
 
 private fun rootActions() = listOf(
@@ -622,11 +713,19 @@ enum class AppMode {
     ADMIN_DASHBOARD,
     ENROLL,
     VERIFY,
+    PROFILE,
+    EDIT_PROFILE,
+    SETTINGS_HELP,
     HISTORY_SELF,
     USERS_MANAGEMENT,
     TENANT_SETTINGS,
     TENANT_HISTORY,
     IDENTIFY_TENANT,
+    ADMIN_INVITE_MANAGEMENT,
+    EXAM_ENTRY,
+    ANALYTICS,
+    MY_INVITATIONS,
+    REQUEST_MEMBERSHIP,
     TENANT_MANAGE,
     PLATFORM_HEALTH,
     PLATFORM_AUDIT,
@@ -658,11 +757,19 @@ enum class AppMode {
             ADMIN_DASHBOARD -> RouteIds.ADMIN_DASHBOARD
             ENROLL -> RouteIds.BIOMETRIC_ENROLL
             VERIFY -> RouteIds.BIOMETRIC_VERIFY
+            PROFILE -> RouteIds.DESKTOP_PROFILE
+            EDIT_PROFILE -> RouteIds.DESKTOP_EDIT_PROFILE
+            SETTINGS_HELP -> RouteIds.DESKTOP_SETTINGS_HELP
             HISTORY_SELF -> RouteIds.ACTIVITY_HISTORY
             USERS_MANAGEMENT -> RouteIds.USERS_MANAGEMENT
             TENANT_SETTINGS -> RouteIds.TENANT_SETTINGS
             TENANT_HISTORY -> RouteIds.TENANT_HISTORY
             IDENTIFY_TENANT -> RouteIds.IDENTIFY_TENANT
+            ADMIN_INVITE_MANAGEMENT -> RouteIds.DESKTOP_ADMIN_INVITE_MANAGEMENT
+            EXAM_ENTRY -> RouteIds.DESKTOP_EXAM_ENTRY
+            ANALYTICS -> RouteIds.DESKTOP_ANALYTICS
+            MY_INVITATIONS -> RouteIds.DESKTOP_MY_INVITATIONS
+            REQUEST_MEMBERSHIP -> RouteIds.DESKTOP_REQUEST_MEMBERSHIP
             TENANT_MANAGE -> RouteIds.TENANT_MANAGE
             PLATFORM_HEALTH -> RouteIds.PLATFORM_HEALTH
             PLATFORM_AUDIT -> RouteIds.PLATFORM_AUDIT

@@ -40,23 +40,65 @@ class DesktopCameraServiceImpl : ICameraService {
         _cameraState.value = CameraState.Initializing
         currentLensFacing = lensFacing
 
-        try {
-            val deviceIndex = if (lensFacing == LensFacing.FRONT) 0 else 1
+        val deviceIndex = if (lensFacing == LensFacing.FRONT) 0 else 1
+        var lastError: Exception? = null
 
-            frameGrabber = OpenCVFrameGrabber(deviceIndex).apply {
+        // Try 1: No format (fastest — avoids dshow negotiation overhead)
+        try {
+            val g1 = OpenCVFrameGrabber(deviceIndex).apply {
                 imageWidth = previewWidth
                 imageHeight = previewHeight
-                frameRate = BiometricConfig.CAMERA_FRAME_RATE_FPS.toDouble()
             }
-
+            g1.start()
+            frameGrabber = g1
             frameConverter = Java2DFrameConverter()
-
-            _cameraState.value = CameraState.Ready
-            Result.success(Unit)
+            isPreviewActive = true
+            _cameraState.value = CameraState.Previewing
+            return@withContext Result.success(Unit)
         } catch (e: Exception) {
-            _cameraState.value = CameraState.Error(e)
-            Result.failure(e)
+            lastError = e
         }
+
+        // Try 2: Windows DirectShow format
+        try {
+            val g2 = OpenCVFrameGrabber(deviceIndex).apply {
+                format = "dshow"
+                imageWidth = previewWidth
+                imageHeight = previewHeight
+            }
+            g2.start()
+            frameGrabber = g2
+            frameConverter = Java2DFrameConverter()
+            isPreviewActive = true
+            _cameraState.value = CameraState.Previewing
+            return@withContext Result.success(Unit)
+        } catch (e: Exception) {
+            lastError = e
+        }
+
+        // Try 3: Minimal settings fallback
+        try {
+            val g3 = OpenCVFrameGrabber(deviceIndex)
+            g3.start()
+            frameGrabber = g3
+            frameConverter = Java2DFrameConverter()
+            isPreviewActive = true
+            _cameraState.value = CameraState.Previewing
+            return@withContext Result.success(Unit)
+        } catch (e: Exception) {
+            lastError = e
+        }
+
+        _cameraState.value = CameraState.Error(
+            Exception(
+                "Failed to initialize camera. Please check:\n" +
+                        "1. Camera is connected\n" +
+                        "2. Camera is not used by another app\n" +
+                        "3. Camera permissions are granted\n\n" +
+                        "Error: ${lastError?.message}"
+            )
+        )
+        Result.failure(lastError ?: Exception("Camera initialization failed"))
     }
 
     override suspend fun startPreview(): Result<Unit> = withContext(Dispatchers.IO) {
