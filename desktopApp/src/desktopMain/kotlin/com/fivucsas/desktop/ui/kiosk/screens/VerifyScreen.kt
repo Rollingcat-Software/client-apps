@@ -1,6 +1,5 @@
 package com.fivucsas.desktop.ui.kiosk.screens
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,7 +10,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Error
@@ -32,26 +30,16 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.fivucsas.desktop.ui.components.DesktopKioskCameraOverlay
+import com.fivucsas.desktop.ui.components.DesktopSectionHeader
 import com.fivucsas.shared.config.UIDimens
 import com.fivucsas.shared.platform.ICameraService
 import com.fivucsas.shared.presentation.viewmodel.KioskViewModel
-import com.fivucsas.shared.ui.theme.AppColors
 import org.koin.compose.koinInject
 
-/**
- * Verify Screen Component
- *
- * Identity verification with biometric capture and result display.
- *
- * @param viewModel Kiosk view model
- * @param onBack Callback to return to welcome screen
- */
 @Composable
 fun VerifyScreen(
     viewModel: KioskViewModel,
@@ -61,18 +49,7 @@ fun VerifyScreen(
     val cameraService: ICameraService = koinInject()
     var pendingVerify by remember { mutableStateOf(false) }
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(
-                brush = Brush.verticalGradient(
-                    colors = listOf(
-                        Color(0xFFE3F2FD),
-                        Color(0xFFFFFFFF)
-                    )
-                )
-            )
-    ) {
+    Box(modifier = Modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -80,23 +57,20 @@ fun VerifyScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            // Header
-            Text(
-                text = "Identity Verification",
-                style = MaterialTheme.typography.displaySmall,
-                color = AppColors.Primary,
-                fontWeight = FontWeight.Bold
+            DesktopSectionHeader(
+                title = "Identity Verification",
+                subtitle = "Use camera capture for biometric identity verification"
             )
 
             Spacer(modifier = Modifier.height(UIDimens.SpacingXLarge))
 
-            // Main Content Card
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f, fill = false),
-                shape = RoundedCornerShape(24.dp),
-                elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+                shape = androidx.compose.foundation.shape.RoundedCornerShape(24.dp),
+                elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
             ) {
                 Column(
                     modifier = Modifier
@@ -106,21 +80,19 @@ fun VerifyScreen(
                 ) {
                     when {
                         uiState.isLoading -> {
-                            // Loading State
                             CircularProgressIndicator(
                                 modifier = Modifier.size(64.dp),
-                                color = AppColors.Primary
+                                color = MaterialTheme.colorScheme.primary
                             )
                             Spacer(modifier = Modifier.height(UIDimens.SpacingMedium))
                             Text(
                                 text = "Verifying identity...",
                                 style = MaterialTheme.typography.titleMedium,
-                                color = AppColors.OnSurfaceVariant
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
 
                         uiState.verificationResult != null -> {
-                            // Result State
                             val result = uiState.verificationResult!!
                             val isSuccess = result.isVerified
 
@@ -128,7 +100,7 @@ fun VerifyScreen(
                                 imageVector = if (isSuccess) Icons.Default.CheckCircle else Icons.Default.Error,
                                 contentDescription = null,
                                 modifier = Modifier.size(80.dp),
-                                tint = if (isSuccess) AppColors.Success else AppColors.Error
+                                tint = if (isSuccess) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.error
                             )
 
                             Spacer(modifier = Modifier.height(UIDimens.SpacingMedium))
@@ -137,7 +109,7 @@ fun VerifyScreen(
                                 text = if (isSuccess) "Verified!" else "Verification Failed",
                                 style = MaterialTheme.typography.headlineMedium,
                                 fontWeight = FontWeight.Bold,
-                                color = if (isSuccess) AppColors.Success else AppColors.Error
+                                color = if (isSuccess) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.error
                             )
 
                             Spacer(modifier = Modifier.height(UIDimens.SpacingSmall))
@@ -146,7 +118,7 @@ fun VerifyScreen(
                                 text = result.message,
                                 style = MaterialTheme.typography.bodyLarge,
                                 textAlign = TextAlign.Center,
-                                color = AppColors.OnSurfaceVariant
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
 
                             if (isSuccess) {
@@ -158,18 +130,17 @@ fun VerifyScreen(
                                 Text(
                                     text = "Confidence: ${result.confidence.toInt()}%",
                                     style = MaterialTheme.typography.bodyMedium,
-                                    color = AppColors.OnSurfaceVariant
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                             }
                         }
 
                         else -> {
-                            // Ready to Verify State
                             Icon(
                                 imageVector = Icons.Default.Face,
                                 contentDescription = null,
                                 modifier = Modifier.size(80.dp),
-                                tint = AppColors.Primary
+                                tint = MaterialTheme.colorScheme.primary
                             )
 
                             Spacer(modifier = Modifier.height(UIDimens.SpacingMedium))
@@ -187,7 +158,7 @@ fun VerifyScreen(
                                 text = "Ensure good lighting and look directly at the camera",
                                 style = MaterialTheme.typography.bodyMedium,
                                 textAlign = TextAlign.Center,
-                                color = AppColors.OnSurfaceVariant
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
                     }
@@ -196,7 +167,6 @@ fun VerifyScreen(
 
             Spacer(modifier = Modifier.height(UIDimens.SpacingXLarge))
 
-            // Actions
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(UIDimens.SpacingMedium)
@@ -204,9 +174,7 @@ fun VerifyScreen(
                 OutlinedButton(
                     onClick = onBack,
                     modifier = Modifier.weight(1f)
-                ) {
-                    Text("Back")
-                }
+                ) { Text("Back") }
 
                 Button(
                     onClick = {
@@ -219,9 +187,7 @@ fun VerifyScreen(
                     },
                     modifier = Modifier.weight(1f),
                     enabled = !uiState.isLoading && uiState.verificationResult == null
-                ) {
-                    Text("Verify Now")
-                }
+                ) { Text("Verify Now") }
             }
         }
 

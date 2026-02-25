@@ -15,6 +15,7 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import java.io.ByteArrayOutputStream
 import java.nio.ByteBuffer
+import java.util.concurrent.Executor
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
@@ -343,4 +344,21 @@ class AndroidCameraService(
      * Get camera info for device capabilities
      */
     fun getCameraInfo(): CameraInfo? = camera?.cameraInfo
+
+    /**
+     * Sets a continuous frame analyzer on the bound ImageAnalysis use case.
+     * Caller is responsible for closing ImageProxy.
+     */
+    fun setFrameAnalyzer(
+        executor: Executor,
+        analyzer: (ImageProxy) -> Unit
+    ) {
+        imageAnalysis?.setAnalyzer(executor) { imageProxy ->
+            analyzer(imageProxy)
+        }
+    }
+
+    fun clearFrameAnalyzer() {
+        imageAnalysis?.clearAnalyzer()
+    }
 }

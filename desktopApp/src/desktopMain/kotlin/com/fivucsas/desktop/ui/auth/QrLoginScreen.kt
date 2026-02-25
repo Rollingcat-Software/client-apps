@@ -1,5 +1,6 @@
 package com.fivucsas.desktop.ui.auth
 
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -21,12 +22,18 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.fivucsas.desktop.ui.components.DesktopAppShell
+import com.fivucsas.desktop.ui.components.DesktopBannerType
+import com.fivucsas.desktop.ui.components.DesktopInfoBanner
+import com.fivucsas.desktop.ui.components.DesktopSectionHeader
 import com.fivucsas.shared.presentation.viewmodel.auth.QrLoginStatus
+import com.google.zxing.BarcodeFormat
+import com.google.zxing.qrcode.QRCodeWriter
 
 @Composable
 fun QrLoginScreen(
@@ -39,46 +46,27 @@ fun QrLoginScreen(
     onBackToLogin: () -> Unit,
     onRefresh: () -> Unit
 ) {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(
-                brush = Brush.verticalGradient(
-                    colors = listOf(
-                        Color(0xFF0B1B2B),
-                        Color(0xFF101E32)
-                    )
-                )
-            )
+    DesktopAppShell(
+        title = "QR Login",
+        onBack = onBackToLogin
     ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(48.dp),
+                .padding(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            Text(
-                text = "QR Verification",
-                style = MaterialTheme.typography.displaySmall,
-                fontWeight = FontWeight.Bold,
-                color = Color.White
-            )
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            Text(
-                text = "Scan this code with your mobile app to continue",
-                style = MaterialTheme.typography.bodyLarge,
-                color = Color.White.copy(alpha = 0.8f),
-                textAlign = TextAlign.Center
+            DesktopSectionHeader(
+                title = "QR Verification",
+                subtitle = "Scan this code with your mobile app to continue"
             )
 
             Spacer(modifier = Modifier.height(32.dp))
 
             Card(
                 shape = RoundedCornerShape(20.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                 elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
             ) {
                 Box(
@@ -87,7 +75,7 @@ fun QrLoginScreen(
                         .padding(24.dp),
                     contentAlignment = Alignment.Center
                 ) {
-                    QrPlaceholder()
+                    QrCodeCanvas(payload = qrPayload)
                 }
             }
 
@@ -102,12 +90,12 @@ fun QrLoginScreen(
                     QrLoginStatus.IDLE -> "Preparing QR session..."
                 },
                 style = MaterialTheme.typography.titleMedium,
-                color = Color.White.copy(alpha = 0.9f)
+                color = MaterialTheme.colorScheme.onSurface
             )
 
             if (status == QrLoginStatus.WAITING_FOR_MOBILE_SCAN || status == QrLoginStatus.IDLE) {
                 Spacer(modifier = Modifier.height(12.dp))
-                CircularProgressIndicator(color = Color.White)
+                CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
             }
 
             sessionCode?.let {
@@ -115,7 +103,7 @@ fun QrLoginScreen(
                 Text(
                     text = "Session: $it",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = Color.White.copy(alpha = 0.85f)
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
 
@@ -124,18 +112,16 @@ fun QrLoginScreen(
                 Text(
                     text = it,
                     style = MaterialTheme.typography.bodySmall,
-                    color = Color.White.copy(alpha = 0.65f),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.Center
                 )
             }
 
             errorMessage?.let {
                 Spacer(modifier = Modifier.height(12.dp))
-                Text(
+                DesktopInfoBanner(
+                    type = DesktopBannerType.Error,
                     text = it,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = Color(0xFFFFCDD2),
-                    textAlign = TextAlign.Center
                 )
             }
 
@@ -160,22 +146,38 @@ fun QrLoginScreen(
 }
 
 @Composable
-private fun QrPlaceholder() {
-    val dark = Color(0xFF1B1F24)
-    val light = Color(0xFFF5F5F5)
+private fun QrCodeCanvas(payload: String?) {
+    val matrix = payload
+        ?.takeIf { it.isNotBlank() }
+        ?.let {
+            runCatching {
+                QRCodeWriter().encode(it, BarcodeFormat.QR_CODE, 256, 256)
+            }.getOrNull()
+        }
 
-    Column(
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+    if (matrix == null) {
+        Text(
+            text = "Waiting for QR payload...",
+            style = MaterialTheme.typography.bodyMedium,
+            color = Color(0xFF37474F),
+            textAlign = TextAlign.Center
+        )
+        return
+    }
+
+    Canvas(
+        modifier = Modifier
+            .size(256.dp)
+            .background(Color.White)
     ) {
-        repeat(5) { row ->
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                repeat(5) { col ->
-                    val isDark = (row + col) % 2 == 0
-                    Box(
-                        modifier = Modifier
-                            .size(36.dp)
-                            .background(if (isDark) dark else light)
+        val moduleSize = size.minDimension / matrix.width.toFloat()
+        for (y in 0 until matrix.height) {
+            for (x in 0 until matrix.width) {
+                if (matrix.get(x, y)) {
+                    drawRect(
+                        color = Color.Black,
+                        topLeft = Offset(x * moduleSize, y * moduleSize),
+                        size = Size(moduleSize, moduleSize)
                     )
                 }
             }

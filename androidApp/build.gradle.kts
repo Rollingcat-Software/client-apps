@@ -75,6 +75,7 @@ dependencies {
 
     // Accompanist (permissions)
     implementation("com.google.accompanist:accompanist-permissions:0.32.0")
+    implementation("com.google.mlkit:barcode-scanning:17.3.0")
 
     // Koin for Android
     implementation("io.insert-koin:koin-android:3.5.3")

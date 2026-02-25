@@ -12,10 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CameraAlt
-import androidx.compose.material.icons.filled.CreditCard
 import androidx.compose.material.icons.filled.History
-import androidx.compose.material.icons.filled.GroupAdd
-import androidx.compose.material.icons.filled.Nfc
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Security
@@ -36,6 +33,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.fivucsas.mobile.android.ui.model.QuickAction
+import com.fivucsas.mobile.android.ui.navigation.Screen
 import com.fivucsas.shared.config.UIDimens
 import com.fivucsas.shared.domain.model.Permission
 import com.fivucsas.shared.domain.model.UserRole
@@ -44,6 +43,7 @@ import com.fivucsas.shared.ui.components.atoms.SectionHeader
 import com.fivucsas.shared.ui.components.atoms.StatusBadgeType
 import com.fivucsas.shared.ui.components.molecules.ActivityItem
 import com.fivucsas.shared.ui.components.molecules.ActivityItemData
+import com.fivucsas.shared.ui.components.organisms.BottomNavItem
 import com.fivucsas.shared.ui.components.organisms.BottomNavBar
 import com.fivucsas.shared.ui.components.organisms.QuickActionGrid
 import com.fivucsas.shared.ui.components.organisms.QuickActionItem
@@ -54,6 +54,7 @@ import com.fivucsas.shared.ui.theme.AppColors
 fun DashboardScreen(
     userName: String,
     userRole: UserRole = UserRole.USER,
+    navItems: List<BottomNavItem>,
     currentRoute: String,
     onNavigateToNotifications: () -> Unit,
     onNavigateToProfile: () -> Unit,
@@ -67,36 +68,71 @@ fun DashboardScreen(
     onNavigateToCardScan: () -> Unit,
     onNavigateBottom: (String) -> Unit
 ) {
-    val hasQrAccess = userRole.hasPermission(Permission.QR_SCAN) ||
-        userRole.hasPermission(Permission.QR_DISPLAY)
-    val quickActions = buildList {
-        if (userRole.hasPermission(Permission.ENROLL_SELF_CREATE)) {
-            add(QuickActionItem("Enroll Face", Icons.Default.CameraAlt, onNavigateToEnroll))
-        }
-        if (userRole.hasPermission(Permission.CARD_ADD_SELF)) {
-            add(QuickActionItem("Add Card", Icons.Default.CreditCard, onNavigateToCardScan))
-        }
-        if (userRole.hasPermission(Permission.VERIFY_SELF)) {
-            add(QuickActionItem("Verify Identity", Icons.Default.Security, onNavigateToVerify))
-        }
-        if (hasQrAccess) {
-            add(QuickActionItem("QR", Icons.Default.CameraAlt, onNavigateToQrScan))
-        }
-        if (userRole.hasPermission(Permission.HISTORY_READ_SELF)) {
-            add(QuickActionItem("Activity History", Icons.Default.History, onNavigateToHistory))
-        }
-        if (userRole.hasPermission(Permission.TENANT_INVITE_ACCEPT)) {
-            add(QuickActionItem("My Invitations", Icons.Default.Notifications, onNavigateToInvitations))
-        }
-        if (userRole.hasPermission(Permission.PROFILE_READ_SELF)) {
-            add(QuickActionItem("Profile", Icons.Default.Person, onNavigateToProfile))
-        }
-        if (userRole.hasPermission(Permission.ENROLL_SELF_CREATE)) {
-            add(QuickActionItem("Exam Entry", Icons.Default.Nfc, onNavigateToExamEntry))
-        }
-        if (userRole.hasPermission(Permission.TENANT_MEMBERSHIP_REQUEST)) {
-            add(QuickActionItem("Join Tenant", Icons.Default.GroupAdd, onNavigateToRequestMembership))
-        }
+    val canViewEnrollmentStatus = userRole.hasPermission(Permission.ENROLL_SELF_CREATE) ||
+        userRole.hasPermission(Permission.VERIFY_SELF)
+    val canViewRecentActivity = userRole.hasPermission(Permission.HISTORY_READ_SELF)
+
+    val actions = listOf(
+        QuickAction(
+            id = "enroll-face",
+            title = "Enroll Face",
+            icon = Icons.Default.CameraAlt,
+            route = Screen.BiometricEnroll.route,
+            anyPermissions = setOf(Permission.ENROLL_SELF_CREATE)
+        ),
+        QuickAction(
+            id = "verify-identity",
+            title = "Verify Identity",
+            icon = Icons.Default.Security,
+            route = Screen.BiometricVerify.route,
+            anyPermissions = setOf(Permission.VERIFY_SELF)
+        ),
+        QuickAction(
+            id = "qr",
+            title = "QR",
+            icon = Icons.Default.CameraAlt,
+            route = Screen.QrLoginScan.route,
+            anyPermissions = setOf(Permission.QR_SCAN, Permission.QR_DISPLAY)
+        ),
+        QuickAction(
+            id = "activity-history",
+            title = "Activity History",
+            icon = Icons.Default.History,
+            route = Screen.ActivityHistory.route,
+            anyPermissions = setOf(Permission.HISTORY_READ_SELF)
+        ),
+        QuickAction(
+            id = "invite-accept",
+            title = "Invitations",
+            icon = Icons.Default.Notifications,
+            route = Screen.InviteAccept.route,
+            anyPermissions = setOf(Permission.TENANT_INVITE_ACCEPT)
+        ),
+        QuickAction(
+            id = "profile",
+            title = "Profile",
+            icon = Icons.Default.Person,
+            route = Screen.Profile.route,
+            anyPermissions = setOf(Permission.PROFILE_READ_SELF)
+        )
+    )
+
+    val visibleActions = actions.filter { it.isAllowed(userRole) }
+    val quickActions = visibleActions.map { action ->
+        QuickActionItem(
+            title = action.title,
+            icon = action.icon,
+            onClick = {
+                when (action.route) {
+                    Screen.BiometricEnroll.route -> onNavigateToEnroll()
+                    Screen.BiometricVerify.route -> onNavigateToVerify()
+                    Screen.QrLoginScan.route -> onNavigateToQrScan()
+                    Screen.ActivityHistory.route -> onNavigateToHistory()
+                    Screen.InviteAccept.route -> onNavigateToInvitations()
+                    Screen.Profile.route -> onNavigateToProfile()
+                }
+            }
+        )
     }
 
     val activityItems = listOf(
@@ -170,7 +206,7 @@ fun DashboardScreen(
         },
         bottomBar = {
             BottomNavBar(
-                items = com.fivucsas.mobile.android.ui.navigation.BottomNavDestinations.items,
+                items = navItems,
                 currentRoute = currentRoute,
                 onItemSelected = { onNavigateBottom(it.route) }
             )
@@ -184,42 +220,44 @@ fun DashboardScreen(
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(UIDimens.SpacingMedium)
         ) {
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = AppColors.Surface),
-                elevation = CardDefaults.cardElevation(defaultElevation = UIDimens.ElevationLow)
-            ) {
-                Column(
-                    modifier = Modifier.padding(UIDimens.SpacingMedium)
+            if (canViewEnrollmentStatus) {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(containerColor = AppColors.Surface),
+                    elevation = CardDefaults.cardElevation(defaultElevation = UIDimens.ElevationLow)
                 ) {
-                    Text(
-                        text = "Enrollment Status",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.SemiBold
-                    )
-                    Spacer(modifier = Modifier.size(8.dp))
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
+                    Column(
+                        modifier = Modifier.padding(UIDimens.SpacingMedium)
                     ) {
                         Text(
-                            text = "Enrolled",
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = AppColors.Success
+                            text = "Enrollment Status",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.SemiBold
                         )
+                        Spacer(modifier = Modifier.size(8.dp))
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = "Enrolled",
+                                style = MaterialTheme.typography.bodyLarge,
+                                color = AppColors.Success
+                            )
+                            Text(
+                                text = "Last verified: 2 hours ago",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = AppColors.OnSurfaceVariant
+                            )
+                        }
+                        Spacer(modifier = Modifier.size(6.dp))
                         Text(
-                            text = "Last verified: 2 hours ago",
+                            text = "Confidence: 94%",
                             style = MaterialTheme.typography.bodySmall,
                             color = AppColors.OnSurfaceVariant
                         )
                     }
-                    Spacer(modifier = Modifier.size(6.dp))
-                    Text(
-                        text = "Confidence: 94%",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = AppColors.OnSurfaceVariant
-                    )
                 }
             }
 
@@ -240,19 +278,21 @@ fun DashboardScreen(
             SectionHeader(title = "Quick Actions")
             QuickActionGrid(actions = quickActions)
 
-            SectionHeader(
-                title = "Recent Activity",
-                actionContent = {
-                    Text(
-                        text = "View All",
-                        style = MaterialTheme.typography.labelLarge,
-                        color = AppColors.Primary
-                    )
-                }
-            )
-            Column(verticalArrangement = Arrangement.spacedBy(UIDimens.SpacingSmall)) {
-                activityItems.forEach { item ->
-                    ActivityItem(data = item)
+            if (canViewRecentActivity) {
+                SectionHeader(
+                    title = "Recent Activity",
+                    actionContent = {
+                        Text(
+                            text = "View All",
+                            style = MaterialTheme.typography.labelLarge,
+                            color = AppColors.Primary
+                        )
+                    }
+                )
+                Column(verticalArrangement = Arrangement.spacedBy(UIDimens.SpacingSmall)) {
+                    activityItems.forEach { item ->
+                        ActivityItem(data = item)
+                    }
                 }
             }
         }

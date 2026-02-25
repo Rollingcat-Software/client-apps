@@ -40,6 +40,7 @@ dependencies {
 
     // Webcam capture - JavaCV
     implementation("org.bytedeco:javacv-platform:1.5.10")
+    implementation("com.google.zxing:core:3.5.3")
 }
 
 compose.desktop {

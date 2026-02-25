@@ -4,15 +4,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -24,6 +15,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import com.fivucsas.desktop.data.DesktopCameraService
 import com.fivucsas.desktop.ui.components.CameraPreview
+import com.fivucsas.desktop.ui.components.DesktopAppShell
+import com.fivucsas.desktop.ui.components.DesktopBannerType
+import com.fivucsas.desktop.ui.components.DesktopInfoBanner
 import com.fivucsas.shared.domain.model.ConfidenceBand
 import com.fivucsas.shared.domain.model.GuestFaceCheckOutcome
 import com.fivucsas.shared.domain.model.confidenceToBand
@@ -33,7 +27,6 @@ import com.fivucsas.shared.ui.screen.GuestFaceCheckResultScreen
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GuestFaceCheckScreen(
     onBack: () -> Unit,
@@ -58,31 +51,21 @@ fun GuestFaceCheckScreen(
         resultConfidence = confidenceToBand(verification.confidence)
     }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("Guest Face Check") },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
-                    }
-                }
-            )
-        }
-    ) { padding ->
+    DesktopAppShell(
+        title = "Guest Face Check",
+        onBack = onBack
+    ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(padding)
                 .padding(com.fivucsas.shared.config.UIDimens.SpacingMedium),
             verticalArrangement = Arrangement.spacedBy(com.fivucsas.shared.config.UIDimens.SpacingMedium)
         ) {
             if (resultOutcome == null) {
                 if (state.error != null) {
-                    Text(
+                    DesktopInfoBanner(
+                        type = DesktopBannerType.Error,
                         text = "Could not reach face-check service. Please check backend/DB connection and try again.",
-                        color = MaterialTheme.colorScheme.error,
-                        style = MaterialTheme.typography.bodyMedium
                     )
                 }
 

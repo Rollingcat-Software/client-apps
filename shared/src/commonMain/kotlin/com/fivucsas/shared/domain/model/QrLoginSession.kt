@@ -14,5 +14,9 @@ data class QrLoginSession(
     val qrContent: String,
     val status: QrLoginSessionStatus,
     val expiresAtEpochSeconds: Long? = null,
-    val message: String? = null
+    val message: String? = null,
+    val accessToken: String? = null,
+    val refreshToken: String? = null,
+    val expiresIn: Long? = null,
+    val role: String? = null
 )

@@ -8,6 +8,7 @@ import com.fivucsas.shared.platform.isFingerprintFlowAvailable
 import com.fivucsas.shared.ui.screen.FingerprintGateScreen
 import com.fivucsas.shared.ui.screen.FingerprintFailureScreen
 import com.fivucsas.shared.ui.screen.FingerprintSuccessScreen
+import com.fivucsas.shared.ui.screen.ForgotPasswordScreen
 import com.fivucsas.shared.ui.screen.LoginScreen
 import com.fivucsas.shared.ui.screen.MissingRouteScreen
 import com.fivucsas.shared.ui.screen.OnboardingScreen
@@ -98,6 +99,11 @@ private fun AppNavigation(
             viewModel = registerViewModel,
             onNavigateBack = { navigator.pop() },
             onRegisterSuccess = { navigator.navigate(AppRoute.Dashboard, clearBackStack = true) }
+        )
+
+        AppRoute.ForgotPassword -> ForgotPasswordScreen(
+            onNavigateBack = { navigator.pop() },
+            onNavigateToLogin = { navigator.navigate(AppRoute.Login, clearBackStack = true) }
         )
 
         is AppRoute.FingerprintGate -> {

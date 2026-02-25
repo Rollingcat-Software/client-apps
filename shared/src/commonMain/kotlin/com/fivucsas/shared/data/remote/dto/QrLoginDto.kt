@@ -20,7 +20,11 @@ data class QrLoginSessionResponseDto(
     val qrContent: String,
     val status: String,
     val expiresAtEpochSeconds: Long? = null,
-    val message: String? = null
+    val message: String? = null,
+    val accessToken: String? = null,
+    val refreshToken: String? = null,
+    val expiresIn: Long? = null,
+    val role: String? = null
 )
 
 fun QrLoginSessionResponseDto.toModel(): QrLoginSession {
@@ -29,7 +33,11 @@ fun QrLoginSessionResponseDto.toModel(): QrLoginSession {
         qrContent = qrContent,
         status = status.toSessionStatus(),
         expiresAtEpochSeconds = expiresAtEpochSeconds,
-        message = message
+        message = message,
+        accessToken = accessToken,
+        refreshToken = refreshToken,
+        expiresIn = expiresIn,
+        role = role
     )
 }
 
