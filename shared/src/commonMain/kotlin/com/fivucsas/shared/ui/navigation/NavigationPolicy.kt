@@ -42,6 +42,14 @@ object NavigationPolicy {
             routeId == RouteIds.INVITE_MANAGEMENT -> canAccess(role, Permission.TENANT_INVITE_CREATE)
             routeId == RouteIds.BIOMETRIC_ENROLL -> canAccess(role, Permission.ENROLL_SELF_CREATE)
             routeId == RouteIds.BIOMETRIC_VERIFY -> canAccess(role, Permission.VERIFY_SELF)
+            routeId == RouteIds.PROFILE || routeId == RouteIds.DESKTOP_PROFILE -> canAccess(role, Permission.PROFILE_READ_SELF)
+            routeId == RouteIds.EDIT_PROFILE || routeId == RouteIds.DESKTOP_EDIT_PROFILE -> canAccess(role, Permission.PROFILE_UPDATE_SELF)
+            routeId == RouteIds.DESKTOP_SETTINGS_HELP -> true
+            routeId == RouteIds.DESKTOP_ADMIN_INVITE_MANAGEMENT -> canAccess(role, Permission.TENANT_INVITE_CREATE)
+            routeId == RouteIds.DESKTOP_EXAM_ENTRY || routeId == RouteIds.EXAM_ENTRY -> true
+            routeId == RouteIds.DESKTOP_ANALYTICS -> canAccess(role, Permission.HISTORY_READ_TENANT)
+            routeId == RouteIds.DESKTOP_MY_INVITATIONS -> canAccess(role, Permission.TENANT_INVITE_ACCEPT)
+            routeId == RouteIds.DESKTOP_REQUEST_MEMBERSHIP -> canAccess(role, Permission.TENANT_MEMBERSHIP_REQUEST)
             routeId == RouteIds.ROOT_CONSOLE -> role == UserRole.ROOT
             routeId == RouteIds.ROOT_TENANT_MANAGEMENT -> canAccess(role, Permission.TENANT_MANAGE)
             routeId == RouteIds.ROOT_TENANT_DETAIL -> canAccess(role, Permission.TENANT_MANAGE)

@@ -3,7 +3,10 @@
     "allow": [
       "Bash(./gradlew :androidApp:assembleDebug:*)",
       "Bash(tail:*)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(find:*)",
+      "Bash(grep:*)",
+      "Bash(cd \"C:\\\\Users\\\\hp\\\\Documents\\\\GitHub\\\\Rollingcat-Software\\\\mobile-app\" && ./gradlew shared:compileKotlinAndroid 2>&1)"
     ]
   }
 }
