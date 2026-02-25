@@ -11,6 +11,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AdminPanelSettings
 import androidx.compose.material.icons.filled.Group
@@ -126,7 +128,7 @@ fun RootDesktopConsoleScreen(
         onLogout = onLogout
     ) {
         Column(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(14.dp)
         ) {
             DesktopSectionHeader("Root Dashboard", "Global platform control center")
@@ -229,17 +231,19 @@ fun RootDesktopTenantManagementScreen(
         onBack = onBack,
         onLogout = onLogout
     ) {
-        DesktopTable("Tenants", "Create, edit, and inspect tenant limits") {
-            state.tenants.forEach { tenant ->
-                Row(
-                    modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text(tenant.name, modifier = Modifier.weight(1f))
-                    Text("${tenant.quotaUsed}/${tenant.quotaLimit}", modifier = Modifier.width(100.dp))
-                    Text("${tenant.adminCount}", modifier = Modifier.width(60.dp))
-                    Text("${tenant.memberCount}", modifier = Modifier.width(70.dp))
-                    OutlinedButton(onClick = { onOpenTenant(tenant.id) }) { Text("Detail") }
+        Column(modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
+            DesktopTable("Tenants", "Create, edit, and inspect tenant limits") {
+                state.tenants.forEach { tenant ->
+                    Row(
+                        modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(tenant.name, modifier = Modifier.weight(1f))
+                        Text("${tenant.quotaUsed}/${tenant.quotaLimit}", modifier = Modifier.width(100.dp))
+                        Text("${tenant.adminCount}", modifier = Modifier.width(60.dp))
+                        Text("${tenant.memberCount}", modifier = Modifier.width(70.dp))
+                        OutlinedButton(onClick = { onOpenTenant(tenant.id) }) { Text("Detail") }
+                    }
                 }
             }
         }
@@ -313,43 +317,45 @@ fun RootDesktopUserListScreen(
         onBack = onBack,
         onLogout = onLogout
     ) {
-        DesktopTable(title, "Directory view across tenants") {
-            Row(
-                modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
-                horizontalArrangement = Arrangement.spacedBy(6.dp)
-            ) {
-                roleOptions.forEach { roleOption ->
-                    AssistChip(
-                        onClick = { selectedRole = roleOption },
-                        label = { Text(roleOption.replace('_', ' ')) },
-                        colors = AssistChipDefaults.assistChipColors(
-                            containerColor = if (selectedRole == roleOption) {
-                                MaterialTheme.colorScheme.primaryContainer
-                            } else {
-                                MaterialTheme.colorScheme.surfaceVariant
-                            }
-                        )
-                    )
-                }
-            }
-
-            visibleUsers.forEach { user ->
+        Column(modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
+            DesktopTable(title, "Directory view across tenants") {
                 Row(
-                    modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween
+                    modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(6.dp)
                 ) {
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(user.fullName, fontWeight = FontWeight.SemiBold)
-                        Text(user.email, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    roleOptions.forEach { roleOption ->
+                        AssistChip(
+                            onClick = { selectedRole = roleOption },
+                            label = { Text(roleOption.replace('_', ' ')) },
+                            colors = AssistChipDefaults.assistChipColors(
+                                containerColor = if (selectedRole == roleOption) {
+                                    MaterialTheme.colorScheme.primaryContainer
+                                } else {
+                                    MaterialTheme.colorScheme.surfaceVariant
+                                }
+                            )
+                        )
                     }
-                    Text(user.role, modifier = Modifier.width(130.dp))
-                    Text(user.tenantId ?: "GLOBAL", modifier = Modifier.width(120.dp))
-                    Text(if (user.enabled) "Enabled" else "Disabled", modifier = Modifier.width(90.dp))
-                    OutlinedButton(onClick = { viewModel.onEvent(RootConsoleUiEvent.ToggleUserEnabled(user.id, !user.enabled)) }) {
-                        Text(if (user.enabled) "Disable" else "Enable")
+                }
+
+                visibleUsers.forEach { user ->
+                    Row(
+                        modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(user.fullName, fontWeight = FontWeight.SemiBold)
+                            Text(user.email, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        }
+                        Text(user.role, modifier = Modifier.width(130.dp))
+                        Text(user.tenantId ?: "GLOBAL", modifier = Modifier.width(120.dp))
+                        Text(if (user.enabled) "Enabled" else "Disabled", modifier = Modifier.width(90.dp))
+                        OutlinedButton(onClick = { viewModel.onEvent(RootConsoleUiEvent.ToggleUserEnabled(user.id, !user.enabled)) }) {
+                            Text(if (user.enabled) "Disable" else "Enable")
+                        }
+                        OutlinedButton(onClick = { editingUser = user }) { Text("Edit") }
+                        OutlinedButton(onClick = { viewModel.onEvent(RootConsoleUiEvent.DeleteUser(user.id)) }) { Text("Delete") }
                     }
-                    OutlinedButton(onClick = { editingUser = user }) { Text("Edit") }
-                    OutlinedButton(onClick = { viewModel.onEvent(RootConsoleUiEvent.DeleteUser(user.id)) }) { Text("Delete") }
                 }
             }
         }
@@ -444,7 +450,10 @@ fun RootDesktopInviteManagementScreen(
         onBack = onBack,
         onLogout = onLogout
     ) {
-        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Column(
+            modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
             DesktopSectionHeader(
                 title = "Invite Management",
                 subtitle = "Send invites and manage existing invitation lifecycle"
@@ -666,7 +675,10 @@ fun RootDesktopRolesPermissionsScreen(
         onBack = onBack,
         onLogout = onLogout
     ) {
-        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Column(
+            modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
             DesktopSectionHeader("Global RBAC Matrix", "Root can manage full role/permission mapping")
             Card(modifier = Modifier.fillMaxWidth()) {
                 Column(modifier = Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -731,11 +743,13 @@ fun RootDesktopSecurityScreen(
         onBack = onBack,
         onLogout = onLogout
     ) {
-        DesktopTable("Security Events", "Platform monitoring feed") {
-            state.securityEvents.forEach { event ->
-                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                    Text("${event.severity} - ${event.eventType}", modifier = Modifier.weight(1f))
-                    Text(event.message, modifier = Modifier.weight(2f))
+        Column(modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
+            DesktopTable("Security Events", "Platform monitoring feed") {
+                state.securityEvents.forEach { event ->
+                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                        Text("${event.severity} - ${event.eventType}", modifier = Modifier.weight(1f))
+                        Text(event.message, modifier = Modifier.weight(2f))
+                    }
                 }
             }
         }
@@ -769,7 +783,7 @@ fun RootDesktopSystemSettingsScreen(
                 rateLimitInput = settings.defaultRateLimitPerMinute.toString()
             }
             Column(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 DesktopSectionHeader(

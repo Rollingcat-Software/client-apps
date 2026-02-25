@@ -15,20 +15,33 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AdminPanelSettings
 import androidx.compose.material.icons.filled.Business
 import androidx.compose.material.icons.filled.CameraAlt
+import androidx.compose.material.icons.filled.CreditCard
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Fingerprint
+import androidx.compose.material.icons.filled.Groups
 import androidx.compose.material.icons.filled.HealthAndSafety
 import androidx.compose.material.icons.automirrored.filled.HelpOutline
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Mail
 import androidx.compose.material.icons.filled.ManageAccounts
+import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.PersonAdd
 import androidx.compose.material.icons.filled.PersonSearch
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Security
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Shield
 import androidx.compose.material.icons.filled.TouchApp
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -39,6 +52,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowPlacement
@@ -59,6 +73,7 @@ import com.fivucsas.desktop.ui.components.DesktopBannerType
 import com.fivucsas.desktop.ui.components.DesktopDashboardActionCard
 import com.fivucsas.desktop.ui.components.DesktopInfoBanner
 import com.fivucsas.desktop.ui.components.DesktopSectionHeader
+import com.fivucsas.desktop.ui.components.DesktopTable
 import com.fivucsas.desktop.ui.member.MemberDesktopActivityHistoryScreen
 import com.fivucsas.desktop.ui.member.MemberDesktopEditProfileScreen
 import com.fivucsas.desktop.ui.member.MemberDesktopMyInvitationsScreen
@@ -85,6 +100,8 @@ import com.fivucsas.shared.presentation.viewmodel.auth.LoginViewModel
 import com.fivucsas.shared.presentation.viewmodel.auth.QrLoginStatus
 import com.fivucsas.shared.presentation.viewmodel.auth.QrLoginViewModel
 import com.fivucsas.shared.presentation.viewmodel.auth.RegisterViewModel
+import com.fivucsas.shared.presentation.viewmodel.InviteStatus
+import com.fivucsas.shared.presentation.viewmodel.InviteViewModel
 import com.fivucsas.shared.ui.navigation.HomeDestination
 import com.fivucsas.shared.ui.navigation.RouteIds
 import com.fivucsas.shared.ui.navigation.homeDestinationFor
@@ -221,9 +238,32 @@ private fun AppContent(
             onBackToLogin = { onNavigate(backTargetForAuth(currentRole)) },
             onRefresh = { qrLoginViewModel.startDesktopSession() }
         )
-        AppMode.USER_HOME -> RoleDashboard("User Dashboard", currentRole ?: UserRole.USER, userActions(), onNavigate, { onNavigate(AppMode.LAUNCHER) }) {
-            onLogoutToLauncher()
-        }
+        AppMode.USER_HOME -> UserDashboardScreen(
+            role = currentRole ?: UserRole.USER,
+            onNavigate = onNavigate,
+            onBack = { onNavigate(AppMode.LAUNCHER) },
+            onLogout = { onLogoutToLauncher() }
+        )
+        AppMode.USER_INVITATIONS -> UserInvitationsScreen(
+            onBack = { onNavigate(AppMode.USER_HOME) },
+            onLogout = { onLogoutToLauncher() }
+        )
+        AppMode.USER_PROFILE -> UserProfileScreen(
+            onBack = { onNavigate(AppMode.USER_HOME) },
+            onLogout = { onLogoutToLauncher() }
+        )
+        AppMode.USER_SETTINGS -> UserSettingsScreen(
+            onBack = { onNavigate(AppMode.USER_HOME) },
+            onLogout = { onLogoutToLauncher() }
+        )
+        AppMode.USER_JOIN_TENANT -> UserJoinTenantScreen(
+            onBack = { onNavigate(AppMode.USER_HOME) },
+            onLogout = { onLogoutToLauncher() }
+        )
+        AppMode.USER_ADD_CARD -> UserAddCardScreen(
+            onBack = { onNavigate(AppMode.USER_HOME) },
+            onLogout = { onLogoutToLauncher() }
+        )
         AppMode.MEMBER_HOME -> RoleDashboard("Member Dashboard", currentRole ?: UserRole.TENANT_MEMBER, memberActions(), onNavigate, { onNavigate(AppMode.LAUNCHER) }) {
             onLogoutToLauncher()
         }
@@ -494,9 +534,11 @@ private data class ActionSpec(
 )
 
 private fun userActions() = listOf(
-    ActionSpec("Invitations", Icons.Default.Person, AppMode.USER_HOME, setOf(Permission.TENANT_INVITE_ACCEPT)),
-    ActionSpec("Profile", Icons.Default.Person, AppMode.USER_HOME, setOf(Permission.PROFILE_READ_SELF)),
-    ActionSpec("Settings / Help", Icons.Default.Settings, AppMode.USER_HOME)
+    ActionSpec("Invitations", Icons.Default.Notifications, AppMode.USER_INVITATIONS, setOf(Permission.TENANT_INVITE_ACCEPT)),
+    ActionSpec("Profile", Icons.Default.Person, AppMode.USER_PROFILE, setOf(Permission.PROFILE_READ_SELF)),
+    ActionSpec("Join a Tenant", Icons.Default.PersonAdd, AppMode.USER_JOIN_TENANT, setOf(Permission.TENANT_MEMBERSHIP_REQUEST)),
+    ActionSpec("Add card", Icons.Default.CreditCard, AppMode.USER_ADD_CARD, setOf(Permission.CARD_ADD_SELF)),
+    ActionSpec("Settings", Icons.Default.Settings, AppMode.USER_SETTINGS)
 )
 
 private fun memberActions() = listOf(
@@ -595,6 +637,330 @@ private fun PlaceholderScreen(title: String, description: String, onBack: () -> 
         onBack = onBack,
         isError = false
     )
+}
+
+@Composable
+private fun UserDashboardScreen(
+    role: UserRole,
+    onNavigate: (AppMode) -> Unit,
+    onBack: () -> Unit,
+    onLogout: () -> Unit
+) {
+    val actions = userActions().filter { action ->
+        action.permissions.isEmpty() || action.permissions.all { role.hasPermission(it) }
+    }
+    DesktopAppShell(
+        title = "User Dashboard",
+        onBack = onBack,
+        onLogout = onLogout
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.spacedBy(14.dp)
+        ) {
+            DesktopSectionHeader(
+                title = "User Dashboard",
+                subtitle = "You are not a tenant member yet. Accept invite or request access."
+            )
+            DesktopInfoBanner(
+                type = DesktopBannerType.Warning,
+                text = "Join a tenant to unlock enrollment and verification features."
+            )
+            actions.chunked(2).forEach { rowActions ->
+                Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
+                    rowActions.forEach { action ->
+                        DesktopDashboardActionCard(
+                            icon = action.icon,
+                            title = action.label,
+                            subtitle = "Open ${action.label.lowercase()}",
+                            onClick = { onNavigate(action.target) },
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+                    if (rowActions.size == 1) Spacer(modifier = Modifier.weight(1f))
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun UserInvitationsScreen(
+    onBack: () -> Unit,
+    onLogout: () -> Unit
+) {
+    val viewModel = remember { InviteViewModel() }
+    val state by viewModel.state.collectAsState()
+    LaunchedEffect(Unit) { viewModel.loadInvites() }
+    DesktopAppShell(title = "Invitations", onBack = onBack, onLogout = onLogout) {
+        Column(
+            modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            DesktopSectionHeader("Invitations", "Pending and past tenant invitations")
+            DesktopTable(title = "My Invitations", subtitle = "${state.filteredInvites.size} items") {
+                state.filteredInvites.forEach { invite ->
+                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(invite.email, fontWeight = FontWeight.SemiBold)
+                            Text("Role: ${invite.role} | Tenant: ${invite.tenantName ?: "GLOBAL"}")
+                        }
+                        Text(invite.status.name)
+                        Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                            if (invite.status == InviteStatus.PENDING) {
+                                OutlinedButton(onClick = { viewModel.revokeInvite(invite.id) }) { Text("Decline") }
+                                Button(onClick = { /* accept placeholder */ }) { Text("Accept") }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun UserProfileScreen(
+    onBack: () -> Unit,
+    onLogout: () -> Unit
+) {
+    DesktopAppShell(title = "Profile", onBack = onBack, onLogout = onLogout) {
+        Column(
+            modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            DesktopSectionHeader("My Profile", "Manage your personal details")
+            DesktopTable(title = "Personal Information") {
+                Text("Name: Test User")
+                Text("Email: test@fivucsas.com")
+                Text("Phone: +1 234 567 8900")
+            }
+        }
+    }
+}
+
+@Composable
+private fun UserSettingsScreen(
+    onBack: () -> Unit,
+    onLogout: () -> Unit
+) {
+    var notificationsEnabled by remember { mutableStateOf(true) }
+    var biometricEnabled by remember { mutableStateOf(true) }
+    var analyticsEnabled by remember { mutableStateOf(false) }
+
+    DesktopAppShell(title = "Settings", onBack = onBack, onLogout = onLogout) {
+        Column(
+            modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            DesktopSectionHeader("Settings", "Notification and account preferences")
+
+            DesktopTable(title = "Notifications", subtitle = "Manage alerts and reminders") {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    Icon(imageVector = Icons.Default.Notifications, contentDescription = null)
+                    Text("Enable Notifications", modifier = Modifier.weight(1f))
+                    Switch(
+                        checked = notificationsEnabled,
+                        onCheckedChange = { notificationsEnabled = it }
+                    )
+                }
+            }
+
+            DesktopTable(title = "Security", subtitle = "Authentication preferences") {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    Icon(imageVector = Icons.Default.Security, contentDescription = null)
+                    Text("Biometric Login", modifier = Modifier.weight(1f))
+                    Switch(
+                        checked = biometricEnabled,
+                        onCheckedChange = { biometricEnabled = it }
+                    )
+                }
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End
+                ) {
+                    TextButton(onClick = { }) { Text("Change Password") }
+                }
+            }
+
+            DesktopTable(title = "App Preferences", subtitle = "Data and privacy") {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    Icon(imageVector = Icons.Default.Settings, contentDescription = null)
+                    Text("Analytics", modifier = Modifier.weight(1f))
+                    Switch(
+                        checked = analyticsEnabled,
+                        onCheckedChange = { analyticsEnabled = it }
+                    )
+                }
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End
+                ) {
+                    TextButton(onClick = { }) { Text("Help & FAQ") }
+                    TextButton(onClick = { }) { Text("About") }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun UserJoinTenantScreen(
+    onBack: () -> Unit,
+    onLogout: () -> Unit
+) {
+    data class TenantInfo(
+        val id: String,
+        val name: String,
+        val description: String,
+        val memberCount: Int
+    )
+    val allTenants = remember {
+        listOf(
+            TenantInfo("t1", "Acme Corporation", "Global technology solutions provider", 142),
+            TenantInfo("t2", "Globex Inc.", "International logistics and supply chain", 87),
+            TenantInfo("t3", "Wayne Enterprises", "Diversified industrial conglomerate", 312),
+            TenantInfo("t4", "Stark Industries", "Advanced technology and defense", 256),
+            TenantInfo("t5", "Umbrella Corp.", "Pharmaceutical and biotech research", 64)
+        )
+    }
+    var searchQuery by remember { mutableStateOf("") }
+    var requestedTenantIds by remember { mutableStateOf(setOf<String>()) }
+    var successMessage by remember { mutableStateOf<String?>(null) }
+    val filteredTenants = if (searchQuery.isBlank()) allTenants else {
+        allTenants.filter {
+            it.name.contains(searchQuery, ignoreCase = true) ||
+                it.description.contains(searchQuery, ignoreCase = true)
+        }
+    }
+
+    DesktopAppShell(title = "Join a Tenant", onBack = onBack, onLogout = onLogout) {
+        Column(
+            modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            DesktopSectionHeader("Join a Tenant", "Request membership to a tenant")
+
+            successMessage?.let { msg ->
+                DesktopInfoBanner(
+                    type = DesktopBannerType.Info,
+                    text = msg
+                )
+            }
+
+            OutlinedTextField(
+                value = searchQuery,
+                onValueChange = { searchQuery = it },
+                label = { Text("Search tenants...") },
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Text(
+                text = "${filteredTenants.size} tenants available",
+                color = androidx.compose.material3.MaterialTheme.colorScheme.onSurfaceVariant
+            )
+
+            if (filteredTenants.isEmpty()) {
+                Column(
+                    modifier = Modifier.fillMaxWidth().padding(vertical = 40.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Search,
+                        contentDescription = null,
+                        tint = androidx.compose.material3.MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text("No tenants found")
+                }
+            } else {
+                filteredTenants.forEach { tenant ->
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = CardDefaults.cardColors(containerColor = androidx.compose.material3.MaterialTheme.colorScheme.surface)
+                    ) {
+                        Column(
+                            modifier = Modifier.fillMaxWidth().padding(14.dp),
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                                Icon(imageVector = Icons.Default.Business, contentDescription = null)
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text(tenant.name, fontWeight = FontWeight.SemiBold)
+                                    Text(
+                                        tenant.description,
+                                        style = androidx.compose.material3.MaterialTheme.typography.bodySmall,
+                                        color = androidx.compose.material3.MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
+                            }
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                                    Icon(
+                                        imageVector = Icons.Default.Groups,
+                                        contentDescription = null
+                                    )
+                                    Text(
+                                        "${tenant.memberCount} members",
+                                        style = androidx.compose.material3.MaterialTheme.typography.bodySmall
+                                    )
+                                }
+                                if (tenant.id in requestedTenantIds) {
+                                    OutlinedButton(onClick = {}, enabled = false) { Text("Requested") }
+                                } else {
+                                    Button(
+                                        onClick = {
+                                            requestedTenantIds = requestedTenantIds + tenant.id
+                                            successMessage = "Membership request sent to ${tenant.name}"
+                                        }
+                                    ) { Text("Request Membership") }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun UserAddCardScreen(
+    onBack: () -> Unit,
+    onLogout: () -> Unit
+) {
+    DesktopAppShell(title = "Add card", onBack = onBack, onLogout = onLogout) {
+        Column(
+            modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            DesktopSectionHeader("Add card", "Register your identity card")
+            DesktopTable(title = "Card Registration") {
+                Text("Card registration flow for desktop will continue here.")
+                OutlinedButton(onClick = { }) { Text("Start Card Add") }
+            }
+        }
+    }
 }
 
 @Composable
@@ -707,6 +1073,11 @@ enum class AppMode {
     GUEST_FACE_CHECK,
     QR_LOGIN,
     USER_HOME,
+    USER_INVITATIONS,
+    USER_PROFILE,
+    USER_SETTINGS,
+    USER_JOIN_TENANT,
+    USER_ADD_CARD,
     MEMBER_HOME,
     TENANT_ADMIN_HOME,
     ROOT_HOME,
@@ -751,6 +1122,11 @@ enum class AppMode {
             GUEST_FACE_CHECK -> RouteIds.DESKTOP_GUEST_FACE_CHECK
             QR_LOGIN -> RouteIds.DESKTOP_QR_LOGIN
             USER_HOME -> RouteIds.DESKTOP_USER_HOME
+            USER_INVITATIONS -> RouteIds.MY_INVITATIONS
+            USER_PROFILE -> RouteIds.PROFILE
+            USER_SETTINGS -> RouteIds.SETTINGS
+            USER_JOIN_TENANT -> RouteIds.REQUEST_MEMBERSHIP
+            USER_ADD_CARD -> RouteIds.CARD_SCAN
             MEMBER_HOME -> RouteIds.DESKTOP_MEMBER_HOME
             TENANT_ADMIN_HOME -> RouteIds.DESKTOP_TENANT_ADMIN_HOME
             ROOT_HOME -> RouteIds.DESKTOP_ROOT_HOME
