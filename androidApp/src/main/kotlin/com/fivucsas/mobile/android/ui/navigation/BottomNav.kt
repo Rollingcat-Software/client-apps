@@ -27,6 +27,12 @@ object BottomNavDestinations {
         BottomNavItem("Profile", Icons.Default.Person, RouteIds.PROFILE)
     )
 
+    val rootItems = listOf(
+        BottomNavItem("Dashboard", Icons.Default.Home, RouteIds.ROOT_CONSOLE),
+        BottomNavItem("History", Icons.Default.History, RouteIds.ROOT_AUDIT_EXPLORER),
+        BottomNavItem("Profile", Icons.Default.Person, RouteIds.PROFILE)
+    )
+
     val operatorItems = listOf(
         BottomNavItem("Dashboard", Icons.Default.Home, RouteIds.OPERATOR_DASHBOARD),
         BottomNavItem("History", Icons.Default.History, RouteIds.ACTIVITY_HISTORY),

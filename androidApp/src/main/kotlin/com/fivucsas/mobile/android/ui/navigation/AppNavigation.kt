@@ -54,6 +54,15 @@ import com.fivucsas.shared.ui.screen.LoginScreen
 import com.fivucsas.shared.ui.screen.OnboardingScreen
 import com.fivucsas.shared.ui.screen.RegisterScreen
 import com.fivucsas.shared.ui.screen.SplashScreen
+import com.fivucsas.shared.ui.screen.root.AuditExplorerScreen
+import com.fivucsas.shared.ui.screen.root.GlobalUserDirectoryScreen
+import com.fivucsas.shared.ui.screen.root.RootConsoleScreen
+import com.fivucsas.shared.ui.screen.root.RolesPermissionsScreen
+import com.fivucsas.shared.ui.screen.root.SecurityEventsScreen
+import com.fivucsas.shared.ui.screen.root.SystemSettingsScreen
+import com.fivucsas.shared.ui.screen.root.TenantAdminsScreen
+import com.fivucsas.shared.ui.screen.root.TenantDetailScreen
+import com.fivucsas.shared.ui.screen.root.TenantManagementScreen
 import com.fivucsas.shared.ui.navigation.NavigationPolicy
 import com.fivucsas.shared.ui.navigation.RouteIds
 import org.koin.compose.koinInject
@@ -98,6 +107,19 @@ sealed class Screen(val route: String) {
     object MyInvitations : Screen(RouteIds.MY_INVITATIONS)
     object RequestMembership : Screen(RouteIds.REQUEST_MEMBERSHIP)
     object CardScan : Screen(RouteIds.CARD_SCAN)
+    object RootConsole : Screen(RouteIds.ROOT_CONSOLE)
+    object RootTenantManagement : Screen(RouteIds.ROOT_TENANT_MANAGEMENT)
+    object RootTenantDetail : Screen("${RouteIds.ROOT_TENANT_DETAIL}/{tenantId}") {
+        fun createRoute(tenantId: String): String = "${RouteIds.ROOT_TENANT_DETAIL}/$tenantId"
+    }
+    object RootGlobalUserDirectory : Screen(RouteIds.ROOT_GLOBAL_USER_DIRECTORY)
+    object RootUsers : Screen(RouteIds.ROOT_USERS)
+    object RootTenantMembers : Screen(RouteIds.ROOT_TENANT_MEMBERS)
+    object RootTenantAdmins : Screen(RouteIds.ROOT_TENANT_ADMINS)
+    object RootRolesPermissions : Screen(RouteIds.ROOT_ROLES_PERMISSIONS)
+    object RootAuditExplorer : Screen(RouteIds.ROOT_AUDIT_EXPLORER)
+    object RootSecurityEvents : Screen(RouteIds.ROOT_SECURITY_EVENTS)
+    object RootSystemSettings : Screen(RouteIds.ROOT_SYSTEM_SETTINGS)
 
     object BiometricEnroll : Screen("${RouteIds.BIOMETRIC_ENROLL}/{userId}") {
         fun createRoute(userId: String) = "${RouteIds.BIOMETRIC_ENROLL}/$userId"
@@ -108,15 +130,15 @@ sealed class Screen(val route: String) {
     }
 
     object FingerprintGate : Screen("${RouteIds.FINGERPRINT_GATE_ANDROID}/{target}") {
-        fun createRoute(target: String) = "${RouteIds.FINGERPRINT_GATE_ANDROID}/$target"
+        fun createRoute(target: String) = "${RouteIds.FINGERPRINT_GATE_ANDROID}/${Uri.encode(target)}"
     }
 
     object FingerprintSuccess : Screen("${RouteIds.FINGERPRINT_SUCCESS_ANDROID}/{target}") {
-        fun createRoute(target: String) = "${RouteIds.FINGERPRINT_SUCCESS_ANDROID}/$target"
+        fun createRoute(target: String) = "${RouteIds.FINGERPRINT_SUCCESS_ANDROID}/${Uri.encode(target)}"
     }
 
     object FingerprintFailure : Screen("${RouteIds.FINGERPRINT_FAILURE_ANDROID}/{target}") {
-        fun createRoute(target: String) = "${RouteIds.FINGERPRINT_FAILURE_ANDROID}/$target"
+        fun createRoute(target: String) = "${RouteIds.FINGERPRINT_FAILURE_ANDROID}/${Uri.encode(target)}"
     }
 }
 
@@ -148,7 +170,8 @@ fun AppNavigation() {
     fun hasQrAccess(role: UserRole): Boolean =
         NavigationPolicy.canAccessRoute(role, RouteIds.QR_LOGIN_SCAN)
     val navItemsForRole = when (currentUserRole()) {
-        UserRole.ROOT, UserRole.TENANT_ADMIN -> BottomNavDestinations.adminItems
+        UserRole.ROOT -> BottomNavDestinations.rootItems
+        UserRole.TENANT_ADMIN -> BottomNavDestinations.adminItems
         UserRole.USER -> BottomNavDestinations.userItems
         else -> BottomNavDestinations.items
     }
@@ -160,8 +183,8 @@ fun AppNavigation() {
         composable(Screen.Splash.route) {
             SplashScreen(
                 isFirstLaunch = prefs.getBoolean(KEY_FIRST_LAUNCH, true),
-                isAuthenticated = isAuthenticated(),
-                userRole = roleValue,
+                isAuthenticated = false,
+                userRole = null,
                 onNavigateToOnboarding = {
                     navController.navigate(Screen.Onboarding.route) {
                         popUpTo(Screen.Splash.route) { inclusive = true }
@@ -173,12 +196,12 @@ fun AppNavigation() {
                     }
                 },
                 onNavigateToDashboard = {
-                    navController.navigate(Screen.Dashboard.route) {
+                    navController.navigate(Screen.Login.route) {
                         popUpTo(Screen.Splash.route) { inclusive = true }
                     }
                 },
                 onNavigateToAdminDashboard = {
-                    navController.navigate(Screen.AdminDashboard.route) {
+                    navController.navigate(Screen.Login.route) {
                         popUpTo(Screen.Splash.route) { inclusive = true }
                     }
                 }
@@ -311,6 +334,169 @@ fun AppNavigation() {
             )
         }
 
+        composable(Screen.RootConsole.route) {
+            if (!isAuthenticated()) {
+                LaunchedEffect(Unit) {
+                    navController.navigate(Screen.Login.route) { popUpTo(0) { inclusive = true } }
+                }
+                return@composable
+            }
+            val userRole = currentUserRole()
+            if (!NavigationPolicy.canAccessRoute(userRole, RouteIds.ROOT_CONSOLE)) {
+                LaunchedEffect(Unit) { navigateUnauthorized("No permission for root console.") }
+                return@composable
+            }
+            RootConsoleScreen(
+                role = userRole,
+                currentRoute = Screen.RootConsole.route,
+                settingsRoute = RouteIds.SETTINGS,
+                onNavigateToNotifications = { navController.navigate(Screen.Notifications.route) },
+                onNavigateToProfile = { navController.navigate(Screen.Profile.route) },
+                onNavigateBottom = { route ->
+                    val destination = when (route) {
+                        RouteIds.TENANT_HISTORY -> Screen.RootAuditExplorer.route
+                        else -> route
+                    }
+                    navController.navigate(destination) {
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                },
+                onNavigate = { route, arg ->
+                    when (route) {
+                        RouteIds.SETTINGS -> navController.navigate(Screen.Settings.route)
+                        RouteIds.ROOT_TENANT_MANAGEMENT -> navController.navigate(Screen.RootTenantManagement.route)
+                        RouteIds.ROOT_GLOBAL_USER_DIRECTORY -> navController.navigate(Screen.RootGlobalUserDirectory.route)
+                        RouteIds.ROOT_USERS -> navController.navigate(Screen.RootUsers.route)
+                        RouteIds.ROOT_TENANT_MEMBERS -> navController.navigate(Screen.RootTenantMembers.route)
+                        RouteIds.ROOT_TENANT_ADMINS -> navController.navigate(Screen.RootTenantAdmins.route)
+                        RouteIds.ROOT_ROLES_PERMISSIONS -> navController.navigate(Screen.RootRolesPermissions.route)
+                        RouteIds.ROOT_AUDIT_EXPLORER -> navController.navigate(Screen.RootAuditExplorer.route)
+                        RouteIds.ROOT_SECURITY_EVENTS -> navController.navigate(Screen.RootSecurityEvents.route)
+                        RouteIds.ROOT_SYSTEM_SETTINGS -> navController.navigate(Screen.RootSystemSettings.route)
+                        RouteIds.ROOT_TENANT_DETAIL -> arg?.let { navController.navigate(Screen.RootTenantDetail.createRoute(it)) }
+                    }
+                }
+            )
+        }
+
+        composable(Screen.RootTenantManagement.route) {
+            val userRole = currentUserRole()
+            if (!NavigationPolicy.canAccessRoute(userRole, RouteIds.ROOT_TENANT_MANAGEMENT)) {
+                LaunchedEffect(Unit) { navigateUnauthorized("No permission to manage tenants.") }
+                return@composable
+            }
+            TenantManagementScreen(
+                role = userRole,
+                onOpenTenant = { tenantId -> navController.navigate(Screen.RootTenantDetail.createRoute(tenantId)) },
+                onNavigateBack = { navController.popBackStack() }
+            )
+        }
+
+        composable(
+            route = Screen.RootTenantDetail.route,
+            arguments = listOf(navArgument("tenantId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val userRole = currentUserRole()
+            if (!NavigationPolicy.canAccessRoute(userRole, RouteIds.ROOT_TENANT_DETAIL)) {
+                LaunchedEffect(Unit) { navigateUnauthorized("No permission to view tenant detail.") }
+                return@composable
+            }
+            val tenantId = backStackEntry.arguments?.getString("tenantId") ?: return@composable
+            TenantDetailScreen(
+                role = userRole,
+                tenantId = tenantId,
+                onNavigateBack = { navController.popBackStack() }
+            )
+        }
+
+        composable(Screen.RootGlobalUserDirectory.route) {
+            val userRole = currentUserRole()
+            if (!NavigationPolicy.canAccessRoute(userRole, RouteIds.ROOT_GLOBAL_USER_DIRECTORY)) {
+                LaunchedEffect(Unit) { navigateUnauthorized("No permission to view global users.") }
+                return@composable
+            }
+            GlobalUserDirectoryScreen(role = userRole, onNavigateBack = { navController.popBackStack() })
+        }
+
+        composable(Screen.RootUsers.route) {
+            val userRole = currentUserRole()
+            if (!NavigationPolicy.canAccessRoute(userRole, RouteIds.ROOT_USERS)) {
+                LaunchedEffect(Unit) { navigateUnauthorized("No permission to view users.") }
+                return@composable
+            }
+            GlobalUserDirectoryScreen(
+                role = userRole,
+                screenTitle = "Users",
+                initialRoleFilter = "USER",
+                onNavigateBack = { navController.popBackStack() }
+            )
+        }
+
+        composable(Screen.RootTenantMembers.route) {
+            val userRole = currentUserRole()
+            if (!NavigationPolicy.canAccessRoute(userRole, RouteIds.ROOT_TENANT_MEMBERS)) {
+                LaunchedEffect(Unit) { navigateUnauthorized("No permission to view tenant members.") }
+                return@composable
+            }
+            GlobalUserDirectoryScreen(
+                role = userRole,
+                screenTitle = "Tenant Members",
+                initialRoleFilter = "TENANT_MEMBER",
+                onNavigateBack = { navController.popBackStack() }
+            )
+        }
+
+        composable(Screen.RootTenantAdmins.route) {
+            val userRole = currentUserRole()
+            if (!NavigationPolicy.canAccessRoute(userRole, RouteIds.ROOT_TENANT_ADMINS)) {
+                LaunchedEffect(Unit) { navigateUnauthorized("No permission to view tenant admins.") }
+                return@composable
+            }
+            GlobalUserDirectoryScreen(
+                role = userRole,
+                screenTitle = "Tenant Admins",
+                initialRoleFilter = "TENANT_ADMIN",
+                onNavigateBack = { navController.popBackStack() }
+            )
+        }
+
+        composable(Screen.RootRolesPermissions.route) {
+            val userRole = currentUserRole()
+            if (!NavigationPolicy.canAccessRoute(userRole, RouteIds.ROOT_ROLES_PERMISSIONS)) {
+                LaunchedEffect(Unit) { navigateUnauthorized("No permission for role/permission editor.") }
+                return@composable
+            }
+            RolesPermissionsScreen(onNavigateBack = { navController.popBackStack() })
+        }
+
+        composable(Screen.RootAuditExplorer.route) {
+            val userRole = currentUserRole()
+            if (!NavigationPolicy.canAccessRoute(userRole, RouteIds.ROOT_AUDIT_EXPLORER)) {
+                LaunchedEffect(Unit) { navigateUnauthorized("No permission for global audit.") }
+                return@composable
+            }
+            AuditExplorerScreen(role = userRole, onNavigateBack = { navController.popBackStack() })
+        }
+
+        composable(Screen.RootSecurityEvents.route) {
+            val userRole = currentUserRole()
+            if (!NavigationPolicy.canAccessRoute(userRole, RouteIds.ROOT_SECURITY_EVENTS)) {
+                LaunchedEffect(Unit) { navigateUnauthorized("No permission for security events.") }
+                return@composable
+            }
+            SecurityEventsScreen(role = userRole, onNavigateBack = { navController.popBackStack() })
+        }
+
+        composable(Screen.RootSystemSettings.route) {
+            val userRole = currentUserRole()
+            if (!NavigationPolicy.canAccessRoute(userRole, RouteIds.ROOT_SYSTEM_SETTINGS)) {
+                LaunchedEffect(Unit) { navigateUnauthorized("No permission for system settings.") }
+                return@composable
+            }
+            SystemSettingsScreen(role = userRole, onNavigateBack = { navController.popBackStack() })
+        }
+
         composable(Screen.UsersManagement.route) {
             if (!isAuthenticated()) {
                 LaunchedEffect(Unit) {
@@ -436,13 +622,24 @@ fun AppNavigation() {
                 return@composable
             }
             val userRole = currentUserRole()
+            val profileNavItems = when (userRole) {
+                UserRole.ROOT -> BottomNavDestinations.rootItems
+                UserRole.TENANT_ADMIN -> BottomNavDestinations.adminItems
+                UserRole.USER -> BottomNavDestinations.userItems
+                else -> BottomNavDestinations.items
+            }
             ProfileScreen(
                 userName = "Test User",
                 userEmail = "test@fivucsas.com",
                 userRole = userRole,
                 currentRoute = Screen.Profile.route,
                 onNavigateBottom = { route ->
-                    navController.navigate(route) {
+                    val destination = if (userRole == UserRole.ROOT && route == RouteIds.ADMIN_DASHBOARD) {
+                        Screen.RootConsole.route
+                    } else {
+                        route
+                    }
+                    navController.navigate(destination) {
                         launchSingleTop = true
                         restoreState = true
                     }
@@ -452,7 +649,7 @@ fun AppNavigation() {
                 onReEnroll = { navController.navigate(Screen.BiometricEnroll.createRoute("1")) },
                 onDeleteEnrollment = { /* mock: enrollment deleted */ },
                 onOpenSettings = { navController.navigate(Screen.Settings.route) },
-                navItems = navItemsForRole
+                navItems = profileNavItems
             )
         }
 
@@ -501,6 +698,7 @@ fun AppNavigation() {
                 return@composable
             }
             SettingsScreen(
+                userRole = currentUserRole(),
                 onNavigateBack = { navController.popBackStack() },
                 onNavigateToChangePassword = { navController.navigate(Screen.ChangePassword.route) },
                 onNavigateToHelp = { navController.navigate(Screen.Help.route) },
@@ -870,7 +1068,7 @@ fun AppNavigation() {
                 }
                 return@composable
             }
-            val target = backStackEntry.arguments?.getString("target") ?: Screen.Dashboard.route
+            val target = backStackEntry.arguments?.getString("target")?.let(Uri::decode) ?: Screen.Dashboard.route
             val viewModel = koinInject<FingerprintViewModel>()
             FingerprintGateScreen(
                 viewModel = viewModel,
@@ -898,7 +1096,7 @@ fun AppNavigation() {
                 }
                 return@composable
             }
-            val target = backStackEntry.arguments?.getString("target") ?: Screen.Dashboard.route
+            val target = backStackEntry.arguments?.getString("target")?.let(Uri::decode) ?: Screen.Dashboard.route
             val viewModel = koinInject<FingerprintViewModel>()
             val stepUpToken = (viewModel.state.value as? FingerprintUiState.Success)?.stepUpToken
             FingerprintSuccessScreen(
@@ -923,7 +1121,7 @@ fun AppNavigation() {
                 }
                 return@composable
             }
-            val target = backStackEntry.arguments?.getString("target") ?: Screen.Dashboard.route
+            val target = backStackEntry.arguments?.getString("target")?.let(Uri::decode) ?: Screen.Dashboard.route
             val viewModel = koinInject<FingerprintViewModel>()
             val failureState = viewModel.state.value as? FingerprintUiState.Error
             FingerprintFailureScreen(

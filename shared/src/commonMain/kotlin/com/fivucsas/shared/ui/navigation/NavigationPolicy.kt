@@ -11,16 +11,17 @@ import com.fivucsas.shared.domain.model.hasPermission
 object NavigationPolicy {
     fun loginSuccessRoute(role: UserRole?): String {
         return when (role) {
-            UserRole.ROOT, UserRole.TENANT_ADMIN -> RouteIds.ADMIN_DASHBOARD
+            UserRole.ROOT -> RouteIds.ROOT_CONSOLE
+            UserRole.TENANT_ADMIN -> RouteIds.ADMIN_DASHBOARD
             else -> RouteIds.DASHBOARD
         }
     }
 
     fun postQrApprovalRoute(role: UserRole): String {
-        return if (canAccess(role, Permission.TENANT_USERS_READ)) {
-            RouteIds.ADMIN_DASHBOARD
-        } else {
-            RouteIds.DASHBOARD
+        return when {
+            role == UserRole.ROOT -> RouteIds.ROOT_CONSOLE
+            canAccess(role, Permission.TENANT_USERS_READ) -> RouteIds.ADMIN_DASHBOARD
+            else -> RouteIds.DASHBOARD
         }
     }
 
@@ -41,6 +42,18 @@ object NavigationPolicy {
             routeId == RouteIds.INVITE_MANAGEMENT -> canAccess(role, Permission.TENANT_INVITE_CREATE)
             routeId == RouteIds.BIOMETRIC_ENROLL -> canAccess(role, Permission.ENROLL_SELF_CREATE)
             routeId == RouteIds.BIOMETRIC_VERIFY -> canAccess(role, Permission.VERIFY_SELF)
+            routeId == RouteIds.ROOT_CONSOLE -> role == UserRole.ROOT
+            routeId == RouteIds.ROOT_TENANT_MANAGEMENT -> canAccess(role, Permission.TENANT_MANAGE)
+            routeId == RouteIds.ROOT_TENANT_DETAIL -> canAccess(role, Permission.TENANT_MANAGE)
+            routeId == RouteIds.ROOT_GLOBAL_USER_DIRECTORY -> canAccess(role, Permission.TENANT_USERS_READ)
+            routeId == RouteIds.ROOT_USERS -> canAccess(role, Permission.TENANT_USERS_READ)
+            routeId == RouteIds.ROOT_TENANT_MEMBERS -> canAccess(role, Permission.TENANT_USERS_READ)
+            routeId == RouteIds.ROOT_TENANT_ADMINS -> canAccess(role, Permission.TENANT_USERS_READ)
+            routeId == RouteIds.ROOT_INVITE_MANAGEMENT -> canAccess(role, Permission.TENANT_INVITE_CREATE)
+            routeId == RouteIds.ROOT_ROLES_PERMISSIONS -> canAccess(role, Permission.TENANT_ROLES_ASSIGN)
+            routeId == RouteIds.ROOT_AUDIT_EXPLORER -> canAccess(role, Permission.PLATFORM_AUDIT_READ)
+            routeId == RouteIds.ROOT_SECURITY_EVENTS -> canAccess(role, Permission.PLATFORM_HEALTH_READ)
+            routeId == RouteIds.ROOT_SYSTEM_SETTINGS -> canAccess(role, Permission.PLATFORM_SETTINGS_UPDATE)
             else -> true
         }
     }
@@ -53,4 +66,3 @@ object NavigationPolicy {
         return permissions.any { role.hasPermission(it) }
     }
 }
-

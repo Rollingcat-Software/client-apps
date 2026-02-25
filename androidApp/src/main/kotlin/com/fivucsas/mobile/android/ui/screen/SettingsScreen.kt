@@ -26,6 +26,8 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Button
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -36,12 +38,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.layout.height
 import com.fivucsas.shared.config.UIDimens
+import com.fivucsas.shared.domain.model.Permission
+import com.fivucsas.shared.domain.model.UserRole
+import com.fivucsas.shared.domain.model.hasPermission
 import com.fivucsas.shared.ui.components.molecules.ExpandableCard
 import com.fivucsas.shared.ui.theme.AppColors
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
+    userRole: UserRole = UserRole.USER,
     onNavigateBack: () -> Unit,
     onNavigateToChangePassword: () -> Unit,
     onNavigateToHelp: () -> Unit,
@@ -51,6 +57,7 @@ fun SettingsScreen(
     val notificationsEnabled = remember { mutableStateOf(true) }
     val biometricEnabled = remember { mutableStateOf(true) }
     val analyticsEnabled = remember { mutableStateOf(false) }
+    val rateLimitInput = remember { mutableStateOf("120") }
 
     Scaffold(
         topBar = {
@@ -182,6 +189,45 @@ fun SettingsScreen(
                         .padding(vertical = 4.dp)
                         .clickable { onNavigateToAbout() }
                 )
+            }
+
+            if (userRole.hasPermission(Permission.PLATFORM_SETTINGS_UPDATE)) {
+                ExpandableCard(
+                    title = "System Settings",
+                    subtitle = "Platform-level defaults"
+                ) {
+                    Text(
+                        text = "Session Policy",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                    Text(
+                        text = "Token and access-session rules are managed centrally.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = AppColors.OnSurfaceVariant
+                    )
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Text(
+                        text = "Password Policy",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                    Text(
+                        text = "Global password requirements are applied for all tenants.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = AppColors.OnSurfaceVariant
+                    )
+                    Spacer(modifier = Modifier.height(10.dp))
+                    OutlinedTextField(
+                        value = rateLimitInput.value,
+                        onValueChange = { rateLimitInput.value = it },
+                        label = { Text("Default rate limit per minute") },
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Button(onClick = { /* TODO persist system settings */ }) {
+                        Text("Save Changes")
+                    }
+                }
             }
 
             Spacer(modifier = Modifier.height(16.dp))

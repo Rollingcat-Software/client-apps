@@ -42,8 +42,6 @@ import com.fivucsas.shared.domain.model.hasPermission
 import com.fivucsas.shared.ui.components.molecules.ConfirmationDialog
 import com.fivucsas.shared.ui.components.molecules.SuccessMessage
 import com.fivucsas.shared.ui.components.atoms.SectionHeader
-import com.fivucsas.shared.ui.components.atoms.StatusBadge
-import com.fivucsas.shared.ui.components.atoms.StatusBadgeType
 import com.fivucsas.shared.ui.components.organisms.BottomNavBar
 import com.fivucsas.shared.ui.theme.AppColors
 
@@ -62,6 +60,7 @@ fun ProfileScreen(
     onOpenSettings: () -> Unit,
     navItems: List<com.fivucsas.shared.ui.components.organisms.BottomNavItem> = com.fivucsas.mobile.android.ui.navigation.BottomNavDestinations.items
 ) {
+    val isSelfBiometricRole = userRole == UserRole.USER || userRole == UserRole.TENANT_MEMBER
     var showDeleteDialog by remember { mutableStateOf(false) }
     var showDeleteSuccess by remember { mutableStateOf(false) }
     Scaffold(
@@ -146,44 +145,12 @@ fun ProfileScreen(
                 }
             }
 
-            SectionHeader(title = "Biometric Status")
-            Card(
-                colors = CardDefaults.cardColors(containerColor = AppColors.Surface)
-            ) {
-                Column(modifier = Modifier.padding(UIDimens.SpacingMedium)) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text("Face Enrolled", style = MaterialTheme.typography.bodyMedium)
-                        StatusBadge(text = "Active", type = StatusBadgeType.Success)
-                    }
-                    Spacer(modifier = Modifier.size(8.dp))
-                    Text(
-                        text = "Quality Score: 88%",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = AppColors.OnSurfaceVariant
-                    )
-                    Text(
-                        text = "Enrolled: Jan 28, 2026",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = AppColors.OnSurfaceVariant
-                    )
-                    Text(
-                        text = "Expires: Jul 28, 2026",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = AppColors.OnSurfaceVariant
-                    )
-                }
-            }
-
             SectionHeader(title = "Account Actions")
             Column(verticalArrangement = Arrangement.spacedBy(UIDimens.SpacingSmall)) {
                 Button(onClick = onChangePassword, modifier = Modifier.fillMaxWidth()) {
                     Text("Change Password")
                 }
-                if (userRole.hasPermission(Permission.ENROLL_SELF_UPDATE)) {
+                if (isSelfBiometricRole && userRole.hasPermission(Permission.ENROLL_SELF_UPDATE)) {
                     Button(onClick = onReEnroll, modifier = Modifier.fillMaxWidth()) {
                         Text("Re-Enroll Face")
                     }
@@ -194,7 +161,7 @@ fun ProfileScreen(
                 ) {
                     Text("Settings")
                 }
-                if (userRole.hasPermission(Permission.ENROLL_SELF_DELETE)) {
+                if (isSelfBiometricRole && userRole.hasPermission(Permission.ENROLL_SELF_DELETE)) {
                     OutlinedButton(
                         onClick = { showDeleteDialog = true },
                         modifier = Modifier.fillMaxWidth(),
