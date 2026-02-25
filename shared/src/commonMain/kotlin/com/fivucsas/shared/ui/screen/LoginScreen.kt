@@ -5,11 +5,13 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenuItem
@@ -66,133 +68,139 @@ fun LoginScreen(
         }
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(24.dp)
-            .verticalScroll(rememberScrollState()),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
     ) {
-        Text(
-            text = "FIVUCSAS",
-            style = MaterialTheme.typography.headlineLarge
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Text(
-            text = "Biometric Authentication",
-            style = MaterialTheme.typography.bodyMedium
-        )
-
-        Spacer(modifier = Modifier.height(32.dp))
-
-        OutlinedTextField(
-            value = email,
-            onValueChange = { email = it },
-            label = { Text("Email") },
-            modifier = Modifier.fillMaxWidth(),
-            enabled = !state.isLoading
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        OutlinedTextField(
-            value = password,
-            onValueChange = { password = it },
-            label = { Text("Password") },
-            visualTransformation = PasswordVisualTransformation(),
-            modifier = Modifier.fillMaxWidth(),
-            enabled = !state.isLoading
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // DEV: Role switcher dropdown
-        ExposedDropdownMenuBox(
-            expanded = roleDropdownExpanded,
-            onExpandedChange = { roleDropdownExpanded = it }
+        Column(
+            modifier = Modifier
+                .widthIn(max = 400.dp)
+                .fillMaxWidth()
+                .padding(24.dp)
+                .verticalScroll(rememberScrollState()),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         ) {
-            OutlinedTextField(
-                value = testRoles.first { it.first == selectedRole }.second,
-                onValueChange = {},
-                readOnly = true,
-                label = { Text("Dev Role") },
-                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = roleDropdownExpanded) },
-                modifier = Modifier.fillMaxWidth().menuAnchor(),
-                colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors()
-            )
-            ExposedDropdownMenu(
-                expanded = roleDropdownExpanded,
-                onDismissRequest = { roleDropdownExpanded = false }
-            ) {
-                testRoles.forEach { (role, label) ->
-                    DropdownMenuItem(
-                        text = { Text(label) },
-                        onClick = {
-                            selectedRole = role
-                            LoginViewModel.devMockRole = role
-                            roleDropdownExpanded = false
-                        }
-                    )
-                }
-            }
-        }
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        TextButton(
-            onClick = onNavigateToForgotPassword,
-            enabled = !state.isLoading
-        ) {
-            Text("Forgot password?")
-        }
-
-        if (state.error != null) {
             Text(
-                text = state.error!!,
-                color = MaterialTheme.colorScheme.error,
-                style = MaterialTheme.typography.bodySmall
+                text = "FIVUCSAS",
+                style = MaterialTheme.typography.headlineLarge
             )
+
             Spacer(modifier = Modifier.height(8.dp))
-        }
 
-        Spacer(modifier = Modifier.height(24.dp))
+            Text(
+                text = "Biometric Authentication",
+                style = MaterialTheme.typography.bodyMedium
+            )
 
-        Button(
-            onClick = {
-                scope.launch {
-                    viewModel.login(email, password)
-                }
-            },
-            modifier = Modifier.fillMaxWidth(),
-            enabled = !state.isLoading
-        ) {
-            if (state.isLoading) {
-                CircularProgressIndicator(
-                    modifier = Modifier.size(24.dp),
-                    color = MaterialTheme.colorScheme.onPrimary
+            Spacer(modifier = Modifier.height(32.dp))
+
+            OutlinedTextField(
+                value = email,
+                onValueChange = { email = it },
+                label = { Text("Email") },
+                modifier = Modifier.fillMaxWidth(),
+                enabled = !state.isLoading
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            OutlinedTextField(
+                value = password,
+                onValueChange = { password = it },
+                label = { Text("Password") },
+                visualTransformation = PasswordVisualTransformation(),
+                modifier = Modifier.fillMaxWidth(),
+                enabled = !state.isLoading
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // DEV: Role switcher dropdown
+            ExposedDropdownMenuBox(
+                expanded = roleDropdownExpanded,
+                onExpandedChange = { roleDropdownExpanded = it }
+            ) {
+                OutlinedTextField(
+                    value = testRoles.first { it.first == selectedRole }.second,
+                    onValueChange = {},
+                    readOnly = true,
+                    label = { Text("Dev Role") },
+                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = roleDropdownExpanded) },
+                    modifier = Modifier.fillMaxWidth().menuAnchor(),
+                    colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors()
                 )
-            } else {
-                Text("Login")
+                ExposedDropdownMenu(
+                    expanded = roleDropdownExpanded,
+                    onDismissRequest = { roleDropdownExpanded = false }
+                ) {
+                    testRoles.forEach { (role, label) ->
+                        DropdownMenuItem(
+                            text = { Text(label) },
+                            onClick = {
+                                selectedRole = role
+                                LoginViewModel.devMockRole = role
+                                roleDropdownExpanded = false
+                            }
+                        )
+                    }
+                }
             }
-        }
 
-        Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
-        TextButton(
-            onClick = onNavigateToRegister,
-            enabled = !state.isLoading
-        ) {
-            Text("Don't have an account? Register")
-        }
+            TextButton(
+                onClick = onNavigateToForgotPassword,
+                enabled = !state.isLoading
+            ) {
+                Text("Forgot password?")
+            }
 
-        TextButton(
-            onClick = onNavigateToGuestFaceCheck,
-            enabled = !state.isLoading
-        ) {
-            Text("Continue as Guest (Face Check)")
+            if (state.error != null) {
+                Text(
+                    text = state.error!!,
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodySmall
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            Button(
+                onClick = {
+                    scope.launch {
+                        viewModel.login(email, password)
+                    }
+                },
+                modifier = Modifier.fillMaxWidth(),
+                enabled = !state.isLoading
+            ) {
+                if (state.isLoading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(24.dp),
+                        color = MaterialTheme.colorScheme.onPrimary
+                    )
+                } else {
+                    Text("Login")
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            TextButton(
+                onClick = onNavigateToRegister,
+                enabled = !state.isLoading
+            ) {
+                Text("Don't have an account? Register")
+            }
+
+            TextButton(
+                onClick = onNavigateToGuestFaceCheck,
+                enabled = !state.isLoading
+            ) {
+                Text("Continue as Guest (Face Check)")
+            }
         }
     }
 }
