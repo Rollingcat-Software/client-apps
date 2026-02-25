@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AdminPanelSettings
@@ -71,6 +72,8 @@ import com.fivucsas.shared.domain.model.TenantSummary
 import com.fivucsas.shared.domain.model.UserRole
 import com.fivucsas.shared.presentation.state.RootConsoleUiEffect
 import com.fivucsas.shared.presentation.state.RootConsoleUiEvent
+import com.fivucsas.shared.presentation.viewmodel.InviteStatus
+import com.fivucsas.shared.presentation.viewmodel.InviteViewModel
 import com.fivucsas.shared.presentation.viewmodel.RootConsoleViewModel
 import com.fivucsas.shared.ui.components.atoms.SectionHeader
 import com.fivucsas.shared.ui.components.molecules.StatCard
@@ -87,6 +90,7 @@ import com.fivucsas.shared.ui.components.root.LoadingState
 import com.fivucsas.shared.ui.components.root.RootNavItem
 import com.fivucsas.shared.ui.components.root.SearchBar
 import com.fivucsas.shared.ui.navigation.RouteIds
+import com.fivucsas.shared.ui.theme.AppColors
 import kotlinx.coroutines.launch
 
 private enum class RootSection(val id: String, val label: String) {
@@ -329,13 +333,14 @@ private fun RootConsoleCompact(
     onOpen: (String, String?) -> Unit
 ) {
     val quickActions = listOf(
-        QuickActionItem("Tenants", Icons.Default.Store) { onOpen("root/tenant-management", null) },
-        QuickActionItem("Admins", Icons.Default.Group) { onOpen("root/tenant-admins", null) },
-        QuickActionItem("Tenant Members", Icons.Default.VerifiedUser) { onOpen(RouteIds.ROOT_TENANT_MEMBERS, null) },
-        QuickActionItem("Users", Icons.Default.People) { onOpen(RouteIds.ROOT_USERS, null) },
-        QuickActionItem("Audit", Icons.Default.History) { onOpen("root/audit-explorer", null) },
-        QuickActionItem("Security", Icons.Default.Security) { onOpen("root/security-events", null) },
-        QuickActionItem("Settings", Icons.Default.Settings) { onOpen(settingsRoute, null) }
+        QuickActionItem("Tenants", Icons.Default.Store, { onOpen("root/tenant-management", null) }, AppColors.Primary),
+        QuickActionItem("Admins", Icons.Default.Group, { onOpen("root/tenant-admins", null) }, AppColors.WarningDark),
+        QuickActionItem("Tenant Members", Icons.Default.VerifiedUser, { onOpen(RouteIds.ROOT_TENANT_MEMBERS, null) }, AppColors.SuccessDark),
+        QuickActionItem("Users", Icons.Default.People, { onOpen(RouteIds.ROOT_USERS, null) }, AppColors.InfoDark),
+        QuickActionItem("Invites", Icons.Default.Mail, { onOpen(RouteIds.ROOT_INVITE_MANAGEMENT, null) }, AppColors.SecondaryVariant),
+        QuickActionItem("Audit", Icons.Default.History, { onOpen("root/audit-explorer", null) }, AppColors.Warning),
+        QuickActionItem("Security", Icons.Default.Security, { onOpen("root/security-events", null) }, AppColors.ErrorDark),
+        QuickActionItem("Settings", Icons.Default.Settings, { onOpen(settingsRoute, null) }, AppColors.Gray700)
     )
     Column(
         modifier = modifier
@@ -354,12 +359,14 @@ private fun RootConsoleCompact(
                 value = state.tenants.size.toString(),
                 label = "Tenants",
                 icon = Icons.Default.Store,
+                iconTint = AppColors.Primary,
                 modifier = Modifier.weight(1f)
             )
             StatCard(
                 value = state.users.size.toString(),
                 label = "Global Users",
                 icon = Icons.Default.People,
+                iconTint = AppColors.Info,
                 modifier = Modifier.weight(1f)
             )
         }
@@ -372,12 +379,14 @@ private fun RootConsoleCompact(
                 value = state.tenantAdmins.size.toString(),
                 label = "Tenant Admins",
                 icon = Icons.Default.VerifiedUser,
+                iconTint = AppColors.WarningDark,
                 modifier = Modifier.weight(1f)
             )
             StatCard(
                 value = state.auditLogs.size.toString(),
                 label = "Audit Items",
                 icon = Icons.Default.Analytics,
+                iconTint = AppColors.SuccessDark,
                 modifier = Modifier.weight(1f)
             )
         }
@@ -387,11 +396,19 @@ private fun RootConsoleCompact(
 
         SectionHeader(title = "Recent Tenants")
         state.tenants.take(5).forEach { tenant ->
+            val tenantPalette = listOf(
+                AppColors.Primary.copy(alpha = 0.10f),
+                AppColors.Success.copy(alpha = 0.12f),
+                AppColors.Warning.copy(alpha = 0.12f),
+                AppColors.Info.copy(alpha = 0.12f),
+                AppColors.Secondary.copy(alpha = 0.12f)
+            )
+            val accent = tenantPalette[kotlin.math.abs(tenant.id.hashCode()) % tenantPalette.size]
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable { onOpen("root/tenant-detail", tenant.id) },
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+                colors = CardDefaults.cardColors(containerColor = accent)
             ) {
                 Row(
                     modifier = Modifier.fillMaxWidth().padding(12.dp),
@@ -730,6 +747,7 @@ private fun RootUserManagementScreen(
 }
 
 @Composable
+@OptIn(ExperimentalLayoutApi::class)
 private fun EditRootUserDialog(
     user: GlobalUser,
     onDismiss: () -> Unit,
@@ -765,11 +783,15 @@ private fun EditRootUserDialog(
                     singleLine = true
                 )
                 Text("Role", style = MaterialTheme.typography.labelLarge)
-                Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                FlowRow(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                    verticalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
                     roles.forEach { option ->
                         AssistChip(
                             onClick = { role = option },
-                            label = { Text(option) },
+                            label = { Text(option.replace('_', ' ')) },
                             colors = AssistChipDefaults.assistChipColors(
                                 containerColor = if (role == option) MaterialTheme.colorScheme.primaryContainer
                                 else MaterialTheme.colorScheme.surfaceVariant
@@ -786,6 +808,226 @@ private fun EditRootUserDialog(
             TextButton(onClick = onDismiss) { Text("Cancel") }
         }
     )
+}
+
+@Composable
+fun RootInviteManagementScreen(
+    onNavigateBack: () -> Unit = {},
+    viewModel: InviteViewModel = remember { InviteViewModel() }
+) {
+    val state by viewModel.state.collectAsState()
+    var inviteEmail by remember { mutableStateOf("") }
+    var inviteRole by remember { mutableStateOf("TENANT_MEMBER") }
+    var inviteTenantId by remember { mutableStateOf<String?>(null) }
+    var inviteTenantName by remember { mutableStateOf<String?>(null) }
+    var selectedInviteRole by remember { mutableStateOf<String?>(null) }
+    val roleOptions = listOf("USER", "TENANT_MEMBER", "TENANT_ADMIN")
+    val tenantOptions = remember(state.invites) {
+        state.invites
+            .mapNotNull { invite ->
+                val tid = invite.tenantId ?: return@mapNotNull null
+                val tname = invite.tenantName ?: tid
+                tid to tname
+            }
+            .distinctBy { it.first }
+            .sortedBy { it.second }
+    }
+    val visibleInvites = state.filteredInvites.filter { invite ->
+        selectedInviteRole == null || invite.role == selectedInviteRole
+    }
+
+    LaunchedEffect(Unit) { viewModel.loadInvites() }
+
+    AppScaffold(title = "Invite Management", snackbarHostState = remember { SnackbarHostState() }) { modifier ->
+        Column(
+            modifier = modifier.fillMaxSize().padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+            SearchBar(
+                value = state.searchQuery,
+                placeholder = "Search by email",
+                onValueChange = viewModel::updateSearch
+            )
+
+            LazyRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                item {
+                    AssistChip(
+                        onClick = { viewModel.setFilter(null) },
+                        label = { Text("ALL") },
+                        colors = AssistChipDefaults.assistChipColors(
+                            containerColor = if (state.selectedFilter == null) MaterialTheme.colorScheme.primaryContainer
+                            else MaterialTheme.colorScheme.surfaceVariant
+                        )
+                    )
+                }
+                items(InviteStatus.entries) { status ->
+                    AssistChip(
+                        onClick = { viewModel.setFilter(status) },
+                        label = { Text(status.name) },
+                        colors = AssistChipDefaults.assistChipColors(
+                            containerColor = if (state.selectedFilter == status) MaterialTheme.colorScheme.primaryContainer
+                            else MaterialTheme.colorScheme.surfaceVariant
+                        )
+                    )
+                }
+            }
+
+            LazyRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                item {
+                    AssistChip(
+                        onClick = { selectedInviteRole = null },
+                        label = { Text("All Roles") },
+                        colors = AssistChipDefaults.assistChipColors(
+                            containerColor = if (selectedInviteRole == null) MaterialTheme.colorScheme.primaryContainer
+                            else MaterialTheme.colorScheme.surfaceVariant
+                        )
+                    )
+                }
+                items(roleOptions) { role ->
+                    AssistChip(
+                        onClick = { selectedInviteRole = role },
+                        label = { Text(role) },
+                        colors = AssistChipDefaults.assistChipColors(
+                            containerColor = if (selectedInviteRole == role) MaterialTheme.colorScheme.primaryContainer
+                            else MaterialTheme.colorScheme.surfaceVariant
+                        )
+                    )
+                }
+            }
+
+            LazyRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                item {
+                    AssistChip(
+                        onClick = { viewModel.setTenantFilter(null) },
+                        label = { Text("All Tenants") },
+                        colors = AssistChipDefaults.assistChipColors(
+                            containerColor = if (state.selectedTenantId == null) MaterialTheme.colorScheme.primaryContainer
+                            else MaterialTheme.colorScheme.surfaceVariant
+                        )
+                    )
+                }
+                items(tenantOptions) { (tenantId, tenantName) ->
+                    AssistChip(
+                        onClick = { viewModel.setTenantFilter(tenantId) },
+                        label = { Text(tenantName) },
+                        colors = AssistChipDefaults.assistChipColors(
+                            containerColor = if (state.selectedTenantId == tenantId) MaterialTheme.colorScheme.primaryContainer
+                            else MaterialTheme.colorScheme.surfaceVariant
+                        )
+                    )
+                }
+            }
+
+            OutlinedButton(onClick = { viewModel.showCreateDialog() }) { Text("Send Invite") }
+
+            LazyColumn(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                items(visibleInvites) { invite ->
+                    Card(modifier = Modifier.fillMaxWidth()) {
+                        Column(modifier = Modifier.fillMaxWidth().padding(12.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                            Text(invite.email, fontWeight = FontWeight.SemiBold)
+                            Text(
+                                "Role: ${invite.role}  |  Tenant: ${invite.tenantName ?: "GLOBAL"}",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                            Text(
+                                "Status: ${invite.status.name}  |  Expires: ${invite.expiresAt}",
+                                style = MaterialTheme.typography.bodySmall
+                            )
+                            if (invite.status == InviteStatus.PENDING) {
+                                OutlinedButton(onClick = { viewModel.revokeInvite(invite.id) }) {
+                                    Text("Revoke")
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            OutlinedButton(onClick = onNavigateBack) { Text("Back") }
+        }
+    }
+
+    if (state.showCreateDialog) {
+        AlertDialog(
+            onDismissRequest = { viewModel.hideCreateDialog() },
+            title = { Text("Create Invite") },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    OutlinedTextField(
+                        value = inviteEmail,
+                        onValueChange = { inviteEmail = it },
+                        label = { Text("Email") },
+                        singleLine = true
+                    )
+                    LazyRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                        items(roleOptions) { role ->
+                            AssistChip(
+                                onClick = { inviteRole = role },
+                                label = { Text(role) },
+                                colors = AssistChipDefaults.assistChipColors(
+                                    containerColor = if (inviteRole == role) MaterialTheme.colorScheme.primaryContainer
+                                    else MaterialTheme.colorScheme.surfaceVariant
+                                )
+                            )
+                        }
+                    }
+                    LazyRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                        item {
+                            AssistChip(
+                                onClick = {
+                                    inviteTenantId = null
+                                    inviteTenantName = null
+                                },
+                                label = { Text("GLOBAL") },
+                                colors = AssistChipDefaults.assistChipColors(
+                                    containerColor = if (inviteTenantId == null) MaterialTheme.colorScheme.primaryContainer
+                                    else MaterialTheme.colorScheme.surfaceVariant
+                                )
+                            )
+                        }
+                        items(tenantOptions) { (tenantId, tenantName) ->
+                            AssistChip(
+                                onClick = {
+                                    inviteTenantId = tenantId
+                                    inviteTenantName = tenantName
+                                },
+                                label = { Text(tenantName) },
+                                colors = AssistChipDefaults.assistChipColors(
+                                    containerColor = if (inviteTenantId == tenantId) MaterialTheme.colorScheme.primaryContainer
+                                    else MaterialTheme.colorScheme.surfaceVariant
+                                )
+                            )
+                        }
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        if (inviteEmail.isNotBlank()) {
+                            viewModel.createInvite(
+                                email = inviteEmail.trim(),
+                                role = inviteRole,
+                                tenantId = inviteTenantId,
+                                tenantName = inviteTenantName
+                            )
+                            inviteEmail = ""
+                            inviteRole = "TENANT_MEMBER"
+                            inviteTenantId = null
+                            inviteTenantName = null
+                        }
+                    }
+                ) { Text("Send") }
+            },
+            dismissButton = {
+                TextButton(onClick = { viewModel.hideCreateDialog() }) { Text("Cancel") }
+            }
+        )
+    }
 }
 
 @Composable

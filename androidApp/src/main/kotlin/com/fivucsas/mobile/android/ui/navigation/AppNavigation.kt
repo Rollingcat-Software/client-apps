@@ -57,6 +57,7 @@ import com.fivucsas.shared.ui.screen.SplashScreen
 import com.fivucsas.shared.ui.screen.root.AuditExplorerScreen
 import com.fivucsas.shared.ui.screen.root.GlobalUserDirectoryScreen
 import com.fivucsas.shared.ui.screen.root.RootConsoleScreen
+import com.fivucsas.shared.ui.screen.root.RootInviteManagementScreen
 import com.fivucsas.shared.ui.screen.root.RolesPermissionsScreen
 import com.fivucsas.shared.ui.screen.root.SecurityEventsScreen
 import com.fivucsas.shared.ui.screen.root.SystemSettingsScreen
@@ -116,6 +117,7 @@ sealed class Screen(val route: String) {
     object RootUsers : Screen(RouteIds.ROOT_USERS)
     object RootTenantMembers : Screen(RouteIds.ROOT_TENANT_MEMBERS)
     object RootTenantAdmins : Screen(RouteIds.ROOT_TENANT_ADMINS)
+    object RootInviteManagement : Screen(RouteIds.ROOT_INVITE_MANAGEMENT)
     object RootRolesPermissions : Screen(RouteIds.ROOT_ROLES_PERMISSIONS)
     object RootAuditExplorer : Screen(RouteIds.ROOT_AUDIT_EXPLORER)
     object RootSecurityEvents : Screen(RouteIds.ROOT_SECURITY_EVENTS)
@@ -370,6 +372,7 @@ fun AppNavigation() {
                         RouteIds.ROOT_USERS -> navController.navigate(Screen.RootUsers.route)
                         RouteIds.ROOT_TENANT_MEMBERS -> navController.navigate(Screen.RootTenantMembers.route)
                         RouteIds.ROOT_TENANT_ADMINS -> navController.navigate(Screen.RootTenantAdmins.route)
+                        RouteIds.ROOT_INVITE_MANAGEMENT -> navController.navigate(Screen.RootInviteManagement.route)
                         RouteIds.ROOT_ROLES_PERMISSIONS -> navController.navigate(Screen.RootRolesPermissions.route)
                         RouteIds.ROOT_AUDIT_EXPLORER -> navController.navigate(Screen.RootAuditExplorer.route)
                         RouteIds.ROOT_SECURITY_EVENTS -> navController.navigate(Screen.RootSecurityEvents.route)
@@ -457,6 +460,17 @@ fun AppNavigation() {
                 role = userRole,
                 screenTitle = "Tenant Admins",
                 initialRoleFilter = "TENANT_ADMIN",
+                onNavigateBack = { navController.popBackStack() }
+            )
+        }
+
+        composable(Screen.RootInviteManagement.route) {
+            val userRole = currentUserRole()
+            if (!NavigationPolicy.canAccessRoute(userRole, RouteIds.ROOT_INVITE_MANAGEMENT)) {
+                LaunchedEffect(Unit) { navigateUnauthorized("No permission to manage invitations.") }
+                return@composable
+            }
+            RootInviteManagementScreen(
                 onNavigateBack = { navController.popBackStack() }
             )
         }
