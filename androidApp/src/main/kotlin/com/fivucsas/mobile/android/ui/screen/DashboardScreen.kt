@@ -12,9 +12,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CameraAlt
+import androidx.compose.material.icons.filled.CreditCard
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.PersonAdd
 import androidx.compose.material.icons.filled.Security
 import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Badge
@@ -114,6 +116,20 @@ fun DashboardScreen(
             icon = Icons.Default.Person,
             route = Screen.Profile.route,
             anyPermissions = setOf(Permission.PROFILE_READ_SELF)
+        ),
+        QuickAction(
+            id = "request-membership",
+            title = "Join a Tenant",
+            icon = Icons.Default.PersonAdd,
+            route = Screen.RequestMembership.route,
+            anyPermissions = setOf(Permission.TENANT_MEMBERSHIP_REQUEST)
+        ),
+        QuickAction(
+            id = "card-scan",
+            title = "Add card",
+            icon = Icons.Default.CreditCard,
+            route = Screen.CardScan.route,
+            anyPermissions = setOf(Permission.CARD_ADD_SELF)
         )
     )
 
@@ -130,6 +146,8 @@ fun DashboardScreen(
                     Screen.ActivityHistory.route -> onNavigateToHistory()
                     Screen.InviteAccept.route -> onNavigateToInvitations()
                     Screen.Profile.route -> onNavigateToProfile()
+                    Screen.RequestMembership.route -> onNavigateToRequestMembership()
+                    Screen.CardScan.route -> onNavigateToCardScan()
                 }
             }
         )

@@ -12,6 +12,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import com.fivucsas.shared.config.UIDimens
@@ -22,7 +23,8 @@ import com.fivucsas.shared.ui.theme.AppTypography
 data class QuickActionItem(
     val title: String,
     val icon: ImageVector,
-    val onClick: () -> Unit
+    val onClick: () -> Unit,
+    val iconTint: Color = AppColors.Primary
 )
 
 @Composable
@@ -54,7 +56,7 @@ fun QuickActionGrid(
                             Icon(
                                 imageVector = action.icon,
                                 contentDescription = null,
-                                tint = AppColors.Primary,
+                                tint = action.iconTint,
                                 modifier = Modifier.size(UIDimens.IconMedium)
                             )
                             Spacer(modifier = Modifier.size(8.dp))
