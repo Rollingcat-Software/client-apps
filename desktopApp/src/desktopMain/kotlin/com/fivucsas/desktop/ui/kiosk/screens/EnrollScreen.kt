@@ -1,6 +1,5 @@
 package com.fivucsas.desktop.ui.kiosk.screens
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -33,29 +32,18 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.fivucsas.desktop.ui.components.DesktopBannerType
+import com.fivucsas.desktop.ui.components.DesktopInfoBanner
+import com.fivucsas.desktop.ui.components.DesktopSectionHeader
 import com.fivucsas.desktop.ui.components.DesktopKioskCameraOverlay
 import com.fivucsas.shared.config.UIDimens
 import com.fivucsas.shared.platform.ICameraService
 import com.fivucsas.shared.presentation.viewmodel.KioskViewModel
 import com.fivucsas.shared.ui.components.atoms.AppTextField
 import com.fivucsas.shared.ui.components.atoms.VerticalSpacerMedium
-import com.fivucsas.shared.ui.components.molecules.ErrorMessage
-import com.fivucsas.shared.ui.components.molecules.SuccessMessage
-import com.fivucsas.shared.ui.theme.AppColors
 import org.koin.compose.koinInject
 
-/**
- * Enroll Screen Component
- *
- * User enrollment form with biometric capture.
- *
- * @param viewModel Kiosk view model
- * @param onBack Callback to return to welcome screen
- */
 @Composable
 fun EnrollScreen(
     viewModel: KioskViewModel,
@@ -66,18 +54,7 @@ fun EnrollScreen(
     val cameraService: ICameraService = koinInject()
     var pendingSubmit by remember { mutableStateOf(false) }
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(
-                brush = Brush.verticalGradient(
-                    colors = listOf(
-                        Color(0xFFE3F2FD),
-                        Color(0xFFFFFFFF)
-                    )
-                )
-            )
-    ) {
+    Box(modifier = Modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -85,45 +62,34 @@ fun EnrollScreen(
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Header
-            Text(
-                text = "New Enrollment",
-                style = MaterialTheme.typography.displaySmall,
-                color = AppColors.Primary,
-                fontWeight = FontWeight.Bold
-            )
-
-            Text(
-                text = "Please fill in your details",
-                style = MaterialTheme.typography.bodyLarge,
-                color = AppColors.OnSurfaceVariant
+            DesktopSectionHeader(
+                title = "New Enrollment",
+                subtitle = "Please fill in your details"
             )
 
             Spacer(modifier = Modifier.height(UIDimens.SpacingXLarge))
 
-            // Messages
             uiState.errorMessage?.let {
-                ErrorMessage(message = it)
+                DesktopInfoBanner(type = DesktopBannerType.Error, text = it)
                 VerticalSpacerMedium()
             }
 
             uiState.successMessage?.let {
-                SuccessMessage(message = it)
+                DesktopInfoBanner(type = DesktopBannerType.Info, text = it)
                 VerticalSpacerMedium()
             }
 
-            // Form Card
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(16.dp),
-                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
             ) {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(UIDimens.SpacingLarge)
                 ) {
-                    // Full Name
                     AppTextField(
                         value = enrollmentData.fullName,
                         onValueChange = viewModel::updateFullName,
@@ -131,10 +97,7 @@ fun EnrollScreen(
                         placeholder = "Enter your full name",
                         leadingIcon = Icons.Default.Person
                     )
-
                     VerticalSpacerMedium()
-
-                    // Email
                     AppTextField(
                         value = enrollmentData.email,
                         onValueChange = viewModel::updateEmail,
@@ -142,10 +105,7 @@ fun EnrollScreen(
                         placeholder = "your.email@example.com",
                         leadingIcon = Icons.Default.Email
                     )
-
                     VerticalSpacerMedium()
-
-                    // ID Number
                     AppTextField(
                         value = enrollmentData.idNumber,
                         onValueChange = viewModel::updateIdNumber,
@@ -153,10 +113,7 @@ fun EnrollScreen(
                         placeholder = "Enter your ID number",
                         leadingIcon = Icons.Default.Badge
                     )
-
                     VerticalSpacerMedium()
-
-                    // Phone Number
                     AppTextField(
                         value = enrollmentData.phoneNumber,
                         onValueChange = viewModel::updatePhoneNumber,
@@ -164,10 +121,7 @@ fun EnrollScreen(
                         placeholder = "+1234567890",
                         leadingIcon = Icons.Default.Phone
                     )
-
                     VerticalSpacerMedium()
-
-                    // Address
                     AppTextField(
                         value = enrollmentData.address,
                         onValueChange = viewModel::updateAddress,
@@ -180,25 +134,15 @@ fun EnrollScreen(
 
             Spacer(modifier = Modifier.height(UIDimens.SpacingLarge))
 
-            // Photo Capture Status
             if (uiState.capturedImage != null) {
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(
-                        containerColor = AppColors.Success.copy(alpha = 0.1f)
-                    )
-                ) {
-                    Text(
-                        text = "✓ Photo captured successfully",
-                        modifier = Modifier.padding(UIDimens.SpacingMedium),
-                        color = AppColors.Success
-                    )
-                }
+                DesktopInfoBanner(
+                    type = DesktopBannerType.Info,
+                    text = "Photo captured successfully"
+                )
             }
 
             Spacer(modifier = Modifier.height(UIDimens.SpacingLarge))
 
-            // Actions
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(UIDimens.SpacingMedium)
@@ -206,9 +150,7 @@ fun EnrollScreen(
                 OutlinedButton(
                     onClick = onBack,
                     modifier = Modifier.weight(1f)
-                ) {
-                    Text("Cancel")
-                }
+                ) { Text("Cancel") }
 
                 Button(
                     onClick = {

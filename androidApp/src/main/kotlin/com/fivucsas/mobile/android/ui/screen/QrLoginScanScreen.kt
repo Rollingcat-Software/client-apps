@@ -47,12 +47,16 @@ import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import com.fivucsas.shared.platform.AndroidCameraService
 import com.fivucsas.shared.platform.CameraState
 import com.fivucsas.shared.platform.LensFacing
 import com.fivucsas.shared.presentation.viewmodel.auth.QrLoginStatus
 import com.fivucsas.shared.presentation.viewmodel.auth.QrLoginViewModel
 import com.fivucsas.shared.ui.platform.AndroidCameraPreview
+import com.google.mlkit.vision.barcode.BarcodeScanning
+import com.google.mlkit.vision.barcode.common.Barcode
+import com.google.mlkit.vision.common.InputImage
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
@@ -77,11 +81,45 @@ fun QRLoginScanScreen(
     val cameraState by cameraService.cameraState.collectAsState()
     val qrState by qrLoginViewModel.state.collectAsState()
     var manualQrPayload by rememberSaveable { mutableStateOf("") }
+    var autoScanSubmitted by rememberSaveable { mutableStateOf(false) }
+    val barcodeScanner = remember {
+        BarcodeScanning.getClient()
+    }
 
     LaunchedEffect(cameraPermissionState.status.isGranted) {
         if (cameraPermissionState.status.isGranted) {
             cameraService.initialize(LensFacing.BACK)
             cameraService.startPreview()
+            cameraService.setFrameAnalyzer(
+                executor = ContextCompat.getMainExecutor(context)
+            ) { imageProxy ->
+                val mediaImage = imageProxy.image
+                if (mediaImage == null || autoScanSubmitted) {
+                    imageProxy.close()
+                    return@setFrameAnalyzer
+                }
+
+                val input = InputImage.fromMediaImage(
+                    mediaImage,
+                    imageProxy.imageInfo.rotationDegrees
+                )
+
+                barcodeScanner.process(input)
+                    .addOnSuccessListener { barcodes ->
+                        if (autoScanSubmitted) return@addOnSuccessListener
+                        val qrRawValue = barcodes.firstOrNull {
+                            it.format == Barcode.FORMAT_QR_CODE && !it.rawValue.isNullOrBlank()
+                        }?.rawValue
+                        if (!qrRawValue.isNullOrBlank()) {
+                            autoScanSubmitted = true
+                            manualQrPayload = qrRawValue
+                            qrLoginViewModel.submitMobileScan(qrRawValue)
+                        }
+                    }
+                    .addOnCompleteListener {
+                        imageProxy.close()
+                    }
+            }
         } else if (!permissionRequested) {
             permissionRequested = true
             cameraPermissionState.launchPermissionRequest()
@@ -90,6 +128,8 @@ fun QRLoginScanScreen(
 
     DisposableEffect(Unit) {
         onDispose {
+            cameraService.clearFrameAnalyzer()
+            barcodeScanner.close()
             scope.launch {
                 cameraService.stopPreview()
                 cameraService.release()
@@ -253,7 +293,7 @@ fun QRLoginScanScreen(
                 value = manualQrPayload,
                 onValueChange = { manualQrPayload = it },
                 modifier = Modifier.fillMaxWidth(),
-                label = { Text("Scanned QR Payload") },
+                label = { Text("Scanned QR Payload (Fallback)") },
                 placeholder = { Text("fivucsas://qr-login?session=...") },
                 singleLine = true
             )

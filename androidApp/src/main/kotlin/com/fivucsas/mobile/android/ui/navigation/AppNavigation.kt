@@ -20,8 +20,8 @@ import com.fivucsas.mobile.android.ui.screen.ChangePasswordScreen
 import com.fivucsas.mobile.android.ui.screen.DashboardScreen
 import com.fivucsas.mobile.android.ui.screen.EditProfileScreen
 import com.fivucsas.mobile.android.ui.screen.ExamEntryScreen
+import com.fivucsas.mobile.android.ui.screen.InviteAcceptScreen
 import com.fivucsas.mobile.android.ui.screen.MyInvitationsScreen
-import com.fivucsas.mobile.android.ui.screen.ForgotPasswordScreen
 import com.fivucsas.mobile.android.ui.screen.HelpScreen
 import com.fivucsas.mobile.android.ui.screen.IdentifyTenantScreen
 import com.fivucsas.mobile.android.ui.screen.InviteManagementScreen
@@ -48,71 +48,75 @@ import com.fivucsas.shared.presentation.viewmodel.auth.RegisterViewModel
 import com.fivucsas.shared.ui.screen.FingerprintFailureScreen
 import com.fivucsas.shared.ui.screen.FingerprintGateScreen
 import com.fivucsas.shared.ui.screen.FingerprintSuccessScreen
+import com.fivucsas.shared.ui.screen.ForgotPasswordScreen
 import com.fivucsas.shared.ui.screen.GuestFaceCheckResultScreen
 import com.fivucsas.shared.ui.screen.LoginScreen
 import com.fivucsas.shared.ui.screen.OnboardingScreen
 import com.fivucsas.shared.ui.screen.RegisterScreen
 import com.fivucsas.shared.ui.screen.SplashScreen
+import com.fivucsas.shared.ui.navigation.NavigationPolicy
+import com.fivucsas.shared.ui.navigation.RouteIds
 import org.koin.compose.koinInject
 
 private const val PREFS_NAME = "fivucsas_prefs"
 private const val KEY_FIRST_LAUNCH = "first_launch"
 
 sealed class Screen(val route: String) {
-    object Splash : Screen("splash")
-    object Onboarding : Screen("onboarding")
-    object Login : Screen("login")
-    object Register : Screen("register")
-    object ForgotPassword : Screen("forgot-password")
-    object Dashboard : Screen("dashboard")
-    object ActivityHistory : Screen("activity-history")
-    object Profile : Screen("profile")
-    object EditProfile : Screen("edit-profile")
-    object ChangePassword : Screen("change-password")
-    object Settings : Screen("settings")
-    object Notifications : Screen("notifications")
-    object Help : Screen("help")
-    object About : Screen("about")
-    object QrLoginScan : Screen("qr-login-scan")
-    object TenantHistory : Screen("tenant-history")
-    object TenantSettings : Screen("tenant-settings")
-    object Unauthorized : Screen("unauthorized/{message}") {
-        fun createRoute(message: String): String = "unauthorized/${Uri.encode(message)}"
+    object Splash : Screen(RouteIds.SPLASH)
+    object Onboarding : Screen(RouteIds.ONBOARDING)
+    object Login : Screen(RouteIds.LOGIN)
+    object Register : Screen(RouteIds.REGISTER)
+    object ForgotPassword : Screen(RouteIds.FORGOT_PASSWORD)
+    object Dashboard : Screen(RouteIds.DASHBOARD)
+    object ActivityHistory : Screen(RouteIds.ACTIVITY_HISTORY)
+    object Profile : Screen(RouteIds.PROFILE)
+    object EditProfile : Screen(RouteIds.EDIT_PROFILE)
+    object ChangePassword : Screen(RouteIds.CHANGE_PASSWORD)
+    object Settings : Screen(RouteIds.SETTINGS)
+    object Notifications : Screen(RouteIds.NOTIFICATIONS)
+    object Help : Screen(RouteIds.HELP)
+    object About : Screen(RouteIds.ABOUT)
+    object QrLoginScan : Screen(RouteIds.QR_LOGIN_SCAN)
+    object TenantHistory : Screen(RouteIds.TENANT_HISTORY)
+    object TenantSettings : Screen(RouteIds.TENANT_SETTINGS)
+    object Unauthorized : Screen("${RouteIds.UNAUTHORIZED}/{message}") {
+        fun createRoute(message: String): String = "${RouteIds.UNAUTHORIZED}/${Uri.encode(message)}"
     }
-    object GuestFaceCheckCapture : Screen("guest-face-check")
-    object GuestFaceCheckResult : Screen("guest-face-check-result/{outcome}/{confidence}") {
+    object GuestFaceCheckCapture : Screen(RouteIds.GUEST_FACE_CHECK_CAPTURE)
+    object GuestFaceCheckResult : Screen("${RouteIds.GUEST_FACE_CHECK_RESULT}/{outcome}/{confidence}") {
         fun createRoute(outcome: GuestFaceCheckOutcome, confidence: ConfidenceBand?) =
-            "guest-face-check-result/${outcome.name}/${confidence?.name ?: "NONE"}"
+            "${RouteIds.GUEST_FACE_CHECK_RESULT}/${outcome.name}/${confidence?.name ?: "NONE"}"
     }
 
-    object AdminDashboard : Screen("admin-dashboard")
-    object OperatorDashboard : Screen("operator-dashboard")
-    object UsersManagement : Screen("users-management")
-    object ExamEntry : Screen("exam-entry")
-    object IdentifyTenant : Screen("identify-tenant")
-    object InviteManagement : Screen("invite-management")
-    object MyInvitations : Screen("my-invitations")
-    object RequestMembership : Screen("request-membership")
-    object CardScan : Screen("card-scan")
+    object AdminDashboard : Screen(RouteIds.ADMIN_DASHBOARD)
+    object OperatorDashboard : Screen(RouteIds.OPERATOR_DASHBOARD)
+    object UsersManagement : Screen(RouteIds.USERS_MANAGEMENT)
+    object ExamEntry : Screen(RouteIds.EXAM_ENTRY)
+    object IdentifyTenant : Screen(RouteIds.IDENTIFY_TENANT)
+    object InviteAccept : Screen(RouteIds.INVITE_ACCEPT)
+    object InviteManagement : Screen(RouteIds.INVITE_MANAGEMENT)
+    object MyInvitations : Screen(RouteIds.MY_INVITATIONS)
+    object RequestMembership : Screen(RouteIds.REQUEST_MEMBERSHIP)
+    object CardScan : Screen(RouteIds.CARD_SCAN)
 
-    object BiometricEnroll : Screen("biometric/enroll/{userId}") {
-        fun createRoute(userId: String) = "biometric/enroll/$userId"
+    object BiometricEnroll : Screen("${RouteIds.BIOMETRIC_ENROLL}/{userId}") {
+        fun createRoute(userId: String) = "${RouteIds.BIOMETRIC_ENROLL}/$userId"
     }
 
-    object BiometricVerify : Screen("biometric/verify/{userId}") {
-        fun createRoute(userId: String) = "biometric/verify/$userId"
+    object BiometricVerify : Screen("${RouteIds.BIOMETRIC_VERIFY}/{userId}") {
+        fun createRoute(userId: String) = "${RouteIds.BIOMETRIC_VERIFY}/$userId"
     }
 
-    object FingerprintGate : Screen("fingerprint-gate/{target}") {
-        fun createRoute(target: String) = "fingerprint-gate/$target"
+    object FingerprintGate : Screen("${RouteIds.FINGERPRINT_GATE_ANDROID}/{target}") {
+        fun createRoute(target: String) = "${RouteIds.FINGERPRINT_GATE_ANDROID}/$target"
     }
 
-    object FingerprintSuccess : Screen("fingerprint-success/{target}") {
-        fun createRoute(target: String) = "fingerprint-success/$target"
+    object FingerprintSuccess : Screen("${RouteIds.FINGERPRINT_SUCCESS_ANDROID}/{target}") {
+        fun createRoute(target: String) = "${RouteIds.FINGERPRINT_SUCCESS_ANDROID}/$target"
     }
 
-    object FingerprintFailure : Screen("fingerprint-failure/{target}") {
-        fun createRoute(target: String) = "fingerprint-failure/$target"
+    object FingerprintFailure : Screen("${RouteIds.FINGERPRINT_FAILURE_ANDROID}/{target}") {
+        fun createRoute(target: String) = "${RouteIds.FINGERPRINT_FAILURE_ANDROID}/$target"
     }
 }
 
@@ -139,11 +143,13 @@ fun AppNavigation() {
             launchSingleTop = true
         }
     }
-    fun isAdminRole(role: UserRole): Boolean = role == UserRole.TENANT_ADMIN || role == UserRole.ROOT
+    fun isAdminRole(role: UserRole): Boolean =
+        NavigationPolicy.canAccessRoute(role, RouteIds.ADMIN_DASHBOARD)
     fun hasQrAccess(role: UserRole): Boolean =
-        canAccessAny(role, Permission.QR_SCAN, Permission.QR_DISPLAY)
+        NavigationPolicy.canAccessRoute(role, RouteIds.QR_LOGIN_SCAN)
     val navItemsForRole = when (currentUserRole()) {
         UserRole.ROOT, UserRole.TENANT_ADMIN -> BottomNavDestinations.adminItems
+        UserRole.USER -> BottomNavDestinations.userItems
         else -> BottomNavDestinations.items
     }
 
@@ -206,10 +212,7 @@ fun AppNavigation() {
                 onLoginSuccess = {
                     viewModel.state.value.tokens?.let { tokenManager?.saveTokens(it) }
                     val loginRole = viewModel.state.value.role
-                    val destination = when (loginRole) {
-                        UserRole.ROOT, UserRole.TENANT_ADMIN -> Screen.AdminDashboard.route
-                        else -> Screen.Dashboard.route
-                    }
+                    val destination = NavigationPolicy.loginSuccessRoute(loginRole)
                     navController.navigate(Screen.FingerprintGate.createRoute(destination)) {
                         popUpTo(Screen.Login.route) { inclusive = true }
                     }
@@ -251,6 +254,7 @@ fun AppNavigation() {
             DashboardScreen(
                 userName = "Test User",
                 userRole = userRole,
+                navItems = navItemsForRole,
                 currentRoute = Screen.Dashboard.route,
                 onNavigateToNotifications = { navController.navigate(Screen.Notifications.route) },
                 onNavigateToProfile = { navController.navigate(Screen.Profile.route) },
@@ -258,7 +262,7 @@ fun AppNavigation() {
                 onNavigateToVerify = { navController.navigate(Screen.BiometricVerify.createRoute("1")) },
                 onNavigateToQrScan = { navController.navigate(Screen.QrLoginScan.route) },
                 onNavigateToHistory = { navController.navigate(Screen.ActivityHistory.route) },
-                onNavigateToInvitations = { navController.navigate(Screen.MyInvitations.route) },
+                onNavigateToInvitations = { navController.navigate(Screen.InviteAccept.route) },
                 onNavigateToExamEntry = { navController.navigate(Screen.ExamEntry.route) },
                 onNavigateToRequestMembership = { navController.navigate(Screen.RequestMembership.route) },
                 onNavigateToCardScan = { navController.navigate(Screen.CardScan.route) },
@@ -317,7 +321,7 @@ fun AppNavigation() {
                 return@composable
             }
             val userRole = currentUserRole()
-            if (!userRole.hasPermission(Permission.TENANT_USERS_READ)) {
+            if (!NavigationPolicy.canAccessRoute(userRole, RouteIds.USERS_MANAGEMENT)) {
                 LaunchedEffect(Unit) {
                     navigateUnauthorized("No permission to view tenant users.")
                 }
@@ -374,7 +378,7 @@ fun AppNavigation() {
                 return@composable
             }
             val userRole = currentUserRole()
-            if (!userRole.hasPermission(Permission.HISTORY_READ_SELF)) {
+            if (!NavigationPolicy.canAccessRoute(userRole, RouteIds.ACTIVITY_HISTORY)) {
                 LaunchedEffect(Unit) {
                     navigateUnauthorized("No permission to view your activity history.")
                 }
@@ -402,7 +406,7 @@ fun AppNavigation() {
                 return@composable
             }
             val userRole = currentUserRole()
-            if (!userRole.hasPermission(Permission.HISTORY_READ_TENANT)) {
+            if (!NavigationPolicy.canAccessRoute(userRole, RouteIds.TENANT_HISTORY)) {
                 LaunchedEffect(Unit) {
                     navigateUnauthorized("No permission to view tenant history.")
                 }
@@ -520,7 +524,7 @@ fun AppNavigation() {
                 return@composable
             }
             val userRole = currentUserRole()
-            if (!userRole.hasPermission(Permission.TENANT_SETTINGS_READ)) {
+            if (!NavigationPolicy.canAccessRoute(userRole, RouteIds.TENANT_SETTINGS)) {
                 LaunchedEffect(Unit) {
                     navigateUnauthorized("No permission to view tenant settings.")
                 }
@@ -577,7 +581,7 @@ fun AppNavigation() {
                 return@composable
             }
             val userRole = currentUserRole()
-            if (!hasQrAccess(userRole)) {
+            if (!NavigationPolicy.canAccessRoute(userRole, RouteIds.QR_LOGIN_SCAN)) {
                 LaunchedEffect(Unit) {
                     navigateUnauthorized("No permission to scan/display QR.")
                 }
@@ -588,7 +592,7 @@ fun AppNavigation() {
 
         composable(Screen.GuestFaceCheckCapture.route) {
             val userRole = currentUserRole()
-            if (!userRole.hasPermission(Permission.GUEST_FACE_CHECK)) {
+            if (!NavigationPolicy.canAccessRoute(userRole, RouteIds.GUEST_FACE_CHECK_CAPTURE)) {
                 LaunchedEffect(Unit) {
                     navController.navigate(Screen.Login.route) {
                         popUpTo(0) { inclusive = true }
@@ -621,7 +625,7 @@ fun AppNavigation() {
             )
         ) { backStackEntry ->
             val userRole = currentUserRole()
-            if (!userRole.hasPermission(Permission.GUEST_FACE_CHECK)) {
+            if (!NavigationPolicy.canAccessRoute(userRole, RouteIds.GUEST_FACE_CHECK_CAPTURE)) {
                 LaunchedEffect(Unit) {
                     navController.navigate(Screen.Login.route) {
                         popUpTo(0) { inclusive = true }
@@ -652,6 +656,30 @@ fun AppNavigation() {
             )
         }
 
+        composable(Screen.InviteAccept.route) {
+            if (!isAuthenticated()) {
+                LaunchedEffect(Unit) {
+                    navController.navigate(Screen.Login.route) {
+                        popUpTo(0) { inclusive = true }
+                    }
+                }
+                return@composable
+            }
+            val userRole = currentUserRole()
+            if (!NavigationPolicy.canAccessRoute(userRole, RouteIds.INVITE_ACCEPT)) {
+                LaunchedEffect(Unit) {
+                    navController.navigate(Screen.Unauthorized.createRoute("No permission to accept invitations.")) {
+                        popUpTo(Screen.InviteAccept.route) { inclusive = true }
+                        launchSingleTop = true
+                    }
+                }
+                return@composable
+            }
+            InviteAcceptScreen(
+                onNavigateBack = { navController.popBackStack() }
+            )
+        }
+
         composable(Screen.MyInvitations.route) {
             if (!isAuthenticated()) {
                 LaunchedEffect(Unit) {
@@ -662,7 +690,7 @@ fun AppNavigation() {
                 return@composable
             }
             val userRole = currentUserRole()
-            if (!userRole.hasPermission(Permission.TENANT_INVITE_ACCEPT)) {
+            if (!NavigationPolicy.canAccessRoute(userRole, RouteIds.MY_INVITATIONS)) {
                 LaunchedEffect(Unit) {
                     navigateUnauthorized("No permission to view invitations.")
                 }
@@ -683,7 +711,7 @@ fun AppNavigation() {
                 return@composable
             }
             val userRole = currentUserRole()
-            if (!userRole.hasPermission(Permission.TENANT_MEMBERSHIP_REQUEST)) {
+            if (!NavigationPolicy.canAccessRoute(userRole, RouteIds.REQUEST_MEMBERSHIP)) {
                 LaunchedEffect(Unit) {
                     navigateUnauthorized("No permission to request tenant membership.")
                 }
@@ -704,7 +732,7 @@ fun AppNavigation() {
                 return@composable
             }
             val userRole = currentUserRole()
-            if (!userRole.hasPermission(Permission.CARD_ADD_SELF)) {
+            if (!NavigationPolicy.canAccessRoute(userRole, RouteIds.CARD_SCAN)) {
                 LaunchedEffect(Unit) {
                     navigateUnauthorized("No permission to scan ID cards.")
                 }
@@ -739,9 +767,12 @@ fun AppNavigation() {
                 return@composable
             }
             val userRole = currentUserRole()
-            if (!userRole.hasPermission(Permission.IDENTIFY_TENANT)) {
+            if (!NavigationPolicy.canAccessRoute(userRole, RouteIds.IDENTIFY_TENANT)) {
                 LaunchedEffect(Unit) {
-                    navigateUnauthorized("No permission for 1:N identification.")
+                    navController.navigate(Screen.Unauthorized.createRoute("No permission for 1:N identification.")) {
+                        popUpTo(Screen.IdentifyTenant.route) { inclusive = true }
+                        launchSingleTop = true
+                    }
                 }
                 return@composable
             }
@@ -760,7 +791,7 @@ fun AppNavigation() {
                 return@composable
             }
             val userRole = currentUserRole()
-            if (!userRole.hasPermission(Permission.TENANT_INVITE_CREATE)) {
+            if (!NavigationPolicy.canAccessRoute(userRole, RouteIds.INVITE_MANAGEMENT)) {
                 LaunchedEffect(Unit) {
                     navigateUnauthorized("No permission to manage invitations.")
                 }
@@ -784,7 +815,7 @@ fun AppNavigation() {
                 return@composable
             }
             val userRole = currentUserRole()
-            if (!userRole.hasPermission(Permission.ENROLL_SELF_CREATE)) {
+            if (!NavigationPolicy.canAccessRoute(userRole, RouteIds.BIOMETRIC_ENROLL)) {
                 LaunchedEffect(Unit) {
                     navigateUnauthorized("No permission to enroll biometric data.")
                 }
@@ -812,7 +843,7 @@ fun AppNavigation() {
                 return@composable
             }
             val userRole = currentUserRole()
-            if (!userRole.hasPermission(Permission.VERIFY_SELF)) {
+            if (!NavigationPolicy.canAccessRoute(userRole, RouteIds.BIOMETRIC_VERIFY)) {
                 LaunchedEffect(Unit) {
                     navigateUnauthorized("No permission to verify biometric data.")
                 }

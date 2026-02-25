@@ -1,6 +1,8 @@
 package com.fivucsas.shared.presentation.viewmodel.auth
 
 import com.fivucsas.shared.domain.model.QrLoginSessionStatus
+import com.fivucsas.shared.domain.model.UserRole
+import com.fivucsas.shared.domain.repository.AuthTokens
 import com.fivucsas.shared.domain.usecase.auth.qr.ApproveQrLoginSessionUseCase
 import com.fivucsas.shared.domain.usecase.auth.qr.GetQrLoginSessionUseCase
 import com.fivucsas.shared.domain.usecase.auth.qr.StartQrLoginSessionUseCase
@@ -27,7 +29,9 @@ data class QrLoginState(
     val status: QrLoginStatus = QrLoginStatus.IDLE,
     val sessionId: String? = null,
     val qrPayload: String? = null,
-    val error: String? = null
+    val error: String? = null,
+    val role: UserRole? = null,
+    val tokens: AuthTokens? = null
 )
 
 class QrLoginViewModel(
@@ -53,7 +57,9 @@ class QrLoginViewModel(
                         status = mapSessionStatus(session.status),
                         sessionId = session.sessionId,
                         qrPayload = session.qrContent,
-                        error = null
+                        error = null,
+                        role = sessionRole(session),
+                        tokens = sessionTokens(session)
                     )
                     if (session.status != QrLoginSessionStatus.APPROVED) {
                         startPolling(session.sessionId)
@@ -131,7 +137,9 @@ class QrLoginViewModel(
                             status = mapSessionStatus(session.status),
                             sessionId = session.sessionId,
                             qrPayload = session.qrContent,
-                            error = session.message
+                            error = session.message,
+                            role = sessionRole(session),
+                            tokens = sessionTokens(session)
                         )
 
                         if (session.status == QrLoginSessionStatus.APPROVED ||
@@ -173,5 +181,23 @@ class QrLoginViewModel(
         }
         val value = payload.substring(idx + key.length)
         return value.substringBefore('&').takeIf { it.isNotBlank() }
+    }
+
+    private fun sessionRole(session: com.fivucsas.shared.domain.model.QrLoginSession): UserRole? {
+        val roleValue = session.role?.takeIf { it.isNotBlank() } ?: return null
+        return UserRole.fromString(roleValue)
+    }
+
+    private fun sessionTokens(session: com.fivucsas.shared.domain.model.QrLoginSession): AuthTokens? {
+        val accessToken = session.accessToken?.takeIf { it.isNotBlank() } ?: return null
+        val refreshToken = session.refreshToken?.takeIf { it.isNotBlank() } ?: return null
+        val expiresIn = session.expiresIn ?: return null
+        val role = session.role?.takeIf { it.isNotBlank() } ?: return null
+        return AuthTokens(
+            accessToken = accessToken,
+            refreshToken = refreshToken,
+            expiresIn = expiresIn,
+            role = role
+        )
     }
 }

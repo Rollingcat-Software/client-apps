@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -49,6 +50,7 @@ import org.koin.compose.koinInject
 @Composable
 fun AdminDashboard(
     onBack: () -> Unit,
+    onLogout: (() -> Unit)? = null,
     viewModel: AdminViewModel = koinInject()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -66,6 +68,11 @@ fun AdminDashboard(
                 actions = {
                     IconButton(onClick = { viewModel.selectTab(AdminTab.SETTINGS) }) {
                         Icon(Icons.Default.Settings, contentDescription = "Settings")
+                    }
+                    if (onLogout != null) {
+                        IconButton(onClick = onLogout) {
+                            Icon(Icons.Default.Logout, contentDescription = "Logout")
+                        }
                     }
                 }
             )
