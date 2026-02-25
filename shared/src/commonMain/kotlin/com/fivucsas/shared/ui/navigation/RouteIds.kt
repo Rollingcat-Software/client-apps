@@ -69,4 +69,17 @@ object RouteIds {
     const val PLATFORM_HEALTH = "platform-health"
     const val PLATFORM_AUDIT = "platform-audit"
     const val PLATFORM_SETTINGS = "platform-settings"
+
+    const val ROOT_CONSOLE = "root/console"
+    const val ROOT_TENANT_MANAGEMENT = "root/tenant-management"
+    const val ROOT_TENANT_DETAIL = "root/tenant-detail"
+    const val ROOT_GLOBAL_USER_DIRECTORY = "root/global-user-directory"
+    const val ROOT_USERS = "root/users"
+    const val ROOT_TENANT_MEMBERS = "root/tenant-members"
+    const val ROOT_TENANT_ADMINS = "root/tenant-admins"
+    const val ROOT_INVITE_MANAGEMENT = "root/invite-management"
+    const val ROOT_ROLES_PERMISSIONS = "root/roles-permissions"
+    const val ROOT_AUDIT_EXPLORER = "root/audit-explorer"
+    const val ROOT_SECURITY_EVENTS = "root/security-events"
+    const val ROOT_SYSTEM_SETTINGS = "root/system-settings"
 }

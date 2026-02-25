@@ -29,7 +29,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -46,6 +48,15 @@ import com.fivucsas.desktop.ui.components.DesktopBannerType
 import com.fivucsas.desktop.ui.components.DesktopDashboardActionCard
 import com.fivucsas.desktop.ui.components.DesktopInfoBanner
 import com.fivucsas.desktop.ui.components.DesktopSectionHeader
+import com.fivucsas.desktop.ui.root.RootDesktopAuditScreen
+import com.fivucsas.desktop.ui.root.RootDesktopConsoleScreen
+import com.fivucsas.desktop.ui.root.RootDesktopInviteManagementScreen
+import com.fivucsas.desktop.ui.root.RootDesktopRolesPermissionsScreen
+import com.fivucsas.desktop.ui.root.RootDesktopSecurityScreen
+import com.fivucsas.desktop.ui.root.RootDesktopSystemSettingsScreen
+import com.fivucsas.desktop.ui.root.RootDesktopTenantDetailScreen
+import com.fivucsas.desktop.ui.root.RootDesktopTenantManagementScreen
+import com.fivucsas.desktop.ui.root.RootDesktopUserListScreen
 import com.fivucsas.desktop.ui.kiosk.KioskMode
 import com.fivucsas.desktop.ui.theme.DesktopTheme
 import com.fivucsas.shared.data.local.TokenManager
@@ -119,6 +130,12 @@ private fun AppContent(
     val registerViewModel: RegisterViewModel = koinInject()
     val qrState by qrLoginViewModel.state.collectAsState()
     val currentRole = tokenManager.getRole()?.let { UserRole.fromString(it) }
+    var rootSelectedTenantId by remember { mutableStateOf<String?>(null) }
+    val onLogoutToLauncher = {
+        tokenManager.clearTokens()
+        loginViewModel.resetState()
+        onNavigate(AppMode.LAUNCHER)
+    }
 
     LaunchedEffect(currentMode) {
         if (currentMode != AppMode.QR_LOGIN) qrLoginViewModel.stopPolling()
@@ -188,31 +205,28 @@ private fun AppContent(
             onRefresh = { qrLoginViewModel.startDesktopSession() }
         )
         AppMode.USER_HOME -> RoleDashboard("User Dashboard", currentRole ?: UserRole.USER, userActions(), onNavigate, { onNavigate(AppMode.LAUNCHER) }) {
-            tokenManager.clearTokens()
-            loginViewModel.resetState()
-            onNavigate(AppMode.LAUNCHER)
+            onLogoutToLauncher()
         }
         AppMode.MEMBER_HOME -> RoleDashboard("Member Dashboard", currentRole ?: UserRole.TENANT_MEMBER, memberActions(), onNavigate, { onNavigate(AppMode.LAUNCHER) }) {
-            tokenManager.clearTokens()
-            loginViewModel.resetState()
-            onNavigate(AppMode.LAUNCHER)
+            onLogoutToLauncher()
         }
         AppMode.TENANT_ADMIN_HOME -> guardedComposable(currentRole, onUnauthorized, "No permission for tenant admin dashboard.", anyPermissions = setOf(Permission.TENANT_USERS_READ)) {
             AdminDashboard(
                 onBack = { onNavigate(AppMode.LAUNCHER) },
-                onLogout = {
-                    tokenManager.clearTokens()
-                    loginViewModel.resetState()
-                    onNavigate(AppMode.LAUNCHER)
-                }
+                onLogout = { onLogoutToLauncher() }
             )
         }
         AppMode.ROOT_HOME -> guardedComposable(currentRole, onUnauthorized, "No permission for root dashboard.", anyPermissions = setOf(Permission.PLATFORM_HEALTH_READ)) {
-            RoleDashboard("Root Dashboard", currentRole ?: UserRole.ROOT, rootActions(), onNavigate, { onNavigate(AppMode.LAUNCHER) }) {
-                tokenManager.clearTokens()
-                loginViewModel.resetState()
-                onNavigate(AppMode.LAUNCHER)
-            }
+            RootDesktopConsoleScreen(
+                role = currentRole ?: UserRole.ROOT,
+                onNavigate = { mode -> onNavigate(mode) },
+                onOpenTenant = { tenantId ->
+                    rootSelectedTenantId = tenantId
+                    onNavigate(AppMode.ROOT_TENANT_DETAIL)
+                },
+                onBack = { onNavigate(AppMode.LAUNCHER) },
+                onLogout = { onLogoutToLauncher() }
+            )
         }
         AppMode.ADMIN_DASHBOARD -> guardedComposable(currentRole, onUnauthorized, "No permission for admin dashboard.", anyPermissions = setOf(Permission.TENANT_USERS_READ)) {
             AdminDashboard(onBack = { onNavigate(modeForRole(currentRole ?: UserRole.USER)) })
@@ -239,16 +253,121 @@ private fun AppContent(
             PlaceholderScreen("Identify Tenant", "1:N identification.") { onNavigate(AppMode.TENANT_ADMIN_HOME) }
         }
         AppMode.TENANT_MANAGE -> guardedComposable(currentRole, onUnauthorized, "No permission to manage tenants.", anyPermissions = setOf(Permission.TENANT_MANAGE)) {
-            PlaceholderScreen("Tenant Manage", "Root-level tenant management.") { onNavigate(AppMode.ROOT_HOME) }
+            RootDesktopTenantManagementScreen(
+                role = currentRole ?: UserRole.ROOT,
+                onNavigate = { mode -> onNavigate(mode) },
+                onOpenTenant = { tenantId ->
+                    rootSelectedTenantId = tenantId
+                    onNavigate(AppMode.ROOT_TENANT_DETAIL)
+                },
+                onBack = { onNavigate(AppMode.ROOT_HOME) },
+                onLogout = { onLogoutToLauncher() }
+            )
         }
         AppMode.PLATFORM_HEALTH -> guardedComposable(currentRole, onUnauthorized, "No permission to read platform health.", anyPermissions = setOf(Permission.PLATFORM_HEALTH_READ)) {
-            PlaceholderScreen("Platform Health", "Root-level health metrics.") { onNavigate(AppMode.ROOT_HOME) }
+            RootDesktopSecurityScreen(
+                role = currentRole ?: UserRole.ROOT,
+                onNavigate = { mode -> onNavigate(mode) },
+                onBack = { onNavigate(AppMode.ROOT_HOME) },
+                onLogout = { onLogoutToLauncher() }
+            )
         }
         AppMode.PLATFORM_AUDIT -> guardedComposable(currentRole, onUnauthorized, "No permission to read platform audit.", anyPermissions = setOf(Permission.PLATFORM_AUDIT_READ)) {
-            PlaceholderScreen("Platform Audit", "Root-level audit logs.") { onNavigate(AppMode.ROOT_HOME) }
+            RootDesktopAuditScreen(
+                role = currentRole ?: UserRole.ROOT,
+                onNavigate = { mode -> onNavigate(mode) },
+                onBack = { onNavigate(AppMode.ROOT_HOME) },
+                onLogout = { onLogoutToLauncher() }
+            )
         }
         AppMode.PLATFORM_SETTINGS -> guardedComposable(currentRole, onUnauthorized, "No permission to update platform settings.", anyPermissions = setOf(Permission.PLATFORM_SETTINGS_UPDATE)) {
-            PlaceholderScreen("Platform Settings", "Root-level settings.") { onNavigate(AppMode.ROOT_HOME) }
+            RootDesktopSystemSettingsScreen(
+                role = currentRole ?: UserRole.ROOT,
+                onNavigate = { mode -> onNavigate(mode) },
+                onBack = { onNavigate(AppMode.ROOT_HOME) },
+                onLogout = { onLogoutToLauncher() }
+            )
+        }
+        AppMode.ROOT_TENANT_MANAGEMENT -> guardedComposable(currentRole, onUnauthorized, "No permission to manage tenants.", anyPermissions = setOf(Permission.TENANT_MANAGE)) {
+            RootDesktopTenantManagementScreen(
+                role = currentRole ?: UserRole.ROOT,
+                onNavigate = { mode -> onNavigate(mode) },
+                onOpenTenant = { tenantId ->
+                    rootSelectedTenantId = tenantId
+                    onNavigate(AppMode.ROOT_TENANT_DETAIL)
+                },
+                onBack = { onNavigate(AppMode.ROOT_HOME) },
+                onLogout = { onLogoutToLauncher() }
+            )
+        }
+        AppMode.ROOT_TENANT_DETAIL -> guardedComposable(currentRole, onUnauthorized, "No permission to view tenant detail.", anyPermissions = setOf(Permission.TENANT_MANAGE)) {
+            RootDesktopTenantDetailScreen(
+                role = currentRole ?: UserRole.ROOT,
+                tenantId = rootSelectedTenantId,
+                onNavigate = { mode -> onNavigate(mode) },
+                onBack = { onNavigate(AppMode.ROOT_TENANT_MANAGEMENT) },
+                onLogout = { onLogoutToLauncher() }
+            )
+        }
+        AppMode.ROOT_GLOBAL_USER_DIRECTORY -> guardedComposable(currentRole, onUnauthorized, "No permission to view global users.", anyPermissions = setOf(Permission.TENANT_USERS_READ)) {
+            RootDesktopUserListScreen(
+                title = "Global User Directory",
+                selected = AppMode.ROOT_GLOBAL_USER_DIRECTORY,
+                role = currentRole ?: UserRole.ROOT,
+                showTenantAdmins = false,
+                onNavigate = { mode -> onNavigate(mode) },
+                onBack = { onNavigate(AppMode.ROOT_HOME) },
+                onLogout = { onLogoutToLauncher() }
+            )
+        }
+        AppMode.ROOT_TENANT_ADMINS -> guardedComposable(currentRole, onUnauthorized, "No permission to view tenant admins.", anyPermissions = setOf(Permission.TENANT_USERS_READ)) {
+            RootDesktopUserListScreen(
+                title = "Tenant Admins",
+                selected = AppMode.ROOT_TENANT_ADMINS,
+                role = currentRole ?: UserRole.ROOT,
+                showTenantAdmins = true,
+                onNavigate = { mode -> onNavigate(mode) },
+                onBack = { onNavigate(AppMode.ROOT_HOME) },
+                onLogout = { onLogoutToLauncher() }
+            )
+        }
+        AppMode.ROOT_ROLES_PERMISSIONS -> guardedComposable(currentRole, onUnauthorized, "No permission to edit role/permission matrix.", anyPermissions = setOf(Permission.TENANT_ROLES_ASSIGN)) {
+            RootDesktopRolesPermissionsScreen(
+                onNavigate = { mode -> onNavigate(mode) },
+                onBack = { onNavigate(AppMode.ROOT_HOME) },
+                onLogout = { onLogoutToLauncher() }
+            )
+        }
+        AppMode.ROOT_INVITE_MANAGEMENT -> guardedComposable(currentRole, onUnauthorized, "No permission to manage invitations.", anyPermissions = setOf(Permission.TENANT_INVITE_CREATE)) {
+            RootDesktopInviteManagementScreen(
+                onNavigate = { mode -> onNavigate(mode) },
+                onBack = { onNavigate(AppMode.ROOT_HOME) },
+                onLogout = { onLogoutToLauncher() }
+            )
+        }
+        AppMode.ROOT_AUDIT_EXPLORER -> guardedComposable(currentRole, onUnauthorized, "No permission for global audit.", anyPermissions = setOf(Permission.PLATFORM_AUDIT_READ)) {
+            RootDesktopAuditScreen(
+                role = currentRole ?: UserRole.ROOT,
+                onNavigate = { mode -> onNavigate(mode) },
+                onBack = { onNavigate(AppMode.ROOT_HOME) },
+                onLogout = { onLogoutToLauncher() }
+            )
+        }
+        AppMode.ROOT_SECURITY_EVENTS -> guardedComposable(currentRole, onUnauthorized, "No permission for security events.", anyPermissions = setOf(Permission.PLATFORM_HEALTH_READ)) {
+            RootDesktopSecurityScreen(
+                role = currentRole ?: UserRole.ROOT,
+                onNavigate = { mode -> onNavigate(mode) },
+                onBack = { onNavigate(AppMode.ROOT_HOME) },
+                onLogout = { onLogoutToLauncher() }
+            )
+        }
+        AppMode.ROOT_SYSTEM_SETTINGS -> guardedComposable(currentRole, onUnauthorized, "No permission for system settings.", anyPermissions = setOf(Permission.PLATFORM_SETTINGS_UPDATE)) {
+            RootDesktopSystemSettingsScreen(
+                role = currentRole ?: UserRole.ROOT,
+                onNavigate = { mode -> onNavigate(mode) },
+                onBack = { onNavigate(AppMode.ROOT_HOME) },
+                onLogout = { onLogoutToLauncher() }
+            )
         }
         AppMode.UNAUTHORIZED -> StateCardScreen(
             title = "Access Denied",
@@ -428,7 +547,8 @@ private fun LauncherScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(horizontal = 48.dp),
-            verticalArrangement = Arrangement.Center
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             DesktopSectionHeader(
                 title = "FIVUCSAS",
@@ -511,6 +631,15 @@ enum class AppMode {
     PLATFORM_HEALTH,
     PLATFORM_AUDIT,
     PLATFORM_SETTINGS,
+    ROOT_TENANT_MANAGEMENT,
+    ROOT_TENANT_DETAIL,
+    ROOT_GLOBAL_USER_DIRECTORY,
+    ROOT_TENANT_ADMINS,
+    ROOT_ROLES_PERMISSIONS,
+    ROOT_INVITE_MANAGEMENT,
+    ROOT_AUDIT_EXPLORER,
+    ROOT_SECURITY_EVENTS,
+    ROOT_SYSTEM_SETTINGS,
     UNAUTHORIZED;
 
     val routeId: String
@@ -538,6 +667,15 @@ enum class AppMode {
             PLATFORM_HEALTH -> RouteIds.PLATFORM_HEALTH
             PLATFORM_AUDIT -> RouteIds.PLATFORM_AUDIT
             PLATFORM_SETTINGS -> RouteIds.PLATFORM_SETTINGS
+            ROOT_TENANT_MANAGEMENT -> RouteIds.ROOT_TENANT_MANAGEMENT
+            ROOT_TENANT_DETAIL -> RouteIds.ROOT_TENANT_DETAIL
+            ROOT_GLOBAL_USER_DIRECTORY -> RouteIds.ROOT_GLOBAL_USER_DIRECTORY
+            ROOT_TENANT_ADMINS -> RouteIds.ROOT_TENANT_ADMINS
+            ROOT_ROLES_PERMISSIONS -> RouteIds.ROOT_ROLES_PERMISSIONS
+            ROOT_INVITE_MANAGEMENT -> RouteIds.ROOT_INVITE_MANAGEMENT
+            ROOT_AUDIT_EXPLORER -> RouteIds.ROOT_AUDIT_EXPLORER
+            ROOT_SECURITY_EVENTS -> RouteIds.ROOT_SECURITY_EVENTS
+            ROOT_SYSTEM_SETTINGS -> RouteIds.ROOT_SYSTEM_SETTINGS
             UNAUTHORIZED -> RouteIds.UNAUTHORIZED
         }
 }
