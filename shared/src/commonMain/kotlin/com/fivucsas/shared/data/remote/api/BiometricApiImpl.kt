@@ -1,6 +1,7 @@
 package com.fivucsas.shared.data.remote.api
 
 import com.fivucsas.shared.data.remote.dto.BiometricDto
+import com.fivucsas.shared.data.remote.dto.IdentificationResponseDto
 import com.fivucsas.shared.data.remote.dto.LivenessResponseDto
 import com.fivucsas.shared.data.remote.dto.VerificationResponseDto
 import io.ktor.client.HttpClient
@@ -78,5 +79,16 @@ class BiometricApiImpl(
         // Biometric processor may not have a direct delete endpoint
         // This would typically go through Identity Core API
         client.delete("embeddings/$userId")
+    }
+
+    override suspend fun identifyFace(imageData: String): IdentificationResponseDto {
+        return client.post("search") {
+            contentType(ContentType.Application.Json)
+            setBody(
+                mapOf(
+                    "image_data" to imageData
+                )
+            )
+        }.body()
     }
 }

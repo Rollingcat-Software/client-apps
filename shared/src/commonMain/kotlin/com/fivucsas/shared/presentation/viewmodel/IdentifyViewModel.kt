@@ -1,48 +1,59 @@
 package com.fivucsas.shared.presentation.viewmodel
 
+import com.fivucsas.shared.domain.usecase.verification.IdentifyUserUseCase
+import com.fivucsas.shared.presentation.state.IdentifyUiState
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
-data class IdentifyResult(
-    val userId: String,
-    val name: String,
-    val confidence: Float,
-    val isMatch: Boolean
-)
-
-data class IdentifyUiState(
-    val isLoading: Boolean = false,
-    val result: IdentifyResult? = null,
-    val errorMessage: String? = null,
-    val isSuccess: Boolean = false
-)
-
-class IdentifyViewModel {
+class IdentifyViewModel(
+    private val identifyUserUseCase: IdentifyUserUseCase
+) {
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
     private val _state = MutableStateFlow(IdentifyUiState())
     val state: StateFlow<IdentifyUiState> = _state.asStateFlow()
 
     fun identifyFace(imageBytes: ByteArray) {
-        _state.value = IdentifyUiState(isLoading = true)
+        _state.update { IdentifyUiState(isLoading = true) }
 
-        // Mock: simulate a successful 1:N identification
-        _state.value = IdentifyUiState(
-            isLoading = false,
-            result = IdentifyResult(
-                userId = "USR-0042",
-                name = "Jane Doe",
-                confidence = 0.93f,
-                isMatch = true
-            ),
-            isSuccess = true
-        )
+        scope.launch {
+            identifyUserUseCase(imageBytes).fold(
+                onSuccess = { result ->
+                    _state.update {
+                        IdentifyUiState(
+                            isLoading = false,
+                            result = result,
+                            isSuccess = result.isMatch
+                        )
+                    }
+                },
+                onFailure = { error ->
+                    _state.update {
+                        IdentifyUiState(
+                            isLoading = false,
+                            errorMessage = error.message ?: "Face identification failed"
+                        )
+                    }
+                }
+            )
+        }
     }
 
     fun onCaptureError(message: String) {
-        _state.value = IdentifyUiState(errorMessage = message)
+        _state.update { IdentifyUiState(errorMessage = message) }
     }
 
     fun clearState() {
-        _state.value = IdentifyUiState()
+        _state.update { IdentifyUiState() }
+    }
+
+    fun dispose() {
+        scope.coroutineContext[Job]?.cancel()
     }
 }

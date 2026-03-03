@@ -1,6 +1,7 @@
 package com.fivucsas.shared.data.remote.api
 
 import com.fivucsas.shared.data.remote.dto.BiometricDto
+import com.fivucsas.shared.data.remote.dto.IdentificationResponseDto
 import com.fivucsas.shared.data.remote.dto.LivenessResponseDto
 import com.fivucsas.shared.data.remote.dto.VerificationResponseDto
 
@@ -57,4 +58,12 @@ interface BiometricApi {
      * DELETE /biometric/{userId}
      */
     suspend fun deleteBiometricData(userId: String)
+
+    /**
+     * Identify face (1:N search)
+     * POST /search
+     *
+     * @param imageData Base64-encoded image
+     */
+    suspend fun identifyFace(imageData: String): IdentificationResponseDto
 }

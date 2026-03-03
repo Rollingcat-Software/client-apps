@@ -2,6 +2,7 @@ package com.fivucsas.shared.domain.repository
 
 import com.fivucsas.shared.domain.model.BiometricData
 import com.fivucsas.shared.domain.model.FacialAction
+import com.fivucsas.shared.domain.model.IdentifyResult
 import com.fivucsas.shared.domain.model.LivenessResult
 import com.fivucsas.shared.domain.model.VerificationResult
 
@@ -46,4 +47,11 @@ interface BiometricRepository {
      * @return Result with success or error
      */
     suspend fun deleteBiometricData(userId: String): Result<Unit>
+
+    /**
+     * Identify face (1:N search)
+     * @param imageData Face image as byte array
+     * @return Result with identification result or error
+     */
+    suspend fun identifyFace(imageData: ByteArray): Result<IdentifyResult>
 }

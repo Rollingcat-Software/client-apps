@@ -245,7 +245,7 @@ fun AdminDesktopIdentifyTenantScreen(
     onBack: () -> Unit,
     onLogout: () -> Unit
 ) {
-    val viewModel = remember { IdentifyViewModel() }
+    val viewModel: IdentifyViewModel = koinInject()
     val state by viewModel.state.collectAsState()
     val cameraService = remember { DesktopCameraService() }
     var showCamera by remember { mutableStateOf(false) }

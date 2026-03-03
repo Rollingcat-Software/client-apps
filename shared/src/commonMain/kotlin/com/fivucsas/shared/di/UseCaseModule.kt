@@ -17,6 +17,7 @@ import com.fivucsas.shared.domain.usecase.invite.GetReceivedInvitesUseCase
 import com.fivucsas.shared.domain.usecase.invite.RespondToInviteUseCase
 import com.fivucsas.shared.domain.usecase.invite.RevokeInviteUseCase
 import com.fivucsas.shared.domain.usecase.verification.CheckLivenessUseCase
+import com.fivucsas.shared.domain.usecase.verification.IdentifyUserUseCase
 import com.fivucsas.shared.domain.usecase.verification.VerifyUserUseCase
 import org.koin.core.module.dsl.factoryOf
 import org.koin.dsl.module
@@ -45,6 +46,7 @@ val useCaseModule = module {
     // Verification Use Cases
     factoryOf(::VerifyUserUseCase)
     factoryOf(::CheckLivenessUseCase)
+    factoryOf(::IdentifyUserUseCase)
 
     // Invite Use Cases
     factoryOf(::GetInvitesUseCase)
