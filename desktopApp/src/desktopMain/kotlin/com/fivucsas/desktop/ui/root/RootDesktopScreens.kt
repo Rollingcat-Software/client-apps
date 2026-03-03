@@ -51,10 +51,11 @@ import com.fivucsas.desktop.ui.components.DesktopSectionHeader
 import com.fivucsas.desktop.ui.components.DesktopTable
 import com.fivucsas.shared.data.repository.MockRootAdminRepository
 import com.fivucsas.shared.domain.model.UserRole
-import com.fivucsas.shared.presentation.viewmodel.InviteStatus
+import com.fivucsas.shared.domain.model.InviteStatus
 import com.fivucsas.shared.presentation.viewmodel.InviteViewModel
 import com.fivucsas.shared.presentation.state.RootConsoleUiEvent
 import com.fivucsas.shared.presentation.viewmodel.RootConsoleViewModel
+import org.koin.compose.koinInject
 
 private data class RootRailItem(val label: String, val mode: AppMode)
 
@@ -418,7 +419,7 @@ fun RootDesktopInviteManagementScreen(
     onBack: () -> Unit,
     onLogout: () -> Unit
 ) {
-    val viewModel = remember { InviteViewModel() }
+    val viewModel: InviteViewModel = koinInject()
     val state by viewModel.state.collectAsState()
     var inviteEmail by remember { mutableStateOf("") }
     var inviteRole by remember { mutableStateOf("TENANT_MEMBER") }

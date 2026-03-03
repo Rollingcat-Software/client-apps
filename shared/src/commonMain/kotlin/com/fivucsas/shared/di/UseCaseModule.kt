@@ -11,6 +11,11 @@ import com.fivucsas.shared.domain.usecase.auth.qr.ApproveQrLoginSessionUseCase
 import com.fivucsas.shared.domain.usecase.auth.qr.GetQrLoginSessionUseCase
 import com.fivucsas.shared.domain.usecase.auth.qr.StartQrLoginSessionUseCase
 import com.fivucsas.shared.domain.usecase.enrollment.EnrollUserUseCase
+import com.fivucsas.shared.domain.usecase.invite.CreateInviteUseCase
+import com.fivucsas.shared.domain.usecase.invite.GetInvitesUseCase
+import com.fivucsas.shared.domain.usecase.invite.GetReceivedInvitesUseCase
+import com.fivucsas.shared.domain.usecase.invite.RespondToInviteUseCase
+import com.fivucsas.shared.domain.usecase.invite.RevokeInviteUseCase
 import com.fivucsas.shared.domain.usecase.verification.CheckLivenessUseCase
 import com.fivucsas.shared.domain.usecase.verification.VerifyUserUseCase
 import org.koin.core.module.dsl.factoryOf
@@ -40,4 +45,11 @@ val useCaseModule = module {
     // Verification Use Cases
     factoryOf(::VerifyUserUseCase)
     factoryOf(::CheckLivenessUseCase)
+
+    // Invite Use Cases
+    factoryOf(::GetInvitesUseCase)
+    factoryOf(::CreateInviteUseCase)
+    factoryOf(::RevokeInviteUseCase)
+    factoryOf(::GetReceivedInvitesUseCase)
+    factoryOf(::RespondToInviteUseCase)
 }

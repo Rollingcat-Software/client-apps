@@ -100,7 +100,7 @@ import com.fivucsas.shared.presentation.viewmodel.auth.LoginViewModel
 import com.fivucsas.shared.presentation.viewmodel.auth.QrLoginStatus
 import com.fivucsas.shared.presentation.viewmodel.auth.QrLoginViewModel
 import com.fivucsas.shared.presentation.viewmodel.auth.RegisterViewModel
-import com.fivucsas.shared.presentation.viewmodel.InviteStatus
+import com.fivucsas.shared.domain.model.InviteStatus
 import com.fivucsas.shared.presentation.viewmodel.InviteViewModel
 import com.fivucsas.shared.ui.navigation.HomeDestination
 import com.fivucsas.shared.ui.navigation.RouteIds
@@ -691,7 +691,7 @@ private fun UserInvitationsScreen(
     onBack: () -> Unit,
     onLogout: () -> Unit
 ) {
-    val viewModel = remember { InviteViewModel() }
+    val viewModel: InviteViewModel = koinInject()
     val state by viewModel.state.collectAsState()
     LaunchedEffect(Unit) { viewModel.loadInvites() }
     DesktopAppShell(title = "Invitations", onBack = onBack, onLogout = onLogout) {

@@ -57,7 +57,7 @@ import com.fivucsas.desktop.ui.components.DesktopSectionHeader
 import com.fivucsas.desktop.ui.components.DesktopTable
 import com.fivucsas.shared.presentation.viewmodel.AdminViewModel
 import com.fivucsas.shared.presentation.viewmodel.IdentifyViewModel
-import com.fivucsas.shared.presentation.viewmodel.InviteStatus
+import com.fivucsas.shared.domain.model.InviteStatus
 import com.fivucsas.shared.presentation.viewmodel.InviteViewModel
 import org.koin.compose.koinInject
 
@@ -580,7 +580,7 @@ fun AdminDesktopInviteManagementScreen(
     onBack: () -> Unit,
     onLogout: () -> Unit
 ) {
-    val viewModel = remember { InviteViewModel() }
+    val viewModel: InviteViewModel = koinInject()
     val state by viewModel.state.collectAsState()
     var inviteEmail by remember { mutableStateOf("") }
     var inviteRole by remember { mutableStateOf("TENANT_MEMBER") }
