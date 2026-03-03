@@ -16,6 +16,8 @@ import com.fivucsas.shared.domain.usecase.invite.GetInvitesUseCase
 import com.fivucsas.shared.domain.usecase.invite.GetReceivedInvitesUseCase
 import com.fivucsas.shared.domain.usecase.invite.RespondToInviteUseCase
 import com.fivucsas.shared.domain.usecase.invite.RevokeInviteUseCase
+import com.fivucsas.shared.domain.usecase.tenant.GetTenantSettingsUseCase
+import com.fivucsas.shared.domain.usecase.tenant.UpdateTenantSettingsUseCase
 import com.fivucsas.shared.domain.usecase.verification.CheckLivenessUseCase
 import com.fivucsas.shared.domain.usecase.verification.IdentifyUserUseCase
 import com.fivucsas.shared.domain.usecase.verification.VerifyUserUseCase
@@ -54,4 +56,8 @@ val useCaseModule = module {
     factoryOf(::RevokeInviteUseCase)
     factoryOf(::GetReceivedInvitesUseCase)
     factoryOf(::RespondToInviteUseCase)
+
+    // Tenant Use Cases
+    factoryOf(::GetTenantSettingsUseCase)
+    factoryOf(::UpdateTenantSettingsUseCase)
 }

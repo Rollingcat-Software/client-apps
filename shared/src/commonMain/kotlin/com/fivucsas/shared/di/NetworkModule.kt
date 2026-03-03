@@ -15,6 +15,8 @@ import com.fivucsas.shared.data.remote.api.InviteApi
 import com.fivucsas.shared.data.remote.api.InviteApiImpl
 import com.fivucsas.shared.data.remote.api.QrLoginApi
 import com.fivucsas.shared.data.remote.api.QrLoginApiImpl
+import com.fivucsas.shared.data.remote.api.TenantSettingsApi
+import com.fivucsas.shared.data.remote.api.TenantSettingsApiImpl
 import com.fivucsas.shared.data.remote.config.ApiConfig
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.HttpTimeout
@@ -134,5 +136,6 @@ val networkModule = module {
     single<IdentityApi> { IdentityApiImpl(get(named("identityClient"))) }
     single<InviteApi> { InviteApiImpl(get(named("identityClient"))) }
     single<QrLoginApi> { QrLoginApiImpl(get(named("identityClient"))) }
+    single<TenantSettingsApi> { TenantSettingsApiImpl(get(named("identityClient"))) }
     single<BiometricApi> { BiometricApiImpl(get(named("biometricClient"))) }
 }

@@ -7,16 +7,19 @@ import com.fivucsas.shared.data.remote.api.AuthApi
 import com.fivucsas.shared.data.remote.api.BiometricApi
 import com.fivucsas.shared.data.remote.api.IdentityApi
 import com.fivucsas.shared.data.remote.api.InviteApi
+import com.fivucsas.shared.data.remote.api.TenantSettingsApi
 import com.fivucsas.shared.data.repository.AuthRepositoryImpl
 import com.fivucsas.shared.data.repository.BiometricRepositoryImpl
 import com.fivucsas.shared.data.repository.FingerprintRepositoryImpl
 import com.fivucsas.shared.data.repository.InviteRepositoryImpl
+import com.fivucsas.shared.data.repository.TenantSettingsRepositoryImpl
 import com.fivucsas.shared.data.repository.QrLoginRepositoryImpl
 import com.fivucsas.shared.data.repository.UserRepositoryImpl
 import com.fivucsas.shared.domain.repository.AuthRepository
 import com.fivucsas.shared.domain.repository.BiometricRepository
 import com.fivucsas.shared.domain.repository.FingerprintRepository
 import com.fivucsas.shared.domain.repository.InviteRepository
+import com.fivucsas.shared.domain.repository.TenantSettingsRepository
 import com.fivucsas.shared.domain.repository.QrLoginRepository
 import com.fivucsas.shared.domain.repository.UserRepository
 import org.koin.core.module.dsl.bind
@@ -70,6 +73,13 @@ val repositoryModule = module {
     single<InviteRepository> {
         InviteRepositoryImpl(
             inviteApi = get<InviteApi>()
+        )
+    }
+
+    // Tenant Settings Repository
+    single<TenantSettingsRepository> {
+        TenantSettingsRepositoryImpl(
+            tenantSettingsApi = get<TenantSettingsApi>()
         )
     }
 }
