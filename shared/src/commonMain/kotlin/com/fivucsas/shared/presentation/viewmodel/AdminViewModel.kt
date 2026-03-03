@@ -4,6 +4,7 @@ import com.fivucsas.shared.config.AnimationConfig
 import com.fivucsas.shared.domain.model.Statistics
 import com.fivucsas.shared.domain.model.User
 import com.fivucsas.shared.domain.model.UserStatus
+import com.fivucsas.shared.domain.usecase.admin.CreateUserUseCase
 import com.fivucsas.shared.domain.usecase.admin.DeleteUserUseCase
 import com.fivucsas.shared.domain.usecase.admin.GetStatisticsUseCase
 import com.fivucsas.shared.domain.usecase.admin.GetUsersUseCase
@@ -33,6 +34,7 @@ import kotlin.random.Random
  */
 class AdminViewModel(
     private val getUsersUseCase: GetUsersUseCase,
+    private val createUserUseCase: CreateUserUseCase,
     private val deleteUserUseCase: DeleteUserUseCase,
     private val updateUserUseCase: UpdateUserUseCase,
     private val getStatisticsUseCase: GetStatisticsUseCase
@@ -199,39 +201,27 @@ class AdminViewModel(
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
 
-            try {
-                kotlinx.coroutines.delay(AnimationConfig.DELAY_API_SIMULATION_SHORT)
-
-                // Add to local list
-                val currentUsers = _uiState.value.users.toMutableList()
-                currentUsers.add(user)
-
-                _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        users = currentUsers,
-                        filteredUsers = currentUsers,
-                        showAddUserDialog = false,
-                        successMessage = "✅ User added: ${user.name}\n⚠️ Using mock data (server not connected)"
-                    )
+            createUserUseCase(user).fold(
+                onSuccess = { createdUser ->
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            showAddUserDialog = false,
+                            successMessage = "User added: ${createdUser.name}"
+                        )
+                    }
+                    loadUsers()
+                    loadStatistics()
+                },
+                onFailure = { error ->
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            errorMessage = error.message ?: "Failed to add user"
+                        )
+                    }
                 }
-
-                // Auto-clear message
-                kotlinx.coroutines.delay(AnimationConfig.TOAST_DISPLAY_DURATION)
-                _uiState.update { it.copy(successMessage = null) }
-
-                // Refresh statistics
-                loadStatistics()
-
-            } catch (e: Exception) {
-                _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        errorMessage = "⚠️ Error adding user: ${e.message}\n" +
-                                "Changes saved locally only."
-                    )
-                }
-            }
+            )
         }
     }
 

@@ -1,5 +1,6 @@
 package com.fivucsas.shared.di
 
+import com.fivucsas.shared.domain.usecase.admin.CreateUserUseCase
 import com.fivucsas.shared.domain.usecase.admin.DeleteUserUseCase
 import com.fivucsas.shared.domain.usecase.admin.GetStatisticsUseCase
 import com.fivucsas.shared.domain.usecase.admin.GetUsersUseCase
@@ -37,6 +38,7 @@ val useCaseModule = module {
 
     // Admin Use Cases (factories - new instance per injection)
     factoryOf(::GetUsersUseCase)
+    factoryOf(::CreateUserUseCase)
     factoryOf(::SearchUsersUseCase)
     factoryOf(::GetStatisticsUseCase)
     factoryOf(::UpdateUserUseCase)
