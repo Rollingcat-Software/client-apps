@@ -80,4 +80,13 @@ class UserRepositoryImpl(
             Result.failure(e)
         }
     }
+
+    override suspend fun healthCheck(): Result<Boolean> {
+        return try {
+            val isHealthy = identityApi.healthCheck()
+            Result.success(isHealthy)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
 }

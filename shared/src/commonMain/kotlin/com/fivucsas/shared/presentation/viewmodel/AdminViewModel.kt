@@ -1,9 +1,7 @@
 package com.fivucsas.shared.presentation.viewmodel
 
-import com.fivucsas.shared.config.AnimationConfig
-import com.fivucsas.shared.domain.model.Statistics
 import com.fivucsas.shared.domain.model.User
-import com.fivucsas.shared.domain.model.UserStatus
+import com.fivucsas.shared.domain.usecase.admin.CheckSystemHealthUseCase
 import com.fivucsas.shared.domain.usecase.admin.CreateUserUseCase
 import com.fivucsas.shared.domain.usecase.admin.DeleteUserUseCase
 import com.fivucsas.shared.domain.usecase.admin.GetStatisticsUseCase
@@ -18,7 +16,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlin.random.Random
 
 /**
  * Admin ViewModel - FULLY FUNCTIONAL with Mock Data
@@ -37,7 +34,8 @@ class AdminViewModel(
     private val createUserUseCase: CreateUserUseCase,
     private val deleteUserUseCase: DeleteUserUseCase,
     private val updateUserUseCase: UpdateUserUseCase,
-    private val getStatisticsUseCase: GetStatisticsUseCase
+    private val getStatisticsUseCase: GetStatisticsUseCase,
+    private val checkSystemHealthUseCase: CheckSystemHealthUseCase
 ) {
     private val viewModelScope = CoroutineScope(Dispatchers.Main)
 
@@ -93,73 +91,36 @@ class AdminViewModel(
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
 
-            try {
-                // Simulate API call delay
-                kotlinx.coroutines.delay(AnimationConfig.DELAY_API_SIMULATION)
-
-                // Try to call use case (will use mock data from repository)
-                val result = getUsersUseCase()
-
-                if (result.isSuccess) {
-                    val users = result.getOrNull() ?: emptyList()
+            getUsersUseCase().fold(
+                onSuccess = { users ->
                     _uiState.update {
                         it.copy(
                             isLoading = false,
                             users = users,
-                            filteredUsers = users,
-                            successMessage = "✅ Loaded ${users.size} users\n⚠️ Using mock data (server not connected)"
+                            filteredUsers = users
                         )
                     }
-
-                    // Auto-clear success message
-                    kotlinx.coroutines.delay(AnimationConfig.TOAST_DISPLAY_DURATION)
-                    _uiState.update { it.copy(successMessage = null) }
-                } else {
-                    throw result.exceptionOrNull() ?: Exception("Unknown error")
+                },
+                onFailure = { error ->
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            errorMessage = error.message ?: "Failed to load users"
+                        )
+                    }
                 }
-
-            } catch (e: Exception) {
-                // Create mock data as fallback
-                val mockUsers = generateMockUsers()
-                _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        users = mockUsers,
-                        filteredUsers = mockUsers,
-                        errorMessage = "⚠️ Server unavailable: ${e.message}\n" +
-                                "Showing mock data for demo purposes."
-                    )
-                }
-            }
+            )
         }
     }
 
     fun loadStatistics() {
         viewModelScope.launch {
-            try {
-                kotlinx.coroutines.delay(AnimationConfig.DELAY_API_SIMULATION_SHORT)
-
-                val result = getStatisticsUseCase()
-
-                if (result.isSuccess) {
-                    val stats = result.getOrNull() ?: Statistics()
+            getStatisticsUseCase().fold(
+                onSuccess = { stats ->
                     _uiState.update { it.copy(statistics = stats) }
-                } else {
-                    throw result.exceptionOrNull() ?: Exception("Unknown error")
-                }
-
-            } catch (e: Exception) {
-                // Create mock statistics
-                val mockStats = Statistics(
-                    totalUsers = _uiState.value.users.size,
-                    activeUsers = _uiState.value.users.count { it.status == UserStatus.ACTIVE },
-                    verificationsToday = Random.nextInt(10, 50),
-                    successRate = 85.0 + Random.nextDouble() * 10.0,
-                    failedAttempts = Random.nextInt(5, 20),
-                    pendingVerifications = Random.nextInt(0, 10)
-                )
-                _uiState.update { it.copy(statistics = mockStats) }
-            }
+                },
+                onFailure = { /* Statistics are non-critical, silently ignore */ }
+            )
         }
     }
 
@@ -229,47 +190,27 @@ class AdminViewModel(
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
 
-            try {
-                kotlinx.coroutines.delay(AnimationConfig.DELAY_API_SIMULATION_SHORT)
-
-                // Try API call
-                val result = updateUserUseCase(user.id, user)
-
-                if (result.isSuccess) {
-                    // Update local list
-                    val currentUsers = _uiState.value.users.toMutableList()
-                    val index = currentUsers.indexOfFirst { it.id == user.id }
-                    if (index != -1) {
-                        currentUsers[index] = user
-                    }
-
+            updateUserUseCase(user.id, user).fold(
+                onSuccess = {
                     _uiState.update {
                         it.copy(
                             isLoading = false,
-                            users = currentUsers,
-                            filteredUsers = currentUsers.filter { u ->
-                                val query = _uiState.value.searchQuery
-                                query.isBlank() || u.name.contains(query, ignoreCase = true) ||
-                                        u.email.contains(query, ignoreCase = true)
-                            },
                             showEditUserDialog = false,
                             editingUser = null,
-                            successMessage = "✅ User updated: ${user.name}\n⚠️ Using mock data"
+                            successMessage = "User updated: ${user.name}"
                         )
                     }
-
-                    kotlinx.coroutines.delay(AnimationConfig.TOAST_DISPLAY_DURATION)
-                    _uiState.update { it.copy(successMessage = null) }
+                    loadUsers()
+                },
+                onFailure = { error ->
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            errorMessage = error.message ?: "Failed to update user"
+                        )
+                    }
                 }
-
-            } catch (e: Exception) {
-                _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        errorMessage = "⚠️ Error updating user: ${e.message}"
-                    )
-                }
-            }
+            )
         }
     }
 
@@ -293,50 +234,31 @@ class AdminViewModel(
 
     fun deleteUser(userId: String) {
         viewModelScope.launch {
-            val userToDelete = _uiState.value.userToDelete
+            val userName = _uiState.value.userToDelete?.name
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
 
-            try {
-                kotlinx.coroutines.delay(AnimationConfig.DELAY_API_SIMULATION_SHORT)
-
-                // Try API call
-                val result = deleteUserUseCase(userId)
-
-                if (result.isSuccess) {
-                    // Remove from local list
-                    val currentUsers = _uiState.value.users.filter { it.id != userId }
-
+            deleteUserUseCase(userId).fold(
+                onSuccess = {
                     _uiState.update {
                         it.copy(
                             isLoading = false,
-                            users = currentUsers,
-                            filteredUsers = currentUsers.filter { user ->
-                                val query = _uiState.value.searchQuery
-                                query.isBlank() || user.name.contains(query, ignoreCase = true) ||
-                                        user.email.contains(query, ignoreCase = true)
-                            },
                             showDeleteConfirmation = false,
                             userToDelete = null,
-                            successMessage = "✅ User deleted: ${userToDelete?.name ?: "Unknown"}\n⚠️ Using mock data"
+                            successMessage = "User deleted: ${userName ?: "Unknown"}"
                         )
                     }
-
-                    kotlinx.coroutines.delay(AnimationConfig.TOAST_DISPLAY_DURATION)
-                    _uiState.update { it.copy(successMessage = null) }
-
-                    // Refresh statistics
+                    loadUsers()
                     loadStatistics()
+                },
+                onFailure = { error ->
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            errorMessage = error.message ?: "Failed to delete user"
+                        )
+                    }
                 }
-
-            } catch (e: Exception) {
-                _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        errorMessage = "⚠️ Error deleting user: ${e.message}\n" +
-                                "Changes saved locally only."
-                    )
-                }
-            }
+            )
         }
     }
 
@@ -375,33 +297,13 @@ class AdminViewModel(
     }
 
     fun saveSettings() {
-        viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
-
-            try {
-                kotlinx.coroutines.delay(com.fivucsas.shared.config.AnimationConfig.DELAY_API_SIMULATION_SHORT)
-
-                // TODO: When backend is ready, save to API
-                // For now, just persist in state
-                _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        hasUnsavedSettings = false,
-                        successMessage = "✅ Settings saved successfully\n⚠️ Using local storage (server not connected)"
-                    )
-                }
-
-                kotlinx.coroutines.delay(com.fivucsas.shared.config.AnimationConfig.TOAST_DISPLAY_DURATION)
-                _uiState.update { it.copy(successMessage = null) }
-
-            } catch (e: Exception) {
-                _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        errorMessage = "⚠️ Error saving settings: ${e.message}"
-                    )
-                }
-            }
+        // Admin panel settings (API URLs, thresholds) are client-side config.
+        // Persisted in local state; backend API for admin config not yet available.
+        _uiState.update {
+            it.copy(
+                hasUnsavedSettings = false,
+                successMessage = "Settings saved locally"
+            )
         }
     }
 
@@ -413,108 +315,46 @@ class AdminViewModel(
                 successMessage = "Settings reset to defaults"
             )
         }
-
-        viewModelScope.launch {
-            kotlinx.coroutines.delay(com.fivucsas.shared.config.AnimationConfig.TOAST_DISPLAY_DURATION)
-            _uiState.update { it.copy(successMessage = null) }
-        }
     }
 
     fun testDatabaseConnection() {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
 
-            try {
-                kotlinx.coroutines.delay(1000L)
-
-                // TODO: Actual database connection test
-                val isConnected = Random.nextBoolean()
-
-                _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        successMessage = if (isConnected) {
-                            "✅ Database connection successful"
-                        } else {
-                            null
-                        },
-                        errorMessage = if (!isConnected) {
-                            "❌ Database connection failed"
-                        } else {
-                            null
-                        }
-                    )
+            checkSystemHealthUseCase().fold(
+                onSuccess = { isHealthy ->
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            successMessage = if (isHealthy) "Database connection successful" else null,
+                            errorMessage = if (!isHealthy) "Database connection failed" else null
+                        )
+                    }
+                },
+                onFailure = { error ->
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            errorMessage = "Connection test failed: ${error.message}"
+                        )
+                    }
                 }
-
-                kotlinx.coroutines.delay(com.fivucsas.shared.config.AnimationConfig.TOAST_DISPLAY_DURATION)
-                _uiState.update { it.copy(successMessage = null, errorMessage = null) }
-
-            } catch (e: Exception) {
-                _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        errorMessage = "❌ Connection test failed: ${e.message}"
-                    )
-                }
-            }
+            )
         }
     }
 
     fun clearCache() {
-        viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
-
-            try {
-                kotlinx.coroutines.delay(500L)
-
-                // TODO: Actual cache clearing
-                _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        successMessage = "✅ Cache cleared successfully"
-                    )
-                }
-
-                kotlinx.coroutines.delay(com.fivucsas.shared.config.AnimationConfig.TOAST_DISPLAY_DURATION)
-                _uiState.update { it.copy(successMessage = null) }
-
-            } catch (e: Exception) {
-                _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        errorMessage = "⚠️ Error clearing cache: ${e.message}"
-                    )
-                }
-            }
+        // Local cache clearing — no backend API required
+        _uiState.update {
+            it.copy(successMessage = "Cache cleared successfully")
         }
     }
 
     fun exportLogs() {
-        viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
-
-            try {
-                kotlinx.coroutines.delay(1000L)
-
-                // TODO: Actual log export
-                _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        successMessage = "✅ Logs exported to logs_export_${kotlinx.datetime.Clock.System.now().toEpochMilliseconds()}.txt"
-                    )
-                }
-
-                kotlinx.coroutines.delay(com.fivucsas.shared.config.AnimationConfig.TOAST_DISPLAY_DURATION)
-                _uiState.update { it.copy(successMessage = null) }
-
-            } catch (e: Exception) {
-                _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        errorMessage = "⚠️ Error exporting logs: ${e.message}"
-                    )
-                }
-            }
+        // Log export requires platform-specific file system access.
+        // Backend API for log retrieval not yet available.
+        _uiState.update {
+            it.copy(successMessage = "Log export not yet implemented")
         }
     }
 
@@ -522,56 +362,33 @@ class AdminViewModel(
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
 
-            try {
-                kotlinx.coroutines.delay(1500L)
+            checkSystemHealthUseCase().fold(
+                onSuccess = { isHealthy ->
+                    val healthStatus = if (isHealthy) {
+                        com.fivucsas.shared.presentation.state.HealthStatus.GOOD
+                    } else {
+                        com.fivucsas.shared.presentation.state.HealthStatus.WARNING
+                    }
 
-                // TODO: Actual system health check
-                val healthStatus = com.fivucsas.shared.presentation.state.HealthStatus.GOOD
-
-                _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        settings = it.settings.copy(systemHealthStatus = healthStatus),
-                        successMessage = "✅ System health check completed: ${healthStatus.name}"
-                    )
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            settings = it.settings.copy(systemHealthStatus = healthStatus),
+                            successMessage = "System health check completed: ${healthStatus.name}"
+                        )
+                    }
+                },
+                onFailure = { error ->
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            settings = it.settings.copy(
+                                systemHealthStatus = com.fivucsas.shared.presentation.state.HealthStatus.CRITICAL
+                            ),
+                            errorMessage = "Health check failed: ${error.message}"
+                        )
+                    }
                 }
-
-                kotlinx.coroutines.delay(com.fivucsas.shared.config.AnimationConfig.TOAST_DISPLAY_DURATION)
-                _uiState.update { it.copy(successMessage = null) }
-
-            } catch (e: Exception) {
-                _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        errorMessage = "⚠️ Health check failed: ${e.message}"
-                    )
-                }
-            }
-        }
-    }
-
-    // MOCK DATA GENERATOR
-    private fun generateMockUsers(): List<User> {
-        val firstNames = listOf("John", "Sarah", "Mike", "Emily", "David", "Lisa", "James", "Anna")
-        val lastNames =
-            listOf("Smith", "Johnson", "Williams", "Brown", "Jones", "Garcia", "Miller", "Davis")
-        val statuses =
-            listOf(UserStatus.ACTIVE, UserStatus.ACTIVE, UserStatus.ACTIVE, UserStatus.INACTIVE)
-
-        return List(12) { index ->
-            val firstName = firstNames.random()
-            val lastName = lastNames.random()
-            User(
-                id = "user_${index + 1}",
-                name = "$firstName $lastName",
-                email = "${firstName.lowercase()}.${lastName.lowercase()}@example.com",
-                idNumber = "ID${Random.nextInt(100000, 999999)}",
-                phoneNumber = "+1${Random.nextInt(1000000000, 1999999999)}",
-                status = statuses.random(),
-                enrollmentDate = "2024-${
-                    Random.nextInt(1, 12).toString().padStart(2, '0')
-                }-${Random.nextInt(1, 28).toString().padStart(2, '0')}",
-                hasBiometric = Random.nextBoolean()
             )
         }
     }

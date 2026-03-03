@@ -57,4 +57,10 @@ interface UserRepository {
      * @return Result with statistics or error
      */
     suspend fun getStatistics(): Result<Statistics>
+
+    /**
+     * Check system health
+     * @return Result with true if healthy, false otherwise
+     */
+    suspend fun healthCheck(): Result<Boolean>
 }

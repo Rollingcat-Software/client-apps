@@ -63,4 +63,10 @@ interface IdentityApi {
      * GET /statistics
      */
     suspend fun getStatistics(): StatisticsDto
+
+    /**
+     * Health check
+     * GET /health
+     */
+    suspend fun healthCheck(): Boolean
 }

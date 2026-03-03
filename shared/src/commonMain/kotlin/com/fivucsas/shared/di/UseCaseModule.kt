@@ -1,5 +1,6 @@
 package com.fivucsas.shared.di
 
+import com.fivucsas.shared.domain.usecase.admin.CheckSystemHealthUseCase
 import com.fivucsas.shared.domain.usecase.admin.CreateUserUseCase
 import com.fivucsas.shared.domain.usecase.admin.DeleteUserUseCase
 import com.fivucsas.shared.domain.usecase.admin.GetStatisticsUseCase
@@ -43,6 +44,7 @@ val useCaseModule = module {
     factoryOf(::GetStatisticsUseCase)
     factoryOf(::UpdateUserUseCase)
     factoryOf(::DeleteUserUseCase)
+    factoryOf(::CheckSystemHealthUseCase)
 
     // Enrollment Use Cases
     factoryOf(::EnrollUserUseCase)

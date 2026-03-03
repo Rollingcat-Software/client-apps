@@ -61,4 +61,13 @@ class IdentityApiImpl(
     override suspend fun getStatistics(): StatisticsDto {
         return client.get(STATS_PATH).body()
     }
+
+    override suspend fun healthCheck(): Boolean {
+        return try {
+            client.get("health")
+            true
+        } catch (_: Exception) {
+            false
+        }
+    }
 }
