@@ -14,7 +14,11 @@ import com.fivucsas.shared.data.remote.api.IdentityApiImpl
 import com.fivucsas.shared.data.remote.api.QrLoginApi
 import com.fivucsas.shared.data.remote.api.QrLoginApiImpl
 import com.fivucsas.shared.data.remote.config.ApiConfig
+import com.fivucsas.shared.data.remote.dto.AuthResponseDto
+import com.fivucsas.shared.domain.repository.AuthTokens
 import io.ktor.client.HttpClient
+import io.ktor.client.call.body
+import io.ktor.client.plugins.HttpResponseValidator
 import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.defaultRequest
@@ -23,7 +27,13 @@ import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logger
 import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.request.header
+import io.ktor.client.request.post
+import io.ktor.client.request.setBody
+import io.ktor.client.statement.HttpResponse
+import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
+import io.ktor.http.HttpStatusCode
+import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 import org.koin.core.module.dsl.bind
@@ -88,6 +98,45 @@ val networkModule = module {
                 }
 
                 stepUpTokenManager.getToken()?.let { header("X-Step-Up-Token", it) }
+            }
+
+            // Automatic token refresh on 401 responses
+            HttpResponseValidator {
+                validateResponse { response: HttpResponse ->
+                    if (response.status == HttpStatusCode.Unauthorized) {
+                        val url = response.call.request.url.toString()
+                        // Don't attempt refresh on auth endpoints to avoid infinite loops
+                        if (url.contains("/auth/login") || url.contains("/auth/refresh") || url.contains("/auth/logout")) {
+                            return@validateResponse
+                        }
+
+                        val refreshToken = tokenManager.getRefreshToken() ?: return@validateResponse
+
+                        try {
+                            // Create a temporary client to avoid interceptor recursion
+                            val refreshResponse = response.call.client.post(ApiConfig.identityBaseUrl + "/auth/refresh") {
+                                contentType(ContentType.Application.Json)
+                                setBody(mapOf("refreshToken" to refreshToken))
+                            }
+                            if (refreshResponse.status == HttpStatusCode.OK) {
+                                val authResponse = refreshResponse.body<AuthResponseDto>()
+                                tokenManager.updateTokens(
+                                    AuthTokens(
+                                        accessToken = authResponse.accessToken,
+                                        refreshToken = authResponse.refreshToken,
+                                        expiresIn = authResponse.expiresIn,
+                                        role = authResponse.role ?: tokenManager.getRole() ?: ""
+                                    )
+                                )
+                            } else {
+                                // Refresh failed — clear tokens to force re-login
+                                tokenManager.clearTokens()
+                            }
+                        } catch (_: Exception) {
+                            tokenManager.clearTokens()
+                        }
+                    }
+                }
             }
         }
     }

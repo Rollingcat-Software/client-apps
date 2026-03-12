@@ -1,55 +1,36 @@
 package com.fivucsas.shared.domain.model
 
 /**
- * Biometric data model
- *
- * Contains face recognition data for a user
+ * Enrollment result from biometric processor
  */
-data class BiometricData(
-    val id: String,
+data class EnrollmentResult(
+    val success: Boolean,
     val userId: String,
-    val faceEmbedding: FloatArray,
-    val enrollmentDate: String,
-    val lastVerificationDate: String? = null,
-    val verificationCount: Int = 0
-) {
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other == null || this::class != other::class) return false
-
-        other as BiometricData
-
-        if (id != other.id) return false
-        if (userId != other.userId) return false
-        if (!faceEmbedding.contentEquals(other.faceEmbedding)) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        var result = id.hashCode()
-        result = 31 * result + userId.hashCode()
-        result = 31 * result + faceEmbedding.contentHashCode()
-        return result
-    }
-}
+    val qualityScore: Float,
+    val message: String,
+    val embeddingDimension: Int = 0,
+    val livenessScore: Float = 1.0f
+)
 
 /**
- * Verification result
+ * Verification result from biometric processor
  */
 data class VerificationResult(
     val isVerified: Boolean,
-    val userId: String?,
     val confidence: Float,
+    val distance: Float = 0f,
+    val threshold: Float = 0f,
     val message: String
 )
 
 /**
- * Liveness check result
+ * Liveness check result from biometric processor
  */
 data class LivenessResult(
     val isLive: Boolean,
-    val confidence: Float,
+    val livenessScore: Float,
+    val challenge: String = "",
+    val challengeCompleted: Boolean = false,
     val message: String
 )
 

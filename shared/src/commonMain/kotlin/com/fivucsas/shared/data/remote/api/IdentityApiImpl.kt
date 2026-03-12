@@ -54,7 +54,7 @@ class IdentityApiImpl(
 
     override suspend fun searchUsers(query: String): List<UserDto> {
         return client.get("$BASE_PATH/search") {
-            parameter("q", query)
+            parameter("query", query)
         }.body()
     }
 

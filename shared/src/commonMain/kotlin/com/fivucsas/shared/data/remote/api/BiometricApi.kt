@@ -1,60 +1,55 @@
 package com.fivucsas.shared.data.remote.api
 
-import com.fivucsas.shared.data.remote.dto.BiometricDto
+import com.fivucsas.shared.data.remote.dto.BiometricEnrollmentResponseDto
 import com.fivucsas.shared.data.remote.dto.LivenessResponseDto
 import com.fivucsas.shared.data.remote.dto.VerificationResponseDto
 
 /**
  * Biometric API interface
  *
- * Defines contract for biometric service communication.
- * TODO: Implement with Ktor client (Week 2, Day 6)
- *
- * Base URL: http://localhost:8000/api/v1/
+ * Defines contract for biometric processor service communication.
+ * Connects to FastAPI service on port 8001.
  *
  * Endpoints:
- * - POST /biometric/enroll      → enrollFace()
- * - POST /biometric/verify      → verifyFace()
- * - POST /biometric/liveness    → checkLiveness()
- * - GET  /biometric/{userId}    → getBiometricData()
- * - DELETE /biometric/{userId}  → deleteBiometricData()
+ * - POST /enroll       → enrollFace() (multipart form-data)
+ * - POST /verify       → verifyFace() (multipart form-data)
+ * - POST /liveness     → checkLiveness() (multipart form-data)
+ * - DELETE /enroll/{id} → deleteBiometricData()
  */
 interface BiometricApi {
 
     /**
-     * Enroll face
-     * POST /biometric/enroll
+     * Enroll face using multipart form-data
+     * POST /enroll
      *
      * @param userId User ID
-     * @param imageData Base64-encoded image
+     * @param imageBytes Raw image bytes (JPEG/PNG)
+     * @param imageName Filename for the image
      */
-    suspend fun enrollFace(userId: String, imageData: String): BiometricDto
+    suspend fun enrollFace(userId: String, imageBytes: ByteArray, imageName: String = "face.jpg", tenantId: String? = null): BiometricEnrollmentResponseDto
 
     /**
-     * Verify face
-     * POST /biometric/verify
+     * Verify face using multipart form-data
+     * POST /verify
      *
-     * @param imageData Base64-encoded image
+     * @param userId User ID to verify against
+     * @param imageBytes Raw image bytes (JPEG/PNG)
+     * @param imageName Filename for the image
      */
-    suspend fun verifyFace(imageData: String): VerificationResponseDto
+    suspend fun verifyFace(userId: String, imageBytes: ByteArray, imageName: String = "face.jpg"): VerificationResponseDto
 
     /**
-     * Check liveness
-     * POST /biometric/liveness
+     * Check liveness using multipart form-data with image
+     * POST /liveness
      *
-     * @param actions List of facial action names
+     * @param imageBytes Raw image bytes (JPEG/PNG)
+     * @param imageName Filename for the image
      */
-    suspend fun checkLiveness(actions: List<String>): LivenessResponseDto
+    suspend fun checkLiveness(imageBytes: ByteArray, imageName: String = "face.jpg"): LivenessResponseDto
 
     /**
-     * Get biometric data
-     * GET /biometric/{userId}
-     */
-    suspend fun getBiometricData(userId: String): BiometricDto
-
-    /**
-     * Delete biometric data
-     * DELETE /biometric/{userId}
+     * Delete biometric data for a user
+     * DELETE /enroll/{userId}
      */
     suspend fun deleteBiometricData(userId: String)
 }
