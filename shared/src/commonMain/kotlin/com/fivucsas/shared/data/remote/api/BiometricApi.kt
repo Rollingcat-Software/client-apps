@@ -26,7 +26,7 @@ interface BiometricApi {
      * @param imageBytes Raw image bytes (JPEG/PNG)
      * @param imageName Filename for the image
      */
-    suspend fun enrollFace(userId: String, imageBytes: ByteArray, imageName: String = "face.jpg"): BiometricEnrollmentResponseDto
+    suspend fun enrollFace(userId: String, imageBytes: ByteArray, imageName: String = "face.jpg", tenantId: String? = null): BiometricEnrollmentResponseDto
 
     /**
      * Verify face using multipart form-data

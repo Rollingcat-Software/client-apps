@@ -28,12 +28,16 @@ class BiometricApiImpl(
     override suspend fun enrollFace(
         userId: String,
         imageBytes: ByteArray,
-        imageName: String
+        imageName: String,
+        tenantId: String?
     ): BiometricEnrollmentResponseDto {
         return client.submitFormWithBinaryData(
             url = "enroll",
             formData = formData {
                 append("user_id", userId)
+                if (tenantId != null) {
+                    append("tenant_id", tenantId)
+                }
                 append("file", imageBytes, Headers.build {
                     append(HttpHeaders.ContentType, "image/jpeg")
                     append(HttpHeaders.ContentDisposition, "filename=\"$imageName\"")

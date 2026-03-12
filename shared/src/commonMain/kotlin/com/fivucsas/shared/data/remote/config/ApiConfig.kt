@@ -24,8 +24,8 @@ object ApiConfig {
      * Identity Core API URLs per environment (Auth, Users, RBAC)
      */
     private const val DEV_IDENTITY_URL = "http://localhost:8080/api/v1"
-    private const val STAGING_IDENTITY_URL = "http://34.116.233.134:8080/api/v1"
-    private const val PROD_IDENTITY_URL = "http://34.116.233.134:8080/api/v1"
+    private const val STAGING_IDENTITY_URL = "https://34.116.233.134:8080/api/v1"
+    private const val PROD_IDENTITY_URL = "https://34.116.233.134:8080/api/v1"
 
     /**
      * Biometric Processor API URLs per environment (Face detection, Verification)
