@@ -2,6 +2,9 @@ package com.fivucsas.shared.platform.factory
 
 import com.fivucsas.shared.platform.*
 import com.fivucsas.shared.platform.config.DefaultConfigurationProvider
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import java.util.prefs.Preferences
 
 /**
  * Desktop Platform Service Factory
@@ -22,18 +25,15 @@ actual fun createPlatformServiceFactory(): PlatformServiceFactory {
 
 class DesktopPlatformServiceFactory : PlatformServiceFactory {
     override fun createCameraService(): ICameraService {
-        // Will be provided by Koin DI - DesktopCameraServiceImpl
-        TODO("Camera service should be injected via DI")
+        return DesktopCameraService()
     }
 
     override fun createLogger(): ILogger {
-        // Will be provided by Koin DI - DesktopLoggerImpl
-        TODO("Logger should be injected via DI")
+        return DesktopLogger()
     }
 
     override fun createSecureStorage(): ISecureStorage {
-        // Will be provided by Koin DI - DesktopSecureStorageImpl
-        TODO("Secure storage should be injected via DI")
+        return DesktopSecureStorage()
     }
 
     override fun createNavigationService(): INavigationService {
@@ -247,4 +247,86 @@ class DesktopNotificationService : INotificationService {
         val type: NotificationType,
         val duration: Long?
     )
+}
+
+/**
+ * Desktop Camera Service Implementation
+ *
+ * Desktop has no built-in camera API, so this returns appropriate errors.
+ * Applications should check isAvailable() before attempting camera operations.
+ */
+class DesktopCameraService : ICameraService {
+    private val _cameraState = MutableStateFlow<CameraState>(CameraState.Uninitialized)
+    override val cameraState: StateFlow<CameraState> = _cameraState
+
+    override suspend fun initialize(lensFacing: LensFacing): Result<Unit> {
+        _cameraState.value = CameraState.Error("Camera not available on desktop")
+        return Result.failure(UnsupportedOperationException("Camera not available on desktop platform"))
+    }
+
+    override suspend fun startPreview(): Result<Unit> =
+        Result.failure(UnsupportedOperationException("Camera not available on desktop platform"))
+
+    override suspend fun stopPreview(): Result<Unit> = Result.success(Unit)
+
+    override suspend fun captureImage(): Result<ByteArray> =
+        Result.failure(UnsupportedOperationException("Camera not available on desktop platform"))
+
+    override suspend fun captureFrame(): Result<ByteArray> =
+        Result.failure(UnsupportedOperationException("Camera not available on desktop platform"))
+
+    override fun isAvailable(): Boolean = false
+    override fun hasCamera(lensFacing: LensFacing): Boolean = false
+    override suspend fun release() { _cameraState.value = CameraState.Uninitialized }
+    override fun getPreviewDimensions(): Pair<Int, Int> = Pair(0, 0)
+    override fun getSupportedResolutions(): List<Pair<Int, Int>> = emptyList()
+}
+
+/**
+ * Desktop Logger Implementation
+ *
+ * Uses standard output for logging on desktop platform.
+ */
+class DesktopLogger : ILogger {
+    override fun debug(tag: String, message: String) {
+        println("D/$tag: $message")
+    }
+
+    override fun info(tag: String, message: String) {
+        println("I/$tag: $message")
+    }
+
+    override fun warn(tag: String, message: String) {
+        System.err.println("W/$tag: $message")
+    }
+
+    override fun error(tag: String, message: String, throwable: Throwable?) {
+        System.err.println("E/$tag: $message")
+        throwable?.printStackTrace(System.err)
+    }
+
+    override fun verbose(tag: String, message: String) {
+        println("V/$tag: $message")
+    }
+}
+
+/**
+ * Desktop Secure Storage Implementation
+ *
+ * Uses Java Preferences API for persistent storage on desktop.
+ */
+class DesktopSecureStorage : ISecureStorage {
+    private val prefs = Preferences.userNodeForPackage(DesktopSecureStorage::class.java)
+
+    override fun saveString(key: String, value: String) { prefs.put(key, value) }
+    override fun getString(key: String): String? = prefs.get(key, null)
+    override fun saveBoolean(key: String, value: Boolean) { prefs.putBoolean(key, value) }
+    override fun getBoolean(key: String, defaultValue: Boolean): Boolean = prefs.getBoolean(key, defaultValue)
+    override fun saveInt(key: String, value: Int) { prefs.putInt(key, value) }
+    override fun getInt(key: String, defaultValue: Int): Int = prefs.getInt(key, defaultValue)
+    override fun saveLong(key: String, value: Long) { prefs.putLong(key, value) }
+    override fun getLong(key: String, defaultValue: Long): Long = prefs.getLong(key, defaultValue)
+    override fun remove(key: String) { prefs.remove(key) }
+    override fun clear() { prefs.clear() }
+    override fun contains(key: String): Boolean = prefs.get(key, null) != null
 }
