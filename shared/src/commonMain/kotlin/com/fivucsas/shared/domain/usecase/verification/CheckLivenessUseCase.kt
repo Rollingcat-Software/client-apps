@@ -3,7 +3,6 @@ package com.fivucsas.shared.domain.usecase.verification
 import com.fivucsas.shared.domain.exception.BiometricErrorCode
 import com.fivucsas.shared.domain.exception.BiometricException
 import com.fivucsas.shared.domain.exception.ValidationException
-import com.fivucsas.shared.domain.model.FacialAction
 import com.fivucsas.shared.domain.model.LivenessResult
 import com.fivucsas.shared.domain.repository.BiometricRepository
 
@@ -11,10 +10,9 @@ import com.fivucsas.shared.domain.repository.BiometricRepository
  * Use case for checking liveness (anti-spoofing)
  *
  * Business logic:
- * 1. Validate facial actions list
- * 2. Perform liveness detection
- * 3. Ensure minimum number of actions performed
- * 4. Return liveness result with confidence score
+ * 1. Validate face image
+ * 2. Send image to biometric processor for passive liveness detection
+ * 3. Return liveness result with score
  *
  * Liveness detection prevents spoofing attacks:
  * - Photo attacks (holding a photo)
@@ -24,55 +22,45 @@ import com.fivucsas.shared.domain.repository.BiometricRepository
  * Example usage:
  * ```
  * val useCase = CheckLivenessUseCase(biometricRepo)
- * val actions = listOf(FacialAction.SMILE, FacialAction.BLINK, FacialAction.LOOK_LEFT)
- * val result = useCase(actions)
+ * val result = useCase(faceImageBytes)
  * ```
  */
 open class CheckLivenessUseCase(
     private val biometricRepository: BiometricRepository
 ) {
     /**
-     * Execute liveness check
+     * Execute liveness check with face image
      *
-     * @param actions List of facial actions performed
+     * @param faceImage Face image as byte array
      * @return Result with liveness result or error
      */
-    open suspend operator fun invoke(actions: List<FacialAction>): Result<LivenessResult> {
-        // Validate actions list
-        if (actions.isEmpty()) {
+    open suspend operator fun invoke(faceImage: ByteArray): Result<LivenessResult> {
+        if (faceImage.isEmpty()) {
             return Result.failure(
-                ValidationException("At least one facial action is required for liveness check")
+                ValidationException("Face image is required for liveness check")
             )
         }
 
-        if (actions.size < MIN_ACTIONS_REQUIRED) {
+        if (faceImage.size > MAX_IMAGE_SIZE) {
+            return Result.failure(
+                ValidationException("Face image is too large (max ${MAX_IMAGE_SIZE / 1024 / 1024}MB)")
+            )
+        }
+
+        if (faceImage.size < MIN_IMAGE_SIZE) {
             return Result.failure(
                 BiometricException(
-                    message = "Please perform at least $MIN_ACTIONS_REQUIRED different actions",
-                    errorCode = BiometricErrorCode.LIVENESS_CHECK_FAILED
+                    message = "Face image is too small (min ${MIN_IMAGE_SIZE / 1024}KB)",
+                    errorCode = BiometricErrorCode.LOW_QUALITY_IMAGE
                 )
             )
         }
 
-        if (actions.size > MAX_ACTIONS_ALLOWED) {
-            return Result.failure(
-                ValidationException("Too many actions (max $MAX_ACTIONS_ALLOWED)")
-            )
-        }
-
-        // Check for duplicate actions
-        val uniqueActions = actions.distinct()
-        if (uniqueActions.size < actions.size) {
-            // Has duplicates - might be acceptable but note it
-            // For now, we allow it
-        }
-
-        // Perform liveness check
-        return biometricRepository.checkLiveness(actions)
+        return biometricRepository.checkLiveness(faceImage)
     }
 
     companion object {
-        private const val MIN_ACTIONS_REQUIRED = 2
-        private const val MAX_ACTIONS_ALLOWED = 5
+        private const val MAX_IMAGE_SIZE = 10 * 1024 * 1024 // 10 MB
+        private const val MIN_IMAGE_SIZE = 10 * 1024 // 10 KB
     }
 }

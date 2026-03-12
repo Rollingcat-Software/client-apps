@@ -40,7 +40,7 @@ open class VerifyUserUseCase(
      * @param faceImage Captured face image (as byte array)
      * @return Result with verification result or error
      */
-    open suspend operator fun invoke(faceImage: ByteArray): Result<VerificationResult> {
+    open suspend operator fun invoke(userId: String, faceImage: ByteArray): Result<VerificationResult> {
         // Validate face image
         if (faceImage.isEmpty()) {
             return Result.failure(
@@ -64,7 +64,7 @@ open class VerifyUserUseCase(
         }
 
         // Perform verification
-        return biometricRepository.verifyFace(faceImage)
+        return biometricRepository.verifyFace(userId, faceImage)
     }
 
     companion object {
