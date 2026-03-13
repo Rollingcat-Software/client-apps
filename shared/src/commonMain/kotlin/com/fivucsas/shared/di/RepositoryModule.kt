@@ -31,7 +31,8 @@ val repositoryModule = module {
     single<AuthRepository> {
         AuthRepositoryImpl(
             authApi = get<AuthApi>(),
-            tokenManager = get<TokenManager>()
+            tokenManager = get<TokenManager>(),
+            stepUpTokenManager = get<StepUpTokenManager>()
         )
     }
 

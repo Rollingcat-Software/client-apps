@@ -1,5 +1,6 @@
 package com.fivucsas.shared.data.repository
 
+import com.fivucsas.shared.data.local.StepUpTokenManager
 import com.fivucsas.shared.data.local.TokenManager
 import com.fivucsas.shared.data.remote.api.AuthApi
 import com.fivucsas.shared.data.remote.dto.LoginRequestDto
@@ -16,7 +17,8 @@ import com.fivucsas.shared.domain.repository.AuthTokens
  */
 class AuthRepositoryImpl(
     private val authApi: AuthApi,
-    private val tokenManager: TokenManager
+    private val tokenManager: TokenManager,
+    private val stepUpTokenManager: StepUpTokenManager? = null
 ) : AuthRepository {
 
     override suspend fun login(email: String, password: String): Result<AuthTokens> {
@@ -63,13 +65,15 @@ class AuthRepositoryImpl(
         return try {
             authApi.logout()
 
-            // Clear tokens from TokenManager
+            // Clear all sensitive data
             tokenManager.clearTokens()
+            stepUpTokenManager?.clear()
 
             Result.success(Unit)
         } catch (e: Exception) {
-            // Clear tokens even if API call fails
+            // Clear sensitive data even if API call fails
             tokenManager.clearTokens()
+            stepUpTokenManager?.clear()
             Result.failure(e)
         }
     }

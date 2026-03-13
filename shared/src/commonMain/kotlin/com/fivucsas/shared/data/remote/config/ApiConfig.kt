@@ -18,13 +18,13 @@ object ApiConfig {
     /**
      * Current environment (can be changed at runtime)
      */
-    var currentEnvironment: Environment = Environment.PRODUCTION
+    var currentEnvironment: Environment = Environment.DEVELOPMENT
 
     /**
      * Identity Core API URLs per environment (Auth, Users, RBAC)
      */
     private const val DEV_IDENTITY_URL = "http://localhost:8080/api/v1"
-    private const val STAGING_IDENTITY_URL = "https://34.116.233.134:8080/api/v1"
+    private const val STAGING_IDENTITY_URL = "https://staging-identity.fivucsas.com/api/v1"
     private const val PROD_IDENTITY_URL = "https://34.116.233.134:8080/api/v1"
 
     /**
