@@ -116,7 +116,7 @@ object BiometricConfig {
      * Number of face samples required during enrollment
      * More samples = better accuracy but slower enrollment
      */
-    const val ENROLLMENT_SAMPLES_REQUIRED = 1
+    const val ENROLLMENT_SAMPLES_REQUIRED = 3
 
     /**
      * Minimum diversity between enrollment samples

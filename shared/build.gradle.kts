@@ -84,13 +84,17 @@ kotlin {
                 implementation("androidx.activity:activity-compose:1.8.1")
 
                 // CameraX (used by AndroidCameraService + preview)
-                implementation("androidx.camera:camera-core:1.3.0")
-                implementation("androidx.camera:camera-camera2:1.3.0")
-                implementation("androidx.camera:camera-lifecycle:1.3.0")
-                implementation("androidx.camera:camera-view:1.3.0")
+                implementation("androidx.camera:camera-core:1.3.1")
+                implementation("androidx.camera:camera-camera2:1.3.1")
+                implementation("androidx.camera:camera-lifecycle:1.3.1")
+                implementation("androidx.camera:camera-view:1.3.1")
 
                 // Accompanist (permissions helper)
                 implementation("com.google.accompanist:accompanist-permissions:0.32.0")
+
+                // ML Kit Face Detection
+                implementation("com.google.mlkit:face-detection:16.1.5")
+
 
                 // Koin for Android
                 implementation("io.insert-koin:koin-android:3.5.0")

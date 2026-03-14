@@ -91,6 +91,8 @@ import com.fivucsas.shared.domain.validation.ValidationRules
 import com.fivucsas.shared.presentation.viewmodel.auth.BiometricResult
 import com.fivucsas.shared.presentation.viewmodel.auth.BiometricState
 import com.fivucsas.shared.presentation.viewmodel.auth.BiometricViewModel
+import com.fivucsas.shared.ui.components.organisms.FaceBounds
+import com.fivucsas.shared.ui.components.organisms.FaceDetectionOverlay
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
@@ -139,6 +141,16 @@ fun BiometricEnrollScreen(
     var capturedImageBytes by remember { mutableStateOf<ByteArray?>(null) }
 
     LaunchedEffect(Unit) { viewModel.clearState() }
+
+    // Detect permanently denied after returning from permission dialog
+    LaunchedEffect(cameraPermissionState.status) {
+        if (hasRequestedPermission &&
+            !cameraPermissionState.status.isGranted &&
+            !cameraPermissionState.status.shouldShowRationale
+        ) {
+            permissionPermanentlyDenied = true
+        }
+    }
 
     Scaffold(
         topBar = {

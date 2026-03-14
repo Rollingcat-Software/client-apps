@@ -13,6 +13,9 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
+import android.graphics.ImageFormat
+import android.graphics.Rect
+import android.graphics.YuvImage
 import java.io.ByteArrayOutputStream
 import java.nio.ByteBuffer
 import java.util.concurrent.Executor
@@ -200,7 +203,7 @@ class AndroidCameraService(
                     IllegalStateException("Image capture not initialized")
                 )
 
-            val imageBytes = suspendCancellableCoroutine<ByteArray> { continuation ->
+            val rawBytes = suspendCancellableCoroutine<ByteArray> { continuation ->
                 imageCapture.takePicture(
                     ContextCompat.getMainExecutor(context),
                     object : ImageCapture.OnImageCapturedCallback() {
@@ -222,8 +225,11 @@ class AndroidCameraService(
                 )
             }
 
+            // Resize and compress through ImageProcessor
+            val processedBytes = ImageProcessor.processForBiometric(rawBytes)
+
             _cameraState.value = CameraState.Previewing
-            Result.success(imageBytes)
+            Result.success(processedBytes)
         } catch (e: Exception) {
             _cameraState.value = CameraState.Error(e)
             Result.failure(e)
@@ -325,14 +331,77 @@ class AndroidCameraService(
     }
 
     /**
-     * Converts ImageProxy to ByteArray
-     * Handles YUV to JPEG conversion
+     * Converts ImageProxy to JPEG ByteArray.
+     * Handles both JPEG (from ImageCapture) and YUV_420_888 (from ImageAnalysis).
      */
     private fun imageProxyToByteArray(imageProxy: ImageProxy): ByteArray {
-        val buffer: ByteBuffer = imageProxy.planes[0].buffer
-        val bytes = ByteArray(buffer.remaining())
-        buffer.get(bytes)
-        return bytes
+        return when (imageProxy.format) {
+            ImageFormat.YUV_420_888 -> yuvToJpeg(imageProxy)
+            else -> {
+                // JPEG or other single-plane format
+                val buffer: ByteBuffer = imageProxy.planes[0].buffer
+                val bytes = ByteArray(buffer.remaining())
+                buffer.get(bytes)
+                bytes
+            }
+        }
+    }
+
+    /**
+     * Converts a YUV_420_888 ImageProxy to JPEG bytes using Android's YuvImage.
+     */
+    private fun yuvToJpeg(imageProxy: ImageProxy): ByteArray {
+        val yPlane = imageProxy.planes[0]
+        val uPlane = imageProxy.planes[1]
+        val vPlane = imageProxy.planes[2]
+
+        val yBuffer = yPlane.buffer
+        val uBuffer = uPlane.buffer
+        val vBuffer = vPlane.buffer
+
+        val ySize = yBuffer.remaining()
+        val uSize = uBuffer.remaining()
+        val vSize = vBuffer.remaining()
+
+        // NV21 format: Y plane followed by interleaved VU
+        val nv21 = ByteArray(ySize + uSize + vSize)
+        yBuffer.get(nv21, 0, ySize)
+        vBuffer.get(nv21, ySize, vSize)
+        uBuffer.get(nv21, ySize + vSize, uSize)
+
+        val yuvImage = YuvImage(
+            nv21,
+            ImageFormat.NV21,
+            imageProxy.width,
+            imageProxy.height,
+            null
+        )
+
+        val out = ByteArrayOutputStream()
+        yuvImage.compressToJpeg(
+            Rect(0, 0, imageProxy.width, imageProxy.height),
+            90,
+            out
+        )
+        return out.toByteArray()
+    }
+
+    /**
+     * Set an analyzer on the ImageAnalysis use case.
+     * Used by AndroidCameraPreview for ML Kit face detection.
+     */
+    fun setImageAnalyzer(
+        executor: java.util.concurrent.Executor,
+        analyzer: ImageAnalysis.Analyzer
+    ) {
+        imageAnalysis?.setAnalyzer(executor, analyzer)
+    }
+
+    /**
+     * Clear the current ImageAnalysis analyzer.
+     */
+    fun clearImageAnalyzer() {
+        imageAnalysis?.clearAnalyzer()
     }
 
     /**
