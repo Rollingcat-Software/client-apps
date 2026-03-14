@@ -49,6 +49,8 @@ fun LoginScreen(
 ) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var selectedRole by remember { mutableStateOf(UserRole.USER) }
+    var expanded by remember { mutableStateOf(false) }
     val state by viewModel.state.collectAsState()
     val scope = rememberCoroutineScope()
 

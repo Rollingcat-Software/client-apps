@@ -68,8 +68,10 @@ fun ProfileScreen(
             TopAppBar(
                 title = { Text("My Profile") },
                 actions = {
-                    IconButton(onClick = onEditProfile) {
-                        Icon(imageVector = Icons.Default.Edit, contentDescription = "Edit profile")
+                    if (userRole.hasPermission(Permission.PROFILE_UPDATE_SELF)) {
+                        IconButton(onClick = onEditProfile) {
+                            Icon(imageVector = Icons.Default.Edit, contentDescription = "Edit profile")
+                        }
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(

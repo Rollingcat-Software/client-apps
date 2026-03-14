@@ -221,7 +221,8 @@ fun AdminDashboardScreen(
             }
             QuickActionGrid(actions = adminQuickActions)
 
-            // [D] Users section with search
+            // [D] Users section with search (gated)
+            if (userRole.hasPermission(Permission.TENANT_USERS_READ)) {
             SectionHeader(title = "Users")
             SearchTextField(
                 value = uiState.searchQuery,
@@ -249,6 +250,7 @@ fun AdminDashboardScreen(
                         .padding(vertical = UIDimens.SpacingSmall)
                 )
             }
+            } // end TENANT_USERS_READ gate
 
             Spacer(modifier = Modifier.height(UIDimens.SpacingMedium))
         }
