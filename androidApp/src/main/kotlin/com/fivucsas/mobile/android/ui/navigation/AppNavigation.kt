@@ -252,7 +252,9 @@ fun AppNavigation() {
                 onNavigateBack = { navController.popBackStack() },
                 onRegisterSuccess = {
                     viewModel.state.value.tokens?.let { tokenManager?.saveTokens(it) }
-                    navController.navigate(Screen.Dashboard.route) {
+                    val registerRole = viewModel.state.value.role
+                    val destination = NavigationPolicy.loginSuccessRoute(registerRole)
+                    navController.navigate(destination) {
                         popUpTo(Screen.Login.route) { inclusive = true }
                     }
                 }
