@@ -50,6 +50,12 @@ fun AuthResponseDto.toModel(): AuthTokens {
 /**
  * Convert domain model to DTO
  */
+@Serializable
+data class ChangePasswordRequestDto(
+    val currentPassword: String,
+    val newPassword: String
+)
+
 fun AuthTokens.toDto(): AuthResponseDto {
     return AuthResponseDto(
         accessToken = accessToken,

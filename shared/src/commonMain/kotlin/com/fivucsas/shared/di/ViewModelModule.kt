@@ -7,6 +7,7 @@ import com.fivucsas.shared.presentation.viewmodel.KioskViewModel
 import com.fivucsas.shared.presentation.viewmodel.TenantSettingsViewModel
 import com.fivucsas.shared.presentation.viewmodel.UserProfileViewModel
 import com.fivucsas.shared.presentation.viewmodel.auth.BiometricViewModel
+import com.fivucsas.shared.presentation.viewmodel.auth.ChangePasswordViewModel
 import com.fivucsas.shared.presentation.viewmodel.auth.FingerprintViewModel
 import com.fivucsas.shared.presentation.viewmodel.auth.LoginViewModel
 import com.fivucsas.shared.presentation.viewmodel.auth.QrLoginViewModel
@@ -24,6 +25,7 @@ val viewModelModule = module {
     factoryOf(::LoginViewModel)
     factoryOf(::RegisterViewModel)
     factoryOf(::BiometricViewModel)
+    factoryOf(::ChangePasswordViewModel)
     factoryOf(::FingerprintViewModel)
     factoryOf(::QrLoginViewModel)
     factoryOf(::InviteViewModel)

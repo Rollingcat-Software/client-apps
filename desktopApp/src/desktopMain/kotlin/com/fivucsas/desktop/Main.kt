@@ -74,6 +74,7 @@ import com.fivucsas.desktop.ui.components.DesktopDashboardActionCard
 import com.fivucsas.desktop.ui.components.DesktopInfoBanner
 import com.fivucsas.desktop.ui.components.DesktopSectionHeader
 import com.fivucsas.desktop.ui.components.DesktopTable
+import com.fivucsas.desktop.ui.member.DesktopChangePasswordScreen
 import com.fivucsas.desktop.ui.member.MemberDesktopActivityHistoryScreen
 import com.fivucsas.desktop.ui.member.MemberDesktopEditProfileScreen
 import com.fivucsas.desktop.ui.member.MemberDesktopMyInvitationsScreen
@@ -297,7 +298,7 @@ private fun AppContent(
             MemberDesktopProfileScreen(
                 role = currentRole ?: UserRole.TENANT_MEMBER,
                 onEditProfile = { onNavigate(AppMode.EDIT_PROFILE) },
-                onChangePassword = { /* TODO: change password flow */ },
+                onChangePassword = { onNavigate(AppMode.CHANGE_PASSWORD) },
                 onReEnroll = { onNavigate(AppMode.ENROLL) },
                 onDeleteEnrollment = { /* TODO: delete enrollment */ },
                 onOpenSettings = { onNavigate(AppMode.SETTINGS_HELP) },
@@ -308,6 +309,11 @@ private fun AppContent(
         AppMode.EDIT_PROFILE -> guardedComposable(currentRole, onUnauthorized, "No permission to edit profile.", anyPermissions = setOf(Permission.PROFILE_UPDATE_SELF)) {
             MemberDesktopEditProfileScreen(
                 onSave = { _, _, _ -> onNavigate(AppMode.PROFILE) },
+                onBack = { onNavigate(AppMode.PROFILE) }
+            )
+        }
+        AppMode.CHANGE_PASSWORD -> {
+            DesktopChangePasswordScreen(
                 onBack = { onNavigate(AppMode.PROFILE) }
             )
         }
@@ -1115,6 +1121,7 @@ enum class AppMode {
     ROOT_AUDIT_EXPLORER,
     ROOT_SECURITY_EVENTS,
     ROOT_SYSTEM_SETTINGS,
+    CHANGE_PASSWORD,
     UNAUTHORIZED;
 
     val routeId: String
@@ -1164,6 +1171,7 @@ enum class AppMode {
             ROOT_AUDIT_EXPLORER -> RouteIds.ROOT_AUDIT_EXPLORER
             ROOT_SECURITY_EVENTS -> RouteIds.ROOT_SECURITY_EVENTS
             ROOT_SYSTEM_SETTINGS -> RouteIds.ROOT_SYSTEM_SETTINGS
+            CHANGE_PASSWORD -> RouteIds.CHANGE_PASSWORD
             UNAUTHORIZED -> RouteIds.UNAUTHORIZED
         }
 }

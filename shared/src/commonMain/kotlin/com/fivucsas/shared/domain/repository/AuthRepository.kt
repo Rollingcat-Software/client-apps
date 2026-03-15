@@ -43,6 +43,14 @@ interface AuthRepository {
     suspend fun refreshToken(refreshToken: String): Result<AuthTokens>
 
     /**
+     * Change password
+     * @param currentPassword Current password
+     * @param newPassword New password
+     * @return Result with success or error
+     */
+    suspend fun changePassword(currentPassword: String, newPassword: String): Result<Unit>
+
+    /**
      * Check if user is authenticated
      * @return True if authenticated
      */

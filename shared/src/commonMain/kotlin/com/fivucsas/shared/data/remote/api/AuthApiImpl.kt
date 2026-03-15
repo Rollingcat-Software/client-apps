@@ -1,6 +1,7 @@
 package com.fivucsas.shared.data.remote.api
 
 import com.fivucsas.shared.data.remote.dto.AuthResponseDto
+import com.fivucsas.shared.data.remote.dto.ChangePasswordRequestDto
 import com.fivucsas.shared.data.remote.dto.LoginRequestDto
 import com.fivucsas.shared.data.remote.dto.RegisterRequestDto
 import io.ktor.client.HttpClient
@@ -45,5 +46,12 @@ class AuthApiImpl(
             contentType(ContentType.Application.Json)
             setBody(mapOf("refreshToken" to refreshToken))
         }.body()
+    }
+
+    override suspend fun changePassword(request: ChangePasswordRequestDto) {
+        client.post("$BASE_PATH/change-password") {
+            contentType(ContentType.Application.Json)
+            setBody(request)
+        }
     }
 }

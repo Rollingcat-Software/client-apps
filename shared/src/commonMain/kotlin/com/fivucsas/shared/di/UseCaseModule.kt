@@ -8,6 +8,7 @@ import com.fivucsas.shared.domain.usecase.admin.GetStatisticsUseCase
 import com.fivucsas.shared.domain.usecase.admin.GetUsersUseCase
 import com.fivucsas.shared.domain.usecase.admin.SearchUsersUseCase
 import com.fivucsas.shared.domain.usecase.admin.UpdateUserUseCase
+import com.fivucsas.shared.domain.usecase.auth.ChangePasswordUseCase
 import com.fivucsas.shared.domain.usecase.auth.LoginUseCase
 import com.fivucsas.shared.domain.usecase.auth.RegisterUseCase
 import com.fivucsas.shared.domain.usecase.auth.qr.ApproveQrLoginSessionUseCase
@@ -33,6 +34,7 @@ import org.koin.dsl.module
 val useCaseModule = module {
     // Auth Use Cases
     factoryOf(::LoginUseCase)
+    factoryOf(::ChangePasswordUseCase)
     factoryOf(::RegisterUseCase)
     factoryOf(::StartQrLoginSessionUseCase)
     factoryOf(::GetQrLoginSessionUseCase)
