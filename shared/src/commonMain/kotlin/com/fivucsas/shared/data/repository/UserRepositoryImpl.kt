@@ -81,6 +81,15 @@ class UserRepositoryImpl(
         }
     }
 
+    override suspend fun getMyProfile(): Result<User> {
+        return try {
+            val response = identityApi.getMyProfile()
+            Result.success(response.toModel())
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
     override suspend fun healthCheck(): Result<Boolean> {
         return try {
             val isHealthy = identityApi.healthCheck()

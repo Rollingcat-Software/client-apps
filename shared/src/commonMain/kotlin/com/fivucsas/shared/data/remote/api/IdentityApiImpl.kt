@@ -62,6 +62,10 @@ class IdentityApiImpl(
         return client.get(STATS_PATH).body()
     }
 
+    override suspend fun getMyProfile(): UserDto {
+        return client.get("$BASE_PATH/me").body()
+    }
+
     override suspend fun healthCheck(): Boolean {
         return try {
             client.get("health")

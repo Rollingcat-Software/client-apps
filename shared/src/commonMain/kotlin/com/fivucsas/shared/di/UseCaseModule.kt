@@ -3,6 +3,7 @@ package com.fivucsas.shared.di
 import com.fivucsas.shared.domain.usecase.admin.CheckSystemHealthUseCase
 import com.fivucsas.shared.domain.usecase.admin.CreateUserUseCase
 import com.fivucsas.shared.domain.usecase.admin.DeleteUserUseCase
+import com.fivucsas.shared.domain.usecase.admin.GetMyProfileUseCase
 import com.fivucsas.shared.domain.usecase.admin.GetStatisticsUseCase
 import com.fivucsas.shared.domain.usecase.admin.GetUsersUseCase
 import com.fivucsas.shared.domain.usecase.admin.SearchUsersUseCase
@@ -45,6 +46,7 @@ val useCaseModule = module {
     factoryOf(::UpdateUserUseCase)
     factoryOf(::DeleteUserUseCase)
     factoryOf(::CheckSystemHealthUseCase)
+    factoryOf(::GetMyProfileUseCase)
 
     // Enrollment Use Cases
     factoryOf(::EnrollUserUseCase)

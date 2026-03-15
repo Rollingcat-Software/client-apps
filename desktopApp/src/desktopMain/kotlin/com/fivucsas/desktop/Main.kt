@@ -726,6 +726,11 @@ private fun UserProfileScreen(
     onBack: () -> Unit,
     onLogout: () -> Unit
 ) {
+    val viewModel: com.fivucsas.shared.presentation.viewmodel.UserProfileViewModel = koinInject()
+    val profileState by viewModel.state.collectAsState()
+    LaunchedEffect(Unit) { viewModel.loadProfile() }
+
+    val user = profileState.user
     DesktopAppShell(title = "Profile", onBack = onBack, onLogout = onLogout) {
         Column(
             modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()),
@@ -733,9 +738,9 @@ private fun UserProfileScreen(
         ) {
             DesktopSectionHeader("My Profile", "Manage your personal details")
             DesktopTable(title = "Personal Information") {
-                Text("Name: Test User")
-                Text("Email: test@fivucsas.com")
-                Text("Phone: +1 234 567 8900")
+                Text("Name: ${user?.name ?: ""}")
+                Text("Email: ${user?.email ?: ""}")
+                Text("Phone: ${user?.phoneNumber ?: ""}")
             }
         }
     }

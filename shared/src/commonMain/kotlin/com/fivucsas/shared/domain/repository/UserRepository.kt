@@ -59,6 +59,12 @@ interface UserRepository {
     suspend fun getStatistics(): Result<Statistics>
 
     /**
+     * Get current user's profile
+     * @return Result with user or error
+     */
+    suspend fun getMyProfile(): Result<User>
+
+    /**
      * Check system health
      * @return Result with true if healthy, false otherwise
      */
