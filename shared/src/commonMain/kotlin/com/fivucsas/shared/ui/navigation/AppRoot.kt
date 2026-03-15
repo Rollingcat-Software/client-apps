@@ -126,7 +126,7 @@ private fun AppNavigation(
 
         AppRoute.FingerprintSuccess -> {
             val token = fingerprintViewModel?.state?.value
-                ?.let { it as? com.fivucsas.shared.presentation.viewmodel.auth.FingerprintUiState.Success }
+                ?.let { it as? com.fivucsas.shared.presentation.state.FingerprintUiState.Success }
                 ?.stepUpToken
             FingerprintSuccessScreen(
                 stepUpToken = token,
@@ -136,7 +136,7 @@ private fun AppNavigation(
 
         AppRoute.FingerprintFailure -> {
             val failureState = fingerprintViewModel?.state?.value
-                as? com.fivucsas.shared.presentation.viewmodel.auth.FingerprintUiState.Error
+                as? com.fivucsas.shared.presentation.state.FingerprintUiState.Error
             FingerprintFailureScreen(
                 message = failureState?.message ?: "Fingerprint verification failed.",
                 recoverable = failureState?.recoverable ?: true,

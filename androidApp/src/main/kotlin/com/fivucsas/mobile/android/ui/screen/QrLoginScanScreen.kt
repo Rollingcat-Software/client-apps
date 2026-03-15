@@ -51,7 +51,7 @@ import androidx.core.content.ContextCompat
 import com.fivucsas.shared.platform.AndroidCameraService
 import com.fivucsas.shared.platform.CameraState
 import com.fivucsas.shared.platform.LensFacing
-import com.fivucsas.shared.presentation.viewmodel.auth.QrLoginStatus
+import com.fivucsas.shared.presentation.state.QrLoginStatus
 import com.fivucsas.shared.presentation.viewmodel.auth.QrLoginViewModel
 import com.fivucsas.shared.ui.platform.AndroidCameraPreview
 import com.google.mlkit.vision.barcode.BarcodeScanning

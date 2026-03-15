@@ -31,7 +31,7 @@ import com.fivucsas.desktop.ui.components.DesktopAppShell
 import com.fivucsas.desktop.ui.components.DesktopBannerType
 import com.fivucsas.desktop.ui.components.DesktopInfoBanner
 import com.fivucsas.desktop.ui.components.DesktopSectionHeader
-import com.fivucsas.shared.presentation.viewmodel.auth.QrLoginStatus
+import com.fivucsas.shared.presentation.state.QrLoginStatus
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.qrcode.QRCodeWriter
 

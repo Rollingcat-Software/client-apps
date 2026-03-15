@@ -2,7 +2,7 @@ package com.fivucsas.shared.presentation.viewmodel
 
 import com.fivucsas.shared.domain.model.UserRole
 import com.fivucsas.shared.domain.usecase.auth.LoginUseCase
-import com.fivucsas.shared.presentation.viewmodel.auth.LoginState
+import com.fivucsas.shared.presentation.state.LoginState
 import com.fivucsas.shared.presentation.viewmodel.auth.LoginViewModel
 import com.fivucsas.shared.test.FakeAuthRepository
 import kotlinx.coroutines.Dispatchers

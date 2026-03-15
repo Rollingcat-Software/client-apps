@@ -21,7 +21,7 @@ import com.fivucsas.desktop.ui.components.DesktopInfoBanner
 import com.fivucsas.shared.domain.model.ConfidenceBand
 import com.fivucsas.shared.domain.model.GuestFaceCheckOutcome
 import com.fivucsas.shared.domain.model.confidenceToBand
-import com.fivucsas.shared.presentation.viewmodel.auth.BiometricResult
+import com.fivucsas.shared.presentation.state.BiometricResult
 import com.fivucsas.shared.presentation.viewmodel.auth.BiometricViewModel
 import com.fivucsas.shared.ui.screen.GuestFaceCheckResultScreen
 import kotlinx.coroutines.launch

@@ -98,7 +98,7 @@ import com.fivucsas.shared.domain.model.Permission
 import com.fivucsas.shared.domain.model.UserRole
 import com.fivucsas.shared.domain.model.hasPermission
 import com.fivucsas.shared.presentation.viewmodel.auth.LoginViewModel
-import com.fivucsas.shared.presentation.viewmodel.auth.QrLoginStatus
+import com.fivucsas.shared.presentation.state.QrLoginStatus
 import com.fivucsas.shared.presentation.viewmodel.auth.QrLoginViewModel
 import com.fivucsas.shared.presentation.viewmodel.auth.RegisterViewModel
 import com.fivucsas.shared.domain.model.InviteStatus

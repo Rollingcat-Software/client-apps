@@ -1,28 +1,13 @@
 package com.fivucsas.shared.presentation.viewmodel.auth
 
 import com.fivucsas.shared.domain.model.EnrollmentData
-import com.fivucsas.shared.domain.model.User
-import com.fivucsas.shared.domain.model.VerificationResult
 import com.fivucsas.shared.domain.usecase.enrollment.EnrollUserUseCase
 import com.fivucsas.shared.domain.usecase.verification.VerifyUserUseCase
+import com.fivucsas.shared.presentation.state.BiometricResult
+import com.fivucsas.shared.presentation.state.BiometricState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-
-/**
- * Biometric operation result - sealed class for type safety
- */
-sealed class BiometricResult {
-    data class EnrollmentSuccess(val user: User) : BiometricResult()
-    data class VerificationSuccess(val result: VerificationResult) : BiometricResult()
-}
-
-data class BiometricState(
-    val isLoading: Boolean = false,
-    val error: String? = null,
-    val result: BiometricResult? = null,
-    val isSuccess: Boolean = false
-)
 
 class BiometricViewModel(
     private val enrollUserUseCase: EnrollUserUseCase,

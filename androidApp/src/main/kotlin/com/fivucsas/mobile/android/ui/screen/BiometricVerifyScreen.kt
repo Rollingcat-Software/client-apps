@@ -70,8 +70,8 @@ import androidx.core.content.ContextCompat
 import com.fivucsas.mobile.android.ui.util.toCompressedJpegBytes
 import com.fivucsas.shared.domain.model.GuestFaceCheckOutcome
 import com.fivucsas.shared.domain.model.confidenceToBand
-import com.fivucsas.shared.presentation.viewmodel.auth.BiometricResult
-import com.fivucsas.shared.presentation.viewmodel.auth.BiometricState
+import com.fivucsas.shared.presentation.state.BiometricResult
+import com.fivucsas.shared.presentation.state.BiometricState
 import com.fivucsas.shared.presentation.viewmodel.auth.BiometricViewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted

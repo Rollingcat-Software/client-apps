@@ -6,6 +6,8 @@ import com.fivucsas.shared.domain.repository.AuthTokens
 import com.fivucsas.shared.domain.usecase.auth.qr.ApproveQrLoginSessionUseCase
 import com.fivucsas.shared.domain.usecase.auth.qr.GetQrLoginSessionUseCase
 import com.fivucsas.shared.domain.usecase.auth.qr.StartQrLoginSessionUseCase
+import com.fivucsas.shared.presentation.state.QrLoginState
+import com.fivucsas.shared.presentation.state.QrLoginStatus
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -15,24 +17,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-
-enum class QrLoginStatus {
-    IDLE,
-    WAITING_FOR_MOBILE_SCAN,
-    WAITING_FOR_DESKTOP_APPROVAL,
-    APPROVED,
-    ERROR
-}
-
-data class QrLoginState(
-    val isLoading: Boolean = false,
-    val status: QrLoginStatus = QrLoginStatus.IDLE,
-    val sessionId: String? = null,
-    val qrPayload: String? = null,
-    val error: String? = null,
-    val role: UserRole? = null,
-    val tokens: AuthTokens? = null
-)
 
 class QrLoginViewModel(
     private val startQrLoginSessionUseCase: StartQrLoginSessionUseCase,

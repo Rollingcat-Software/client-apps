@@ -37,7 +37,7 @@ import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.fivucsas.shared.presentation.viewmodel.auth.FingerprintUiState
+import com.fivucsas.shared.presentation.state.FingerprintUiState
 import com.fivucsas.shared.presentation.viewmodel.auth.FingerprintViewModel
 import kotlinx.coroutines.launch
 
