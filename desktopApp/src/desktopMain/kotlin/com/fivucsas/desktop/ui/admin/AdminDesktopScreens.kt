@@ -58,6 +58,7 @@ import com.fivucsas.desktop.ui.components.DesktopTable
 import com.fivucsas.shared.presentation.viewmodel.AdminViewModel
 import com.fivucsas.shared.presentation.viewmodel.IdentifyViewModel
 import com.fivucsas.shared.domain.model.InviteStatus
+import com.fivucsas.shared.domain.model.TenantHistoryEntry
 import com.fivucsas.shared.presentation.viewmodel.InviteViewModel
 import org.koin.compose.koinInject
 
@@ -119,14 +120,6 @@ fun AdminDesktopTenantHistoryScreen(
     onBack: () -> Unit,
     onLogout: () -> Unit
 ) {
-    data class TenantHistoryEntry(
-        val action: String,
-        val user: String,
-        val detail: String,
-        val timestamp: String,
-        val isSuccess: Boolean
-    )
-
     val filters = listOf("all" to "All", "verification" to "Verifications", "enrollment" to "Enrollments", "admin" to "Admin Actions")
     var selectedFilter by remember { mutableStateOf("all") }
 

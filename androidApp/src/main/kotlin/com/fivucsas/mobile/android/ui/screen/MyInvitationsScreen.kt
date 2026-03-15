@@ -44,21 +44,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.fivucsas.shared.domain.model.ReceivedInvite
+import com.fivucsas.shared.domain.model.ReceivedInviteStatus
 import com.fivucsas.shared.ui.components.atoms.StatusBadge
 import com.fivucsas.shared.ui.components.atoms.StatusBadgeType
 import com.fivucsas.shared.ui.theme.AppColors
-
-private data class ReceivedInvite(
-    val id: String,
-    val tenantName: String,
-    val invitedBy: String,
-    val role: String,
-    val receivedAt: String,
-    val expiresAt: String,
-    val status: ReceivedInviteStatus
-)
-
-private enum class ReceivedInviteStatus { PENDING, ACCEPTED, DECLINED, EXPIRED }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

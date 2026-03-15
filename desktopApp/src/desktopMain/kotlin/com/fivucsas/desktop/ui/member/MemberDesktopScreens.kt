@@ -47,7 +47,11 @@ import com.fivucsas.desktop.ui.components.DesktopInfoBanner
 import com.fivucsas.desktop.ui.components.DesktopBannerType
 import com.fivucsas.desktop.ui.components.DesktopSectionHeader
 import com.fivucsas.desktop.ui.components.DesktopTable
+import com.fivucsas.shared.domain.model.ActivityHistoryEntry
 import com.fivucsas.shared.domain.model.Permission
+import com.fivucsas.shared.domain.model.ReceivedInvite
+import com.fivucsas.shared.domain.model.ReceivedInviteStatus
+import com.fivucsas.shared.domain.model.TenantInfo
 import com.fivucsas.shared.domain.model.UserRole
 import com.fivucsas.shared.domain.model.hasPermission
 import com.fivucsas.shared.presentation.viewmodel.UserProfileViewModel
@@ -321,29 +325,20 @@ fun MemberDesktopActivityHistoryScreen(
     onBack: () -> Unit,
     onLogout: () -> Unit
 ) {
-    data class HistoryEntry(
-        val category: String,
-        val title: String,
-        val description: String,
-        val timestamp: String,
-        val score: String,
-        val isSuccess: Boolean
-    )
-
     val filters = listOf("all" to "All", "verification" to "Verifications", "enrollment" to "Enrollments")
     var selectedFilter by remember { mutableStateOf("all") }
 
     val sections = listOf(
         "Today" to listOf(
-            HistoryEntry("verification", "Verification Successful", "Confidence: 94%", "10:30 AM", "94%", true),
-            HistoryEntry("verification", "Verification Successful", "Confidence: 91%", "09:15 AM", "91%", true)
+            ActivityHistoryEntry("verification", "Verification Successful", "Confidence: 94%", "10:30 AM", "94%", true),
+            ActivityHistoryEntry("verification", "Verification Successful", "Confidence: 91%", "09:15 AM", "91%", true)
         ),
         "Yesterday" to listOf(
-            HistoryEntry("verification", "Verification Failed", "Low confidence score", "3:14 PM", "62%", false),
-            HistoryEntry("verification", "Verification Successful", "Confidence: 91%", "3:15 PM", "91%", true)
+            ActivityHistoryEntry("verification", "Verification Failed", "Low confidence score", "3:14 PM", "62%", false),
+            ActivityHistoryEntry("verification", "Verification Successful", "Confidence: 91%", "3:15 PM", "91%", true)
         ),
         "January 28, 2026" to listOf(
-            HistoryEntry("enrollment", "Face Enrollment Completed", "Quality score: 88%", "2:00 PM", "88%", true)
+            ActivityHistoryEntry("enrollment", "Face Enrollment Completed", "Quality score: 88%", "2:00 PM", "88%", true)
         )
     )
 
@@ -552,18 +547,6 @@ private fun FaqCard(
 
 // ─── My Invitations Screen ──────────────────────────────────────────────────
 
-private data class ReceivedInvite(
-    val id: String,
-    val tenantName: String,
-    val invitedBy: String,
-    val role: String,
-    val receivedAt: String,
-    val expiresAt: String,
-    val status: ReceivedInviteStatus
-)
-
-private enum class ReceivedInviteStatus { PENDING, ACCEPTED, DECLINED, EXPIRED }
-
 @Composable
 fun MemberDesktopMyInvitationsScreen(
     onBack: () -> Unit,
@@ -732,13 +715,6 @@ private fun InviteRow(
 }
 
 // ─── Request Membership (Join Tenant) Screen ─────────────────────────────────
-
-private data class TenantInfo(
-    val id: String,
-    val name: String,
-    val description: String,
-    val memberCount: Int
-)
 
 @Composable
 fun MemberDesktopRequestMembershipScreen(

@@ -95,6 +95,7 @@ import com.fivucsas.desktop.ui.theme.DesktopTheme
 import com.fivucsas.shared.data.local.TokenManager
 import com.fivucsas.shared.di.getAppModules
 import com.fivucsas.shared.domain.model.Permission
+import com.fivucsas.shared.domain.model.TenantInfo
 import com.fivucsas.shared.domain.model.UserRole
 import com.fivucsas.shared.domain.model.hasPermission
 import com.fivucsas.shared.presentation.viewmodel.auth.LoginViewModel
@@ -823,12 +824,6 @@ private fun UserJoinTenantScreen(
     onBack: () -> Unit,
     onLogout: () -> Unit
 ) {
-    data class TenantInfo(
-        val id: String,
-        val name: String,
-        val description: String,
-        val memberCount: Int
-    )
     val allTenants = remember {
         listOf(
             TenantInfo("t1", "Acme Corporation", "Global technology solutions provider", 142),
