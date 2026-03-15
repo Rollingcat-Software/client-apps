@@ -9,6 +9,8 @@ import com.fivucsas.shared.presentation.state.RootConsoleUiEvent
 import com.fivucsas.shared.presentation.state.RootConsoleUiState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -32,6 +34,8 @@ class RootConsoleViewModel(
 
     private val _effect = MutableSharedFlow<RootConsoleUiEffect>()
     val effect: SharedFlow<RootConsoleUiEffect> = _effect.asSharedFlow()
+
+    private var searchJob: Job? = null
 
     fun onEvent(event: RootConsoleUiEvent) {
         when (event) {
@@ -85,7 +89,15 @@ class RootConsoleViewModel(
 
     private fun updateQuery(value: String) {
         _state.update { it.copy(filter = it.filter.copy(query = value)) }
-        load(_state.value.selectedTenantId)
+        searchJob?.cancel()
+        searchJob = scope.launch {
+            delay(SEARCH_DEBOUNCE_MS)
+            load(_state.value.selectedTenantId)
+        }
+    }
+
+    companion object {
+        private const val SEARCH_DEBOUNCE_MS = 300L
     }
 
     private fun selectTenant(tenantId: String?) {
