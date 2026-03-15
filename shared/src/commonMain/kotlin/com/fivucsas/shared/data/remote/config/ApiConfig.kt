@@ -80,8 +80,4 @@ object ApiConfig {
     val isLoggingEnabled: Boolean
         get() = currentEnvironment != Environment.PRODUCTION
 
-    /**
-     * Feature flags
-     */
-    var useRealApi: Boolean = true // Set to false to use mock data
 }

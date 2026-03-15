@@ -104,7 +104,6 @@ import com.fivucsas.shared.presentation.viewmodel.auth.RegisterViewModel
 import com.fivucsas.shared.domain.model.InviteStatus
 import com.fivucsas.shared.presentation.viewmodel.InviteViewModel
 import com.fivucsas.shared.ui.navigation.HomeDestination
-import com.fivucsas.shared.ui.navigation.RouteIds
 import com.fivucsas.shared.ui.navigation.homeDestinationFor
 import com.fivucsas.shared.ui.screen.ForgotPasswordScreen
 import com.fivucsas.shared.ui.screen.LoginScreen
@@ -636,16 +635,6 @@ private fun RoleDashboard(
 }
 
 @Composable
-private fun PlaceholderScreen(title: String, description: String, onBack: () -> Unit) {
-    StateCardScreen(
-        title = title,
-        description = description,
-        onBack = onBack,
-        isError = false
-    )
-}
-
-@Composable
 private fun UserDashboardScreen(
     role: UserRole,
     onNavigate: (AppMode) -> Unit,
@@ -1122,57 +1111,6 @@ enum class AppMode {
     ROOT_SECURITY_EVENTS,
     ROOT_SYSTEM_SETTINGS,
     CHANGE_PASSWORD,
-    UNAUTHORIZED;
-
-    val routeId: String
-        get() = when (this) {
-            LAUNCHER -> RouteIds.DESKTOP_LAUNCHER
-            LOGIN -> RouteIds.DESKTOP_LOGIN
-            REGISTER -> RouteIds.DESKTOP_REGISTER
-            FORGOT_PASSWORD -> RouteIds.DESKTOP_FORGOT_PASSWORD
-            KIOSK -> RouteIds.DESKTOP_KIOSK
-            GUEST_FACE_CHECK -> RouteIds.DESKTOP_GUEST_FACE_CHECK
-            QR_LOGIN -> RouteIds.DESKTOP_QR_LOGIN
-            USER_HOME -> RouteIds.DESKTOP_USER_HOME
-            USER_INVITATIONS -> RouteIds.MY_INVITATIONS
-            USER_PROFILE -> RouteIds.PROFILE
-            USER_SETTINGS -> RouteIds.SETTINGS
-            USER_JOIN_TENANT -> RouteIds.REQUEST_MEMBERSHIP
-            USER_ADD_CARD -> RouteIds.CARD_SCAN
-            MEMBER_HOME -> RouteIds.DESKTOP_MEMBER_HOME
-            TENANT_ADMIN_HOME -> RouteIds.DESKTOP_TENANT_ADMIN_HOME
-            ROOT_HOME -> RouteIds.DESKTOP_ROOT_HOME
-            ADMIN_DASHBOARD -> RouteIds.ADMIN_DASHBOARD
-            ENROLL -> RouteIds.BIOMETRIC_ENROLL
-            VERIFY -> RouteIds.BIOMETRIC_VERIFY
-            PROFILE -> RouteIds.DESKTOP_PROFILE
-            EDIT_PROFILE -> RouteIds.DESKTOP_EDIT_PROFILE
-            SETTINGS_HELP -> RouteIds.DESKTOP_SETTINGS_HELP
-            HISTORY_SELF -> RouteIds.ACTIVITY_HISTORY
-            USERS_MANAGEMENT -> RouteIds.USERS_MANAGEMENT
-            TENANT_SETTINGS -> RouteIds.TENANT_SETTINGS
-            TENANT_HISTORY -> RouteIds.TENANT_HISTORY
-            IDENTIFY_TENANT -> RouteIds.IDENTIFY_TENANT
-            ADMIN_INVITE_MANAGEMENT -> RouteIds.DESKTOP_ADMIN_INVITE_MANAGEMENT
-            EXAM_ENTRY -> RouteIds.DESKTOP_EXAM_ENTRY
-            ANALYTICS -> RouteIds.DESKTOP_ANALYTICS
-            MY_INVITATIONS -> RouteIds.DESKTOP_MY_INVITATIONS
-            REQUEST_MEMBERSHIP -> RouteIds.DESKTOP_REQUEST_MEMBERSHIP
-            TENANT_MANAGE -> RouteIds.TENANT_MANAGE
-            PLATFORM_HEALTH -> RouteIds.PLATFORM_HEALTH
-            PLATFORM_AUDIT -> RouteIds.PLATFORM_AUDIT
-            PLATFORM_SETTINGS -> RouteIds.PLATFORM_SETTINGS
-            ROOT_TENANT_MANAGEMENT -> RouteIds.ROOT_TENANT_MANAGEMENT
-            ROOT_TENANT_DETAIL -> RouteIds.ROOT_TENANT_DETAIL
-            ROOT_GLOBAL_USER_DIRECTORY -> RouteIds.ROOT_GLOBAL_USER_DIRECTORY
-            ROOT_TENANT_ADMINS -> RouteIds.ROOT_TENANT_ADMINS
-            ROOT_ROLES_PERMISSIONS -> RouteIds.ROOT_ROLES_PERMISSIONS
-            ROOT_INVITE_MANAGEMENT -> RouteIds.ROOT_INVITE_MANAGEMENT
-            ROOT_AUDIT_EXPLORER -> RouteIds.ROOT_AUDIT_EXPLORER
-            ROOT_SECURITY_EVENTS -> RouteIds.ROOT_SECURITY_EVENTS
-            ROOT_SYSTEM_SETTINGS -> RouteIds.ROOT_SYSTEM_SETTINGS
-            CHANGE_PASSWORD -> RouteIds.CHANGE_PASSWORD
-            UNAUTHORIZED -> RouteIds.UNAUTHORIZED
-        }
+    UNAUTHORIZED
 }
 
