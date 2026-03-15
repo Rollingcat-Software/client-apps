@@ -3,6 +3,7 @@ package com.fivucsas.shared.data.remote.api
 import com.fivucsas.shared.data.remote.dto.AuthResponseDto
 import com.fivucsas.shared.data.remote.dto.ChangePasswordRequestDto
 import com.fivucsas.shared.data.remote.dto.LoginRequestDto
+import com.fivucsas.shared.data.remote.dto.RefreshTokenRequestDto
 import com.fivucsas.shared.data.remote.dto.RegisterRequestDto
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -44,7 +45,7 @@ class AuthApiImpl(
     override suspend fun refreshToken(refreshToken: String): AuthResponseDto {
         return client.post("$BASE_PATH/refresh") {
             contentType(ContentType.Application.Json)
-            setBody(mapOf("refreshToken" to refreshToken))
+            setBody(RefreshTokenRequestDto(refreshToken = refreshToken))
         }.body()
     }
 

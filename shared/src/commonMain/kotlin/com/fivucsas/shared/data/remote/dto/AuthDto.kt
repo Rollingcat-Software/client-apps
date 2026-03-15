@@ -1,6 +1,7 @@
 package com.fivucsas.shared.data.remote.dto
 
 import com.fivucsas.shared.domain.repository.AuthTokens
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /**
@@ -19,8 +20,8 @@ data class LoginRequestDto(
 data class RegisterRequestDto(
     val email: String,
     val password: String,
-    val firstName: String,
-    val lastName: String
+    @SerialName("first_name") val firstName: String,
+    @SerialName("last_name") val lastName: String
 )
 
 /**
@@ -28,11 +29,16 @@ data class RegisterRequestDto(
  */
 @Serializable
 data class AuthResponseDto(
-    val accessToken: String,
-    val refreshToken: String,
-    val expiresIn: Long,
-    val tokenType: String = "Bearer",
+    @SerialName("access_token") val accessToken: String,
+    @SerialName("refresh_token") val refreshToken: String,
+    @SerialName("expires_in") val expiresIn: Long,
+    @SerialName("token_type") val tokenType: String = "Bearer",
     val role: String? = null
+)
+
+@Serializable
+data class RefreshTokenRequestDto(
+    @SerialName("refresh_token") val refreshToken: String
 )
 
 /**
@@ -52,8 +58,8 @@ fun AuthResponseDto.toModel(): AuthTokens {
  */
 @Serializable
 data class ChangePasswordRequestDto(
-    val currentPassword: String,
-    val newPassword: String
+    @SerialName("current_password") val currentPassword: String,
+    @SerialName("new_password") val newPassword: String
 )
 
 fun AuthTokens.toDto(): AuthResponseDto {
