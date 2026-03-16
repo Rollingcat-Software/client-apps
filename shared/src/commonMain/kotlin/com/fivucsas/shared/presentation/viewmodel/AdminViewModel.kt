@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import com.fivucsas.shared.data.remote.config.ApiConfig
 import kotlin.random.Random
 
 /**
@@ -389,16 +390,24 @@ class AdminViewModel(
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
 
             try {
-                kotlinx.coroutines.delay(com.fivucsas.shared.config.AnimationConfig.DELAY_API_SIMULATION_SHORT)
-
-                // TODO: When backend is ready, save to API
-                // For now, just persist in state
-                _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        hasUnsavedSettings = false,
-                        successMessage = "✅ Settings saved successfully\n⚠️ Using local storage (server not connected)"
-                    )
+                if (!ApiConfig.useRealApi) {
+                    kotlinx.coroutines.delay(com.fivucsas.shared.config.AnimationConfig.DELAY_API_SIMULATION_SHORT)
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            hasUnsavedSettings = false,
+                            successMessage = "Settings saved locally (mock mode)"
+                        )
+                    }
+                } else {
+                    // TODO: Call PUT /api/v1/settings on identity-core-api
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            hasUnsavedSettings = false,
+                            successMessage = "Settings saved locally (server sync pending)"
+                        )
+                    }
                 }
 
                 kotlinx.coroutines.delay(com.fivucsas.shared.config.AnimationConfig.TOAST_DISPLAY_DURATION)
@@ -408,7 +417,7 @@ class AdminViewModel(
                 _uiState.update {
                     it.copy(
                         isLoading = false,
-                        errorMessage = "⚠️ Error saving settings: ${e.message}"
+                        errorMessage = "Error saving settings: ${e.message}"
                     )
                 }
             }
@@ -435,25 +444,24 @@ class AdminViewModel(
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
 
             try {
-                kotlinx.coroutines.delay(1000L)
-
-                // TODO: Actual database connection test
-                val isConnected = Random.nextBoolean()
-
-                _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        successMessage = if (isConnected) {
-                            "✅ Database connection successful"
-                        } else {
-                            null
-                        },
-                        errorMessage = if (!isConnected) {
-                            "❌ Database connection failed"
-                        } else {
-                            null
-                        }
-                    )
+                if (!ApiConfig.useRealApi) {
+                    kotlinx.coroutines.delay(1000L)
+                    val isConnected = Random.nextBoolean()
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            successMessage = if (isConnected) "Database connection successful (mock)" else null,
+                            errorMessage = if (!isConnected) "Database connection failed (mock)" else null
+                        )
+                    }
+                } else {
+                    // TODO: Call GET /actuator/health on identity-core-api
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            errorMessage = "Database connection test not yet available - backend endpoint required"
+                        )
+                    }
                 }
 
                 kotlinx.coroutines.delay(com.fivucsas.shared.config.AnimationConfig.TOAST_DISPLAY_DURATION)
@@ -463,7 +471,7 @@ class AdminViewModel(
                 _uiState.update {
                     it.copy(
                         isLoading = false,
-                        errorMessage = "❌ Connection test failed: ${e.message}"
+                        errorMessage = "Connection test failed: ${e.message}"
                     )
                 }
             }
@@ -475,24 +483,32 @@ class AdminViewModel(
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
 
             try {
-                kotlinx.coroutines.delay(500L)
-
-                // TODO: Actual cache clearing
-                _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        successMessage = "✅ Cache cleared successfully"
-                    )
+                if (!ApiConfig.useRealApi) {
+                    kotlinx.coroutines.delay(500L)
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            successMessage = "Cache cleared (mock mode)"
+                        )
+                    }
+                } else {
+                    // TODO: Call POST /api/v1/admin/cache/clear on identity-core-api
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            errorMessage = "Cache clearing not yet available - backend endpoint required"
+                        )
+                    }
                 }
 
                 kotlinx.coroutines.delay(com.fivucsas.shared.config.AnimationConfig.TOAST_DISPLAY_DURATION)
-                _uiState.update { it.copy(successMessage = null) }
+                _uiState.update { it.copy(successMessage = null, errorMessage = null) }
 
             } catch (e: Exception) {
                 _uiState.update {
                     it.copy(
                         isLoading = false,
-                        errorMessage = "⚠️ Error clearing cache: ${e.message}"
+                        errorMessage = "Error clearing cache: ${e.message}"
                     )
                 }
             }
@@ -504,24 +520,32 @@ class AdminViewModel(
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
 
             try {
-                kotlinx.coroutines.delay(1000L)
-
-                // TODO: Actual log export
-                _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        successMessage = "✅ Logs exported to logs_export_${kotlinx.datetime.Clock.System.now().toEpochMilliseconds()}.txt"
-                    )
+                if (!ApiConfig.useRealApi) {
+                    kotlinx.coroutines.delay(1000L)
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            successMessage = "Logs exported (mock mode)"
+                        )
+                    }
+                } else {
+                    // TODO: Call GET /api/v1/audit-logs/export on identity-core-api
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            errorMessage = "Log export not yet available - backend endpoint required"
+                        )
+                    }
                 }
 
                 kotlinx.coroutines.delay(com.fivucsas.shared.config.AnimationConfig.TOAST_DISPLAY_DURATION)
-                _uiState.update { it.copy(successMessage = null) }
+                _uiState.update { it.copy(successMessage = null, errorMessage = null) }
 
             } catch (e: Exception) {
                 _uiState.update {
                     it.copy(
                         isLoading = false,
-                        errorMessage = "⚠️ Error exporting logs: ${e.message}"
+                        errorMessage = "Error exporting logs: ${e.message}"
                     )
                 }
             }
@@ -533,30 +557,36 @@ class AdminViewModel(
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
 
             try {
-                kotlinx.coroutines.delay(1500L)
-
-                // TODO: Actual system health check
-                val healthStatus = com.fivucsas.shared.presentation.state.HealthStatus.GOOD
-
-                _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        settings = it.settings.copy(systemHealthStatus = healthStatus),
-                        successMessage = "✅ System health check completed: ${healthStatus.name}"
-                    )
+                if (!ApiConfig.useRealApi) {
+                    kotlinx.coroutines.delay(1500L)
+                    val healthStatus = com.fivucsas.shared.presentation.state.HealthStatus.GOOD
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            settings = it.settings.copy(systemHealthStatus = healthStatus),
+                            successMessage = "System health: ${healthStatus.name} (mock mode)"
+                        )
+                    }
+                } else {
+                    // TODO: Call GET /actuator/health on identity-core-api + biometric-processor /health
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            errorMessage = "System health check not yet available - backend endpoint required"
+                        )
+                    }
                 }
 
                 kotlinx.coroutines.delay(com.fivucsas.shared.config.AnimationConfig.TOAST_DISPLAY_DURATION)
-                _uiState.update { it.copy(successMessage = null) }
+                _uiState.update { it.copy(successMessage = null, errorMessage = null) }
 
             } catch (e: Exception) {
                 _uiState.update {
                     it.copy(
                         isLoading = false,
-                        errorMessage = "⚠️ Health check failed: ${e.message}"
+                        errorMessage = "Health check failed: ${e.message}"
                     )
                 }
-            }
         }
     }
 

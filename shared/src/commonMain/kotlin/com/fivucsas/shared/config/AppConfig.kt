@@ -35,8 +35,8 @@ object AppConfig {
      * Logging Configuration
      */
     object Logging {
-        const val ENABLE_DEBUG_LOGS = true
-        const val ENABLE_NETWORK_LOGS = true
+        const val ENABLE_DEBUG_LOGS = false
+        const val ENABLE_NETWORK_LOGS = false
         const val ENABLE_ANALYTICS = false
     }
 

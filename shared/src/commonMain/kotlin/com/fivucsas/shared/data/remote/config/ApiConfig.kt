@@ -18,7 +18,7 @@ object ApiConfig {
     /**
      * Current environment (can be changed at runtime)
      */
-    var currentEnvironment: Environment = Environment.PRODUCTION
+    var currentEnvironment: Environment = Environment.DEVELOPMENT
 
     /**
      * Identity Core API URLs per environment (Auth, Users, RBAC)
