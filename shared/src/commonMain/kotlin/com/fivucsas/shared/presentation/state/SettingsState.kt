@@ -8,8 +8,8 @@ package com.fivucsas.shared.presentation.state
  */
 data class SettingsState(
     // System Settings
-    val apiEndpoint: String = "http://localhost:8080/api",
-    val biometricProcessorUrl: String = "http://localhost:8081",
+    val apiEndpoint: String = "https://auth.rollingcatsoftware.com/api/v1",
+    val biometricProcessorUrl: String = "https://bpa-fivucsas.rollingcatsoftware.com/api/v1",
     val connectionStatus: ConnectionStatus = ConnectionStatus.DISCONNECTED,
 
     // Security Settings
