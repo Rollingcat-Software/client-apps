@@ -63,4 +63,16 @@ interface IdentityApi {
      * GET /statistics
      */
     suspend fun getStatistics(): StatisticsDto
+
+    /**
+     * Get current user's profile
+     * GET /users/me
+     */
+    suspend fun getMyProfile(): UserDto
+
+    /**
+     * Health check
+     * GET /health
+     */
+    suspend fun healthCheck(): Boolean
 }

@@ -2,7 +2,9 @@ package com.fivucsas.shared.data.repository
 
 import com.fivucsas.shared.data.remote.api.BiometricApi
 import com.fivucsas.shared.data.remote.dto.toModel
-import com.fivucsas.shared.domain.model.EnrollmentResult
+import com.fivucsas.shared.domain.model.BiometricData
+import com.fivucsas.shared.domain.model.FacialAction
+import com.fivucsas.shared.domain.model.IdentifyResult
 import com.fivucsas.shared.domain.model.LivenessResult
 import com.fivucsas.shared.domain.model.VerificationResult
 import com.fivucsas.shared.domain.repository.BiometricRepository
@@ -48,6 +50,17 @@ class BiometricRepositoryImpl(
         return try {
             biometricApi.deleteBiometricData(userId)
             Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    @OptIn(ExperimentalEncodingApi::class)
+    override suspend fun identifyFace(imageData: ByteArray): Result<IdentifyResult> {
+        return try {
+            val base64Image = Base64.encode(imageData)
+            val response = biometricApi.identifyFace(base64Image)
+            Result.success(response.toModel())
         } catch (e: Exception) {
             Result.failure(e)
         }

@@ -47,9 +47,17 @@ import com.fivucsas.desktop.ui.components.DesktopInfoBanner
 import com.fivucsas.desktop.ui.components.DesktopBannerType
 import com.fivucsas.desktop.ui.components.DesktopSectionHeader
 import com.fivucsas.desktop.ui.components.DesktopTable
+import com.fivucsas.shared.domain.model.ActivityHistoryEntry
 import com.fivucsas.shared.domain.model.Permission
+import com.fivucsas.shared.domain.model.ReceivedInvite
+import com.fivucsas.shared.domain.model.ReceivedInviteStatus
+import com.fivucsas.shared.domain.model.TenantInfo
 import com.fivucsas.shared.domain.model.UserRole
 import com.fivucsas.shared.domain.model.hasPermission
+import com.fivucsas.shared.presentation.viewmodel.UserProfileViewModel
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import org.koin.compose.koinInject
 
 // ─── Profile Screen ─────────────────────────────────────────────────────────
 
@@ -64,6 +72,17 @@ fun MemberDesktopProfileScreen(
     onBack: () -> Unit,
     onLogout: () -> Unit
 ) {
+    val viewModel: UserProfileViewModel = koinInject()
+    val profileState by viewModel.state.collectAsState()
+    LaunchedEffect(Unit) { viewModel.loadProfile() }
+
+    val user = profileState.user
+    val displayName = user?.name ?: ""
+    val displayEmail = user?.email ?: ""
+    val displayPhone = user?.phoneNumber ?: ""
+    val displayId = user?.idNumber ?: ""
+    val displayDate = user?.enrollmentDate ?: ""
+
     val isSelfBiometricRole = role == UserRole.USER || role == UserRole.TENANT_MEMBER
     var showDeleteConfirm by remember { mutableStateOf(false) }
 
@@ -96,12 +115,12 @@ fun MemberDesktopProfileScreen(
                     )
                     Column {
                         Text(
-                            text = "John Doe",
+                            text = displayName,
                             style = MaterialTheme.typography.headlineSmall,
                             fontWeight = FontWeight.Bold
                         )
                         Text(
-                            text = "john.doe@example.com",
+                            text = displayEmail,
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -122,11 +141,11 @@ fun MemberDesktopProfileScreen(
             // Personal Information Card
             DesktopTable(title = "Personal Information") {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    ProfileRow("Name", "John Doe")
-                    ProfileRow("Email", "john.doe@example.com")
-                    ProfileRow("Phone", "+1 234 567 8900")
-                    ProfileRow("ID Number", "ID-20260001")
-                    ProfileRow("Member Since", "Jan 2026")
+                    ProfileRow("Name", displayName)
+                    ProfileRow("Email", displayEmail)
+                    ProfileRow("Phone", displayPhone)
+                    ProfileRow("ID Number", displayId)
+                    ProfileRow("Member Since", displayDate)
                 }
             }
 
@@ -212,9 +231,17 @@ fun MemberDesktopEditProfileScreen(
     onSave: (String, String, String) -> Unit,
     onBack: () -> Unit
 ) {
-    var firstName by remember { mutableStateOf("John") }
-    var lastName by remember { mutableStateOf("Doe") }
-    var phone by remember { mutableStateOf("+1 234 567 8900") }
+    val viewModel: UserProfileViewModel = koinInject()
+    val profileState by viewModel.state.collectAsState()
+    LaunchedEffect(Unit) { viewModel.loadProfile() }
+
+    val user = profileState.user
+    val nameParts = (user?.name ?: "").split(" ", limit = 2)
+    var firstName by remember(user) { mutableStateOf(nameParts.getOrElse(0) { "" }) }
+    var lastName by remember(user) { mutableStateOf(nameParts.getOrElse(1) { "" }) }
+    var phone by remember(user) { mutableStateOf(user?.phoneNumber ?: "") }
+    val email = user?.email ?: ""
+    val idNumber = user?.idNumber ?: ""
 
     DesktopAppShell(
         title = "Edit Profile",
@@ -254,7 +281,7 @@ fun MemberDesktopEditProfileScreen(
                         modifier = Modifier.fillMaxWidth()
                     )
                     OutlinedTextField(
-                        value = "john.doe@example.com",
+                        value = email,
                         onValueChange = {},
                         label = { Text("Email (read-only)") },
                         enabled = false,
@@ -269,7 +296,7 @@ fun MemberDesktopEditProfileScreen(
                         modifier = Modifier.fillMaxWidth()
                     )
                     OutlinedTextField(
-                        value = "ID-20260001",
+                        value = idNumber,
                         onValueChange = {},
                         label = { Text("ID Number (read-only)") },
                         enabled = false,
@@ -298,29 +325,20 @@ fun MemberDesktopActivityHistoryScreen(
     onBack: () -> Unit,
     onLogout: () -> Unit
 ) {
-    data class HistoryEntry(
-        val category: String,
-        val title: String,
-        val description: String,
-        val timestamp: String,
-        val score: String,
-        val isSuccess: Boolean
-    )
-
     val filters = listOf("all" to "All", "verification" to "Verifications", "enrollment" to "Enrollments")
     var selectedFilter by remember { mutableStateOf("all") }
 
     val sections = listOf(
         "Today" to listOf(
-            HistoryEntry("verification", "Verification Successful", "Confidence: 94%", "10:30 AM", "94%", true),
-            HistoryEntry("verification", "Verification Successful", "Confidence: 91%", "09:15 AM", "91%", true)
+            ActivityHistoryEntry("verification", "Verification Successful", "Confidence: 94%", "10:30 AM", "94%", true),
+            ActivityHistoryEntry("verification", "Verification Successful", "Confidence: 91%", "09:15 AM", "91%", true)
         ),
         "Yesterday" to listOf(
-            HistoryEntry("verification", "Verification Failed", "Low confidence score", "3:14 PM", "62%", false),
-            HistoryEntry("verification", "Verification Successful", "Confidence: 91%", "3:15 PM", "91%", true)
+            ActivityHistoryEntry("verification", "Verification Failed", "Low confidence score", "3:14 PM", "62%", false),
+            ActivityHistoryEntry("verification", "Verification Successful", "Confidence: 91%", "3:15 PM", "91%", true)
         ),
         "January 28, 2026" to listOf(
-            HistoryEntry("enrollment", "Face Enrollment Completed", "Quality score: 88%", "2:00 PM", "88%", true)
+            ActivityHistoryEntry("enrollment", "Face Enrollment Completed", "Quality score: 88%", "2:00 PM", "88%", true)
         )
     )
 
@@ -529,18 +547,6 @@ private fun FaqCard(
 
 // ─── My Invitations Screen ──────────────────────────────────────────────────
 
-private data class ReceivedInvite(
-    val id: String,
-    val tenantName: String,
-    val invitedBy: String,
-    val role: String,
-    val receivedAt: String,
-    val expiresAt: String,
-    val status: ReceivedInviteStatus
-)
-
-private enum class ReceivedInviteStatus { PENDING, ACCEPTED, DECLINED, EXPIRED }
-
 @Composable
 fun MemberDesktopMyInvitationsScreen(
     onBack: () -> Unit,
@@ -709,13 +715,6 @@ private fun InviteRow(
 }
 
 // ─── Request Membership (Join Tenant) Screen ─────────────────────────────────
-
-private data class TenantInfo(
-    val id: String,
-    val name: String,
-    val description: String,
-    val memberCount: Int
-)
 
 @Composable
 fun MemberDesktopRequestMembershipScreen(

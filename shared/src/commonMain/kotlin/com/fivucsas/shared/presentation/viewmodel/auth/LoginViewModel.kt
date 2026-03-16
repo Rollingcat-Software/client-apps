@@ -2,17 +2,10 @@ package com.fivucsas.shared.presentation.viewmodel.auth
 
 import com.fivucsas.shared.domain.model.UserRole
 import com.fivucsas.shared.domain.usecase.auth.LoginUseCase
+import com.fivucsas.shared.presentation.state.LoginState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-
-data class LoginState(
-    val isLoading: Boolean = false,
-    val error: String? = null,
-    val tokens: AuthTokens? = null,
-    val isSuccess: Boolean = false,
-    val role: UserRole? = null
-)
 
 class LoginViewModel(
     private val loginUseCase: LoginUseCase

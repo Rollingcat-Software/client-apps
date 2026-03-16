@@ -11,8 +11,12 @@ import com.fivucsas.shared.data.remote.api.BiometricApi
 import com.fivucsas.shared.data.remote.api.BiometricApiImpl
 import com.fivucsas.shared.data.remote.api.IdentityApi
 import com.fivucsas.shared.data.remote.api.IdentityApiImpl
+import com.fivucsas.shared.data.remote.api.InviteApi
+import com.fivucsas.shared.data.remote.api.InviteApiImpl
 import com.fivucsas.shared.data.remote.api.QrLoginApi
 import com.fivucsas.shared.data.remote.api.QrLoginApiImpl
+import com.fivucsas.shared.data.remote.api.TenantSettingsApi
+import com.fivucsas.shared.data.remote.api.TenantSettingsApiImpl
 import com.fivucsas.shared.data.remote.config.ApiConfig
 import com.fivucsas.shared.data.remote.dto.AuthResponseDto
 import com.fivucsas.shared.domain.repository.AuthTokens
@@ -179,6 +183,8 @@ val networkModule = module {
     single<AuthApi> { AuthApiImpl(get(named("identityClient"))) }
     single<AuthBiometricApi> { AuthBiometricApiImpl(get(named("identityClient"))) }
     single<IdentityApi> { IdentityApiImpl(get(named("identityClient"))) }
+    single<InviteApi> { InviteApiImpl(get(named("identityClient"))) }
     single<QrLoginApi> { QrLoginApiImpl(get(named("identityClient"))) }
+    single<TenantSettingsApi> { TenantSettingsApiImpl(get(named("identityClient"))) }
     single<BiometricApi> { BiometricApiImpl(get(named("biometricClient"))) }
 }

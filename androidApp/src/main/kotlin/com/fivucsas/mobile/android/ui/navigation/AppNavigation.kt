@@ -42,7 +42,7 @@ import com.fivucsas.shared.domain.model.UserRole
 import com.fivucsas.shared.domain.model.hasPermission
 import com.fivucsas.shared.presentation.viewmodel.auth.BiometricViewModel
 import com.fivucsas.shared.presentation.viewmodel.auth.FingerprintViewModel
-import com.fivucsas.shared.presentation.viewmodel.auth.FingerprintUiState
+import com.fivucsas.shared.presentation.state.FingerprintUiState
 import com.fivucsas.shared.presentation.viewmodel.auth.LoginViewModel
 import com.fivucsas.shared.presentation.viewmodel.auth.RegisterViewModel
 import com.fivucsas.shared.ui.screen.FingerprintFailureScreen
@@ -252,7 +252,9 @@ fun AppNavigation() {
                 onNavigateBack = { navController.popBackStack() },
                 onRegisterSuccess = {
                     viewModel.state.value.tokens?.let { tokenManager?.saveTokens(it) }
-                    navController.navigate(Screen.Dashboard.route) {
+                    val registerRole = viewModel.state.value.role
+                    val destination = NavigationPolicy.loginSuccessRoute(registerRole)
+                    navController.navigate(destination) {
                         popUpTo(Screen.Login.route) { inclusive = true }
                     }
                 }

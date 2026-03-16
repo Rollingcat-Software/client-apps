@@ -3,6 +3,7 @@ package com.fivucsas.shared.data.repository
 import com.fivucsas.shared.data.local.StepUpTokenManager
 import com.fivucsas.shared.data.local.TokenManager
 import com.fivucsas.shared.data.remote.api.AuthApi
+import com.fivucsas.shared.data.remote.dto.ChangePasswordRequestDto
 import com.fivucsas.shared.data.remote.dto.LoginRequestDto
 import com.fivucsas.shared.data.remote.dto.RegisterRequestDto
 import com.fivucsas.shared.data.remote.dto.toModel
@@ -87,6 +88,19 @@ class AuthRepositoryImpl(
             tokenManager.updateTokens(tokens)
 
             Result.success(tokens)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun changePassword(currentPassword: String, newPassword: String): Result<Unit> {
+        return try {
+            val request = ChangePasswordRequestDto(
+                currentPassword = currentPassword,
+                newPassword = newPassword
+            )
+            authApi.changePassword(request)
+            Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(e)
         }

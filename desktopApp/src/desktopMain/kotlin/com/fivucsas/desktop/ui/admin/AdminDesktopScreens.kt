@@ -57,7 +57,8 @@ import com.fivucsas.desktop.ui.components.DesktopSectionHeader
 import com.fivucsas.desktop.ui.components.DesktopTable
 import com.fivucsas.shared.presentation.viewmodel.AdminViewModel
 import com.fivucsas.shared.presentation.viewmodel.IdentifyViewModel
-import com.fivucsas.shared.presentation.viewmodel.InviteStatus
+import com.fivucsas.shared.domain.model.InviteStatus
+import com.fivucsas.shared.domain.model.TenantHistoryEntry
 import com.fivucsas.shared.presentation.viewmodel.InviteViewModel
 import org.koin.compose.koinInject
 
@@ -119,14 +120,6 @@ fun AdminDesktopTenantHistoryScreen(
     onBack: () -> Unit,
     onLogout: () -> Unit
 ) {
-    data class TenantHistoryEntry(
-        val action: String,
-        val user: String,
-        val detail: String,
-        val timestamp: String,
-        val isSuccess: Boolean
-    )
-
     val filters = listOf("all" to "All", "verification" to "Verifications", "enrollment" to "Enrollments", "admin" to "Admin Actions")
     var selectedFilter by remember { mutableStateOf("all") }
 
@@ -245,7 +238,7 @@ fun AdminDesktopIdentifyTenantScreen(
     onBack: () -> Unit,
     onLogout: () -> Unit
 ) {
-    val viewModel = remember { IdentifyViewModel() }
+    val viewModel: IdentifyViewModel = koinInject()
     val state by viewModel.state.collectAsState()
     val cameraService = remember { DesktopCameraService() }
     var showCamera by remember { mutableStateOf(false) }
@@ -580,7 +573,7 @@ fun AdminDesktopInviteManagementScreen(
     onBack: () -> Unit,
     onLogout: () -> Unit
 ) {
-    val viewModel = remember { InviteViewModel() }
+    val viewModel: InviteViewModel = koinInject()
     val state by viewModel.state.collectAsState()
     var inviteEmail by remember { mutableStateOf("") }
     var inviteRole by remember { mutableStateOf("TENANT_MEMBER") }

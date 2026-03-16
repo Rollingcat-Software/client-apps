@@ -88,8 +88,8 @@ import com.fivucsas.mobile.android.ui.util.toCompressedJpegBytes
 import com.fivucsas.shared.domain.model.EnrollmentData
 import com.fivucsas.shared.domain.validation.ValidationResult
 import com.fivucsas.shared.domain.validation.ValidationRules
-import com.fivucsas.shared.presentation.viewmodel.auth.BiometricResult
-import com.fivucsas.shared.presentation.viewmodel.auth.BiometricState
+import com.fivucsas.shared.presentation.state.BiometricResult
+import com.fivucsas.shared.presentation.state.BiometricState
 import com.fivucsas.shared.presentation.viewmodel.auth.BiometricViewModel
 import com.fivucsas.shared.ui.components.organisms.FaceBounds
 import com.fivucsas.shared.ui.components.organisms.FaceDetectionOverlay

@@ -187,7 +187,7 @@ fun IdentifyTenantScreen(
 private fun IdentifyCameraContent(
     cameraController: LifecycleCameraController,
     lifecycleOwner: androidx.lifecycle.LifecycleOwner,
-    state: com.fivucsas.shared.presentation.viewmodel.IdentifyUiState,
+    state: com.fivucsas.shared.presentation.state.IdentifyUiState,
     onCapture: () -> Unit,
     onRetry: () -> Unit,
     onDone: () -> Unit

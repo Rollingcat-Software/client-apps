@@ -72,7 +72,7 @@ import com.fivucsas.shared.domain.model.TenantSummary
 import com.fivucsas.shared.domain.model.UserRole
 import com.fivucsas.shared.presentation.state.RootConsoleUiEffect
 import com.fivucsas.shared.presentation.state.RootConsoleUiEvent
-import com.fivucsas.shared.presentation.viewmodel.InviteStatus
+import com.fivucsas.shared.domain.model.InviteStatus
 import com.fivucsas.shared.presentation.viewmodel.InviteViewModel
 import com.fivucsas.shared.presentation.viewmodel.RootConsoleViewModel
 import com.fivucsas.shared.ui.components.atoms.SectionHeader
@@ -91,6 +91,7 @@ import com.fivucsas.shared.ui.components.root.RootNavItem
 import com.fivucsas.shared.ui.components.root.SearchBar
 import com.fivucsas.shared.ui.navigation.RouteIds
 import com.fivucsas.shared.ui.theme.AppColors
+import org.koin.compose.koinInject
 import kotlinx.coroutines.launch
 
 private enum class RootSection(val id: String, val label: String) {
@@ -813,7 +814,7 @@ private fun EditRootUserDialog(
 @Composable
 fun RootInviteManagementScreen(
     onNavigateBack: () -> Unit = {},
-    viewModel: InviteViewModel = remember { InviteViewModel() }
+    viewModel: InviteViewModel = koinInject()
 ) {
     val state by viewModel.state.collectAsState()
     var inviteEmail by remember { mutableStateOf("") }

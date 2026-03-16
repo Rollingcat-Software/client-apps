@@ -1,6 +1,7 @@
 package com.fivucsas.shared.data.remote.api
 
 import com.fivucsas.shared.data.remote.dto.AuthResponseDto
+import com.fivucsas.shared.data.remote.dto.ChangePasswordRequestDto
 import com.fivucsas.shared.data.remote.dto.LoginRequestDto
 import com.fivucsas.shared.data.remote.dto.RegisterRequestDto
 
@@ -42,4 +43,10 @@ interface AuthApi {
      * POST /auth/refresh
      */
     suspend fun refreshToken(refreshToken: String): AuthResponseDto
+
+    /**
+     * Change password
+     * POST /auth/change-password
+     */
+    suspend fun changePassword(request: ChangePasswordRequestDto)
 }

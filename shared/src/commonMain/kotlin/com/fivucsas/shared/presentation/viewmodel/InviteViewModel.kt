@@ -1,126 +1,159 @@
 package com.fivucsas.shared.presentation.viewmodel
 
+import com.fivucsas.shared.domain.model.InviteStatus
+import com.fivucsas.shared.domain.usecase.invite.CreateInviteUseCase
+import com.fivucsas.shared.domain.usecase.invite.GetInvitesUseCase
+import com.fivucsas.shared.domain.usecase.invite.RevokeInviteUseCase
+import com.fivucsas.shared.presentation.state.InviteUiState
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
-data class Invite(
-    val id: String,
-    val email: String,
-    val role: String,
-    val tenantId: String? = null,
-    val tenantName: String? = null,
-    val status: InviteStatus,
-    val createdAt: String,
-    val expiresAt: String
-)
-
-enum class InviteStatus { PENDING, ACCEPTED, EXPIRED, REVOKED }
-
-data class InviteUiState(
-    val invites: List<Invite> = emptyList(),
-    val filteredInvites: List<Invite> = emptyList(),
-    val searchQuery: String = "",
-    val selectedTenantId: String? = null,
-    val selectedFilter: InviteStatus? = null,
-    val isLoading: Boolean = false,
-    val errorMessage: String? = null,
-    val successMessage: String? = null,
-    val showCreateDialog: Boolean = false
-)
-
-class InviteViewModel {
+class InviteViewModel(
+    private val getInvitesUseCase: GetInvitesUseCase,
+    private val createInviteUseCase: CreateInviteUseCase,
+    private val revokeInviteUseCase: RevokeInviteUseCase
+) {
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
     private val _state = MutableStateFlow(InviteUiState())
     val state: StateFlow<InviteUiState> = _state.asStateFlow()
 
-    private val mockInvites = listOf(
-        Invite("1", "alice@example.com", "TENANT_MEMBER", "t_1", "Acme University", InviteStatus.PENDING, "2026-02-20", "2026-03-20"),
-        Invite("2", "bob@example.com", "TENANT_MEMBER", "t_1", "Acme University", InviteStatus.ACCEPTED, "2026-02-15", "2026-03-15"),
-        Invite("3", "carol@example.com", "TENANT_ADMIN", "t_2", "North Labs", InviteStatus.EXPIRED, "2026-01-10", "2026-02-10"),
-        Invite("4", "dave@example.com", "TENANT_MEMBER", "t_3", "Metro Health", InviteStatus.PENDING, "2026-02-22", "2026-03-22"),
-        Invite("5", "eve@example.com", "TENANT_MEMBER", "t_3", "Metro Health", InviteStatus.REVOKED, "2026-02-01", "2026-03-01")
-    )
-
     fun loadInvites() {
-        _state.value = _state.value.copy(
-            invites = mockInvites,
-            filteredInvites = mockInvites,
-            isLoading = false
-        )
+        _state.update { it.copy(isLoading = true, errorMessage = null) }
+
+        scope.launch {
+            getInvitesUseCase().fold(
+                onSuccess = { invites ->
+                    _state.update {
+                        it.copy(
+                            invites = invites,
+                            isLoading = false,
+                            errorMessage = null
+                        )
+                    }
+                    applyFilters()
+                },
+                onFailure = { error ->
+                    _state.update {
+                        it.copy(
+                            isLoading = false,
+                            errorMessage = error.message ?: "Failed to load invitations"
+                        )
+                    }
+                }
+            )
+        }
     }
 
     fun updateSearch(query: String) {
-        _state.value = _state.value.copy(searchQuery = query)
+        _state.update { it.copy(searchQuery = query) }
         applyFilters()
     }
 
     fun setFilter(status: InviteStatus?) {
-        _state.value = _state.value.copy(selectedFilter = status)
+        _state.update { it.copy(selectedFilter = status) }
         applyFilters()
     }
 
     fun setTenantFilter(tenantId: String?) {
-        _state.value = _state.value.copy(selectedTenantId = tenantId)
+        _state.update { it.copy(selectedTenantId = tenantId) }
         applyFilters()
     }
 
     private fun applyFilters() {
-        val s = _state.value
-        val filtered = s.invites.filter { invite ->
-            val matchesSearch = s.searchQuery.isBlank() ||
-                invite.email.contains(s.searchQuery, ignoreCase = true)
-            val matchesFilter = s.selectedFilter == null || invite.status == s.selectedFilter
-            val matchesTenant = s.selectedTenantId == null || invite.tenantId == s.selectedTenantId
-            matchesSearch && matchesFilter && matchesTenant
+        _state.update { s ->
+            val filtered = s.invites.filter { invite ->
+                val matchesSearch = s.searchQuery.isBlank() ||
+                    invite.email.contains(s.searchQuery, ignoreCase = true)
+                val matchesFilter = s.selectedFilter == null || invite.status == s.selectedFilter
+                val matchesTenant = s.selectedTenantId == null || invite.tenantId == s.selectedTenantId
+                matchesSearch && matchesFilter && matchesTenant
+            }
+            s.copy(filteredInvites = filtered)
         }
-        _state.value = s.copy(filteredInvites = filtered)
     }
 
     fun showCreateDialog() {
-        _state.value = _state.value.copy(showCreateDialog = true)
+        _state.update { it.copy(showCreateDialog = true) }
     }
 
     fun hideCreateDialog() {
-        _state.value = _state.value.copy(showCreateDialog = false)
+        _state.update { it.copy(showCreateDialog = false) }
     }
 
     fun createInvite(
         email: String,
         role: String,
         tenantId: String? = null,
-        tenantName: String? = null
+        @Suppress("UNUSED_PARAMETER") tenantName: String? = null
     ) {
-        val newInvite = Invite(
-            id = (mockInvites.size + 1).toString(),
-            email = email,
-            role = role,
-            tenantId = tenantId,
-            tenantName = tenantName,
-            status = InviteStatus.PENDING,
-            createdAt = "2026-02-25",
-            expiresAt = "2026-03-25"
-        )
-        val updated = _state.value.invites + newInvite
-        _state.value = _state.value.copy(
-            invites = updated,
-            showCreateDialog = false,
-            successMessage = "Invitation sent to $email"
-        )
-        applyFilters()
+        _state.update { it.copy(isLoading = true, errorMessage = null) }
+
+        scope.launch {
+            createInviteUseCase(
+                email = email,
+                role = role,
+                tenantId = tenantId
+            ).fold(
+                onSuccess = {
+                    _state.update {
+                        it.copy(
+                            isLoading = false,
+                            showCreateDialog = false,
+                            successMessage = "Invitation sent to $email"
+                        )
+                    }
+                    loadInvites()
+                },
+                onFailure = { error ->
+                    _state.update {
+                        it.copy(
+                            isLoading = false,
+                            errorMessage = error.message ?: "Failed to send invitation"
+                        )
+                    }
+                }
+            )
+        }
     }
 
     fun revokeInvite(inviteId: String) {
-        val updated = _state.value.invites.map {
-            if (it.id == inviteId) it.copy(status = InviteStatus.REVOKED) else it
+        _state.update { it.copy(isLoading = true, errorMessage = null) }
+
+        scope.launch {
+            revokeInviteUseCase(inviteId).fold(
+                onSuccess = {
+                    _state.update {
+                        it.copy(
+                            isLoading = false,
+                            successMessage = "Invitation revoked"
+                        )
+                    }
+                    loadInvites()
+                },
+                onFailure = { error ->
+                    _state.update {
+                        it.copy(
+                            isLoading = false,
+                            errorMessage = error.message ?: "Failed to revoke invitation"
+                        )
+                    }
+                }
+            )
         }
-        _state.value = _state.value.copy(
-            invites = updated,
-            successMessage = "Invitation revoked"
-        )
-        applyFilters()
     }
 
     fun clearMessages() {
-        _state.value = _state.value.copy(errorMessage = null, successMessage = null)
+        _state.update { it.copy(errorMessage = null, successMessage = null) }
+    }
+
+    fun dispose() {
+        scope.coroutineContext[Job]?.cancel()
     }
 }

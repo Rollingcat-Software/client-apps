@@ -41,15 +41,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.fivucsas.shared.domain.model.TenantInfo
 import com.fivucsas.shared.ui.components.atoms.SearchTextField
 import com.fivucsas.shared.ui.theme.AppColors
-
-private data class TenantInfo(
-    val id: String,
-    val name: String,
-    val description: String,
-    val memberCount: Int
-)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

@@ -3,19 +3,10 @@ package com.fivucsas.shared.presentation.viewmodel.auth
 import com.fivucsas.shared.domain.repository.FingerprintRepository
 import com.fivucsas.shared.domain.repository.FingerprintStep
 import com.fivucsas.shared.platform.FingerprintAuthException
+import com.fivucsas.shared.presentation.state.FingerprintUiState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-
-sealed class FingerprintUiState {
-    data object Idle : FingerprintUiState()
-    data object RegisteringDevice : FingerprintUiState()
-    data object RequestingChallenge : FingerprintUiState()
-    data object ScanningBiometric : FingerprintUiState()
-    data object VerifyingSignature : FingerprintUiState()
-    data class Success(val stepUpToken: String) : FingerprintUiState()
-    data class Error(val message: String, val recoverable: Boolean) : FingerprintUiState()
-}
 
 class FingerprintViewModel(
     private val fingerprintRepository: FingerprintRepository

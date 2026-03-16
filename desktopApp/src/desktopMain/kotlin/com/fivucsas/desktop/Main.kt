@@ -74,6 +74,7 @@ import com.fivucsas.desktop.ui.components.DesktopDashboardActionCard
 import com.fivucsas.desktop.ui.components.DesktopInfoBanner
 import com.fivucsas.desktop.ui.components.DesktopSectionHeader
 import com.fivucsas.desktop.ui.components.DesktopTable
+import com.fivucsas.desktop.ui.member.DesktopChangePasswordScreen
 import com.fivucsas.desktop.ui.member.MemberDesktopActivityHistoryScreen
 import com.fivucsas.desktop.ui.member.MemberDesktopEditProfileScreen
 import com.fivucsas.desktop.ui.member.MemberDesktopMyInvitationsScreen
@@ -94,16 +95,16 @@ import com.fivucsas.desktop.ui.theme.DesktopTheme
 import com.fivucsas.shared.data.local.TokenManager
 import com.fivucsas.shared.di.getAppModules
 import com.fivucsas.shared.domain.model.Permission
+import com.fivucsas.shared.domain.model.TenantInfo
 import com.fivucsas.shared.domain.model.UserRole
 import com.fivucsas.shared.domain.model.hasPermission
 import com.fivucsas.shared.presentation.viewmodel.auth.LoginViewModel
-import com.fivucsas.shared.presentation.viewmodel.auth.QrLoginStatus
+import com.fivucsas.shared.presentation.state.QrLoginStatus
 import com.fivucsas.shared.presentation.viewmodel.auth.QrLoginViewModel
 import com.fivucsas.shared.presentation.viewmodel.auth.RegisterViewModel
-import com.fivucsas.shared.presentation.viewmodel.InviteStatus
+import com.fivucsas.shared.domain.model.InviteStatus
 import com.fivucsas.shared.presentation.viewmodel.InviteViewModel
 import com.fivucsas.shared.ui.navigation.HomeDestination
-import com.fivucsas.shared.ui.navigation.RouteIds
 import com.fivucsas.shared.ui.navigation.homeDestinationFor
 import com.fivucsas.shared.ui.screen.ForgotPasswordScreen
 import com.fivucsas.shared.ui.screen.LoginScreen
@@ -297,7 +298,7 @@ private fun AppContent(
             MemberDesktopProfileScreen(
                 role = currentRole ?: UserRole.TENANT_MEMBER,
                 onEditProfile = { onNavigate(AppMode.EDIT_PROFILE) },
-                onChangePassword = { /* TODO: change password flow */ },
+                onChangePassword = { onNavigate(AppMode.CHANGE_PASSWORD) },
                 onReEnroll = { onNavigate(AppMode.ENROLL) },
                 onDeleteEnrollment = { /* TODO: delete enrollment */ },
                 onOpenSettings = { onNavigate(AppMode.SETTINGS_HELP) },
@@ -308,6 +309,11 @@ private fun AppContent(
         AppMode.EDIT_PROFILE -> guardedComposable(currentRole, onUnauthorized, "No permission to edit profile.", anyPermissions = setOf(Permission.PROFILE_UPDATE_SELF)) {
             MemberDesktopEditProfileScreen(
                 onSave = { _, _, _ -> onNavigate(AppMode.PROFILE) },
+                onBack = { onNavigate(AppMode.PROFILE) }
+            )
+        }
+        AppMode.CHANGE_PASSWORD -> {
+            DesktopChangePasswordScreen(
                 onBack = { onNavigate(AppMode.PROFILE) }
             )
         }
@@ -630,16 +636,6 @@ private fun RoleDashboard(
 }
 
 @Composable
-private fun PlaceholderScreen(title: String, description: String, onBack: () -> Unit) {
-    StateCardScreen(
-        title = title,
-        description = description,
-        onBack = onBack,
-        isError = false
-    )
-}
-
-@Composable
 private fun UserDashboardScreen(
     role: UserRole,
     onNavigate: (AppMode) -> Unit,
@@ -691,7 +687,7 @@ private fun UserInvitationsScreen(
     onBack: () -> Unit,
     onLogout: () -> Unit
 ) {
-    val viewModel = remember { InviteViewModel() }
+    val viewModel: InviteViewModel = koinInject()
     val state by viewModel.state.collectAsState()
     LaunchedEffect(Unit) { viewModel.loadInvites() }
     DesktopAppShell(title = "Invitations", onBack = onBack, onLogout = onLogout) {
@@ -726,6 +722,11 @@ private fun UserProfileScreen(
     onBack: () -> Unit,
     onLogout: () -> Unit
 ) {
+    val viewModel: com.fivucsas.shared.presentation.viewmodel.UserProfileViewModel = koinInject()
+    val profileState by viewModel.state.collectAsState()
+    LaunchedEffect(Unit) { viewModel.loadProfile() }
+
+    val user = profileState.user
     DesktopAppShell(title = "Profile", onBack = onBack, onLogout = onLogout) {
         Column(
             modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()),
@@ -733,9 +734,9 @@ private fun UserProfileScreen(
         ) {
             DesktopSectionHeader("My Profile", "Manage your personal details")
             DesktopTable(title = "Personal Information") {
-                Text("Name: Test User")
-                Text("Email: test@fivucsas.com")
-                Text("Phone: +1 234 567 8900")
+                Text("Name: ${user?.name ?: ""}")
+                Text("Email: ${user?.email ?: ""}")
+                Text("Phone: ${user?.phoneNumber ?: ""}")
             }
         }
     }
@@ -823,12 +824,6 @@ private fun UserJoinTenantScreen(
     onBack: () -> Unit,
     onLogout: () -> Unit
 ) {
-    data class TenantInfo(
-        val id: String,
-        val name: String,
-        val description: String,
-        val memberCount: Int
-    )
     val allTenants = remember {
         listOf(
             TenantInfo("t1", "Acme Corporation", "Global technology solutions provider", 142),
@@ -1110,56 +1105,7 @@ enum class AppMode {
     ROOT_AUDIT_EXPLORER,
     ROOT_SECURITY_EVENTS,
     ROOT_SYSTEM_SETTINGS,
-    UNAUTHORIZED;
-
-    val routeId: String
-        get() = when (this) {
-            LAUNCHER -> RouteIds.DESKTOP_LAUNCHER
-            LOGIN -> RouteIds.DESKTOP_LOGIN
-            REGISTER -> RouteIds.DESKTOP_REGISTER
-            FORGOT_PASSWORD -> RouteIds.DESKTOP_FORGOT_PASSWORD
-            KIOSK -> RouteIds.DESKTOP_KIOSK
-            GUEST_FACE_CHECK -> RouteIds.DESKTOP_GUEST_FACE_CHECK
-            QR_LOGIN -> RouteIds.DESKTOP_QR_LOGIN
-            USER_HOME -> RouteIds.DESKTOP_USER_HOME
-            USER_INVITATIONS -> RouteIds.MY_INVITATIONS
-            USER_PROFILE -> RouteIds.PROFILE
-            USER_SETTINGS -> RouteIds.SETTINGS
-            USER_JOIN_TENANT -> RouteIds.REQUEST_MEMBERSHIP
-            USER_ADD_CARD -> RouteIds.CARD_SCAN
-            MEMBER_HOME -> RouteIds.DESKTOP_MEMBER_HOME
-            TENANT_ADMIN_HOME -> RouteIds.DESKTOP_TENANT_ADMIN_HOME
-            ROOT_HOME -> RouteIds.DESKTOP_ROOT_HOME
-            ADMIN_DASHBOARD -> RouteIds.ADMIN_DASHBOARD
-            ENROLL -> RouteIds.BIOMETRIC_ENROLL
-            VERIFY -> RouteIds.BIOMETRIC_VERIFY
-            PROFILE -> RouteIds.DESKTOP_PROFILE
-            EDIT_PROFILE -> RouteIds.DESKTOP_EDIT_PROFILE
-            SETTINGS_HELP -> RouteIds.DESKTOP_SETTINGS_HELP
-            HISTORY_SELF -> RouteIds.ACTIVITY_HISTORY
-            USERS_MANAGEMENT -> RouteIds.USERS_MANAGEMENT
-            TENANT_SETTINGS -> RouteIds.TENANT_SETTINGS
-            TENANT_HISTORY -> RouteIds.TENANT_HISTORY
-            IDENTIFY_TENANT -> RouteIds.IDENTIFY_TENANT
-            ADMIN_INVITE_MANAGEMENT -> RouteIds.DESKTOP_ADMIN_INVITE_MANAGEMENT
-            EXAM_ENTRY -> RouteIds.DESKTOP_EXAM_ENTRY
-            ANALYTICS -> RouteIds.DESKTOP_ANALYTICS
-            MY_INVITATIONS -> RouteIds.DESKTOP_MY_INVITATIONS
-            REQUEST_MEMBERSHIP -> RouteIds.DESKTOP_REQUEST_MEMBERSHIP
-            TENANT_MANAGE -> RouteIds.TENANT_MANAGE
-            PLATFORM_HEALTH -> RouteIds.PLATFORM_HEALTH
-            PLATFORM_AUDIT -> RouteIds.PLATFORM_AUDIT
-            PLATFORM_SETTINGS -> RouteIds.PLATFORM_SETTINGS
-            ROOT_TENANT_MANAGEMENT -> RouteIds.ROOT_TENANT_MANAGEMENT
-            ROOT_TENANT_DETAIL -> RouteIds.ROOT_TENANT_DETAIL
-            ROOT_GLOBAL_USER_DIRECTORY -> RouteIds.ROOT_GLOBAL_USER_DIRECTORY
-            ROOT_TENANT_ADMINS -> RouteIds.ROOT_TENANT_ADMINS
-            ROOT_ROLES_PERMISSIONS -> RouteIds.ROOT_ROLES_PERMISSIONS
-            ROOT_INVITE_MANAGEMENT -> RouteIds.ROOT_INVITE_MANAGEMENT
-            ROOT_AUDIT_EXPLORER -> RouteIds.ROOT_AUDIT_EXPLORER
-            ROOT_SECURITY_EVENTS -> RouteIds.ROOT_SECURITY_EVENTS
-            ROOT_SYSTEM_SETTINGS -> RouteIds.ROOT_SYSTEM_SETTINGS
-            UNAUTHORIZED -> RouteIds.UNAUTHORIZED
-        }
+    CHANGE_PASSWORD,
+    UNAUTHORIZED
 }
 

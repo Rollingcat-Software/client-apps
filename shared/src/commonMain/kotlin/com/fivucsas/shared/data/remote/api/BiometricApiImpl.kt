@@ -1,6 +1,7 @@
 package com.fivucsas.shared.data.remote.api
 
-import com.fivucsas.shared.data.remote.dto.BiometricEnrollmentResponseDto
+import com.fivucsas.shared.data.remote.dto.BiometricDto
+import com.fivucsas.shared.data.remote.dto.IdentificationResponseDto
 import com.fivucsas.shared.data.remote.dto.LivenessResponseDto
 import com.fivucsas.shared.data.remote.dto.VerificationResponseDto
 import io.ktor.client.HttpClient
@@ -80,5 +81,16 @@ class BiometricApiImpl(
 
     override suspend fun deleteBiometricData(userId: String) {
         client.delete("enroll/$userId")
+    }
+
+    override suspend fun identifyFace(imageData: String): IdentificationResponseDto {
+        return client.post("search") {
+            contentType(ContentType.Application.Json)
+            setBody(
+                mapOf(
+                    "image_data" to imageData
+                )
+            )
+        }.body()
     }
 }
