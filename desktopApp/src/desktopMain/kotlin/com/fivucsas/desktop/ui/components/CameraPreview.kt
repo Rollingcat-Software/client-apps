@@ -45,7 +45,7 @@ import org.jetbrains.skia.Image as SkiaImage
 /**
  * Camera Preview Composable
  * Shows live webcam feed and allows capturing
- * Falls back to mock capture if camera fails
+ * Falls back to test image capture if camera fails
  */
 @Composable
 fun CameraPreview(
@@ -57,22 +57,22 @@ fun CameraPreview(
     var previewImage by remember { mutableStateOf<ImageBitmap?>(null) }
     var isCapturing by remember { mutableStateOf(false) }
     var error by remember { mutableStateOf<String?>(null) }
-    var useMockMode by remember { mutableStateOf(false) }
+    var useFallbackMode by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
 
     // Initialize camera and start preview
     LaunchedEffect(Unit) {
-        if (useMockMode) return@LaunchedEffect
+        if (useFallbackMode) return@LaunchedEffect
 
         val initResult = cameraService.initialize()
         if (initResult.isFailure) {
             error = initResult.exceptionOrNull()?.message
-            // Don't enable mock mode automatically - let user decide
+            // Don't enable fallback mode automatically - let user decide
             return@LaunchedEffect
         }
 
         // Continuous preview loop
-        while (isActive && !useMockMode) {
+        while (isActive && !useFallbackMode) {
             val frameResult = cameraService.getPreviewFrame()
             if (frameResult.isSuccess) {
                 frameResult.getOrNull()?.let { bufferedImage ->
@@ -100,7 +100,7 @@ fun CameraPreview(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            if (useMockMode) "Mock Capture Mode" else "Live Camera Preview",
+            if (useFallbackMode) "Fallback Capture Mode" else "Live Camera Preview",
             style = MaterialTheme.typography.titleLarge
         )
 
@@ -119,20 +119,20 @@ fun CameraPreview(
                 contentAlignment = Alignment.Center
             ) {
                 when {
-                    useMockMode -> {
+                    useFallbackMode -> {
                         Column(
                             horizontalAlignment = Alignment.CenterHorizontally,
                             verticalArrangement = Arrangement.Center
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Face,
-                                contentDescription = "Mock Mode",
+                                contentDescription = "Fallback Mode",
                                 modifier = Modifier.size(120.dp),
                                 tint = MaterialTheme.colorScheme.primary
                             )
                             Spacer(modifier = Modifier.height(16.dp))
                             Text(
-                                "Mock Capture Mode",
+                                "Fallback Capture Mode",
                                 style = MaterialTheme.typography.titleMedium
                             )
                             Text(
@@ -161,8 +161,8 @@ fun CameraPreview(
                                 textAlign = androidx.compose.ui.text.style.TextAlign.Center
                             )
                             Spacer(modifier = Modifier.height(16.dp))
-                            Button(onClick = { useMockMode = true }) {
-                                Text("Use Mock Capture Instead")
+                            Button(onClick = { useFallbackMode = true }) {
+                                Text("Use Fallback Capture Instead")
                             }
                         }
                     }
@@ -205,11 +205,11 @@ fun CameraPreview(
                 onClick = {
                     isCapturing = true
                     scope.launch {
-                        if (useMockMode) {
-                            // Generate mock JPEG image
+                        if (useFallbackMode) {
+                            // Generate fallback JPEG image
                             kotlinx.coroutines.delay(500) // Simulate capture
-                            val mockImage = generateMockImage()
-                            onCapture(mockImage)
+                            val fallbackImage = generateFallbackImage()
+                            onCapture(fallbackImage)
                         } else {
                             val captureResult = cameraService.captureFrame()
                             if (captureResult.isSuccess) {
@@ -217,15 +217,15 @@ fun CameraPreview(
                                     onCapture(imageBytes)
                                 }
                             } else {
-                                // If capture fails, offer mock mode
+                                // If capture fails, offer fallback mode
                                 error = captureResult.exceptionOrNull()?.message
-                                useMockMode = true
+                                useFallbackMode = true
                             }
                         }
                         isCapturing = false
                     }
                 },
-                enabled = !isCapturing && (error == null || useMockMode)
+                enabled = !isCapturing && (error == null || useFallbackMode)
             ) {
                 if (isCapturing) {
                     CircularProgressIndicator(
@@ -241,9 +241,9 @@ fun CameraPreview(
 }
 
 /**
- * Generate a mock image for testing when camera is unavailable
+ * Generate a fallback test image when camera is unavailable
  */
-private fun generateMockImage(): ByteArray {
+private fun generateFallbackImage(): ByteArray {
     // Create a simple test image
     val width = 640
     val height = 480
@@ -274,7 +274,7 @@ private fun generateMockImage(): ByteArray {
     // Draw text
     graphics.color = java.awt.Color.WHITE
     graphics.font = java.awt.Font("Arial", java.awt.Font.BOLD, 24)
-    graphics.drawString("MOCK TEST IMAGE", width / 2 - 100, height - 50)
+    graphics.drawString("FALLBACK TEST IMAGE", width / 2 - 110, height - 50)
 
     graphics.dispose()
 

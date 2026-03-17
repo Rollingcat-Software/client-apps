@@ -30,6 +30,11 @@ sealed class AppRoute(val id: String) {
     object RootSecurityEvents : AppRoute(RouteIds.ROOT_SECURITY_EVENTS)
     object RootSystemSettings : AppRoute(RouteIds.ROOT_SYSTEM_SETTINGS)
 
+    data class AuthFlows(val tenantId: String) : AppRoute(RouteIds.AUTH_FLOWS)
+    object Sessions : AppRoute(RouteIds.SESSIONS)
+    data class Devices(val userId: String) : AppRoute(RouteIds.DEVICES)
+    data class EnrollmentsList(val userId: String) : AppRoute(RouteIds.ENROLLMENTS_LIST)
+
     data class FingerprintGate(val targetRouteId: String) : AppRoute(FINGERPRINT_GATE)
     object FingerprintSuccess : AppRoute(FINGERPRINT_SUCCESS)
     object FingerprintFailure : AppRoute(FINGERPRINT_FAILURE)

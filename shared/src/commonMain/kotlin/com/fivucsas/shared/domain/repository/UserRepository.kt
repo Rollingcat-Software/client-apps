@@ -6,7 +6,7 @@ import com.fivucsas.shared.domain.model.User
 /**
  * User repository interface - defines contract for data access
  *
- * Implementations can be for API, local cache, or mock data.
+ * Implementations can be for API or local cache.
  * This follows the Repository Pattern and Dependency Inversion Principle.
  */
 interface UserRepository {

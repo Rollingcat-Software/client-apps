@@ -9,7 +9,7 @@ import com.fivucsas.shared.domain.model.ReceivedInvite
  * Handles all invitation operations for both admin (outbound)
  * and member (inbound) perspectives.
  *
- * Implementations can target the real API, local cache, or mock data.
+ * Implementations can target the API or local cache.
  */
 interface InviteRepository {
 

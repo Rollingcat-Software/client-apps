@@ -49,7 +49,7 @@ import com.fivucsas.desktop.ui.components.DesktopAppShell
 import com.fivucsas.desktop.ui.components.DesktopDashboardActionCard
 import com.fivucsas.desktop.ui.components.DesktopSectionHeader
 import com.fivucsas.desktop.ui.components.DesktopTable
-import com.fivucsas.shared.data.repository.MockRootAdminRepository
+import com.fivucsas.shared.domain.repository.RootAdminRepository
 import com.fivucsas.shared.domain.model.UserRole
 import com.fivucsas.shared.domain.model.InviteStatus
 import com.fivucsas.shared.presentation.viewmodel.InviteViewModel
@@ -117,7 +117,8 @@ fun RootDesktopConsoleScreen(
     onBack: () -> Unit,
     onLogout: () -> Unit
 ) {
-    val viewModel = remember { RootConsoleViewModel(role, MockRootAdminRepository()) }
+    val rootAdminRepository: RootAdminRepository = koinInject()
+    val viewModel = remember { RootConsoleViewModel(role, rootAdminRepository) }
     val state by viewModel.state.collectAsState()
     LaunchedEffect(Unit) { viewModel.onEvent(RootConsoleUiEvent.Load()) }
 
@@ -221,7 +222,8 @@ fun RootDesktopTenantManagementScreen(
     onBack: () -> Unit,
     onLogout: () -> Unit
 ) {
-    val viewModel = remember { RootConsoleViewModel(role, MockRootAdminRepository()) }
+    val rootAdminRepository: RootAdminRepository = koinInject()
+    val viewModel = remember { RootConsoleViewModel(role, rootAdminRepository) }
     val state by viewModel.state.collectAsState()
     LaunchedEffect(Unit) { viewModel.onEvent(RootConsoleUiEvent.Load()) }
 
@@ -259,7 +261,8 @@ fun RootDesktopTenantDetailScreen(
     onBack: () -> Unit,
     onLogout: () -> Unit
 ) {
-    val viewModel = remember { RootConsoleViewModel(role, MockRootAdminRepository()) }
+    val rootAdminRepository: RootAdminRepository = koinInject()
+    val viewModel = remember { RootConsoleViewModel(role, rootAdminRepository) }
     val state by viewModel.state.collectAsState()
     LaunchedEffect(tenantId) { if (tenantId != null) viewModel.onEvent(RootConsoleUiEvent.Load(tenantId)) }
 
@@ -302,7 +305,8 @@ fun RootDesktopUserListScreen(
     onBack: () -> Unit,
     onLogout: () -> Unit
 ) {
-    val viewModel = remember { RootConsoleViewModel(role, MockRootAdminRepository()) }
+    val rootAdminRepository: RootAdminRepository = koinInject()
+    val viewModel = remember { RootConsoleViewModel(role, rootAdminRepository) }
     val state by viewModel.state.collectAsState()
     var selectedRole by remember { mutableStateOf(if (showTenantAdmins) "TENANT_ADMIN" else "ALL") }
     var editingUser by remember { mutableStateOf<com.fivucsas.shared.domain.model.GlobalUser?>(null) }
@@ -701,7 +705,8 @@ fun RootDesktopAuditScreen(
     onBack: () -> Unit,
     onLogout: () -> Unit
 ) {
-    val viewModel = remember { RootConsoleViewModel(role, MockRootAdminRepository()) }
+    val rootAdminRepository: RootAdminRepository = koinInject()
+    val viewModel = remember { RootConsoleViewModel(role, rootAdminRepository) }
     val state by viewModel.state.collectAsState()
     LaunchedEffect(Unit) { viewModel.onEvent(RootConsoleUiEvent.Load()) }
 
@@ -733,7 +738,8 @@ fun RootDesktopSecurityScreen(
     onBack: () -> Unit,
     onLogout: () -> Unit
 ) {
-    val viewModel = remember { RootConsoleViewModel(role, MockRootAdminRepository()) }
+    val rootAdminRepository: RootAdminRepository = koinInject()
+    val viewModel = remember { RootConsoleViewModel(role, rootAdminRepository) }
     val state by viewModel.state.collectAsState()
     LaunchedEffect(Unit) { viewModel.onEvent(RootConsoleUiEvent.Load()) }
 
@@ -764,7 +770,8 @@ fun RootDesktopSystemSettingsScreen(
     onBack: () -> Unit,
     onLogout: () -> Unit
 ) {
-    val viewModel = remember { RootConsoleViewModel(role, MockRootAdminRepository()) }
+    val rootAdminRepository: RootAdminRepository = koinInject()
+    val viewModel = remember { RootConsoleViewModel(role, rootAdminRepository) }
     val state by viewModel.state.collectAsState()
     var rateLimitInput by remember { mutableStateOf("") }
     LaunchedEffect(Unit) { viewModel.onEvent(RootConsoleUiEvent.Load()) }

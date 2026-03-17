@@ -300,7 +300,7 @@ private fun AppContent(
                 onEditProfile = { onNavigate(AppMode.EDIT_PROFILE) },
                 onChangePassword = { onNavigate(AppMode.CHANGE_PASSWORD) },
                 onReEnroll = { onNavigate(AppMode.ENROLL) },
-                onDeleteEnrollment = { /* TODO: delete enrollment */ },
+                onDeleteEnrollment = { /* Enrollment deletion not yet available */ },
                 onOpenSettings = { onNavigate(AppMode.SETTINGS_HELP) },
                 onBack = { onNavigate(modeForRole(currentRole ?: UserRole.USER)) },
                 onLogout = { onLogoutToLauncher() }

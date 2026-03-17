@@ -7,14 +7,24 @@ import com.fivucsas.shared.data.remote.api.AuthBiometricApi
 import com.fivucsas.shared.data.remote.api.AuthBiometricApiImpl
 import com.fivucsas.shared.data.remote.api.AuthApi
 import com.fivucsas.shared.data.remote.api.AuthApiImpl
+import com.fivucsas.shared.data.remote.api.AuthFlowApi
+import com.fivucsas.shared.data.remote.api.AuthFlowApiImpl
 import com.fivucsas.shared.data.remote.api.BiometricApi
 import com.fivucsas.shared.data.remote.api.BiometricApiImpl
+import com.fivucsas.shared.data.remote.api.DeviceApi
+import com.fivucsas.shared.data.remote.api.DeviceApiImpl
+import com.fivucsas.shared.data.remote.api.EnrollmentApi
+import com.fivucsas.shared.data.remote.api.EnrollmentApiImpl
 import com.fivucsas.shared.data.remote.api.IdentityApi
 import com.fivucsas.shared.data.remote.api.IdentityApiImpl
 import com.fivucsas.shared.data.remote.api.InviteApi
 import com.fivucsas.shared.data.remote.api.InviteApiImpl
 import com.fivucsas.shared.data.remote.api.QrLoginApi
 import com.fivucsas.shared.data.remote.api.QrLoginApiImpl
+import com.fivucsas.shared.data.remote.api.RootAdminApi
+import com.fivucsas.shared.data.remote.api.RootAdminApiImpl
+import com.fivucsas.shared.data.remote.api.SessionApi
+import com.fivucsas.shared.data.remote.api.SessionApiImpl
 import com.fivucsas.shared.data.remote.api.TenantSettingsApi
 import com.fivucsas.shared.data.remote.api.TenantSettingsApiImpl
 import com.fivucsas.shared.data.remote.config.ApiConfig
@@ -187,4 +197,9 @@ val networkModule = module {
     single<QrLoginApi> { QrLoginApiImpl(get(named("identityClient"))) }
     single<TenantSettingsApi> { TenantSettingsApiImpl(get(named("identityClient"))) }
     single<BiometricApi> { BiometricApiImpl(get(named("biometricClient"))) }
+    single<RootAdminApi> { RootAdminApiImpl(get(named("identityClient"))) }
+    single<AuthFlowApi> { AuthFlowApiImpl(get(named("identityClient"))) }
+    single<SessionApi> { SessionApiImpl(get(named("identityClient"))) }
+    single<DeviceApi> { DeviceApiImpl(get(named("identityClient"))) }
+    single<EnrollmentApi> { EnrollmentApiImpl(get(named("identityClient"))) }
 }

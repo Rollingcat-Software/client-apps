@@ -74,6 +74,11 @@ object RouteIds {
     const val DESKTOP_MY_INVITATIONS = "desktop/my-invitations"
     const val DESKTOP_REQUEST_MEMBERSHIP = "desktop/request-membership"
 
+    const val AUTH_FLOWS = "auth-flows"
+    const val SESSIONS = "sessions"
+    const val DEVICES = "devices"
+    const val ENROLLMENTS_LIST = "enrollments-list"
+
     const val TENANT_MANAGE = "tenant-manage"
     const val PLATFORM_HEALTH = "platform-health"
     const val PLATFORM_AUDIT = "platform-audit"

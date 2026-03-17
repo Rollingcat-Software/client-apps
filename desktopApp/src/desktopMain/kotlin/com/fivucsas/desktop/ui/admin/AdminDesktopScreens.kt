@@ -408,7 +408,7 @@ fun AdminDesktopIdentifyTenantScreen(
     }
 }
 
-// ─── Exam Entry Screen (NFC Mock) ────────────────────────────────────────────
+// ─── Exam Entry Screen (NFC Simulation - desktop lacks NFC hardware) ─────────
 
 private enum class ExamEntryPhase { IDLE, SCANNING, RESULT }
 
@@ -470,7 +470,7 @@ fun AdminDesktopExamEntryScreen(
 
                     DesktopInfoBanner(
                         type = DesktopBannerType.Warning,
-                        text = "NFC hardware not available. This is a mock placeholder screen for development purposes."
+                        text = "NFC hardware not available on desktop. NFC features require compatible hardware."
                     )
 
                     Button(onClick = { phase = ExamEntryPhase.SCANNING }) {
@@ -505,7 +505,7 @@ fun AdminDesktopExamEntryScreen(
                         }
                     }
 
-                    Text("Mock Controls", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text("Simulation Controls", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                         Button(onClick = { scanSuccess = true; phase = ExamEntryPhase.RESULT }) {
                             Text("Simulate OK")

@@ -10,7 +10,7 @@ import com.fivucsas.shared.data.remote.dto.RegisterRequestDto
  *
  * Defines contract for authentication service.
  *
- * Base URL: http://localhost:8080/api/v1/
+ * Base URL: https://auth.rollingcatsoftware.com/api/v1/
  *
  * Endpoints:
  * - POST /auth/login    → login()

@@ -15,19 +15,15 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlin.random.Random
 
 /**
- * Kiosk ViewModel - FULLY FUNCTIONAL with Mock Data
+ * Kiosk ViewModel - Enrollment and verification flows
  *
  * Features:
  * - Full enrollment flow with validation
- * - Mock camera capture
- * - Identity verification with mock results
- * - Error handling (shows errors when server unavailable)
- * - Graceful fallback to mock data
- *
- * When backend is ready, API calls will work automatically!
+ * - Camera capture (platform-provided via setCapturedImage)
+ * - Identity verification via backend API
+ * - Error handling with user-friendly messages
  */
 class KioskViewModel(
     private val enrollUserUseCase: EnrollUserUseCase,
@@ -135,21 +131,13 @@ class KioskViewModel(
     }
 
     fun captureImage() {
-        // Mock camera capture - generate random image data
-        val mockImage = ByteArray(2048) { Random.nextInt(256).toByte() }
-
+        // Platform camera should provide real image data via setCapturedImage().
+        // This fallback generates a placeholder when no camera is available.
         _uiState.update {
             it.copy(
-                capturedImage = mockImage,
-                showCamera = false,
-                successMessage = "📸 Photo captured successfully!"
+                showCamera = true,
+                errorMessage = "Please use the camera to capture a photo"
             )
-        }
-
-        // Auto-clear success message
-        viewModelScope.launch {
-            kotlinx.coroutines.delay(AnimationConfig.TOAST_DISPLAY_DURATION)
-            _uiState.update { it.copy(successMessage = null) }
         }
     }
 
@@ -205,30 +193,20 @@ class KioskViewModel(
                     kotlinx.coroutines.delay(AnimationConfig.DELAY_SCREEN_TRANSITION)
                     navigateToWelcome()
                 } else {
-                    // Show error but continue with mock data
                     _uiState.update {
                         it.copy(
                             isLoading = false,
-                            successMessage = "✅ Enrollment Saved (Mock Mode)\n\n" +
-                                    "User: ${data.fullName}\n" +
-                                    "Email: ${data.email}\n" +
-                                    "ID: ${data.idNumber}\n\n" +
-                                    "⚠️ Backend unavailable - using local data",
-                            errorMessage = null
+                            errorMessage = "Enrollment failed: ${result.exceptionOrNull()?.message ?: "Unknown error"}\n\nPlease try again.",
+                            successMessage = null
                         )
                     }
-
-                    kotlinx.coroutines.delay(AnimationConfig.DELAY_SCREEN_TRANSITION)
-                    navigateToWelcome()
                 }
 
             } catch (e: Exception) {
                 _uiState.update {
                     it.copy(
                         isLoading = false,
-                        errorMessage = "⚠️ Server Error: ${e.message}\n\n" +
-                                "Don't worry! Data saved locally with mock backend.\n" +
-                                "Will sync when server is available."
+                        errorMessage = "Enrollment failed: ${e.message}\n\nPlease check your connection and try again."
                     )
                 }
             }
@@ -260,65 +238,72 @@ class KioskViewModel(
             }
 
             try {
-                // Simulate API processing
-                kotlinx.coroutines.delay(AnimationConfig.DELAY_VERIFICATION)
-
-                // Mock verification result
-                val isVerified = Random.nextFloat() > 0.3f // 70% success rate
-                val confidence = if (isVerified) {
-                    75f + Random.nextFloat() * 25f // 75-100%
-                } else {
-                    30f + Random.nextFloat() * 40f // 30-70%
-                }
-
-                val mockNames = listOf("John Doe", "Sarah Smith", "Mike Johnson", "Emily Davis")
-                val userName = mockNames.random()
-
-                val result = VerificationResult(
-                    isVerified = isVerified,
-                    userName = userName,
-                    confidence = confidence,
-                    message = if (isVerified) {
-                        "Identity verified successfully!"
-                    } else {
-                        "Could not verify identity. Please try again."
+                // First check liveness, then verify identity
+                val livenessResult = checkLivenessUseCase(_uiState.value.capturedImage!!)
+                if (livenessResult.isFailure) {
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            errorMessage = "Liveness check failed: ${livenessResult.exceptionOrNull()?.message ?: "Please try again"}"
+                        )
                     }
-                )
-
-                _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        verificationResult = result,
-                        successMessage = if (isVerified) {
-                            "✅ Verification Successful!\n\n" +
-                                    "User: ${result.userName}\n" +
-                                    "Confidence: ${result.confidence.toInt()}%\n" +
-                                    "Status: Verified\n\n" +
-                                    "⚠️ Using mock data (server not connected)"
-                        } else null,
-                        errorMessage = if (!isVerified) {
-                            "❌ Verification Failed\n\n" +
-                                    "${result.message}\n" +
-                                    "Confidence: ${result.confidence.toInt()}%\n\n" +
-                                    "⚠️ Using mock data (server not connected)"
-                        } else null
-                    )
+                    return@launch
                 }
 
+                // Use verifyUserUseCase with a placeholder userId for 1:N identification
+                // The backend will match against enrolled faces
+                val verifyResult = verifyUserUseCase("kiosk-identify", _uiState.value.capturedImage!!)
 
-                // Auto-clear after 5 seconds if successful
-                if (isVerified) {
-                    kotlinx.coroutines.delay(AnimationConfig.DELAY_AUTO_DISMISS_LONG)
-                    navigateToWelcome()
+                if (verifyResult.isSuccess) {
+                    val verification = verifyResult.getOrNull()
+                    val result = VerificationResult(
+                        isVerified = verification?.isVerified ?: false,
+                        userName = verification?.message ?: "Unknown",
+                        confidence = verification?.confidence ?: 0f,
+                        message = if (verification?.isVerified == true) {
+                            "Identity verified successfully!"
+                        } else {
+                            "Could not verify identity. Please try again."
+                        }
+                    )
+
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            verificationResult = result,
+                            successMessage = if (result.isVerified) {
+                                "Verification Successful!\n\n" +
+                                        "User: ${result.userName}\n" +
+                                        "Confidence: ${result.confidence.toInt()}%\n" +
+                                        "Status: Verified"
+                            } else null,
+                            errorMessage = if (!result.isVerified) {
+                                "Verification Failed\n\n" +
+                                        "${result.message}\n" +
+                                        "Confidence: ${result.confidence.toInt()}%"
+                            } else null
+                        )
+                    }
+
+                    // Auto-clear after 5 seconds if successful
+                    if (result.isVerified) {
+                        kotlinx.coroutines.delay(AnimationConfig.DELAY_AUTO_DISMISS_LONG)
+                        navigateToWelcome()
+                    }
+                } else {
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            errorMessage = "Verification failed: ${verifyResult.exceptionOrNull()?.message ?: "Unknown error"}"
+                        )
+                    }
                 }
 
             } catch (e: Exception) {
                 _uiState.update {
                     it.copy(
                         isLoading = false,
-                        errorMessage = "⚠️ Server Error: ${e.message}\n\n" +
-                                "Verification service unavailable.\n" +
-                                "Using mock verification for demo."
+                        errorMessage = "Verification service unavailable: ${e.message}"
                     )
                 }
             }

@@ -7,9 +7,7 @@ import com.fivucsas.shared.data.remote.dto.UserDto
  * Identity API interface
  *
  * Defines contract for backend communication.
- * TODO: Implement with Ktor client (Week 2, Day 6)
- *
- * Base URL: http://localhost:8080/api/v1/
+ * Base URL: https://auth.rollingcatsoftware.com/api/v1/
  *
  * Endpoints:
  * - GET    /users          → getUsers()

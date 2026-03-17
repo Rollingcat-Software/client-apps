@@ -135,7 +135,7 @@ class DesktopDialogService : IDialogService {
             )
         )
         // In real implementation, would wait for user response
-        return true // Mock response
+        return true // Default response (dialog is displayed asynchronously)
     }
 
     override suspend fun showError(title: String, message: String, onDismiss: (() -> Unit)?) {

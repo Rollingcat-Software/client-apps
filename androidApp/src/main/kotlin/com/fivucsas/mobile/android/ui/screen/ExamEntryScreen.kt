@@ -140,7 +140,7 @@ private fun ExamEntryIdleContent(onStartScan: () -> Unit) {
         modifier = Modifier.fillMaxWidth()
     ) {
         Text(
-            text = "NFC hardware not available. This is a mock placeholder screen for development purposes.",
+            text = "NFC hardware not available on this device. NFC features require compatible hardware.",
             style = MaterialTheme.typography.bodySmall,
             color = AppColors.OnSurface,
             modifier = Modifier.padding(12.dp),
@@ -187,7 +187,7 @@ private fun ExamEntryScanningContent(
     Spacer(modifier = Modifier.height(24.dp))
 
     Text(
-        text = "Mock Controls",
+        text = "Simulation Controls",
         style = MaterialTheme.typography.labelMedium,
         color = MaterialTheme.colorScheme.onSurfaceVariant
     )

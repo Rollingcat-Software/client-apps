@@ -125,6 +125,17 @@ sealed class Screen(val route: String) {
     object RootSecurityEvents : Screen(RouteIds.ROOT_SECURITY_EVENTS)
     object RootSystemSettings : Screen(RouteIds.ROOT_SYSTEM_SETTINGS)
 
+    object AuthFlows : Screen("${RouteIds.AUTH_FLOWS}/{tenantId}") {
+        fun createRoute(tenantId: String) = "${RouteIds.AUTH_FLOWS}/$tenantId"
+    }
+    object Sessions : Screen(RouteIds.SESSIONS)
+    object Devices : Screen("${RouteIds.DEVICES}/{userId}") {
+        fun createRoute(userId: String) = "${RouteIds.DEVICES}/$userId"
+    }
+    object EnrollmentsList : Screen("${RouteIds.ENROLLMENTS_LIST}/{userId}") {
+        fun createRoute(userId: String) = "${RouteIds.ENROLLMENTS_LIST}/$userId"
+    }
+
     object BiometricEnroll : Screen("${RouteIds.BIOMETRIC_ENROLL}/{userId}") {
         fun createRoute(userId: String) = "${RouteIds.BIOMETRIC_ENROLL}/$userId"
     }
@@ -634,7 +645,7 @@ fun AppNavigation() {
                 },
                 navItems = BottomNavDestinations.adminItems,
                 showExportButton = userRole.hasPermission(Permission.HISTORY_EXPORT_TENANT),
-                onExport = { /* TODO: implement export */ }
+                onExport = { /* Export feature not yet available */ }
             )
         }
 
@@ -673,7 +684,7 @@ fun AppNavigation() {
                 onEditProfile = { navController.navigate(Screen.EditProfile.route) },
                 onChangePassword = { navController.navigate(Screen.ChangePassword.route) },
                 onReEnroll = { navController.navigate(Screen.BiometricEnroll.createRoute("1")) },
-                onDeleteEnrollment = { /* mock: enrollment deleted */ },
+                onDeleteEnrollment = { /* Enrollment deletion not yet available */ },
                 onOpenSettings = { navController.navigate(Screen.Settings.route) },
                 navItems = profileNavItems
             )
@@ -1180,6 +1191,81 @@ fun AppNavigation() {
                         }
                     }
                 }
+            )
+        }
+
+        // Auth Flows screen
+        composable(
+            route = Screen.AuthFlows.route,
+            arguments = listOf(navArgument("tenantId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            if (!isAuthenticated()) {
+                LaunchedEffect(Unit) {
+                    navController.navigate(Screen.Login.route) { popUpTo(0) { inclusive = true } }
+                }
+                return@composable
+            }
+            val tenantId = backStackEntry.arguments?.getString("tenantId") ?: ""
+            val viewModel = koinInject<com.fivucsas.shared.presentation.viewmodel.AuthFlowViewModel>()
+            com.fivucsas.shared.ui.screen.AuthFlowsScreen(
+                viewModel = viewModel,
+                tenantId = tenantId,
+                onBack = { navController.popBackStack() }
+            )
+        }
+
+        // Sessions screen
+        composable(Screen.Sessions.route) {
+            if (!isAuthenticated()) {
+                LaunchedEffect(Unit) {
+                    navController.navigate(Screen.Login.route) { popUpTo(0) { inclusive = true } }
+                }
+                return@composable
+            }
+            val viewModel = koinInject<com.fivucsas.shared.presentation.viewmodel.SessionViewModel>()
+            com.fivucsas.shared.ui.screen.SessionsScreen(
+                viewModel = viewModel,
+                onBack = { navController.popBackStack() }
+            )
+        }
+
+        // Devices screen
+        composable(
+            route = Screen.Devices.route,
+            arguments = listOf(navArgument("userId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            if (!isAuthenticated()) {
+                LaunchedEffect(Unit) {
+                    navController.navigate(Screen.Login.route) { popUpTo(0) { inclusive = true } }
+                }
+                return@composable
+            }
+            val userId = backStackEntry.arguments?.getString("userId") ?: ""
+            val viewModel = koinInject<com.fivucsas.shared.presentation.viewmodel.DeviceViewModel>()
+            com.fivucsas.shared.ui.screen.DevicesScreen(
+                viewModel = viewModel,
+                userId = userId,
+                onBack = { navController.popBackStack() }
+            )
+        }
+
+        // Enrollments screen
+        composable(
+            route = Screen.EnrollmentsList.route,
+            arguments = listOf(navArgument("userId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            if (!isAuthenticated()) {
+                LaunchedEffect(Unit) {
+                    navController.navigate(Screen.Login.route) { popUpTo(0) { inclusive = true } }
+                }
+                return@composable
+            }
+            val userId = backStackEntry.arguments?.getString("userId") ?: ""
+            val viewModel = koinInject<com.fivucsas.shared.presentation.viewmodel.EnrollmentViewModel>()
+            com.fivucsas.shared.ui.screen.EnrollmentsScreen(
+                viewModel = viewModel,
+                userId = userId,
+                onBack = { navController.popBackStack() }
             )
         }
     }

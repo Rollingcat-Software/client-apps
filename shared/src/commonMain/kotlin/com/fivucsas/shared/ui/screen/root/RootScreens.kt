@@ -63,7 +63,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.fivucsas.shared.data.repository.MockRootAdminRepository
+import com.fivucsas.shared.domain.repository.RootAdminRepository
 import com.fivucsas.shared.domain.model.CapabilityPolicy
 import com.fivucsas.shared.domain.model.GlobalUser
 import com.fivucsas.shared.domain.model.RootPermission
@@ -112,7 +112,7 @@ fun RootConsoleScreen(
     onNavigateToProfile: () -> Unit = {},
     onNavigateBottom: (String) -> Unit = {},
     onNavigate: (String, String?) -> Unit = { _, _ -> },
-    viewModel: RootConsoleViewModel = remember { RootConsoleViewModel(role, MockRootAdminRepository()) }
+    viewModel: RootConsoleViewModel = koinInject<RootAdminRepository>().let { repo -> remember { RootConsoleViewModel(role, repo) } }
 ) {
     val state by viewModel.state.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -477,7 +477,7 @@ fun TenantManagementScreen(
     role: UserRole,
     onOpenTenant: (String) -> Unit,
     onNavigateBack: () -> Unit = {},
-    viewModel: RootConsoleViewModel = remember { RootConsoleViewModel(role, MockRootAdminRepository()) }
+    viewModel: RootConsoleViewModel = koinInject<RootAdminRepository>().let { repo -> remember { RootConsoleViewModel(role, repo) } }
 ) {
     val state by viewModel.state.collectAsState()
     LaunchedEffect(Unit) { viewModel.onEvent(RootConsoleUiEvent.Load()) }
@@ -558,7 +558,7 @@ fun TenantDetailScreen(
     role: UserRole,
     tenantId: String,
     onNavigateBack: () -> Unit = {},
-    viewModel: RootConsoleViewModel = remember { RootConsoleViewModel(role, MockRootAdminRepository()) }
+    viewModel: RootConsoleViewModel = koinInject<RootAdminRepository>().let { repo -> remember { RootConsoleViewModel(role, repo) } }
 ) {
     val state by viewModel.state.collectAsState()
     var askImpersonate by remember { mutableStateOf(false) }
@@ -611,7 +611,7 @@ fun GlobalUserDirectoryScreen(
     screenTitle: String = "Global User Directory",
     initialRoleFilter: String? = null,
     onNavigateBack: () -> Unit = {},
-    viewModel: RootConsoleViewModel = remember { RootConsoleViewModel(role, MockRootAdminRepository()) }
+    viewModel: RootConsoleViewModel = koinInject<RootAdminRepository>().let { repo -> remember { RootConsoleViewModel(role, repo) } }
 ) {
     val state by viewModel.state.collectAsState()
     LaunchedEffect(Unit) { viewModel.onEvent(RootConsoleUiEvent.Load()) }
@@ -640,7 +640,7 @@ fun GlobalUserDirectoryScreen(
 fun TenantAdminsScreen(
     role: UserRole,
     onNavigateBack: () -> Unit = {},
-    viewModel: RootConsoleViewModel = remember { RootConsoleViewModel(role, MockRootAdminRepository()) }
+    viewModel: RootConsoleViewModel = koinInject<RootAdminRepository>().let { repo -> remember { RootConsoleViewModel(role, repo) } }
 ) {
     val state by viewModel.state.collectAsState()
     LaunchedEffect(Unit) { viewModel.onEvent(RootConsoleUiEvent.Load()) }
@@ -1055,7 +1055,7 @@ fun RolesPermissionsScreen(onNavigateBack: () -> Unit = {}) {
 fun AuditExplorerScreen(
     role: UserRole,
     onNavigateBack: () -> Unit = {},
-    viewModel: RootConsoleViewModel = remember { RootConsoleViewModel(role, MockRootAdminRepository()) }
+    viewModel: RootConsoleViewModel = koinInject<RootAdminRepository>().let { repo -> remember { RootConsoleViewModel(role, repo) } }
 ) {
     val state by viewModel.state.collectAsState()
     LaunchedEffect(Unit) { viewModel.onEvent(RootConsoleUiEvent.Load()) }
@@ -1092,7 +1092,7 @@ fun AuditExplorerScreen(
 fun SecurityEventsScreen(
     role: UserRole,
     onNavigateBack: () -> Unit = {},
-    viewModel: RootConsoleViewModel = remember { RootConsoleViewModel(role, MockRootAdminRepository()) }
+    viewModel: RootConsoleViewModel = koinInject<RootAdminRepository>().let { repo -> remember { RootConsoleViewModel(role, repo) } }
 ) {
     val state by viewModel.state.collectAsState()
     LaunchedEffect(Unit) { viewModel.onEvent(RootConsoleUiEvent.Load()) }
@@ -1118,7 +1118,7 @@ fun SecurityEventsScreen(
 fun SystemSettingsScreen(
     role: UserRole,
     onNavigateBack: () -> Unit = {},
-    viewModel: RootConsoleViewModel = remember { RootConsoleViewModel(role, MockRootAdminRepository()) }
+    viewModel: RootConsoleViewModel = koinInject<RootAdminRepository>().let { repo -> remember { RootConsoleViewModel(role, repo) } }
 ) {
     val state by viewModel.state.collectAsState()
     var rateLimit by remember { mutableStateOf("120") }

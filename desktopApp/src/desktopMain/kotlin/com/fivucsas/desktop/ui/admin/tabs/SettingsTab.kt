@@ -58,6 +58,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.fivucsas.desktop.ui.admin.components.AdminConstants
 import com.fivucsas.shared.config.UIDimens
+import com.fivucsas.shared.i18n.StringKey
+import com.fivucsas.shared.i18n.StringResources
+import com.fivucsas.shared.i18n.s
 import com.fivucsas.shared.presentation.state.AppTheme
 import com.fivucsas.shared.presentation.state.ConnectionStatus
 import com.fivucsas.shared.presentation.state.HealthStatus
@@ -485,10 +488,47 @@ private fun AppearanceSettingsSection(
     onSettingsChange: (SettingsState) -> Unit
 ) {
     SettingsCard(
-        title = "Appearance & Localization",
+        title = s(StringKey.SETTINGS_SUBTITLE),
         icon = Icons.Default.ColorLens,
         description = "Theme, language, and display preferences"
     ) {
+        // Language Selection
+        var languageExpanded by remember { mutableStateOf(false) }
+        var currentLang by remember { mutableStateOf(StringResources.currentLanguage) }
+
+        ExposedDropdownMenuBox(
+            expanded = languageExpanded,
+            onExpandedChange = { languageExpanded = it }
+        ) {
+            OutlinedTextField(
+                value = currentLang.displayName,
+                onValueChange = {},
+                readOnly = true,
+                label = { Text(s(StringKey.LANGUAGE)) },
+                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = languageExpanded) },
+                modifier = Modifier.fillMaxWidth().menuAnchor()
+            )
+
+            ExposedDropdownMenu(
+                expanded = languageExpanded,
+                onDismissRequest = { languageExpanded = false }
+            ) {
+                StringResources.Language.values().forEach { lang ->
+                    DropdownMenuItem(
+                        text = { Text(lang.displayName) },
+                        onClick = {
+                            StringResources.setLanguage(lang)
+                            currentLang = lang
+                            onSettingsChange(settings.copy(language = lang.code))
+                            languageExpanded = false
+                        }
+                    )
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(UIDimens.SpacingMedium))
+
         // Theme Selection
         var themeExpanded by remember { mutableStateOf(false) }
 

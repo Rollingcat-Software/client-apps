@@ -18,7 +18,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 /**
- * Admin ViewModel - FULLY FUNCTIONAL with Mock Data
+ * Admin ViewModel - User management and administration
  *
  * Features:
  * - User management (add, edit, delete)

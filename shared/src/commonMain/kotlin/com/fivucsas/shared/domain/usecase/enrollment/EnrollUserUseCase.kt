@@ -21,7 +21,7 @@ import com.fivucsas.shared.domain.validation.ValidationRules
  *
  * Benefits of Use Case pattern:
  * - Business logic in one place
- * - Easy to test (just mock repositories)
+ * - Easy to test (inject test doubles for repositories)
  * - Transaction-like behavior (rollback on failure)
  * - Reusable across all platforms
  *

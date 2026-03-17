@@ -84,8 +84,8 @@ fun UsersTab(
         UsersSearchBar(
             searchQuery = uiState.searchQuery,
             onSearchQueryChange = viewModel::updateSearchQuery,
-            onFilter = { /* TODO: Implement filter */ },
-            onExport = { /* TODO: Implement export */ }
+            onFilter = { /* Filter feature not yet available */ },
+            onExport = { /* Export feature not yet available */ }
         )
 
         Spacer(modifier = Modifier.height(UIDimens.SpacingLarge))

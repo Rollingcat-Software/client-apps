@@ -13,26 +13,32 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.clickable
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Security
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Button
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -41,6 +47,9 @@ import com.fivucsas.shared.config.UIDimens
 import com.fivucsas.shared.domain.model.Permission
 import com.fivucsas.shared.domain.model.UserRole
 import com.fivucsas.shared.domain.model.hasPermission
+import com.fivucsas.shared.i18n.StringKey
+import com.fivucsas.shared.i18n.StringResources
+import com.fivucsas.shared.i18n.s
 import com.fivucsas.shared.ui.components.molecules.ExpandableCard
 import com.fivucsas.shared.ui.theme.AppColors
 
@@ -62,10 +71,10 @@ fun SettingsScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Settings") },
+                title = { Text(s(StringKey.SETTINGS_TITLE)) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = s(StringKey.BACK))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -83,9 +92,61 @@ fun SettingsScreen(
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(UIDimens.SpacingMedium)
         ) {
+            // Language Selection
             ExpandableCard(
-                title = "Notifications",
-                subtitle = "Manage alerts and reminders"
+                title = s(StringKey.LANGUAGE),
+                subtitle = "Turkish / English"
+            ) {
+                var languageExpanded by remember { mutableStateOf(false) }
+                var currentLang by remember { mutableStateOf(StringResources.currentLanguage) }
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Language,
+                        contentDescription = null,
+                        tint = AppColors.Primary
+                    )
+                    Spacer(modifier = Modifier.size(8.dp))
+
+                    ExposedDropdownMenuBox(
+                        expanded = languageExpanded,
+                        onExpandedChange = { languageExpanded = it },
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        OutlinedTextField(
+                            value = currentLang.displayName,
+                            onValueChange = {},
+                            readOnly = true,
+                            label = { Text(s(StringKey.LANGUAGE)) },
+                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = languageExpanded) },
+                            modifier = Modifier.fillMaxWidth().menuAnchor()
+                        )
+
+                        ExposedDropdownMenu(
+                            expanded = languageExpanded,
+                            onDismissRequest = { languageExpanded = false }
+                        ) {
+                            StringResources.Language.values().forEach { lang ->
+                                DropdownMenuItem(
+                                    text = { Text(lang.displayName) },
+                                    onClick = {
+                                        StringResources.setLanguage(lang)
+                                        currentLang = lang
+                                        languageExpanded = false
+                                    }
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+
+            ExpandableCard(
+                title = s(StringKey.NAV_NOTIFICATIONS),
+                subtitle = s(StringKey.NOTIFICATIONS_ENABLED)
             ) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -98,7 +159,7 @@ fun SettingsScreen(
                     )
                     Spacer(modifier = Modifier.size(8.dp))
                     Text(
-                        text = "Enable Notifications",
+                        text = s(StringKey.NOTIFICATIONS_ENABLED),
                         style = MaterialTheme.typography.bodyMedium,
                         modifier = Modifier.weight(1f)
                     )
@@ -110,8 +171,8 @@ fun SettingsScreen(
             }
 
             ExpandableCard(
-                title = "Security",
-                subtitle = "Authentication preferences"
+                title = s(StringKey.SECURITY_TITLE),
+                subtitle = s(StringKey.BIOMETRIC_AUTH)
             ) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -124,7 +185,7 @@ fun SettingsScreen(
                     )
                     Spacer(modifier = Modifier.size(8.dp))
                     Text(
-                        text = "Biometric Login",
+                        text = s(StringKey.BIOMETRIC_AUTH),
                         style = MaterialTheme.typography.bodyMedium,
                         modifier = Modifier.weight(1f)
                     )
@@ -136,7 +197,7 @@ fun SettingsScreen(
 
                 Spacer(modifier = Modifier.size(12.dp))
                 Text(
-                    text = "Change Password",
+                    text = s(StringKey.CHANGE_PASSWORD),
                     style = MaterialTheme.typography.bodyMedium,
                     color = AppColors.Primary,
                     modifier = Modifier
@@ -147,7 +208,7 @@ fun SettingsScreen(
             }
 
             ExpandableCard(
-                title = "App Preferences",
+                title = s(StringKey.NAV_SETTINGS),
                 subtitle = "Data and privacy"
             ) {
                 Row(
@@ -161,7 +222,7 @@ fun SettingsScreen(
                     )
                     Spacer(modifier = Modifier.size(8.dp))
                     Text(
-                        text = "Analytics",
+                        text = s(StringKey.NAV_ANALYTICS),
                         style = MaterialTheme.typography.bodyMedium,
                         modifier = Modifier.weight(1f)
                     )
@@ -172,7 +233,7 @@ fun SettingsScreen(
                 }
                 Spacer(modifier = Modifier.size(12.dp))
                 Text(
-                    text = "Help & FAQ",
+                    text = s(StringKey.NAV_HELP),
                     style = MaterialTheme.typography.bodyMedium,
                     color = AppColors.Primary,
                     modifier = Modifier
@@ -181,7 +242,7 @@ fun SettingsScreen(
                         .clickable { onNavigateToHelp() }
                 )
                 Text(
-                    text = "About",
+                    text = s(StringKey.NAV_ABOUT),
                     style = MaterialTheme.typography.bodyMedium,
                     color = AppColors.Primary,
                     modifier = Modifier
@@ -225,7 +286,7 @@ fun SettingsScreen(
                     )
                     Spacer(modifier = Modifier.height(10.dp))
                     Button(onClick = { /* TODO persist system settings */ }) {
-                        Text("Save Changes")
+                        Text(s(StringKey.SAVE_SETTINGS))
                     }
                 }
             }
@@ -245,7 +306,7 @@ fun SettingsScreen(
                     modifier = Modifier.size(20.dp)
                 )
                 Spacer(modifier = Modifier.size(8.dp))
-                Text("Logout")
+                Text(s(StringKey.LOGOUT))
             }
         }
     }
