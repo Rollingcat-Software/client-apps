@@ -46,3 +46,19 @@ fun StatusBadge(
         )
     }
 }
+
+/**
+ * Convenience overload for simple positive/negative status badges
+ */
+@Composable
+fun StatusBadge(
+    text: String,
+    isPositive: Boolean,
+    modifier: Modifier = Modifier
+) {
+    StatusBadge(
+        text = text,
+        type = if (isPositive) StatusBadgeType.Success else StatusBadgeType.Neutral,
+        modifier = modifier
+    )
+}

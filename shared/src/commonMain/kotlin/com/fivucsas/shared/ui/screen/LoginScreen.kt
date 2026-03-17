@@ -30,6 +30,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import com.fivucsas.shared.i18n.StringKey
+import com.fivucsas.shared.i18n.s
 import com.fivucsas.shared.presentation.viewmodel.auth.LoginViewModel
 import kotlinx.coroutines.launch
 
@@ -68,14 +70,14 @@ fun LoginScreen(
             verticalArrangement = Arrangement.Center
         ) {
             Text(
-                text = "FIVUCSAS",
+                text = s(StringKey.APP_NAME),
                 style = MaterialTheme.typography.headlineLarge
             )
 
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "Biometric Authentication",
+                text = s(StringKey.APP_SUBTITLE),
                 style = MaterialTheme.typography.bodyMedium
             )
 
@@ -84,7 +86,7 @@ fun LoginScreen(
             OutlinedTextField(
                 value = email,
                 onValueChange = { email = it },
-                label = { Text("Email") },
+                label = { Text(s(StringKey.EMAIL)) },
                 modifier = Modifier.fillMaxWidth(),
                 enabled = !state.isLoading
             )
@@ -94,7 +96,7 @@ fun LoginScreen(
             OutlinedTextField(
                 value = password,
                 onValueChange = { password = it },
-                label = { Text("Password") },
+                label = { Text(s(StringKey.PASSWORD)) },
                 visualTransformation = PasswordVisualTransformation(),
                 modifier = Modifier.fillMaxWidth(),
                 enabled = !state.isLoading
@@ -108,7 +110,7 @@ fun LoginScreen(
                 onClick = onNavigateToForgotPassword,
                 enabled = !state.isLoading
             ) {
-                Text("Forgot password?")
+                Text(s(StringKey.FORGOT_PASSWORD))
             }
 
             if (state.error != null) {
@@ -137,7 +139,7 @@ fun LoginScreen(
                         color = MaterialTheme.colorScheme.onPrimary
                     )
                 } else {
-                    Text("Login")
+                    Text(s(StringKey.LOGIN))
                 }
             }
 
@@ -147,14 +149,14 @@ fun LoginScreen(
                 onClick = onNavigateToRegister,
                 enabled = !state.isLoading
             ) {
-                Text("Don't have an account? Register")
+                Text(s(StringKey.DONT_HAVE_ACCOUNT))
             }
 
             TextButton(
                 onClick = onNavigateToGuestFaceCheck,
                 enabled = !state.isLoading
             ) {
-                Text("Continue as Guest (Face Check)")
+                Text(s(StringKey.GUEST_FACE_CHECK))
             }
         }
     }

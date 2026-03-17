@@ -36,6 +36,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import com.fivucsas.shared.i18n.StringKey
+import com.fivucsas.shared.i18n.s
 import com.fivucsas.shared.presentation.viewmodel.auth.RegisterViewModel
 import kotlinx.coroutines.launch
 
@@ -62,12 +64,12 @@ fun RegisterScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Register") },
+                title = { Text(s(StringKey.REGISTER)) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back"
+                            contentDescription = s(StringKey.BACK)
                         )
                     }
                 }
@@ -90,7 +92,7 @@ fun RegisterScreen(
             verticalArrangement = Arrangement.Center
         ) {
             Text(
-                text = "Create Account",
+                text = s(StringKey.REGISTER),
                 style = MaterialTheme.typography.headlineMedium
             )
 
@@ -99,7 +101,7 @@ fun RegisterScreen(
             OutlinedTextField(
                 value = firstName,
                 onValueChange = { firstName = it },
-                label = { Text("First Name") },
+                label = { Text(s(StringKey.FIRST_NAME)) },
                 modifier = Modifier.fillMaxWidth(),
                 enabled = !state.isLoading
             )
@@ -109,7 +111,7 @@ fun RegisterScreen(
             OutlinedTextField(
                 value = lastName,
                 onValueChange = { lastName = it },
-                label = { Text("Last Name") },
+                label = { Text(s(StringKey.LAST_NAME)) },
                 modifier = Modifier.fillMaxWidth(),
                 enabled = !state.isLoading
             )
@@ -119,7 +121,7 @@ fun RegisterScreen(
             OutlinedTextField(
                 value = email,
                 onValueChange = { email = it },
-                label = { Text("Email") },
+                label = { Text(s(StringKey.EMAIL)) },
                 modifier = Modifier.fillMaxWidth(),
                 enabled = !state.isLoading
             )
@@ -129,7 +131,7 @@ fun RegisterScreen(
             OutlinedTextField(
                 value = password,
                 onValueChange = { password = it },
-                label = { Text("Password (min 8 characters)") },
+                label = { Text(s(StringKey.PASSWORD)) },
                 visualTransformation = PasswordVisualTransformation(),
                 modifier = Modifier.fillMaxWidth(),
                 enabled = !state.isLoading
@@ -163,7 +165,7 @@ fun RegisterScreen(
                         color = MaterialTheme.colorScheme.onPrimary
                     )
                 } else {
-                    Text("Register")
+                    Text(s(StringKey.REGISTER))
                 }
             }
         }
