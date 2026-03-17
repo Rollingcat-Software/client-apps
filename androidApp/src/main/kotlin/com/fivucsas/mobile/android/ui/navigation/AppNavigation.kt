@@ -16,6 +16,7 @@ import com.fivucsas.mobile.android.ui.screen.AdminDashboardScreen
 import com.fivucsas.mobile.android.ui.screen.BiometricEnrollScreen
 import com.fivucsas.mobile.android.ui.screen.BiometricVerifyScreen
 import com.fivucsas.mobile.android.ui.screen.CardScanScreen
+import com.fivucsas.mobile.android.ui.screen.NfcReadScreen
 import com.fivucsas.mobile.android.ui.screen.ChangePasswordScreen
 import com.fivucsas.mobile.android.ui.screen.DashboardScreen
 import com.fivucsas.mobile.android.ui.screen.EditProfileScreen
@@ -108,6 +109,7 @@ sealed class Screen(val route: String) {
     object MyInvitations : Screen(RouteIds.MY_INVITATIONS)
     object RequestMembership : Screen(RouteIds.REQUEST_MEMBERSHIP)
     object CardScan : Screen(RouteIds.CARD_SCAN)
+    object NfcRead : Screen(RouteIds.NFC_READ)
     object RootConsole : Screen(RouteIds.ROOT_CONSOLE)
     object RootTenantManagement : Screen(RouteIds.ROOT_TENANT_MANAGEMENT)
     object RootTenantDetail : Screen("${RouteIds.ROOT_TENANT_DETAIL}/{tenantId}") {
@@ -293,6 +295,7 @@ fun AppNavigation() {
                 onNavigateToExamEntry = { navController.navigate(Screen.ExamEntry.route) },
                 onNavigateToRequestMembership = { navController.navigate(Screen.RequestMembership.route) },
                 onNavigateToCardScan = { navController.navigate(Screen.CardScan.route) },
+                onNavigateToNfcRead = { navController.navigate(Screen.NfcRead.route) },
                 onNavigateBottom = { route ->
                     navController.navigate(route) {
                         launchSingleTop = true
@@ -960,6 +963,12 @@ fun AppNavigation() {
                 return@composable
             }
             CardScanScreen(
+                onNavigateBack = { navController.popBackStack() }
+            )
+        }
+
+        composable(Screen.NfcRead.route) {
+            NfcReadScreen(
                 onNavigateBack = { navController.popBackStack() }
             )
         }

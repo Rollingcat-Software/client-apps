@@ -84,6 +84,10 @@ dependencies {
     implementation("io.insert-koin:koin-android:3.5.3")
     implementation("io.insert-koin:koin-androidx-compose:3.5.3")
 
+    // BouncyCastle for NFC SOD validation (e-Passport/eID)
+    implementation("org.bouncycastle:bcprov-jdk18on:1.78.1")
+    implementation("org.bouncycastle:bcpkix-jdk18on:1.78.1")
+
     debugImplementation("androidx.compose.ui:ui-tooling")
 }
 

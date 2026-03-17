@@ -1,9 +1,11 @@
 package com.fivucsas.shared.di
 
+import com.fivucsas.mobile.android.data.nfc.AndroidNfcService
 import com.fivucsas.shared.platform.AndroidCameraService
 import com.fivucsas.shared.platform.FingerprintAuthenticator
 import com.fivucsas.shared.platform.AndroidTokenStorage
 import com.fivucsas.shared.platform.ICameraService
+import com.fivucsas.shared.platform.INfcService
 import com.fivucsas.shared.platform.providePlatformFingerprintAuthenticator
 import com.fivucsas.shared.data.local.TokenStorage
 import org.koin.android.ext.koin.androidContext
@@ -42,4 +44,9 @@ actual val platformModule = module {
     }
 
     single<FingerprintAuthenticator> { providePlatformFingerprintAuthenticator() }
+
+    // NFC Service
+    single<INfcService> {
+        AndroidNfcService(androidContext())
+    }
 }

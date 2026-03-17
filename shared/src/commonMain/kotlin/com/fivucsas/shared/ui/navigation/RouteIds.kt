@@ -38,6 +38,7 @@ object RouteIds {
     const val MY_INVITATIONS = "my-invitations"
     const val REQUEST_MEMBERSHIP = "request-membership"
     const val CARD_SCAN = "card-scan"
+    const val NFC_READ = "nfc-read"
     const val TENANT_HISTORY = "tenant-history"
     const val TENANT_SETTINGS = "tenant-settings"
 

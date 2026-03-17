@@ -70,6 +70,7 @@ fun DashboardScreen(
     onNavigateToExamEntry: () -> Unit,
     onNavigateToRequestMembership: () -> Unit,
     onNavigateToCardScan: () -> Unit,
+    onNavigateToNfcRead: () -> Unit = {},
     onNavigateBottom: (String) -> Unit
 ) {
     val canViewEnrollmentStatus = userRole.hasPermission(Permission.ENROLL_SELF_CREATE) ||
@@ -132,6 +133,12 @@ fun DashboardScreen(
             icon = Icons.Default.CreditCard,
             route = Screen.CardScan.route,
             anyPermissions = setOf(Permission.CARD_ADD_SELF)
+        ),
+        QuickAction(
+            id = "nfc-read",
+            title = "NFC Reader",
+            icon = Icons.Default.Nfc,
+            route = Screen.NfcRead.route
         )
     )
 
@@ -150,6 +157,7 @@ fun DashboardScreen(
                     Screen.Profile.route -> onNavigateToProfile()
                     Screen.RequestMembership.route -> onNavigateToRequestMembership()
                     Screen.CardScan.route -> onNavigateToCardScan()
+                    Screen.NfcRead.route -> onNavigateToNfcRead()
                 }
             }
         )
