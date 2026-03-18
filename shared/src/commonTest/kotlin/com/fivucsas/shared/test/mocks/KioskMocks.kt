@@ -1,7 +1,6 @@
 package com.fivucsas.shared.test.mocks
 
 import com.fivucsas.shared.domain.model.EnrollmentData
-import com.fivucsas.shared.domain.model.FacialAction
 import com.fivucsas.shared.domain.model.LivenessResult
 import com.fivucsas.shared.domain.model.User
 import com.fivucsas.shared.domain.model.UserStatus
@@ -50,16 +49,17 @@ class MockEnrollUserUseCase : EnrollUserUseCase(FakeUserRepository(), FakeBiomet
 
 class MockVerifyUserUseCase : VerifyUserUseCase(FakeBiometricRepository()) {
     var shouldSucceed = true
+    var lastUserId: String? = null
     var lastImageBytes: ByteArray? = null
     var mockResult = VerificationResult(
-        userId = "user_123",
         isVerified = true,
         confidence = 95.5f,
         message = "Verification successful"
     )
     var errorMessage = "Failed to verify user"
 
-    override suspend fun invoke(faceImage: ByteArray): Result<VerificationResult> {
+    override suspend fun invoke(userId: String, faceImage: ByteArray): Result<VerificationResult> {
+        lastUserId = userId
         lastImageBytes = faceImage
         return if (shouldSucceed) {
             Result.success(mockResult)
@@ -71,16 +71,16 @@ class MockVerifyUserUseCase : VerifyUserUseCase(FakeBiometricRepository()) {
 
 class MockCheckLivenessUseCase : CheckLivenessUseCase(FakeBiometricRepository()) {
     var shouldSucceed = true
-    var lastActions: List<FacialAction>? = null
+    var lastImageBytes: ByteArray? = null
     var mockResult = LivenessResult(
         isLive = true,
-        confidence = 0.95f,
+        livenessScore = 0.95f,
         message = "Liveness check passed"
     )
     var errorMessage = "Failed to check liveness"
 
-    override suspend fun invoke(actions: List<FacialAction>): Result<LivenessResult> {
-        lastActions = actions
+    override suspend fun invoke(faceImage: ByteArray): Result<LivenessResult> {
+        lastImageBytes = faceImage
         return if (shouldSucceed) {
             Result.success(mockResult)
         } else {

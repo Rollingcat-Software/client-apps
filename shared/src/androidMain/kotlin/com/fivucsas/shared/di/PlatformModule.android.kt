@@ -1,16 +1,14 @@
 package com.fivucsas.shared.di
 
-import com.fivucsas.mobile.android.data.nfc.AndroidNfcService
 import com.fivucsas.shared.platform.AndroidCameraService
 import com.fivucsas.shared.platform.FingerprintAuthenticator
 import com.fivucsas.shared.platform.AndroidTokenStorage
 import com.fivucsas.shared.platform.ICameraService
 import com.fivucsas.shared.platform.INfcService
+import com.fivucsas.shared.platform.NoOpNfcService
 import com.fivucsas.shared.platform.providePlatformFingerprintAuthenticator
 import com.fivucsas.shared.data.local.TokenStorage
 import org.koin.android.ext.koin.androidContext
-import org.koin.core.module.dsl.singleOf
-import org.koin.dsl.bind
 import org.koin.dsl.module
 
 /**
@@ -22,6 +20,10 @@ import org.koin.dsl.module
  * Provides:
  * - AndroidCameraService: CameraX-based camera implementation
  * - AndroidTokenStorage: Encrypted SharedPreferences for secure token storage
+ *
+ * Note: NFC service is registered as a no-op default here.
+ * The androidApp module overrides this with AndroidNfcService
+ * (which lives in the androidApp module and can't be referenced from shared).
  *
  * Design Patterns:
  * - Dependency Injection Pattern: Uses Koin for IoC
@@ -45,8 +47,8 @@ actual val platformModule = module {
 
     single<FingerprintAuthenticator> { providePlatformFingerprintAuthenticator() }
 
-    // NFC Service
+    // NFC Service — default no-op; overridden in androidApp with AndroidNfcService
     single<INfcService> {
-        AndroidNfcService(androidContext())
+        NoOpNfcService()
     }
 }

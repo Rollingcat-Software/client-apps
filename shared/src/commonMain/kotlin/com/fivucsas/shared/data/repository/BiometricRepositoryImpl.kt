@@ -2,12 +2,14 @@ package com.fivucsas.shared.data.repository
 
 import com.fivucsas.shared.data.remote.api.BiometricApi
 import com.fivucsas.shared.data.remote.dto.toModel
-import com.fivucsas.shared.domain.model.BiometricData
+import com.fivucsas.shared.domain.model.EnrollmentResult
 import com.fivucsas.shared.domain.model.FacialAction
 import com.fivucsas.shared.domain.model.IdentifyResult
 import com.fivucsas.shared.domain.model.LivenessResult
 import com.fivucsas.shared.domain.model.VerificationResult
 import com.fivucsas.shared.domain.repository.BiometricRepository
+import kotlin.io.encoding.Base64
+import kotlin.io.encoding.ExperimentalEncodingApi
 
 /**
  * Real implementation of BiometricRepository

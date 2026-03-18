@@ -53,15 +53,15 @@ class DefaultConfigurationProvider : IConfigurationProvider {
     override val maxPageSize: Int get() = AppConfig.Pagination.MAX_PAGE_SIZE
 
     // Biometric Configuration
-    override val confidenceThreshold: Float get() = BiometricConfig.CONFIDENCE_THRESHOLD
-    override val livenessThreshold: Float get() = BiometricConfig.LIVENESS_THRESHOLD
-    override val minFaceSize: Int get() = BiometricConfig.MIN_FACE_SIZE
-    override val maxFaceSize: Int get() = BiometricConfig.MAX_FACE_SIZE
+    override val confidenceThreshold: Float get() = BiometricConfig.CONFIDENCE_THRESHOLD.toFloat()
+    override val livenessThreshold: Float get() = BiometricConfig.LIVENESS_THRESHOLD.toFloat()
+    override val minFaceSize: Int get() = BiometricConfig.MIN_FACE_SIZE_PIXELS
+    override val maxFaceSize: Int get() = BiometricConfig.MAX_FACE_SIZE_PIXELS
 
     // UI Configuration
     override val animationDurationNormal: Int get() = AnimationConfig.DURATION_NORMAL
     override val animationDurationFast: Int get() = AnimationConfig.DURATION_FAST
-    override val animationDelayVerification: Int get() = AnimationConfig.DELAY_VERIFICATION
+    override val animationDelayVerification: Int get() = AnimationConfig.DELAY_VERIFICATION.toInt()
 
     @Suppress("UNCHECKED_CAST")
     override fun <T> get(key: String, defaultValue: T): T {

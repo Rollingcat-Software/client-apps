@@ -73,7 +73,7 @@ fun GuestFaceCheckScreen(
                     cameraService = cameraService,
                     onCapture = { imageBytes ->
                         scope.launch {
-                            viewModel.verifyFace(imageBytes)
+                            viewModel.verifyFace("guest", imageBytes)
                         }
                     },
                     onClose = onBack

@@ -1,6 +1,6 @@
 package com.fivucsas.shared.domain.repository
 
-import com.fivucsas.shared.domain.model.BiometricData
+import com.fivucsas.shared.domain.model.EnrollmentResult
 import com.fivucsas.shared.domain.model.FacialAction
 import com.fivucsas.shared.domain.model.IdentifyResult
 import com.fivucsas.shared.domain.model.LivenessResult

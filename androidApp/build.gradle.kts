@@ -37,6 +37,11 @@ android {
         }
     }
 
+    // Exclude BouncyCastle bundled by Android to avoid duplicate class conflicts
+    configurations.all {
+        exclude(group = "org.bouncycastle", module = "bcprov-jdk15to18")
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = false
