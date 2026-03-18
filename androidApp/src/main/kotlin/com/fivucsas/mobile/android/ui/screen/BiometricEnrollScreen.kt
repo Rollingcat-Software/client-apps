@@ -128,7 +128,7 @@ private data class EnrollmentFormState(
 // Main Screen â€“ orchestrates Form â†’ Capture â†’ Preview â†’ Success
 // ---------------------------------------------------------------------------
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
 fun BiometricEnrollScreen(
     userId: String,
@@ -139,6 +139,10 @@ fun BiometricEnrollScreen(
     var currentStep by rememberSaveable { mutableStateOf(STEP_FORM) }
     var formState by remember { mutableStateOf(EnrollmentFormState()) }
     var capturedImageBytes by remember { mutableStateOf<ByteArray?>(null) }
+
+    val cameraPermissionState = rememberPermissionState(Manifest.permission.CAMERA)
+    var hasRequestedPermission by rememberSaveable { mutableStateOf(false) }
+    var permissionPermanentlyDenied by rememberSaveable { mutableStateOf(false) }
 
     LaunchedEffect(Unit) { viewModel.clearState() }
 

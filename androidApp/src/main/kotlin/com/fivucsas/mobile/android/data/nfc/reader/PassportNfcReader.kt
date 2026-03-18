@@ -215,9 +215,10 @@ class PassportNfcReader : BaseCardReader() {
 
             // Verify DG1 hash
             var dg1HashValid: Boolean? = null
-            if (dg1Data != null && sodValidationResult?.ldsSecurityObject != null) {
+            val ldsSod = sodValidationResult?.ldsSecurityObject
+            if (dg1Data != null && ldsSod != null) {
                 val dg1Result = HashVerifier.verifyDataGroup(
-                    1, dg1Data, sodValidationResult.ldsSecurityObject
+                    1, dg1Data, ldsSod
                 )
                 dg1HashValid = dg1Result.isValid
                 SecureLogger.d(TAG, "DG1 hash verification: $dg1HashValid")
@@ -229,9 +230,9 @@ class PassportNfcReader : BaseCardReader() {
             // Verify DG2 hash
             var dg2HashValid: Boolean? = null
             val dg2Data = readFileSecure(isoDep, secureMessaging, EidApduHelper.FileIds.DG2)
-            if (dg2Data != null && sodValidationResult?.ldsSecurityObject != null) {
+            if (dg2Data != null && ldsSod != null) {
                 val dg2Result = HashVerifier.verifyDataGroup(
-                    2, dg2Data, sodValidationResult.ldsSecurityObject
+                    2, dg2Data, ldsSod
                 )
                 dg2HashValid = dg2Result.isValid
                 SecureLogger.d(TAG, "DG2 hash verification: $dg2HashValid")

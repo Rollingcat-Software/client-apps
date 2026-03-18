@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CameraAlt
+import androidx.compose.material.icons.filled.Contactless
 import androidx.compose.material.icons.filled.CreditCard
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Notifications
@@ -137,7 +138,7 @@ fun DashboardScreen(
         QuickAction(
             id = "nfc-read",
             title = "NFC Reader",
-            icon = Icons.Default.Nfc,
+            icon = Icons.Default.Contactless,
             route = Screen.NfcRead.route
         )
     )
