@@ -5,6 +5,8 @@ import com.fivucsas.shared.platform.ICameraService
 import com.fivucsas.shared.platform.DesktopCameraServiceImpl
 import com.fivucsas.shared.platform.DesktopTokenStorage
 import com.fivucsas.shared.platform.FingerprintAuthenticator
+import com.fivucsas.shared.platform.IPushNotificationService
+import com.fivucsas.shared.platform.NoOpPushNotificationService
 import com.fivucsas.shared.platform.providePlatformFingerprintAuthenticator
 import org.koin.dsl.bind
 import org.koin.dsl.module
@@ -32,4 +34,6 @@ actual val platformModule = module {
     // Uses Java Preferences for persistent storage
     single { DesktopTokenStorage() } bind TokenStorage::class
     single<FingerprintAuthenticator> { providePlatformFingerprintAuthenticator() }
+    // Push notifications not supported on desktop
+    single<IPushNotificationService> { NoOpPushNotificationService() }
 }

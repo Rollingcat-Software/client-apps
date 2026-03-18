@@ -5,7 +5,9 @@ import com.fivucsas.shared.platform.FingerprintAuthenticator
 import com.fivucsas.shared.platform.AndroidTokenStorage
 import com.fivucsas.shared.platform.ICameraService
 import com.fivucsas.shared.platform.INfcService
+import com.fivucsas.shared.platform.IPushNotificationService
 import com.fivucsas.shared.platform.NoOpNfcService
+import com.fivucsas.shared.platform.NoOpPushNotificationService
 import com.fivucsas.shared.platform.providePlatformFingerprintAuthenticator
 import com.fivucsas.shared.data.local.TokenStorage
 import org.koin.android.ext.koin.androidContext
@@ -50,5 +52,10 @@ actual val platformModule = module {
     // NFC Service — default no-op; overridden in androidApp with AndroidNfcService
     single<INfcService> {
         NoOpNfcService()
+    }
+
+    // Push Notification Service — default no-op; overridden in androidApp when Firebase is configured
+    single<IPushNotificationService> {
+        NoOpPushNotificationService()
     }
 }
