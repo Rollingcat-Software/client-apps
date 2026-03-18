@@ -3,6 +3,7 @@ package com.fivucsas.mobile.android.ui.navigation
 import android.net.Uri
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavType
@@ -42,10 +43,13 @@ import com.fivucsas.shared.domain.model.Permission
 import com.fivucsas.shared.domain.model.UserRole
 import com.fivucsas.shared.domain.model.hasPermission
 import com.fivucsas.shared.presentation.viewmodel.auth.BiometricViewModel
+import com.fivucsas.shared.presentation.viewmodel.auth.ChangePasswordViewModel
 import com.fivucsas.shared.presentation.viewmodel.auth.FingerprintViewModel
 import com.fivucsas.shared.presentation.state.FingerprintUiState
 import com.fivucsas.shared.presentation.viewmodel.auth.LoginViewModel
 import com.fivucsas.shared.presentation.viewmodel.auth.RegisterViewModel
+import com.fivucsas.shared.presentation.viewmodel.UserProfileViewModel
+import androidx.compose.runtime.collectAsState
 import com.fivucsas.shared.ui.screen.FingerprintFailureScreen
 import com.fivucsas.shared.ui.screen.FingerprintGateScreen
 import com.fivucsas.shared.ui.screen.FingerprintSuccessScreen
@@ -196,10 +200,12 @@ fun AppNavigation() {
         startDestination = Screen.Splash.route
     ) {
         composable(Screen.Splash.route) {
+            val isAuth = isAuthenticated()
+            val splashRole = if (isAuth) currentUserRole() else null
             SplashScreen(
                 isFirstLaunch = prefs.getBoolean(KEY_FIRST_LAUNCH, true),
-                isAuthenticated = false,
-                userRole = null,
+                isAuthenticated = isAuth,
+                userRole = splashRole,
                 onNavigateToOnboarding = {
                     navController.navigate(Screen.Onboarding.route) {
                         popUpTo(Screen.Splash.route) { inclusive = true }
@@ -211,12 +217,14 @@ fun AppNavigation() {
                     }
                 },
                 onNavigateToDashboard = {
-                    navController.navigate(Screen.Login.route) {
+                    val dest = NavigationPolicy.loginSuccessRoute(currentUserRole())
+                    navController.navigate(dest) {
                         popUpTo(Screen.Splash.route) { inclusive = true }
                     }
                 },
                 onNavigateToAdminDashboard = {
-                    navController.navigate(Screen.Login.route) {
+                    val dest = NavigationPolicy.loginSuccessRoute(currentUserRole())
+                    navController.navigate(dest) {
                         popUpTo(Screen.Splash.route) { inclusive = true }
                     }
                 }
@@ -291,15 +299,16 @@ fun AppNavigation() {
                 return@composable
             }
             val userRole = currentUserRole()
+            val dashboardUserName = tokenManager?.getUserName() ?: "User"
             DashboardScreen(
-                userName = "Test User",
+                userName = dashboardUserName,
                 userRole = userRole,
                 navItems = navItemsForRole,
                 currentRoute = Screen.Dashboard.route,
                 onNavigateToNotifications = { navController.navigate(Screen.Notifications.route) },
                 onNavigateToProfile = { navController.navigate(Screen.Profile.route) },
-                onNavigateToEnroll = { navController.navigate(Screen.BiometricEnroll.createRoute("1")) },
-                onNavigateToVerify = { navController.navigate(Screen.BiometricVerify.createRoute("1")) },
+                onNavigateToEnroll = { navController.navigate(Screen.BiometricEnroll.createRoute(tokenManager?.getUserId() ?: "me")) },
+                onNavigateToVerify = { navController.navigate(Screen.BiometricVerify.createRoute(tokenManager?.getUserId() ?: "me")) },
                 onNavigateToQrScan = { navController.navigate(Screen.QrLoginScan.route) },
                 onNavigateToHistory = { navController.navigate(Screen.ActivityHistory.route) },
                 onNavigateToInvitations = { navController.navigate(Screen.InviteAccept.route) },
@@ -572,8 +581,8 @@ fun AppNavigation() {
                 currentRoute = Screen.OperatorDashboard.route,
                 onNavigateToNotifications = { navController.navigate(Screen.Notifications.route) },
                 onNavigateToProfile = { navController.navigate(Screen.Profile.route) },
-                onNavigateToEnroll = { navController.navigate(Screen.BiometricEnroll.createRoute("1")) },
-                onNavigateToVerify = { navController.navigate(Screen.BiometricVerify.createRoute("1")) },
+                onNavigateToEnroll = { navController.navigate(Screen.BiometricEnroll.createRoute(tokenManager?.getUserId() ?: "me")) },
+                onNavigateToVerify = { navController.navigate(Screen.BiometricVerify.createRoute(tokenManager?.getUserId() ?: "me")) },
                 onNavigateToHistory = { navController.navigate(Screen.ActivityHistory.route) },
                 onNavigateBottom = { route ->
                     navController.navigate(route) {
@@ -659,16 +668,25 @@ fun AppNavigation() {
                 return@composable
             }
             val userRole = currentUserRole()
+            val profileVm = koinInject<UserProfileViewModel>()
+            val profileState by profileVm.state.collectAsState()
+            LaunchedEffect(Unit) { profileVm.loadProfile() }
             val profileNavItems = when (userRole) {
                 UserRole.ROOT -> BottomNavDestinations.rootItems
                 UserRole.TENANT_ADMIN -> BottomNavDestinations.adminItems
                 UserRole.USER -> BottomNavDestinations.userItems
                 else -> BottomNavDestinations.items
             }
+            val profileUserName = profileState.user?.name ?: tokenManager?.getUserName() ?: "User"
+            val profileUserEmail = profileState.user?.email ?: tokenManager?.getUserEmail() ?: ""
             ProfileScreen(
-                userName = "Test User",
-                userEmail = "test@fivucsas.com",
+                userName = profileUserName,
+                userEmail = profileUserEmail,
                 userRole = userRole,
+                userPhone = profileState.user?.phoneNumber ?: "",
+                enrollmentDate = profileState.user?.enrollmentDate ?: "",
+                isLoading = profileState.isLoading,
+                errorMessage = profileState.errorMessage,
                 currentRoute = Screen.Profile.route,
                 onNavigateBottom = { route ->
                     val destination = if (userRole == UserRole.ROOT && route == RouteIds.ADMIN_DASHBOARD) {
@@ -683,7 +701,7 @@ fun AppNavigation() {
                 },
                 onEditProfile = { navController.navigate(Screen.EditProfile.route) },
                 onChangePassword = { navController.navigate(Screen.ChangePassword.route) },
-                onReEnroll = { navController.navigate(Screen.BiometricEnroll.createRoute("1")) },
+                onReEnroll = { navController.navigate(Screen.BiometricEnroll.createRoute(tokenManager?.getUserId() ?: "me")) },
                 onDeleteEnrollment = { /* Enrollment deletion not yet available */ },
                 onOpenSettings = { navController.navigate(Screen.Settings.route) },
                 navItems = profileNavItems
@@ -699,12 +717,17 @@ fun AppNavigation() {
                 }
                 return@composable
             }
+            val editProfileVm = koinInject<UserProfileViewModel>()
+            val editProfileState by editProfileVm.state.collectAsState()
+            LaunchedEffect(Unit) { editProfileVm.loadProfile() }
+            val editUser = editProfileState.user
+            val editNameParts = (editUser?.name ?: tokenManager?.getUserName() ?: "").split(" ", limit = 2)
             EditProfileScreen(
-                initialFirstName = "Test",
-                initialLastName = "User",
-                email = "test@fivucsas.com",
-                initialPhone = "+1 234 567 8900",
-                idNumber = "NIC-12345678",
+                initialFirstName = editNameParts.getOrElse(0) { "" },
+                initialLastName = editNameParts.getOrElse(1) { "" },
+                email = editUser?.email ?: tokenManager?.getUserEmail() ?: "",
+                initialPhone = editUser?.phoneNumber ?: "",
+                idNumber = editUser?.idNumber ?: "",
                 onNavigateBack = { navController.popBackStack() },
                 onSave = { _, _, _ -> navController.popBackStack() }
             )
@@ -719,9 +742,21 @@ fun AppNavigation() {
                 }
                 return@composable
             }
+            val changePasswordVm = koinInject<ChangePasswordViewModel>()
+            val cpState by changePasswordVm.state.collectAsState()
+            LaunchedEffect(cpState.isSuccess) {
+                if (cpState.isSuccess) {
+                    navController.popBackStack()
+                }
+            }
             ChangePasswordScreen(
                 onNavigateBack = { navController.popBackStack() },
-                onSubmit = { _, _, _ -> navController.popBackStack() }
+                onSubmit = { current, newPw, confirm ->
+                    changePasswordVm.changePassword(current, newPw, confirm)
+                },
+                isLoading = cpState.isLoading,
+                errorMessage = cpState.errorMessage,
+                onClearError = { changePasswordVm.clearError() }
             )
         }
 

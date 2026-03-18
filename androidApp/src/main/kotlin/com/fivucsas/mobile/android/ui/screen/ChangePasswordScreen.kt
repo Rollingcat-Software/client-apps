@@ -29,14 +29,20 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import com.fivucsas.shared.config.UIDimens
 import com.fivucsas.shared.ui.components.atoms.AppTextField
+import com.fivucsas.shared.ui.components.molecules.ErrorMessage
 import com.fivucsas.shared.ui.components.molecules.PasswordStrengthIndicator
 import com.fivucsas.shared.ui.theme.AppColors
+import androidx.compose.foundation.layout.height
+import androidx.compose.material3.CircularProgressIndicator
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChangePasswordScreen(
     onNavigateBack: () -> Unit,
-    onSubmit: (String, String, String) -> Unit
+    onSubmit: (String, String, String) -> Unit,
+    isLoading: Boolean = false,
+    errorMessage: String? = null,
+    onClearError: () -> Unit = {}
 ) {
     val currentPassword = remember { mutableStateOf("") }
     val newPassword = remember { mutableStateOf("") }
@@ -92,11 +98,28 @@ fun ChangePasswordScreen(
                 visualTransformation = PasswordVisualTransformation()
             )
 
+            errorMessage?.let {
+                ErrorMessage(message = it)
+                Spacer(modifier = Modifier.size(4.dp))
+            }
+
             Spacer(modifier = Modifier.size(4.dp))
             Button(
-                onClick = { onSubmit(currentPassword.value, newPassword.value, confirmPassword.value) },
-                modifier = Modifier.fillMaxWidth()
+                onClick = {
+                    onClearError()
+                    onSubmit(currentPassword.value, newPassword.value, confirmPassword.value)
+                },
+                modifier = Modifier.fillMaxWidth(),
+                enabled = !isLoading
             ) {
+                if (isLoading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(20.dp),
+                        strokeWidth = 2.dp,
+                        color = MaterialTheme.colorScheme.onPrimary
+                    )
+                    Spacer(modifier = Modifier.size(8.dp))
+                }
                 Text("Update Password")
             }
             Text(

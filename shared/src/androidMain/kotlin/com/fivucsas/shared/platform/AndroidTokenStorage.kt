@@ -49,8 +49,47 @@ class AndroidTokenStorage(context: Context) : TokenStorage {
         sharedPreferences.edit().remove(KEY_ROLE).apply()
     }
 
+    override fun saveUserName(name: String) {
+        sharedPreferences.edit().putString(KEY_USER_NAME, name).apply()
+    }
+
+    override fun getUserName(): String? {
+        return sharedPreferences.getString(KEY_USER_NAME, null)
+    }
+
+    override fun clearUserName() {
+        sharedPreferences.edit().remove(KEY_USER_NAME).apply()
+    }
+
+    override fun saveUserEmail(email: String) {
+        sharedPreferences.edit().putString(KEY_USER_EMAIL, email).apply()
+    }
+
+    override fun getUserEmail(): String? {
+        return sharedPreferences.getString(KEY_USER_EMAIL, null)
+    }
+
+    override fun clearUserEmail() {
+        sharedPreferences.edit().remove(KEY_USER_EMAIL).apply()
+    }
+
+    override fun saveUserId(id: String) {
+        sharedPreferences.edit().putString(KEY_USER_ID, id).apply()
+    }
+
+    override fun getUserId(): String? {
+        return sharedPreferences.getString(KEY_USER_ID, null)
+    }
+
+    override fun clearUserId() {
+        sharedPreferences.edit().remove(KEY_USER_ID).apply()
+    }
+
     companion object {
         private const val KEY_TOKEN = "auth_token"
         private const val KEY_ROLE = "user_role"
+        private const val KEY_USER_NAME = "user_name"
+        private const val KEY_USER_EMAIL = "user_email"
+        private const val KEY_USER_ID = "user_id"
     }
 }

@@ -56,74 +56,8 @@ fun ActivityHistoryScreen(
     )
     var selectedFilter by remember { mutableStateOf(filters.first().value) }
 
-    val sections = listOf(
-        "Today" to listOf(
-            HistoryEntry(
-                category = "verification",
-                item = ActivityItemData(
-                    title = "Verification Successful",
-                    description = "Confidence: 94%",
-                    timestamp = "10:30 AM",
-                    score = "94%",
-                    status = StatusBadgeType.Success,
-                    icon = Icons.Default.Security,
-                    iconTint = AppColors.Success
-                )
-            ),
-            HistoryEntry(
-                category = "verification",
-                item = ActivityItemData(
-                    title = "Verification Successful",
-                    description = "Confidence: 91%",
-                    timestamp = "09:15 AM",
-                    score = "91%",
-                    status = StatusBadgeType.Success,
-                    icon = Icons.Default.Security,
-                    iconTint = AppColors.Success
-                )
-            )
-        ),
-        "Yesterday" to listOf(
-            HistoryEntry(
-                category = "verification",
-                item = ActivityItemData(
-                    title = "Verification Failed",
-                    description = "Low confidence score",
-                    timestamp = "3:14 PM",
-                    score = "62%",
-                    status = StatusBadgeType.Failure,
-                    icon = Icons.Default.Security,
-                    iconTint = AppColors.Error
-                )
-            ),
-            HistoryEntry(
-                category = "verification",
-                item = ActivityItemData(
-                    title = "Verification Successful",
-                    description = "Confidence: 91%",
-                    timestamp = "3:15 PM",
-                    score = "91%",
-                    status = StatusBadgeType.Success,
-                    icon = Icons.Default.Security,
-                    iconTint = AppColors.Success
-                )
-            )
-        ),
-        "January 28, 2026" to listOf(
-            HistoryEntry(
-                category = "enrollment",
-                item = ActivityItemData(
-                    title = "Face Enrollment Completed",
-                    description = "Quality score: 88%",
-                    timestamp = "2:00 PM",
-                    score = "88%",
-                    status = StatusBadgeType.Info,
-                    icon = Icons.Default.CameraAlt,
-                    iconTint = AppColors.Primary
-                )
-            )
-        )
-    )
+    // Activity history will be loaded from API when endpoint is available
+    val sections = emptyList<Pair<String, List<HistoryEntry>>>()
 
     val filteredSections = sections.mapNotNull { (title, entries) ->
         val filteredEntries = if (selectedFilter == "all") {
@@ -179,20 +113,34 @@ fun ActivityHistoryScreen(
                 onSelected = { selectedFilter = it.value }
             )
 
-            LazyColumn(
-                modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(vertical = 12.dp),
-                verticalArrangement = Arrangement.spacedBy(UIDimens.SpacingSmall)
-            ) {
-                filteredSections.forEach { (title, itemsList) ->
-                    item {
-                        SectionHeader(
-                            title = title,
-                            modifier = Modifier.padding(vertical = 4.dp)
-                        )
-                    }
-                    items(itemsList) { entry ->
-                        ActivityItem(data = entry.item)
+            if (filteredSections.isEmpty()) {
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = "No activity history yet",
+                        style = androidx.compose.material3.MaterialTheme.typography.bodyLarge,
+                        color = AppColors.OnSurfaceVariant
+                    )
+                }
+            } else {
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(vertical = 12.dp),
+                    verticalArrangement = Arrangement.spacedBy(UIDimens.SpacingSmall)
+                ) {
+                    filteredSections.forEach { (title, itemsList) ->
+                        item {
+                            SectionHeader(
+                                title = title,
+                                modifier = Modifier.padding(vertical = 4.dp)
+                            )
+                        }
+                        items(itemsList) { entry ->
+                            ActivityItem(data = entry.item)
+                        }
                     }
                 }
             }

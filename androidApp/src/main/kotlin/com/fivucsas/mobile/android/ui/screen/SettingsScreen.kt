@@ -285,7 +285,7 @@ fun SettingsScreen(
                         modifier = Modifier.fillMaxWidth()
                     )
                     Spacer(modifier = Modifier.height(10.dp))
-                    Button(onClick = { /* TODO persist system settings */ }) {
+                    Button(onClick = { /* System settings save not yet implemented */ }) {
                         Text(s(StringKey.SAVE_SETTINGS))
                     }
                 }

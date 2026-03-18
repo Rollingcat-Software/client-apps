@@ -32,7 +32,7 @@ data class SettingsState(
     // Notification Settings
     val emailNotificationsEnabled: Boolean = true,
     val securityAlertThreshold: Int = 3,
-    val notificationRecipients: List<String> = listOf("admin@fivucsas.com"),
+    val notificationRecipients: List<String> = emptyList(),
 
     // Appearance Settings
     val theme: AppTheme = AppTheme.SYSTEM,

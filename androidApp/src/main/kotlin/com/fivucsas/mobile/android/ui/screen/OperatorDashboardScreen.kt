@@ -18,8 +18,6 @@ import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Security
-import androidx.compose.material3.Badge
-import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -71,53 +69,8 @@ fun OperatorDashboardScreen(
         viewModel.loadStatistics()
     }
 
-    val recentActivities = listOf(
-        ActivityItemData(
-            title = "Verification Successful",
-            description = "User: Maria Garcia - Confidence: 96%",
-            timestamp = "Today, 11:45 AM",
-            score = "96%",
-            status = StatusBadgeType.Success,
-            icon = Icons.Default.Security,
-            iconTint = AppColors.Success
-        ),
-        ActivityItemData(
-            title = "New Enrollment",
-            description = "User: James Wilson enrolled successfully",
-            timestamp = "Today, 11:20 AM",
-            score = "92%",
-            status = StatusBadgeType.Info,
-            icon = Icons.Default.CameraAlt,
-            iconTint = AppColors.Primary
-        ),
-        ActivityItemData(
-            title = "Verification Failed",
-            description = "User: Unknown - Low confidence score",
-            timestamp = "Today, 10:55 AM",
-            score = "45%",
-            status = StatusBadgeType.Failure,
-            icon = Icons.Default.Security,
-            iconTint = AppColors.Error
-        ),
-        ActivityItemData(
-            title = "Verification Successful",
-            description = "User: Carlos Mendez - Confidence: 91%",
-            timestamp = "Today, 10:30 AM",
-            score = "91%",
-            status = StatusBadgeType.Success,
-            icon = Icons.Default.Security,
-            iconTint = AppColors.Success
-        ),
-        ActivityItemData(
-            title = "New Enrollment",
-            description = "User: Aisha Patel enrolled successfully",
-            timestamp = "Today, 9:15 AM",
-            score = "89%",
-            status = StatusBadgeType.Info,
-            icon = Icons.Default.CameraAlt,
-            iconTint = AppColors.Primary
-        )
-    )
+    // Activity data will be loaded from API when endpoint is available
+    val recentActivities = emptyList<ActivityItemData>()
 
     Scaffold(
         topBar = {
@@ -138,12 +91,10 @@ fun OperatorDashboardScreen(
                 },
                 actions = {
                     IconButton(onClick = onNavigateToNotifications) {
-                        BadgedBox(badge = { Badge { Text("1") } }) {
-                            Icon(
-                                imageVector = Icons.Default.Notifications,
-                                contentDescription = "Notifications"
-                            )
-                        }
+                        Icon(
+                            imageVector = Icons.Default.Notifications,
+                            contentDescription = "Notifications"
+                        )
                     }
                     IconButton(onClick = onNavigateToProfile) {
                         Icon(
@@ -278,9 +229,17 @@ fun OperatorDashboardScreen(
                     )
                 }
             )
-            Column(verticalArrangement = Arrangement.spacedBy(UIDimens.SpacingSmall)) {
-                recentActivities.forEach { activity ->
-                    ActivityItem(data = activity)
+            if (recentActivities.isEmpty()) {
+                Text(
+                    text = "No recent activity yet.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = AppColors.OnSurfaceVariant
+                )
+            } else {
+                Column(verticalArrangement = Arrangement.spacedBy(UIDimens.SpacingSmall)) {
+                    recentActivities.forEach { activity ->
+                        ActivityItem(data = activity)
+                    }
                 }
             }
 

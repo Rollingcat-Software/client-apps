@@ -3,8 +3,10 @@ package com.fivucsas.mobile.android.ui.screen
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -33,35 +35,8 @@ import com.fivucsas.shared.ui.theme.AppColors
 fun NotificationsScreen(
     onNavigateBack: () -> Unit
 ) {
-    val notifications = listOf(
-        NotificationItemData(
-            title = "Security Alert",
-            message = "Failed verification attempt",
-            time = "2 min ago",
-            isUnread = true,
-            status = StatusBadgeType.Failure,
-            icon = Icons.Default.Error,
-            iconTint = AppColors.Error
-        ),
-        NotificationItemData(
-            title = "Warning",
-            message = "Multiple failed verifications",
-            time = "15 min ago",
-            isUnread = false,
-            status = StatusBadgeType.Warning,
-            icon = Icons.Default.Warning,
-            iconTint = AppColors.Warning
-        ),
-        NotificationItemData(
-            title = "Info",
-            message = "New device login detected",
-            time = "1 hour ago",
-            isUnread = false,
-            status = StatusBadgeType.Info,
-            icon = Icons.Default.Info,
-            iconTint = AppColors.Info
-        )
-    )
+    // Notifications will be loaded from API when endpoint is available
+    val notifications = emptyList<NotificationItemData>()
 
     Scaffold(
         topBar = {
@@ -79,16 +54,40 @@ fun NotificationsScreen(
             )
         }
     ) { paddingValues ->
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .padding(UIDimens.SpacingMedium),
-            contentPadding = PaddingValues(vertical = 8.dp),
-            verticalArrangement = Arrangement.spacedBy(UIDimens.SpacingSmall)
-        ) {
-            items(notifications) { item ->
-                NotificationItem(data = item)
+        if (notifications.isEmpty()) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+                    .padding(UIDimens.SpacingMedium),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Info,
+                    contentDescription = null,
+                    modifier = Modifier.size(48.dp),
+                    tint = AppColors.OnSurfaceVariant
+                )
+                Spacer(modifier = Modifier.size(16.dp))
+                Text(
+                    text = "No notifications yet",
+                    style = androidx.compose.material3.MaterialTheme.typography.bodyLarge,
+                    color = AppColors.OnSurfaceVariant
+                )
+            }
+        } else {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+                    .padding(UIDimens.SpacingMedium),
+                contentPadding = PaddingValues(vertical = 8.dp),
+                verticalArrangement = Arrangement.spacedBy(UIDimens.SpacingSmall)
+            ) {
+                items(notifications) { item ->
+                    NotificationItem(data = item)
+                }
             }
         }
     }

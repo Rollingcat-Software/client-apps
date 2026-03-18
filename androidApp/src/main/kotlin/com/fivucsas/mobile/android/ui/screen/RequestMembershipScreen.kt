@@ -50,15 +50,8 @@ import com.fivucsas.shared.ui.theme.AppColors
 fun RequestMembershipScreen(
     onNavigateBack: () -> Unit
 ) {
-    val allTenants = remember {
-        listOf(
-            TenantInfo("t1", "Acme Corporation", "Global technology solutions provider", 142),
-            TenantInfo("t2", "Globex Inc.", "International logistics and supply chain", 87),
-            TenantInfo("t3", "Wayne Enterprises", "Diversified industrial conglomerate", 312),
-            TenantInfo("t4", "Stark Industries", "Advanced technology and defense", 256),
-            TenantInfo("t5", "Umbrella Corp.", "Pharmaceutical and biotech research", 64)
-        )
-    }
+    // Tenants will be loaded from API when endpoint is available
+    val allTenants = remember { emptyList<TenantInfo>() }
 
     var searchQuery by remember { mutableStateOf("") }
     var requestedTenantIds by remember { mutableStateOf(setOf<String>()) }

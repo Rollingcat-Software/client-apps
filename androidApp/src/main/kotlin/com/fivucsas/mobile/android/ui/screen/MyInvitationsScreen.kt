@@ -55,14 +55,8 @@ import com.fivucsas.shared.ui.theme.AppColors
 fun MyInvitationsScreen(
     onNavigateBack: () -> Unit
 ) {
-    val invites = remember {
-        mutableStateListOf(
-            ReceivedInvite("1", "Acme Corporation", "admin@acme.com", "TENANT_MEMBER", "2026-02-20", "2026-03-20", ReceivedInviteStatus.PENDING),
-            ReceivedInvite("2", "Globex Inc.", "hr@globex.com", "TENANT_MEMBER", "2026-02-18", "2026-03-18", ReceivedInviteStatus.PENDING),
-            ReceivedInvite("3", "Wayne Enterprises", "ops@wayne.com", "TENANT_MEMBER", "2026-01-15", "2026-02-15", ReceivedInviteStatus.ACCEPTED),
-            ReceivedInvite("4", "Stark Industries", "tony@stark.com", "TENANT_ADMIN", "2026-01-05", "2026-02-05", ReceivedInviteStatus.EXPIRED)
-        )
-    }
+    // Invitations will be loaded from API when endpoint is available
+    val invites = remember { mutableStateListOf<ReceivedInvite>() }
 
     var successMessage by remember { mutableStateOf<String?>(null) }
 

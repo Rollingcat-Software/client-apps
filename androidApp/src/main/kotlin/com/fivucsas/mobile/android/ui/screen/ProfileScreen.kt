@@ -40,8 +40,10 @@ import com.fivucsas.shared.domain.model.Permission
 import com.fivucsas.shared.domain.model.UserRole
 import com.fivucsas.shared.domain.model.hasPermission
 import com.fivucsas.shared.ui.components.molecules.ConfirmationDialog
+import com.fivucsas.shared.ui.components.molecules.ErrorMessage
 import com.fivucsas.shared.ui.components.molecules.SuccessMessage
 import com.fivucsas.shared.ui.components.atoms.SectionHeader
+import androidx.compose.material3.CircularProgressIndicator
 import com.fivucsas.shared.ui.components.organisms.BottomNavBar
 import com.fivucsas.shared.ui.theme.AppColors
 
@@ -51,6 +53,10 @@ fun ProfileScreen(
     userName: String,
     userEmail: String,
     userRole: UserRole = UserRole.USER,
+    userPhone: String = "",
+    enrollmentDate: String = "",
+    isLoading: Boolean = false,
+    errorMessage: String? = null,
     currentRoute: String,
     onNavigateBottom: (String) -> Unit,
     onEditProfile: () -> Unit,
@@ -96,6 +102,14 @@ fun ProfileScreen(
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(UIDimens.SpacingMedium)
         ) {
+            if (isLoading) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(48.dp).align(Alignment.CenterHorizontally)
+                )
+            }
+            errorMessage?.let {
+                ErrorMessage(message = it)
+            }
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(UIDimens.SpacingMedium)
@@ -117,10 +131,17 @@ fun ProfileScreen(
                         style = MaterialTheme.typography.bodyMedium,
                         color = AppColors.OnSurfaceVariant
                     )
+                    if (enrollmentDate.isNotBlank()) {
+                        Text(
+                            text = "Member since $enrollmentDate",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = AppColors.OnSurfaceVariant
+                        )
+                    }
                     Text(
-                        text = "Member since Jan 2026",
+                        text = userRole.name.replace("_", " "),
                         style = MaterialTheme.typography.bodySmall,
-                        color = AppColors.OnSurfaceVariant
+                        color = AppColors.Primary
                     )
                 }
             }
@@ -140,9 +161,11 @@ fun ProfileScreen(
                         Text(userEmail, style = MaterialTheme.typography.bodyMedium)
                     }
                     Spacer(modifier = Modifier.size(8.dp))
-                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                        Text("Phone", style = MaterialTheme.typography.bodySmall, color = AppColors.OnSurfaceVariant)
-                        Text("+1 234 567 8900", style = MaterialTheme.typography.bodyMedium)
+                    if (userPhone.isNotBlank()) {
+                        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                            Text("Phone", style = MaterialTheme.typography.bodySmall, color = AppColors.OnSurfaceVariant)
+                            Text(userPhone, style = MaterialTheme.typography.bodyMedium)
+                        }
                     }
                 }
             }

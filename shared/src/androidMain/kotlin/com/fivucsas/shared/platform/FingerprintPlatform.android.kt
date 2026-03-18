@@ -179,9 +179,9 @@ private class AndroidFingerprintAuthenticator(
                 }
 
                 override fun onAuthenticationFailed() {
-                    continuation.resumeWithException(
-                        FingerprintAuthException("Fingerprint not recognized.", true)
-                    )
+                    // onAuthenticationFailed is called for each failed attempt but
+                    // the system prompt allows retries. Do NOT resume the coroutine
+                    // here — the user will either succeed or get onAuthenticationError.
                 }
             }
         )

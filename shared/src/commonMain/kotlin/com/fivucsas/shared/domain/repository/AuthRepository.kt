@@ -70,5 +70,8 @@ data class AuthTokens(
     val accessToken: String,
     val refreshToken: String,
     val expiresIn: Long,
-    val role: String = "USER"
+    val role: String = "USER",
+    val userName: String = "",
+    val userEmail: String = "",
+    val userId: String = ""
 )

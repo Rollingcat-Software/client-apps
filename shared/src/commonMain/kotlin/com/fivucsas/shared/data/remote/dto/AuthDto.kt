@@ -81,11 +81,15 @@ data class RefreshTokenRequestDto(
  * Convert DTO to domain model
  */
 fun AuthResponseDto.toModel(): AuthTokens {
+    val fullName = listOfNotNull(user?.firstName, user?.lastName).joinToString(" ").ifBlank { user?.email ?: "" }
     return AuthTokens(
         accessToken = accessToken,
         refreshToken = refreshToken,
         expiresIn = expiresIn,
-        role = user?.role ?: user?.roles?.firstOrNull() ?: "USER"
+        role = user?.role ?: user?.roles?.firstOrNull() ?: "USER",
+        userName = fullName,
+        userEmail = user?.email ?: "",
+        userId = user?.id ?: ""
     )
 }
 

@@ -19,8 +19,6 @@ import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.PersonAdd
 import androidx.compose.material.icons.filled.Security
-import androidx.compose.material3.BadgedBox
-import androidx.compose.material3.Badge
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -164,35 +162,8 @@ fun DashboardScreen(
         )
     }
 
-    val activityItems = listOf(
-        ActivityItemData(
-            title = "Verification Successful",
-            description = "Confidence: 94%",
-            timestamp = "Today, 10:30 AM",
-            score = "94%",
-            status = StatusBadgeType.Success,
-            icon = Icons.Default.Security,
-            iconTint = AppColors.Success
-        ),
-        ActivityItemData(
-            title = "Verification Failed",
-            description = "Low confidence score",
-            timestamp = "Yesterday, 3:14 PM",
-            score = "62%",
-            status = StatusBadgeType.Failure,
-            icon = Icons.Default.Security,
-            iconTint = AppColors.Error
-        ),
-        ActivityItemData(
-            title = "Face Enrollment Completed",
-            description = "Quality score: 88%",
-            timestamp = "Jan 28, 2026",
-            score = "88%",
-            status = StatusBadgeType.Info,
-            icon = Icons.Default.CameraAlt,
-            iconTint = AppColors.Primary
-        )
-    )
+    // Activity items will be loaded from API when available; show empty state for now
+    val activityItems = emptyList<ActivityItemData>()
 
     Scaffold(
         topBar = {
@@ -213,12 +184,10 @@ fun DashboardScreen(
                 },
                 actions = {
                     IconButton(onClick = onNavigateToNotifications) {
-                        BadgedBox(badge = { Badge { Text("2") } }) {
-                            Icon(
-                                imageVector = Icons.Default.Notifications,
-                                contentDescription = "Notifications"
-                            )
-                        }
+                        Icon(
+                            imageVector = Icons.Default.Notifications,
+                            contentDescription = "Notifications"
+                        )
                     }
                     IconButton(onClick = onNavigateToProfile) {
                         Icon(
@@ -264,26 +233,9 @@ fun DashboardScreen(
                             fontWeight = FontWeight.SemiBold
                         )
                         Spacer(modifier = Modifier.size(8.dp))
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
-                                text = "Enrolled",
-                                style = MaterialTheme.typography.bodyLarge,
-                                color = AppColors.Success
-                            )
-                            Text(
-                                text = "Last verified: 2 hours ago",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = AppColors.OnSurfaceVariant
-                            )
-                        }
-                        Spacer(modifier = Modifier.size(6.dp))
                         Text(
-                            text = "Confidence: 94%",
-                            style = MaterialTheme.typography.bodySmall,
+                            text = "Enroll your face to enable biometric verification.",
+                            style = MaterialTheme.typography.bodyMedium,
                             color = AppColors.OnSurfaceVariant
                         )
                     }
@@ -318,9 +270,17 @@ fun DashboardScreen(
                         )
                     }
                 )
-                Column(verticalArrangement = Arrangement.spacedBy(UIDimens.SpacingSmall)) {
-                    activityItems.forEach { item ->
-                        ActivityItem(data = item)
+                if (activityItems.isEmpty()) {
+                    Text(
+                        text = "No recent activity yet.",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = AppColors.OnSurfaceVariant
+                    )
+                } else {
+                    Column(verticalArrangement = Arrangement.spacedBy(UIDimens.SpacingSmall)) {
+                        activityItems.forEach { item ->
+                            ActivityItem(data = item)
+                        }
                     }
                 }
             }
