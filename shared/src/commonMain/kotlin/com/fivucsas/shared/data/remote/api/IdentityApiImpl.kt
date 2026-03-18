@@ -76,19 +76,24 @@ class IdentityApiImpl(
     }
 
     override suspend fun getMyProfile(): UserDto {
-        // Note: The server doesn't have a /users/me endpoint.
-        // This calls GET /users/me which returns 400 "Invalid UUID string: me".
-        // Callers should use the auth response's user field instead.
-        // For now, attempt the call; the error will be caught by the repository.
-        return client.get("$BASE_PATH/me").body()
+        // Server provides user profile at GET /auth/me (not /users/me)
+        return client.get("auth/me").body()
     }
 
     override suspend fun healthCheck(): Boolean {
         return try {
-            client.get("health")
+            // The server's health check is at /actuator/health (outside /api/v1/ prefix)
+            // Use a relative path that Ktor will resolve against the base URL
+            client.get("../../../actuator/health")
             true
         } catch (_: Exception) {
-            false
+            // Fallback: if the relative path resolution fails, just check if the base URL is reachable
+            try {
+                client.get("auth/me")
+                true
+            } catch (_: Exception) {
+                false
+            }
         }
     }
 }

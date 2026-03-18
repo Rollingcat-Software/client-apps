@@ -112,10 +112,11 @@ fun EnrollmentsScreen(
 @Composable
 private fun EnrollmentCard(enrollment: Enrollment) {
     val methodDisplayName = when (enrollment.method.uppercase()) {
-        "FACE" -> s(StringKey.FACE_RECOGNITION)
+        "PASSWORD" -> s(StringKey.PASSWORD_AUTH_METHOD)
+        "FACE", "FACE_RECOGNITION" -> s(StringKey.FACE_RECOGNITION)
         "FINGERPRINT" -> s(StringKey.FINGERPRINT)
-        "VOICE" -> s(StringKey.VOICE_RECOGNITION)
-        "NFC" -> s(StringKey.NFC_DOCUMENT)
+        "VOICE", "VOICE_RECOGNITION" -> s(StringKey.VOICE_RECOGNITION)
+        "NFC", "NFC_DOCUMENT" -> s(StringKey.NFC_DOCUMENT)
         "TOTP" -> s(StringKey.TOTP)
         "EMAIL_OTP" -> s(StringKey.EMAIL_OTP)
         "SMS_OTP" -> s(StringKey.SMS_OTP)
@@ -144,12 +145,13 @@ private fun EnrollmentCard(enrollment: Enrollment) {
 
                 StatusBadge(
                     text = when (enrollment.status) {
-                        EnrollmentStatus.ACTIVE -> s(StringKey.ENROLLED)
+                        EnrollmentStatus.ENROLLED -> s(StringKey.ENROLLED)
+                        EnrollmentStatus.ACTIVE -> s(StringKey.ACTIVE)
                         EnrollmentStatus.PENDING -> s(StringKey.LOADING)
                         EnrollmentStatus.REVOKED -> s(StringKey.INACTIVE)
                         EnrollmentStatus.EXPIRED -> s(StringKey.INACTIVE)
                     },
-                    isPositive = enrollment.status == EnrollmentStatus.ACTIVE
+                    isPositive = enrollment.status == EnrollmentStatus.ENROLLED || enrollment.status == EnrollmentStatus.ACTIVE
                 )
             }
 

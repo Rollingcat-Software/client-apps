@@ -33,7 +33,7 @@ class TotpRepositoryImpl(
     override suspend fun getStatus(userId: String): Result<TotpStatusResult> {
         return runCatching {
             val response = totpApi.getStatus(userId)
-            TotpStatusResult(enabled = response.enabled, message = response.message)
+            TotpStatusResult(enabled = response.configured, message = "")
         }
     }
 }

@@ -2,7 +2,7 @@ package com.fivucsas.shared.domain.model
 
 /**
  * Enrollment domain model
- * Represents a biometric enrollment for a user
+ * Represents a biometric/auth method enrollment for a user
  */
 data class Enrollment(
     val id: String,
@@ -10,12 +10,17 @@ data class Enrollment(
     val method: String,
     val status: EnrollmentStatus = EnrollmentStatus.PENDING,
     val enrolledAt: String = "",
-    val updatedAt: String = "",
-    val metadata: Map<String, String> = emptyMap()
+    val completedAt: String? = null,
+    val userName: String? = null,
+    val userEmail: String? = null,
+    val tenantId: String? = null,
+    val qualityScore: Float? = null,
+    val livenessScore: Float? = null
 )
 
 enum class EnrollmentStatus {
     PENDING,
+    ENROLLED,
     ACTIVE,
     REVOKED,
     EXPIRED;
@@ -24,6 +29,7 @@ enum class EnrollmentStatus {
         fun fromString(value: String): EnrollmentStatus {
             return when (value.uppercase()) {
                 "PENDING" -> PENDING
+                "ENROLLED" -> ENROLLED
                 "ACTIVE" -> ACTIVE
                 "REVOKED" -> REVOKED
                 "EXPIRED" -> EXPIRED

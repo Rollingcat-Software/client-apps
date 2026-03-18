@@ -110,6 +110,14 @@ private fun AuthFlowCard(flow: AuthFlow) {
                         fontWeight = FontWeight.SemiBold
                     )
                     Spacer(modifier = Modifier.height(4.dp))
+                    if (!flow.description.isNullOrBlank()) {
+                        Text(
+                            text = flow.description,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Spacer(modifier = Modifier.height(2.dp))
+                    }
                     Text(
                         text = "${s(StringKey.FLOW_OPERATION_TYPE)}: ${flow.operationType}",
                         style = MaterialTheme.typography.bodySmall,
@@ -145,7 +153,7 @@ private fun AuthFlowCard(flow: AuthFlow) {
                             modifier = Modifier.width(24.dp)
                         )
                         Text(
-                            text = step.authMethod,
+                            text = step.authMethod.name.ifBlank { step.authMethod.type },
                             style = MaterialTheme.typography.bodySmall
                         )
                         if (step.isRequired) {

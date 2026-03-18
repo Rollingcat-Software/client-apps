@@ -64,7 +64,7 @@ interface IdentityApi {
 
     /**
      * Get current user's profile
-     * GET /users/me
+     * GET /auth/me
      */
     suspend fun getMyProfile(): UserDto
 

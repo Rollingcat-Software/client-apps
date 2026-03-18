@@ -21,8 +21,14 @@ data class TotpVerifyResponseDto(
     val message: String = ""
 )
 
+/**
+ * TOTP status response DTO — matches server response:
+ * GET /totp/status/{userId}
+ *
+ * Server returns: { "userId": "...", "configured": true/false }
+ */
 @Serializable
 data class TotpStatusResponseDto(
-    val enabled: Boolean = false,
-    val message: String = ""
+    val userId: String = "",
+    val configured: Boolean = false
 )

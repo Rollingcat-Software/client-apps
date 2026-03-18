@@ -32,7 +32,7 @@ class FingerprintRepositoryImpl(
             ensureDeviceRegistered(keyId, publicKeyJwk)
 
             onStep(FingerprintStep.RequestingChallenge)
-            val challenge = authBiometricApi.createChallenge()
+            val challenge = authBiometricApi.createChallenge(deviceKeyId = keyId)
 
             onStep(FingerprintStep.ScanningBiometric)
             val signature = fingerprintAuthenticator.signNonce(challenge.nonce)
@@ -66,8 +66,8 @@ class FingerprintRepositoryImpl(
             authBiometricApi.registerDevice(
                 RegisterBiometricDeviceRequestDto(
                     keyId = keyId,
-                    platform = "mobile",
-                    publicKeyJwk = publicKeyJwk
+                    publicKeyJwk = publicKeyJwk,
+                    devicePlatform = "ANDROID"
                 )
             )
         } catch (e: ClientRequestException) {

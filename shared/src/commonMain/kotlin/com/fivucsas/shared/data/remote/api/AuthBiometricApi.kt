@@ -7,7 +7,6 @@ import com.fivucsas.shared.data.remote.dto.VerifyBiometricSignatureResponseDto
 
 interface AuthBiometricApi {
     suspend fun registerDevice(request: RegisterBiometricDeviceRequestDto)
-    suspend fun createChallenge(): CreateBiometricChallengeResponseDto
+    suspend fun createChallenge(deviceKeyId: String): CreateBiometricChallengeResponseDto
     suspend fun verifySignature(request: VerifyBiometricSignatureRequestDto): VerifyBiometricSignatureResponseDto
 }
-

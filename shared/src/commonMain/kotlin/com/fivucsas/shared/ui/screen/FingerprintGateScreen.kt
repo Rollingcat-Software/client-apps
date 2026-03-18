@@ -37,6 +37,8 @@ import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.fivucsas.shared.i18n.StringKey
+import com.fivucsas.shared.i18n.s
 import com.fivucsas.shared.presentation.state.FingerprintUiState
 import com.fivucsas.shared.presentation.viewmodel.auth.FingerprintViewModel
 import kotlinx.coroutines.launch
@@ -81,7 +83,7 @@ fun FingerprintGateScreen(
     ) {
         Icon(
             imageVector = Icons.Default.Fingerprint,
-            contentDescription = "Fingerprint authentication icon",
+            contentDescription = s(StringKey.FINGERPRINT),
             tint = MaterialTheme.colorScheme.primary,
             modifier = Modifier
                 .size(96.dp)
@@ -92,7 +94,7 @@ fun FingerprintGateScreen(
         Spacer(modifier = Modifier.height(20.dp))
 
         Text(
-            text = "Security check required",
+            text = s(StringKey.FINGERPRINT_SECURITY_CHECK),
             style = MaterialTheme.typography.headlineSmall,
             textAlign = TextAlign.Center
         )
@@ -100,7 +102,7 @@ fun FingerprintGateScreen(
         Spacer(modifier = Modifier.height(8.dp))
 
         Text(
-            text = "Before opening Home, verify with fingerprint to get a short-lived step-up token.",
+            text = s(StringKey.FINGERPRINT_SECURITY_CHECK_DESC),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center
@@ -118,7 +120,7 @@ fun FingerprintGateScreen(
                 .fillMaxWidth()
                 .semantics {
                     role = Role.Button
-                    contentDescription = "Verify fingerprint and continue"
+                    contentDescription = s(StringKey.FINGERPRINT_VERIFY_BUTTON)
                 }
         ) {
             if (state is FingerprintUiState.RegisteringDevice ||
@@ -131,7 +133,12 @@ fun FingerprintGateScreen(
                     strokeWidth = 2.dp
                 )
             }
-            Text(if (state is FingerprintUiState.Error) "Retry" else "Verify fingerprint")
+            Text(
+                if (state is FingerprintUiState.Error)
+                    s(StringKey.FINGERPRINT_RETRY_BUTTON)
+                else
+                    s(StringKey.FINGERPRINT_VERIFY_BUTTON)
+            )
         }
 
         Spacer(modifier = Modifier.height(12.dp))
@@ -142,10 +149,10 @@ fun FingerprintGateScreen(
                 .fillMaxWidth()
                 .semantics {
                     role = Role.Button
-                    contentDescription = "Skip fingerprint for now and continue"
+                    contentDescription = s(StringKey.FINGERPRINT_SKIP)
                 }
         ) {
-            Text("Skip for now")
+            Text(s(StringKey.FINGERPRINT_SKIP))
         }
 
         Spacer(modifier = Modifier.height(12.dp))
@@ -156,10 +163,10 @@ fun FingerprintGateScreen(
                 .fillMaxWidth()
                 .semantics {
                     role = Role.Button
-                    contentDescription = "Go back"
+                    contentDescription = s(StringKey.BACK)
                 }
         ) {
-            Text("Back")
+            Text(s(StringKey.BACK))
         }
     }
 }
@@ -167,12 +174,12 @@ fun FingerprintGateScreen(
 @Composable
 private fun StateText(state: FingerprintUiState) {
     val text = when (state) {
-        FingerprintUiState.Idle -> "Ready"
-        FingerprintUiState.RegisteringDevice -> "Registering this device"
-        FingerprintUiState.RequestingChallenge -> "Requesting secure challenge"
-        FingerprintUiState.ScanningBiometric -> "Scan your fingerprint now"
-        FingerprintUiState.VerifyingSignature -> "Verifying signature"
-        is FingerprintUiState.Success -> "Verification successful"
+        FingerprintUiState.Idle -> s(StringKey.FINGERPRINT_READY)
+        FingerprintUiState.RegisteringDevice -> s(StringKey.FINGERPRINT_REGISTERING_DEVICE)
+        FingerprintUiState.RequestingChallenge -> s(StringKey.FINGERPRINT_REQUESTING_CHALLENGE)
+        FingerprintUiState.ScanningBiometric -> s(StringKey.FINGERPRINT_SCAN_NOW)
+        FingerprintUiState.VerifyingSignature -> s(StringKey.FINGERPRINT_VERIFYING)
+        is FingerprintUiState.Success -> s(StringKey.FINGERPRINT_VERIFIED)
         is FingerprintUiState.Error -> state.message
     }
     val color = if (state is FingerprintUiState.Error) {

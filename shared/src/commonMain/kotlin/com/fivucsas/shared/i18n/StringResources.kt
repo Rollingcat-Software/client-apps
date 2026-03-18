@@ -335,6 +335,20 @@ enum class StringKey {
     // Offline Mode (P2)
     OFFLINE_MODE_BANNER,
     OFFLINE_LAST_SYNCED,
+
+    // Fingerprint Step-Up
+    FINGERPRINT_SECURITY_CHECK,
+    FINGERPRINT_SECURITY_CHECK_DESC,
+    FINGERPRINT_READY,
+    FINGERPRINT_REGISTERING_DEVICE,
+    FINGERPRINT_REQUESTING_CHALLENGE,
+    FINGERPRINT_SCAN_NOW,
+    FINGERPRINT_VERIFYING,
+    FINGERPRINT_VERIFIED,
+    FINGERPRINT_VERIFY_BUTTON,
+    FINGERPRINT_RETRY_BUTTON,
+    FINGERPRINT_SKIP,
+    PASSWORD_AUTH_METHOD,
 }
 
 private val enStrings = mapOf(
@@ -634,6 +648,20 @@ private val enStrings = mapOf(
     // Offline Mode (P2)
     StringKey.OFFLINE_MODE_BANNER to "You are offline. Showing cached data.",
     StringKey.OFFLINE_LAST_SYNCED to "Last synced: {0}",
+
+    // Fingerprint Step-Up
+    StringKey.FINGERPRINT_SECURITY_CHECK to "Security check required",
+    StringKey.FINGERPRINT_SECURITY_CHECK_DESC to "Before opening Home, verify with fingerprint to get a short-lived step-up token.",
+    StringKey.FINGERPRINT_READY to "Ready",
+    StringKey.FINGERPRINT_REGISTERING_DEVICE to "Registering this device",
+    StringKey.FINGERPRINT_REQUESTING_CHALLENGE to "Requesting secure challenge",
+    StringKey.FINGERPRINT_SCAN_NOW to "Scan your fingerprint now",
+    StringKey.FINGERPRINT_VERIFYING to "Verifying signature",
+    StringKey.FINGERPRINT_VERIFIED to "Verification successful",
+    StringKey.FINGERPRINT_VERIFY_BUTTON to "Verify fingerprint",
+    StringKey.FINGERPRINT_RETRY_BUTTON to "Retry",
+    StringKey.FINGERPRINT_SKIP to "Skip for now",
+    StringKey.PASSWORD_AUTH_METHOD to "Password",
 )
 
 private val trStrings = mapOf(
@@ -933,6 +961,20 @@ private val trStrings = mapOf(
     // Offline Mode (P2)
     StringKey.OFFLINE_MODE_BANNER to "Cevrimdisi moddasiniz. Onbellekteki veriler gosteriliyor.",
     StringKey.OFFLINE_LAST_SYNCED to "Son senkronizasyon: {0}",
+
+    // Fingerprint Step-Up
+    StringKey.FINGERPRINT_SECURITY_CHECK to "Guvenlik kontrolu gerekli",
+    StringKey.FINGERPRINT_SECURITY_CHECK_DESC to "Ana sayfayi acmadan once, kisa sureli adim-yukselme tokeni almak icin parmak izinizi dogrulayin.",
+    StringKey.FINGERPRINT_READY to "Hazir",
+    StringKey.FINGERPRINT_REGISTERING_DEVICE to "Cihaz kaydediliyor",
+    StringKey.FINGERPRINT_REQUESTING_CHALLENGE to "Guvenli sorgu isteniyor",
+    StringKey.FINGERPRINT_SCAN_NOW to "Simdi parmak izinizi tarayin",
+    StringKey.FINGERPRINT_VERIFYING to "Imza dogrulaniyor",
+    StringKey.FINGERPRINT_VERIFIED to "Dogrulama basarili",
+    StringKey.FINGERPRINT_VERIFY_BUTTON to "Parmak izini dogrula",
+    StringKey.FINGERPRINT_RETRY_BUTTON to "Tekrar dene",
+    StringKey.FINGERPRINT_SKIP to "Simdilik atla",
+    StringKey.PASSWORD_AUTH_METHOD to "Sifre",
 )
 
 /**

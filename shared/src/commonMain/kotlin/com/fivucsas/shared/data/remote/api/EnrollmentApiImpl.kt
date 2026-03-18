@@ -10,6 +10,6 @@ class EnrollmentApiImpl(
 ) : EnrollmentApi {
 
     override suspend fun getEnrollments(userId: String): List<EnrollmentDto> {
-        return client.get("enrollments/users/$userId/enrollments").body()
+        return client.get("users/$userId/enrollments").body()
     }
 }

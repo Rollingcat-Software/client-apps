@@ -10,31 +10,47 @@ import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
+import kotlinx.serialization.Serializable
 
+/**
+ * Step-up biometric authentication API implementation.
+ *
+ * Maps to the Identity Core API step-up endpoints:
+ * - POST /step-up/register-device  — register a device key
+ * - POST /step-up/challenge         — request a challenge nonce
+ * - POST /step-up/verify-challenge  — verify signed challenge
+ */
 class AuthBiometricApiImpl(
     private val client: HttpClient
 ) : AuthBiometricApi {
 
     companion object {
-        private const val BASE_PATH = "auth/biometric"
+        private const val BASE_PATH = "step-up"
     }
 
+    @Serializable
+    private data class ChallengeRequestDto(
+        val deviceKeyId: String
+    )
+
     override suspend fun registerDevice(request: RegisterBiometricDeviceRequestDto) {
-        client.post("$BASE_PATH/devices") {
+        client.post("$BASE_PATH/register-device") {
             contentType(ContentType.Application.Json)
             setBody(request)
         }
     }
 
-    override suspend fun createChallenge(): CreateBiometricChallengeResponseDto {
-        return client.post("$BASE_PATH/challenge").body()
+    override suspend fun createChallenge(deviceKeyId: String): CreateBiometricChallengeResponseDto {
+        return client.post("$BASE_PATH/challenge") {
+            contentType(ContentType.Application.Json)
+            setBody(ChallengeRequestDto(deviceKeyId = deviceKeyId))
+        }.body()
     }
 
     override suspend fun verifySignature(request: VerifyBiometricSignatureRequestDto): VerifyBiometricSignatureResponseDto {
-        return client.post("$BASE_PATH/verify") {
+        return client.post("$BASE_PATH/verify-challenge") {
             contentType(ContentType.Application.Json)
             setBody(request)
         }.body()
     }
 }
-
