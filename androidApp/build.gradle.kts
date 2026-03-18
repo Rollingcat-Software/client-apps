@@ -32,6 +32,8 @@ android {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
             excludes += "META-INF/versions/9/previous-compilation-data.bin"
+            // BouncyCastle OSGI manifest conflicts
+            pickFirsts += "META-INF/versions/9/OSGI-INF/MANIFEST.MF"
         }
         jniLibs {
             useLegacyPackaging = true
