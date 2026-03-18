@@ -37,6 +37,18 @@ class AndroidTokenStorage(context: Context) : TokenStorage {
         sharedPreferences.edit().remove(KEY_TOKEN).apply()
     }
 
+    override fun saveRefreshToken(token: String) {
+        sharedPreferences.edit().putString(KEY_REFRESH_TOKEN, token).apply()
+    }
+
+    override fun getRefreshToken(): String? {
+        return sharedPreferences.getString(KEY_REFRESH_TOKEN, null)
+    }
+
+    override fun clearRefreshToken() {
+        sharedPreferences.edit().remove(KEY_REFRESH_TOKEN).apply()
+    }
+
     override fun saveRole(role: String) {
         sharedPreferences.edit().putString(KEY_ROLE, role).apply()
     }
@@ -87,6 +99,7 @@ class AndroidTokenStorage(context: Context) : TokenStorage {
 
     companion object {
         private const val KEY_TOKEN = "auth_token"
+        private const val KEY_REFRESH_TOKEN = "refresh_token"
         private const val KEY_ROLE = "user_role"
         private const val KEY_USER_NAME = "user_name"
         private const val KEY_USER_EMAIL = "user_email"

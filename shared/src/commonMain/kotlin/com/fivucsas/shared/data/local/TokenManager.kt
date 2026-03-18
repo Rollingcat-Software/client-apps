@@ -24,6 +24,7 @@ class TokenManager(
     fun saveTokens(tokens: AuthTokens) {
         cachedTokens = tokens
         tokenStorage.saveToken(tokens.accessToken)
+        tokenStorage.saveRefreshToken(tokens.refreshToken)
         tokenStorage.saveRole(tokens.role)
         cachedRole = tokens.role
         if (tokens.userName.isNotBlank()) {
@@ -48,10 +49,10 @@ class TokenManager(
     }
 
     /**
-     * Get current refresh token
+     * Get current refresh token (from cache or persistent storage)
      */
     fun getRefreshToken(): String? {
-        return cachedTokens?.refreshToken
+        return cachedTokens?.refreshToken ?: tokenStorage.getRefreshToken()
     }
 
     /**
@@ -99,6 +100,7 @@ class TokenManager(
         cachedUserEmail = null
         cachedUserId = null
         tokenStorage.clearToken()
+        tokenStorage.clearRefreshToken()
         tokenStorage.clearRole()
         tokenStorage.clearUserName()
         tokenStorage.clearUserEmail()

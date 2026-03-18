@@ -14,6 +14,7 @@ class DesktopTokenStorage : TokenStorage {
 
     companion object {
         private const val KEY_ACCESS_TOKEN = "access_token"
+        private const val KEY_REFRESH_TOKEN = "refresh_token"
         private const val KEY_ROLE = "user_role"
     }
 
@@ -28,6 +29,20 @@ class DesktopTokenStorage : TokenStorage {
 
     override fun clearToken() {
         prefs.remove(KEY_ACCESS_TOKEN)
+        prefs.flush()
+    }
+
+    override fun saveRefreshToken(token: String) {
+        prefs.put(KEY_REFRESH_TOKEN, token)
+        prefs.flush()
+    }
+
+    override fun getRefreshToken(): String? {
+        return prefs.get(KEY_REFRESH_TOKEN, null)
+    }
+
+    override fun clearRefreshToken() {
+        prefs.remove(KEY_REFRESH_TOKEN)
         prefs.flush()
     }
 

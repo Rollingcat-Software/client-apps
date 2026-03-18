@@ -131,6 +131,34 @@ class AppStateManager {
 }
 
 fun main() {
+    // Install global crash handler — logs to ~/fivucsas-crash-logs/ before re-throwing
+    val defaultHandler = Thread.getDefaultUncaughtExceptionHandler()
+    Thread.setDefaultUncaughtExceptionHandler { thread, throwable ->
+        try {
+            val crashDir = java.io.File(System.getProperty("user.home"), "fivucsas-crash-logs")
+            crashDir.mkdirs()
+            val timestamp = java.text.SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(java.util.Date())
+            val logFile = java.io.File(crashDir, "crash_$timestamp.log")
+            val sw = java.io.StringWriter()
+            val pw = java.io.PrintWriter(sw)
+            pw.println("FIVUCSAS Desktop Crash Report")
+            pw.println("Time: $timestamp")
+            pw.println("Thread: ${thread.name}")
+            pw.println("Exception: ${throwable.javaClass.name}")
+            pw.println("Message: ${throwable.message}")
+            pw.println()
+            throwable.printStackTrace(pw)
+            pw.flush()
+            logFile.writeText(sw.toString())
+            System.err.println("Crash logged to ${logFile.absolutePath}")
+            // Prune old logs (keep 10)
+            crashDir.listFiles()?.sortedByDescending { it.lastModified() }?.drop(10)?.forEach { it.delete() }
+        } catch (e: Exception) {
+            System.err.println("Failed to write crash log: ${e.message}")
+        }
+        defaultHandler?.uncaughtException(thread, throwable)
+    }
+
     startKoin { modules(getAppModules()) }
     application {
         val stateManager = remember { AppStateManager() }
