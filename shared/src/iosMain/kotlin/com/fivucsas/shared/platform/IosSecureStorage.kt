@@ -1,5 +1,6 @@
 package com.fivucsas.shared.platform
 
+import platform.CoreFoundation.*
 import platform.Foundation.*
 import platform.Security.*
 import kotlinx.cinterop.*
