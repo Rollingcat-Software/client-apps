@@ -1,5 +1,6 @@
 package com.fivucsas.shared.di
 
+import com.fivucsas.shared.data.local.OfflineCache
 import com.fivucsas.shared.data.local.TokenManager
 import com.fivucsas.shared.data.local.StepUpTokenManager
 import com.fivucsas.shared.data.remote.api.AuthBiometricApi
@@ -161,4 +162,7 @@ val repositoryModule = module {
             dashboardApi = get<com.fivucsas.shared.data.remote.api.DashboardApi>()
         )
     }
+
+    // Offline Cache
+    single { OfflineCache(storage = get()) }
 }

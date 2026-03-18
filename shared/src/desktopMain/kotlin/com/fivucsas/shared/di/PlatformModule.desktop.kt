@@ -1,10 +1,13 @@
 package com.fivucsas.shared.di
 
 import com.fivucsas.shared.data.local.TokenStorage
+import com.fivucsas.shared.platform.DefaultNetworkMonitor
 import com.fivucsas.shared.platform.ICameraService
 import com.fivucsas.shared.platform.DesktopCameraServiceImpl
 import com.fivucsas.shared.platform.DesktopTokenStorage
 import com.fivucsas.shared.platform.FingerprintAuthenticator
+import com.fivucsas.shared.platform.INetworkMonitor
+import com.fivucsas.shared.platform.ISecureStorage
 import com.fivucsas.shared.platform.IPushNotificationService
 import com.fivucsas.shared.platform.NoOpPushNotificationService
 import com.fivucsas.shared.platform.providePlatformFingerprintAuthenticator
@@ -36,4 +39,8 @@ actual val platformModule = module {
     single<FingerprintAuthenticator> { providePlatformFingerprintAuthenticator() }
     // Push notifications not supported on desktop
     single<IPushNotificationService> { NoOpPushNotificationService() }
+    // Secure Storage for offline cache
+    single<ISecureStorage> { com.fivucsas.shared.platform.factory.DesktopSecureStorage() }
+    // Network Monitor — always-online default on desktop
+    single<INetworkMonitor> { DefaultNetworkMonitor() }
 }

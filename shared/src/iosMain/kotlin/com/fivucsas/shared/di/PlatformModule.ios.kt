@@ -1,6 +1,8 @@
 package com.fivucsas.shared.di
 
+import com.fivucsas.shared.platform.DefaultNetworkMonitor
 import com.fivucsas.shared.platform.ICameraService
+import com.fivucsas.shared.platform.INetworkMonitor
 import com.fivucsas.shared.platform.ISecureStorage
 import com.fivucsas.shared.platform.ILogger
 import com.fivucsas.shared.platform.FingerprintAuthenticator
@@ -47,4 +49,7 @@ actual val platformModule = module {
 
     // Push Notification Service - stub until APNs is configured
     single<IPushNotificationService> { NoOpPushNotificationService() }
+
+    // Network Monitor — default always-online on iOS for now
+    single<INetworkMonitor> { DefaultNetworkMonitor() }
 }

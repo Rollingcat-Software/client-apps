@@ -2,6 +2,7 @@ package com.fivucsas.shared.di
 
 import com.fivucsas.shared.presentation.viewmodel.AdminViewModel
 import com.fivucsas.shared.presentation.viewmodel.AuthFlowViewModel
+import com.fivucsas.shared.presentation.viewmodel.BiometricBackupViewModel
 import com.fivucsas.shared.presentation.viewmodel.DeviceViewModel
 import com.fivucsas.shared.presentation.viewmodel.EnrollmentViewModel
 import com.fivucsas.shared.presentation.viewmodel.IdentifyViewModel
@@ -54,4 +55,5 @@ val viewModelModule = module {
     factoryOf(::LivenessViewModel)
     factoryOf(::CardDetectionViewModel)
     factoryOf(::HardwareTokenViewModel)
+    factoryOf(::BiometricBackupViewModel)
 }

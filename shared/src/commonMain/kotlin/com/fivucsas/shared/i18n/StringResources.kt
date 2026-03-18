@@ -304,6 +304,37 @@ enum class StringKey {
     HARDWARE_TOKEN_VERIFY,
     HARDWARE_TOKEN_CREDENTIAL_ID,
     HARDWARE_TOKEN_TRANSPORTS,
+
+    // Analytics Enhanced (P3)
+    ANALYTICS_OVERVIEW,
+    ANALYTICS_ENROLLMENTS_BY_METHOD,
+    ANALYTICS_RECENT_ACTIVITY,
+    ANALYTICS_LOGINS_TODAY,
+    ANALYTICS_REGISTRATIONS_TODAY,
+    ANALYTICS_ENROLLMENTS_TODAY,
+
+    // Biometric Backup (P3)
+    BIOMETRIC_BACKUP_TITLE,
+    BIOMETRIC_BACKUP_STATUS_TITLE,
+    BIOMETRIC_BACKUP_EXPORT,
+    BIOMETRIC_BACKUP_DELETE_ALL,
+    BIOMETRIC_BACKUP_DELETE_TITLE,
+    BIOMETRIC_BACKUP_DELETE_CONFIRM,
+    BIOMETRIC_BACKUP_GDPR_TITLE,
+    BIOMETRIC_BACKUP_GDPR_DESC,
+
+    // Desktop NFC (P3)
+    DESKTOP_NFC_TITLE,
+    DESKTOP_NFC_SUBTITLE,
+    DESKTOP_NFC_USB_REQUIRED,
+    DESKTOP_NFC_CHECKING,
+    DESKTOP_NFC_READER_FOUND,
+    DESKTOP_NFC_NO_READER,
+    DESKTOP_NFC_NOT_AVAILABLE,
+
+    // Offline Mode (P2)
+    OFFLINE_MODE_BANNER,
+    OFFLINE_LAST_SYNCED,
 }
 
 private val enStrings = mapOf(
@@ -572,6 +603,37 @@ private val enStrings = mapOf(
     StringKey.HARDWARE_TOKEN_VERIFY to "Verify Token",
     StringKey.HARDWARE_TOKEN_CREDENTIAL_ID to "Credential ID",
     StringKey.HARDWARE_TOKEN_TRANSPORTS to "Transports",
+
+    // Analytics Enhanced (P3)
+    StringKey.ANALYTICS_OVERVIEW to "Overview",
+    StringKey.ANALYTICS_ENROLLMENTS_BY_METHOD to "Enrollments by Method",
+    StringKey.ANALYTICS_RECENT_ACTIVITY to "Recent Activity",
+    StringKey.ANALYTICS_LOGINS_TODAY to "Logins Today",
+    StringKey.ANALYTICS_REGISTRATIONS_TODAY to "Registrations",
+    StringKey.ANALYTICS_ENROLLMENTS_TODAY to "Enrollments",
+
+    // Biometric Backup (P3)
+    StringKey.BIOMETRIC_BACKUP_TITLE to "Biometric Data & Privacy",
+    StringKey.BIOMETRIC_BACKUP_STATUS_TITLE to "Enrolled Biometrics",
+    StringKey.BIOMETRIC_BACKUP_EXPORT to "Export My Data",
+    StringKey.BIOMETRIC_BACKUP_DELETE_ALL to "Delete All My Biometric Data",
+    StringKey.BIOMETRIC_BACKUP_DELETE_TITLE to "Delete Biometric Data",
+    StringKey.BIOMETRIC_BACKUP_DELETE_CONFIRM to "This will permanently delete all your biometric enrollments (face, voice, fingerprint). This action cannot be undone. Are you sure?",
+    StringKey.BIOMETRIC_BACKUP_GDPR_TITLE to "Your Data Rights (GDPR/KVKK)",
+    StringKey.BIOMETRIC_BACKUP_GDPR_DESC to "You have the right to view, export, and delete your biometric data at any time. Deleting your data will unenroll you from all biometric authentication methods.",
+
+    // Desktop NFC (P3)
+    StringKey.DESKTOP_NFC_TITLE to "Desktop NFC",
+    StringKey.DESKTOP_NFC_SUBTITLE to "NFC reader status for desktop",
+    StringKey.DESKTOP_NFC_USB_REQUIRED to "NFC on desktop requires a USB smart card reader.",
+    StringKey.DESKTOP_NFC_CHECKING to "Checking for NFC readers...",
+    StringKey.DESKTOP_NFC_READER_FOUND to "NFC reader detected: {0}",
+    StringKey.DESKTOP_NFC_NO_READER to "No NFC reader found. Connect a USB smart card reader to use NFC features.",
+    StringKey.DESKTOP_NFC_NOT_AVAILABLE to "Smart card I/O library is not available on this system.",
+
+    // Offline Mode (P2)
+    StringKey.OFFLINE_MODE_BANNER to "You are offline. Showing cached data.",
+    StringKey.OFFLINE_LAST_SYNCED to "Last synced: {0}",
 )
 
 private val trStrings = mapOf(
@@ -840,6 +902,37 @@ private val trStrings = mapOf(
     StringKey.HARDWARE_TOKEN_VERIFY to "Token Dogrula",
     StringKey.HARDWARE_TOKEN_CREDENTIAL_ID to "Kimlik Bilgisi ID",
     StringKey.HARDWARE_TOKEN_TRANSPORTS to "Tasimacilar",
+
+    // Analytics Enhanced (P3)
+    StringKey.ANALYTICS_OVERVIEW to "Genel Bakis",
+    StringKey.ANALYTICS_ENROLLMENTS_BY_METHOD to "Yonteme Gore Kayitlar",
+    StringKey.ANALYTICS_RECENT_ACTIVITY to "Son Etkinlikler",
+    StringKey.ANALYTICS_LOGINS_TODAY to "Bugunun Girisleri",
+    StringKey.ANALYTICS_REGISTRATIONS_TODAY to "Kayitlar",
+    StringKey.ANALYTICS_ENROLLMENTS_TODAY to "Kayitlar",
+
+    // Biometric Backup (P3)
+    StringKey.BIOMETRIC_BACKUP_TITLE to "Biyometrik Veri ve Gizlilik",
+    StringKey.BIOMETRIC_BACKUP_STATUS_TITLE to "Kayitli Biyometrikler",
+    StringKey.BIOMETRIC_BACKUP_EXPORT to "Verilerimi Disa Aktar",
+    StringKey.BIOMETRIC_BACKUP_DELETE_ALL to "Tum Biyometrik Verilerimi Sil",
+    StringKey.BIOMETRIC_BACKUP_DELETE_TITLE to "Biyometrik Verileri Sil",
+    StringKey.BIOMETRIC_BACKUP_DELETE_CONFIRM to "Bu islem tum biyometrik kayitlarinizi (yuz, ses, parmak izi) kalici olarak silecektir. Bu islem geri alinamaz. Emin misiniz?",
+    StringKey.BIOMETRIC_BACKUP_GDPR_TITLE to "Veri Haklariniz (GDPR/KVKK)",
+    StringKey.BIOMETRIC_BACKUP_GDPR_DESC to "Biyometrik verilerinizi istediginiz zaman goruntuleme, disa aktarma ve silme hakkiniz vardir. Verilerinizi silmek, tum biyometrik kimlik dogrulama yontemlerinden kaydınızı kaldıracaktır.",
+
+    // Desktop NFC (P3)
+    StringKey.DESKTOP_NFC_TITLE to "Masaustu NFC",
+    StringKey.DESKTOP_NFC_SUBTITLE to "Masaustu icin NFC okuyucu durumu",
+    StringKey.DESKTOP_NFC_USB_REQUIRED to "Masaustunde NFC icin USB akilli kart okuyucu gereklidir.",
+    StringKey.DESKTOP_NFC_CHECKING to "NFC okuyuculari kontrol ediliyor...",
+    StringKey.DESKTOP_NFC_READER_FOUND to "NFC okuyucu algilandi: {0}",
+    StringKey.DESKTOP_NFC_NO_READER to "NFC okuyucu bulunamadi. NFC ozelliklerini kullanmak icin bir USB akilli kart okuyucu baglayin.",
+    StringKey.DESKTOP_NFC_NOT_AVAILABLE to "Akilli kart G/C kutuphanesi bu sistemde mevcut degil.",
+
+    // Offline Mode (P2)
+    StringKey.OFFLINE_MODE_BANNER to "Cevrimdisi moddasiniz. Onbellekteki veriler gosteriliyor.",
+    StringKey.OFFLINE_LAST_SYNCED to "Son senkronizasyon: {0}",
 )
 
 /**

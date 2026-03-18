@@ -1,11 +1,14 @@
 package com.fivucsas.shared.di
 
 import com.fivucsas.shared.platform.AndroidCameraService
+import com.fivucsas.shared.platform.AndroidSecureStorage
 import com.fivucsas.shared.platform.FingerprintAuthenticator
 import com.fivucsas.shared.platform.AndroidTokenStorage
 import com.fivucsas.shared.platform.ICameraService
+import com.fivucsas.shared.platform.INetworkMonitor
 import com.fivucsas.shared.platform.INfcService
 import com.fivucsas.shared.platform.IPushNotificationService
+import com.fivucsas.shared.platform.ISecureStorage
 import com.fivucsas.shared.platform.NoOpNfcService
 import com.fivucsas.shared.platform.NoOpPushNotificationService
 import com.fivucsas.shared.platform.providePlatformFingerprintAuthenticator
@@ -57,5 +60,17 @@ actual val platformModule = module {
     // Push Notification Service — default no-op; overridden in androidApp when Firebase is configured
     single<IPushNotificationService> {
         NoOpPushNotificationService()
+    }
+
+    // Secure Storage for offline cache and general KV storage
+    single<ISecureStorage> {
+        AndroidSecureStorage(androidContext())
+    }
+
+    // Network Monitor — real connectivity via ConnectivityManager
+    // Note: AndroidNetworkMonitor is in androidApp module, registered in FIVUCSASApplication.
+    // Default no-op here; overridden in androidApp.
+    single<INetworkMonitor> {
+        com.fivucsas.shared.platform.DefaultNetworkMonitor()
     }
 }

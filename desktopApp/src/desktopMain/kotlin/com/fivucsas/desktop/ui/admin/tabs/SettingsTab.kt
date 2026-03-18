@@ -28,6 +28,7 @@ import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Nfc
 import androidx.compose.material.icons.filled.WifiOff
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -151,6 +152,10 @@ fun SettingsTab(
                     onCheckHealth = { viewModel.checkSystemHealth() },
                     isLoading = isLoading
                 )
+            }
+
+            item {
+                DesktopNfcSection()
             }
 
             item {
@@ -688,6 +693,110 @@ private fun MaintenanceSection(
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
+    }
+}
+
+/**
+ * Desktop NFC Reader Information Section (P3)
+ *
+ * Shows NFC USB reader availability status.
+ * Attempts to detect smart card readers via javax.smartcardio if available.
+ */
+@Composable
+private fun DesktopNfcSection() {
+    var readerStatus by remember { mutableStateOf<NfcReaderStatus>(NfcReaderStatus.Checking) }
+
+    // Check for NFC reader availability on first composition
+    androidx.compose.runtime.LaunchedEffect(Unit) {
+        readerStatus = checkNfcReaderAvailability()
+    }
+
+    SettingsCard(
+        title = s(StringKey.DESKTOP_NFC_TITLE),
+        icon = Icons.Default.Nfc,
+        description = s(StringKey.DESKTOP_NFC_SUBTITLE)
+    ) {
+        Text(
+            s(StringKey.DESKTOP_NFC_USB_REQUIRED),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+
+        Spacer(modifier = Modifier.height(UIDimens.SpacingMedium))
+
+        val (icon, color, text) = when (readerStatus) {
+            is NfcReaderStatus.Checking -> Triple(
+                Icons.Default.Refresh,
+                Color(0xFF2196F3),
+                s(StringKey.DESKTOP_NFC_CHECKING)
+            )
+            is NfcReaderStatus.Found -> Triple(
+                Icons.Default.CheckCircle,
+                Color(0xFF4CAF50),
+                s(StringKey.DESKTOP_NFC_READER_FOUND, (readerStatus as NfcReaderStatus.Found).readerName)
+            )
+            is NfcReaderStatus.NotFound -> Triple(
+                Icons.Default.Nfc,
+                Color(0xFF9E9E9E),
+                s(StringKey.DESKTOP_NFC_NO_READER)
+            )
+            is NfcReaderStatus.NotAvailable -> Triple(
+                Icons.Default.Error,
+                Color(0xFFFF9800),
+                s(StringKey.DESKTOP_NFC_NOT_AVAILABLE)
+            )
+        }
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(UIDimens.SpacingSmall)
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = color,
+                modifier = Modifier.size(UIDimens.IconSmall)
+            )
+            Text(
+                text,
+                style = MaterialTheme.typography.bodyMedium,
+                color = color
+            )
+        }
+    }
+}
+
+private sealed class NfcReaderStatus {
+    object Checking : NfcReaderStatus()
+    data class Found(val readerName: String) : NfcReaderStatus()
+    object NotFound : NfcReaderStatus()
+    object NotAvailable : NfcReaderStatus()
+}
+
+/**
+ * Attempts to detect smart card readers via javax.smartcardio.
+ * Returns the availability status.
+ */
+private fun checkNfcReaderAvailability(): NfcReaderStatus {
+    return try {
+        val factoryClass = Class.forName("javax.smartcardio.TerminalFactory")
+        val getDefaultMethod = factoryClass.getMethod("getDefault")
+        val factory = getDefaultMethod.invoke(null)
+        val terminalsMethod = factoryClass.getMethod("terminals")
+        val terminals = terminalsMethod.invoke(factory)
+        val listMethod = terminals.javaClass.getMethod("list")
+        @Suppress("UNCHECKED_CAST")
+        val terminalList = listMethod.invoke(terminals) as? List<Any>
+        if (terminalList != null && terminalList.isNotEmpty()) {
+            val name = terminalList.first().toString()
+            NfcReaderStatus.Found(name)
+        } else {
+            NfcReaderStatus.NotFound
+        }
+    } catch (_: ClassNotFoundException) {
+        NfcReaderStatus.NotAvailable
+    } catch (_: Exception) {
+        NfcReaderStatus.NotFound
     }
 }
 

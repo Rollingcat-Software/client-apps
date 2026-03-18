@@ -1,5 +1,6 @@
 package com.fivucsas.shared.presentation.viewmodel.auth
 
+import com.fivucsas.shared.data.local.OfflineCache
 import com.fivucsas.shared.domain.model.UserRole
 import com.fivucsas.shared.domain.usecase.auth.LoginUseCase
 import com.fivucsas.shared.presentation.state.LoginState
@@ -8,7 +9,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 class LoginViewModel(
-    private val loginUseCase: LoginUseCase
+    private val loginUseCase: LoginUseCase,
+    private val offlineCache: OfflineCache
 ) {
     private val _state = MutableStateFlow(LoginState())
     val state: StateFlow<LoginState> = _state.asStateFlow()
@@ -17,6 +19,13 @@ class LoginViewModel(
         _state.value = LoginState(isLoading = true)
         loginUseCase(email, password).fold(
             onSuccess = { tokens ->
+                // Cache login data for offline mode
+                offlineCache.cacheLoginData(
+                    userId = tokens.userId,
+                    userName = tokens.userName,
+                    userEmail = tokens.userEmail,
+                    role = tokens.role
+                )
                 _state.value = LoginState(
                     isLoading = false,
                     tokens = tokens,

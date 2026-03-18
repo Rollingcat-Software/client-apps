@@ -44,6 +44,7 @@ import com.fivucsas.mobile.android.ui.screen.AnalyticsScreen
 import com.fivucsas.mobile.android.ui.screen.LivenessScreen
 import com.fivucsas.mobile.android.ui.screen.CardDetectionScreen
 import com.fivucsas.mobile.android.ui.screen.HardwareTokenScreen
+import com.fivucsas.mobile.android.ui.screen.BiometricBackupScreen
 import com.fivucsas.shared.data.local.TokenManager
 import com.fivucsas.shared.domain.model.ConfidenceBand
 import com.fivucsas.shared.domain.model.GuestFaceCheckOutcome
@@ -150,6 +151,9 @@ sealed class Screen(val route: String) {
         fun createRoute(userId: String) = "${RouteIds.TOTP_ENROLL}/$userId"
     }
     object Analytics : Screen(RouteIds.ANALYTICS)
+    object BiometricBackup : Screen("${RouteIds.BIOMETRIC_BACKUP}/{userId}") {
+        fun createRoute(userId: String) = "${RouteIds.BIOMETRIC_BACKUP}/$userId"
+    }
     object LivenessPuzzle : Screen(RouteIds.LIVENESS_PUZZLE)
     object CardDetection : Screen(RouteIds.CARD_DETECTION)
     object HardwareToken : Screen(RouteIds.HARDWARE_TOKEN)
@@ -808,6 +812,7 @@ fun AppNavigation() {
                 onNavigateToLiveness = { navController.navigate(Screen.LivenessPuzzle.route) },
                 onNavigateToCardDetection = { navController.navigate(Screen.CardDetection.route) },
                 onNavigateToHardwareToken = { navController.navigate(Screen.HardwareToken.route) },
+                onNavigateToBiometricBackup = { navController.navigate(Screen.BiometricBackup.createRoute(tokenManager?.getUserId() ?: "me")) },
                 onLogout = {
                     tokenManager?.clearTokens()
                     navController.navigate(Screen.Login.route) {
@@ -1473,6 +1478,26 @@ fun AppNavigation() {
             val viewModel = koinInject<com.fivucsas.shared.presentation.viewmodel.HardwareTokenViewModel>()
             HardwareTokenScreen(
                 viewModel = viewModel,
+                onNavigateBack = { navController.popBackStack() }
+            )
+        }
+
+        // P3: Biometric Backup / Data Export screen
+        composable(
+            Screen.BiometricBackup.route,
+            arguments = listOf(navArgument("userId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            if (!isAuthenticated()) {
+                LaunchedEffect(Unit) {
+                    navController.navigate(Screen.Login.route) { popUpTo(0) { inclusive = true } }
+                }
+                return@composable
+            }
+            val userId = backStackEntry.arguments?.getString("userId") ?: "me"
+            val viewModel = koinInject<com.fivucsas.shared.presentation.viewmodel.BiometricBackupViewModel>()
+            BiometricBackupScreen(
+                viewModel = viewModel,
+                userId = userId,
                 onNavigateBack = { navController.popBackStack() }
             )
         }

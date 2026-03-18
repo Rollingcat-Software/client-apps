@@ -69,6 +69,7 @@ fun SettingsScreen(
     onNavigateToLiveness: () -> Unit = {},
     onNavigateToCardDetection: () -> Unit = {},
     onNavigateToHardwareToken: () -> Unit = {},
+    onNavigateToBiometricBackup: () -> Unit = {},
     onLogout: () -> Unit
 ) {
     val notificationsEnabled = remember { mutableStateOf(true) }
@@ -343,6 +344,28 @@ fun SettingsScreen(
                         .fillMaxWidth()
                         .padding(vertical = 6.dp)
                         .clickable { onNavigateToAnalytics() }
+                )
+            }
+
+            // Biometric Backup / Data Privacy (P3)
+            ExpandableCard(
+                title = s(StringKey.BIOMETRIC_BACKUP_TITLE),
+                subtitle = s(StringKey.BIOMETRIC_BACKUP_GDPR_TITLE)
+            ) {
+                Text(
+                    text = s(StringKey.BIOMETRIC_BACKUP_GDPR_DESC),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = AppColors.OnSurfaceVariant
+                )
+                Spacer(modifier = Modifier.size(8.dp))
+                Text(
+                    text = s(StringKey.BIOMETRIC_BACKUP_TITLE),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = AppColors.Primary,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 6.dp)
+                        .clickable { onNavigateToBiometricBackup() }
                 )
             }
 

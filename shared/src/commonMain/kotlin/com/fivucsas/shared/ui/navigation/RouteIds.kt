@@ -105,4 +105,7 @@ object RouteIds {
     const val ROOT_AUDIT_EXPLORER = "root/audit-explorer"
     const val ROOT_SECURITY_EVENTS = "root/security-events"
     const val ROOT_SYSTEM_SETTINGS = "root/system-settings"
+
+    // P3: Biometric Backup
+    const val BIOMETRIC_BACKUP = "biometric-backup"
 }
