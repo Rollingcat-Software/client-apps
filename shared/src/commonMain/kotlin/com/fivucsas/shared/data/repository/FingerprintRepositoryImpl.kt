@@ -46,7 +46,7 @@ class FingerprintRepositoryImpl(
                 )
             )
 
-            val stepUpToken = response.resolvedStepUpToken()
+            val stepUpToken = response.stepUpToken
             if (stepUpToken.isBlank()) {
                 throw FingerprintAuthException(
                     message = "Step-up token was missing in backend response.",

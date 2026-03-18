@@ -2,17 +2,19 @@ package com.fivucsas.shared.data.remote.dto
 
 import com.fivucsas.shared.domain.model.Enrollment
 import com.fivucsas.shared.domain.model.EnrollmentStatus
-import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
+/**
+ * Enrollment DTO — server returns camelCase JSON (Spring Boot / Jackson)
+ */
 @Serializable
 data class EnrollmentDto(
     val id: String = "",
-    @SerialName("user_id") val userId: String = "",
+    val userId: String = "",
     val method: String = "",
     val status: String = "PENDING",
-    @SerialName("enrolled_at") val enrolledAt: String = "",
-    @SerialName("updated_at") val updatedAt: String = "",
+    val enrolledAt: String = "",
+    val updatedAt: String = "",
     val metadata: Map<String, String> = emptyMap()
 )
 

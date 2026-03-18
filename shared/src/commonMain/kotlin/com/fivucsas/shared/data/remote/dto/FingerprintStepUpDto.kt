@@ -1,6 +1,5 @@
 package com.fivucsas.shared.data.remote.dto
 
-import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -23,12 +22,11 @@ data class VerifyBiometricSignatureRequestDto(
     val signatureBase64: String
 )
 
+/**
+ * Server returns camelCase JSON: { "stepUpToken": "..." }
+ */
 @Serializable
 data class VerifyBiometricSignatureResponseDto(
-    @SerialName("step_up_token")
-    val stepUpTokenSnake: String? = null,
-    val stepUpToken: String? = null
-) {
-    fun resolvedStepUpToken(): String = stepUpToken ?: stepUpTokenSnake.orEmpty()
-}
+    val stepUpToken: String = ""
+)
 

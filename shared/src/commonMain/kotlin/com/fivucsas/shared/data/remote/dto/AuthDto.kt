@@ -1,7 +1,6 @@
 package com.fivucsas.shared.data.remote.dto
 
 import com.fivucsas.shared.domain.repository.AuthTokens
-import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /**
@@ -15,30 +14,67 @@ data class LoginRequestDto(
 
 /**
  * Register Request DTO
+ *
+ * Server (Spring Boot / Jackson) expects camelCase: firstName, lastName
  */
 @Serializable
 data class RegisterRequestDto(
     val email: String,
     val password: String,
-    @SerialName("first_name") val firstName: String,
-    @SerialName("last_name") val lastName: String
+    val firstName: String,
+    val lastName: String
+)
+
+/**
+ * User info returned inside the auth response.
+ * All fields optional with defaults so unknown/null fields don't crash deserialization.
+ */
+@Serializable
+data class AuthUserDto(
+    val id: String = "",
+    val email: String = "",
+    val firstName: String? = null,
+    val lastName: String? = null,
+    val phoneNumber: String? = null,
+    val address: String? = null,
+    val idNumber: String? = null,
+    val status: String = "ACTIVE",
+    val emailVerified: Boolean = false,
+    val phoneVerified: Boolean = false,
+    val role: String? = null,
+    val roles: List<String> = emptyList(),
+    val tenantId: String? = null,
+    val enrolledAt: String? = null,
+    val lastVerifiedAt: String? = null,
+    val verificationCount: Int = 0,
+    val lastLoginAt: String? = null,
+    val lastLoginIp: String? = null,
+    val createdAt: String? = null,
+    val updatedAt: String? = null,
+    val biometricEnrolled: Boolean = false
 )
 
 /**
  * Auth Response DTO
+ *
+ * Server returns camelCase JSON (Spring Boot / Jackson default):
+ *   { accessToken, refreshToken, tokenType, expiresIn, user: {...} }
  */
 @Serializable
 data class AuthResponseDto(
-    @SerialName("access_token") val accessToken: String,
-    @SerialName("refresh_token") val refreshToken: String,
-    @SerialName("expires_in") val expiresIn: Long,
-    @SerialName("token_type") val tokenType: String = "Bearer",
-    val role: String? = null
+    val accessToken: String,
+    val refreshToken: String,
+    val expiresIn: Long,
+    val tokenType: String = "Bearer",
+    val user: AuthUserDto? = null
 )
 
+/**
+ * Refresh token request DTO — server expects camelCase: { "refreshToken": "..." }
+ */
 @Serializable
 data class RefreshTokenRequestDto(
-    @SerialName("refresh_token") val refreshToken: String
+    val refreshToken: String
 )
 
 /**
@@ -49,24 +85,23 @@ fun AuthResponseDto.toModel(): AuthTokens {
         accessToken = accessToken,
         refreshToken = refreshToken,
         expiresIn = expiresIn,
-        role = role ?: "USER"
+        role = user?.role ?: user?.roles?.firstOrNull() ?: "USER"
     )
 }
 
 /**
- * Convert domain model to DTO
+ * Change password request DTO — server expects camelCase
  */
 @Serializable
 data class ChangePasswordRequestDto(
-    @SerialName("current_password") val currentPassword: String,
-    @SerialName("new_password") val newPassword: String
+    val currentPassword: String,
+    val newPassword: String
 )
 
 fun AuthTokens.toDto(): AuthResponseDto {
     return AuthResponseDto(
         accessToken = accessToken,
         refreshToken = refreshToken,
-        expiresIn = expiresIn,
-        role = role
+        expiresIn = expiresIn
     )
 }

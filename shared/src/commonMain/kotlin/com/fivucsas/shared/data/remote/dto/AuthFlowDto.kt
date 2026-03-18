@@ -2,27 +2,32 @@ package com.fivucsas.shared.data.remote.dto
 
 import com.fivucsas.shared.domain.model.AuthFlow
 import com.fivucsas.shared.domain.model.AuthFlowStep
-import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
+/**
+ * Auth flow DTO — server returns camelCase JSON (Spring Boot / Jackson)
+ */
 @Serializable
 data class AuthFlowDto(
     val id: String = "",
-    @SerialName("tenant_id") val tenantId: String = "",
+    val tenantId: String = "",
     val name: String = "",
-    @SerialName("operation_type") val operationType: String = "",
-    @SerialName("is_active") val isActive: Boolean = true,
+    val operationType: String = "",
+    val isActive: Boolean = true,
     val steps: List<AuthFlowStepDto> = emptyList(),
-    @SerialName("created_at") val createdAt: String = "",
-    @SerialName("updated_at") val updatedAt: String = ""
+    val createdAt: String = "",
+    val updatedAt: String = ""
 )
 
+/**
+ * Auth flow step DTO — server returns camelCase JSON
+ */
 @Serializable
 data class AuthFlowStepDto(
     val id: String = "",
-    @SerialName("step_order") val stepOrder: Int = 0,
-    @SerialName("auth_method") val authMethod: String = "",
-    @SerialName("is_required") val isRequired: Boolean = true,
+    val stepOrder: Int = 0,
+    val authMethod: String = "",
+    val isRequired: Boolean = true,
     val config: Map<String, String> = emptyMap()
 )
 

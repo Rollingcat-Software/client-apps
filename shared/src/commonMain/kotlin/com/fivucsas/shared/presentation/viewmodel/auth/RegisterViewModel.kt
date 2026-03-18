@@ -28,7 +28,7 @@ class RegisterViewModel(
             onFailure = { error ->
                 _state.value = RegisterState(
                     isLoading = false,
-                    error = error.message ?: "Registration failed"
+                    error = mapErrorToUserMessage(error)
                 )
             }
         )
@@ -36,5 +36,22 @@ class RegisterViewModel(
 
     fun clearError() {
         _state.value = _state.value.copy(error = null)
+    }
+
+    private fun mapErrorToUserMessage(error: Throwable): String {
+        val message = error.message ?: return "Registration failed. Please try again."
+        return when {
+            "409" in message || "Conflict" in message || "already exists" in message.lowercase() ->
+                "An account with this email already exists."
+            "400" in message || "Bad Request" in message ->
+                "Please check your input and try again."
+            "ConnectException" in message || "UnresolvedAddressException" in message ->
+                "Cannot reach the server. Check your internet connection."
+            "timeout" in message.lowercase() ->
+                "Connection timed out. Please try again."
+            "Illegal input" in message || "serializ" in message.lowercase() ->
+                "Unexpected server response. Please update the app or try again later."
+            else -> "Registration failed. Please try again."
+        }
     }
 }
