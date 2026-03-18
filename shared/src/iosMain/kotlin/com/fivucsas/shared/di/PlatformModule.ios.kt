@@ -10,6 +10,8 @@ import com.fivucsas.shared.platform.IPushNotificationService
 import com.fivucsas.shared.platform.IosCameraService
 import com.fivucsas.shared.platform.IosSecureStorage
 import com.fivucsas.shared.platform.IosLogger
+import com.fivucsas.shared.platform.INfcService
+import com.fivucsas.shared.platform.NoOpNfcService
 import com.fivucsas.shared.platform.NoOpPushNotificationService
 import com.fivucsas.shared.platform.providePlatformFingerprintAuthenticator
 import org.koin.dsl.module
@@ -52,4 +54,7 @@ actual val platformModule = module {
 
     // Network Monitor — default always-online on iOS for now
     single<INetworkMonitor> { DefaultNetworkMonitor() }
+
+    // NFC Service — no-op on iOS until Core NFC is integrated
+    single<INfcService> { NoOpNfcService() }
 }
