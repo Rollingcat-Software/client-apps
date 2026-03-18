@@ -202,4 +202,18 @@ val networkModule = module {
     single<SessionApi> { SessionApiImpl(get(named("identityClient"))) }
     single<DeviceApi> { DeviceApiImpl(get(named("identityClient"))) }
     single<EnrollmentApi> { EnrollmentApiImpl(get(named("identityClient"))) }
+
+    // New API clients for voice, OTP, TOTP, dashboard
+    single<com.fivucsas.shared.data.remote.api.VoiceApi> {
+        com.fivucsas.shared.data.remote.api.VoiceApiImpl(get(named("identityClient")))
+    }
+    single<com.fivucsas.shared.data.remote.api.OtpApi> {
+        com.fivucsas.shared.data.remote.api.OtpApiImpl(get(named("identityClient")))
+    }
+    single<com.fivucsas.shared.data.remote.api.TotpApi> {
+        com.fivucsas.shared.data.remote.api.TotpApiImpl(get(named("identityClient")))
+    }
+    single<com.fivucsas.shared.data.remote.api.DashboardApi> {
+        com.fivucsas.shared.data.remote.api.DashboardApiImpl(get(named("identityClient")))
+    }
 }

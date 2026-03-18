@@ -10,6 +10,10 @@ import com.fivucsas.shared.presentation.viewmodel.KioskViewModel
 import com.fivucsas.shared.presentation.viewmodel.SessionViewModel
 import com.fivucsas.shared.presentation.viewmodel.TenantSettingsViewModel
 import com.fivucsas.shared.presentation.viewmodel.UserProfileViewModel
+import com.fivucsas.shared.presentation.viewmodel.AnalyticsViewModel
+import com.fivucsas.shared.presentation.viewmodel.OtpViewModel
+import com.fivucsas.shared.presentation.viewmodel.TotpViewModel
+import com.fivucsas.shared.presentation.viewmodel.VoiceViewModel
 import com.fivucsas.shared.presentation.viewmodel.auth.BiometricViewModel
 import com.fivucsas.shared.presentation.viewmodel.auth.ChangePasswordViewModel
 import com.fivucsas.shared.presentation.viewmodel.auth.FingerprintViewModel
@@ -40,4 +44,8 @@ val viewModelModule = module {
     factoryOf(::SessionViewModel)
     factoryOf(::DeviceViewModel)
     factoryOf(::EnrollmentViewModel)
+    factoryOf(::VoiceViewModel)
+    factoryOf(::OtpViewModel)
+    factoryOf(::TotpViewModel)
+    factoryOf(::AnalyticsViewModel)
 }

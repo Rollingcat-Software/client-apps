@@ -36,6 +36,11 @@ import com.fivucsas.mobile.android.ui.screen.SettingsScreen
 import com.fivucsas.mobile.android.ui.screen.TenantSettingsScreen
 import com.fivucsas.mobile.android.ui.screen.UnauthorizedScreen
 import com.fivucsas.mobile.android.ui.screen.UsersManagementScreen
+import com.fivucsas.mobile.android.ui.screen.VoiceEnrollScreen
+import com.fivucsas.mobile.android.ui.screen.EmailOtpScreen
+import com.fivucsas.mobile.android.ui.screen.SmsOtpScreen
+import com.fivucsas.mobile.android.ui.screen.TotpEnrollScreen
+import com.fivucsas.mobile.android.ui.screen.AnalyticsScreen
 import com.fivucsas.shared.data.local.TokenManager
 import com.fivucsas.shared.domain.model.ConfidenceBand
 import com.fivucsas.shared.domain.model.GuestFaceCheckOutcome
@@ -128,6 +133,20 @@ sealed class Screen(val route: String) {
     object RootAuditExplorer : Screen(RouteIds.ROOT_AUDIT_EXPLORER)
     object RootSecurityEvents : Screen(RouteIds.ROOT_SECURITY_EVENTS)
     object RootSystemSettings : Screen(RouteIds.ROOT_SYSTEM_SETTINGS)
+
+    object VoiceAuth : Screen("${RouteIds.VOICE_AUTH}/{userId}") {
+        fun createRoute(userId: String) = "${RouteIds.VOICE_AUTH}/$userId"
+    }
+    object EmailOtp : Screen("${RouteIds.EMAIL_OTP}/{userId}") {
+        fun createRoute(userId: String) = "${RouteIds.EMAIL_OTP}/$userId"
+    }
+    object SmsOtp : Screen("${RouteIds.SMS_OTP}/{userId}") {
+        fun createRoute(userId: String) = "${RouteIds.SMS_OTP}/$userId"
+    }
+    object TotpEnroll : Screen("${RouteIds.TOTP_ENROLL}/{userId}") {
+        fun createRoute(userId: String) = "${RouteIds.TOTP_ENROLL}/$userId"
+    }
+    object Analytics : Screen(RouteIds.ANALYTICS)
 
     object AuthFlows : Screen("${RouteIds.AUTH_FLOWS}/{tenantId}") {
         fun createRoute(tenantId: String) = "${RouteIds.AUTH_FLOWS}/$tenantId"
@@ -775,6 +794,11 @@ fun AppNavigation() {
                 onNavigateToChangePassword = { navController.navigate(Screen.ChangePassword.route) },
                 onNavigateToHelp = { navController.navigate(Screen.Help.route) },
                 onNavigateToAbout = { navController.navigate(Screen.About.route) },
+                onNavigateToVoiceAuth = { navController.navigate(Screen.VoiceAuth.createRoute(tokenManager?.getUserId() ?: "me")) },
+                onNavigateToEmailOtp = { navController.navigate(Screen.EmailOtp.createRoute(tokenManager?.getUserId() ?: "me")) },
+                onNavigateToSmsOtp = { navController.navigate(Screen.SmsOtp.createRoute(tokenManager?.getUserId() ?: "me")) },
+                onNavigateToTotpEnroll = { navController.navigate(Screen.TotpEnroll.createRoute(tokenManager?.getUserId() ?: "me")) },
+                onNavigateToAnalytics = { navController.navigate(Screen.Analytics.route) },
                 onLogout = {
                     tokenManager?.clearTokens()
                     navController.navigate(Screen.Login.route) {
@@ -1301,6 +1325,101 @@ fun AppNavigation() {
                 viewModel = viewModel,
                 userId = userId,
                 onBack = { navController.popBackStack() }
+            )
+        }
+
+        // Voice Auth screen
+        composable(
+            route = Screen.VoiceAuth.route,
+            arguments = listOf(navArgument("userId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            if (!isAuthenticated()) {
+                LaunchedEffect(Unit) {
+                    navController.navigate(Screen.Login.route) { popUpTo(0) { inclusive = true } }
+                }
+                return@composable
+            }
+            val userId = backStackEntry.arguments?.getString("userId") ?: ""
+            val viewModel = koinInject<com.fivucsas.shared.presentation.viewmodel.VoiceViewModel>()
+            VoiceEnrollScreen(
+                userId = userId,
+                viewModel = viewModel,
+                onNavigateBack = { navController.popBackStack() }
+            )
+        }
+
+        // Email OTP screen
+        composable(
+            route = Screen.EmailOtp.route,
+            arguments = listOf(navArgument("userId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            if (!isAuthenticated()) {
+                LaunchedEffect(Unit) {
+                    navController.navigate(Screen.Login.route) { popUpTo(0) { inclusive = true } }
+                }
+                return@composable
+            }
+            val userId = backStackEntry.arguments?.getString("userId") ?: ""
+            val viewModel = koinInject<com.fivucsas.shared.presentation.viewmodel.OtpViewModel>()
+            EmailOtpScreen(
+                userId = userId,
+                viewModel = viewModel,
+                onNavigateBack = { navController.popBackStack() }
+            )
+        }
+
+        // SMS OTP screen
+        composable(
+            route = Screen.SmsOtp.route,
+            arguments = listOf(navArgument("userId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            if (!isAuthenticated()) {
+                LaunchedEffect(Unit) {
+                    navController.navigate(Screen.Login.route) { popUpTo(0) { inclusive = true } }
+                }
+                return@composable
+            }
+            val userId = backStackEntry.arguments?.getString("userId") ?: ""
+            val viewModel = koinInject<com.fivucsas.shared.presentation.viewmodel.OtpViewModel>()
+            SmsOtpScreen(
+                userId = userId,
+                viewModel = viewModel,
+                onNavigateBack = { navController.popBackStack() }
+            )
+        }
+
+        // TOTP Enroll screen
+        composable(
+            route = Screen.TotpEnroll.route,
+            arguments = listOf(navArgument("userId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            if (!isAuthenticated()) {
+                LaunchedEffect(Unit) {
+                    navController.navigate(Screen.Login.route) { popUpTo(0) { inclusive = true } }
+                }
+                return@composable
+            }
+            val userId = backStackEntry.arguments?.getString("userId") ?: ""
+            val viewModel = koinInject<com.fivucsas.shared.presentation.viewmodel.TotpViewModel>()
+            TotpEnrollScreen(
+                userId = userId,
+                viewModel = viewModel,
+                onNavigateBack = { navController.popBackStack() }
+            )
+        }
+
+        // Analytics screen
+        composable(Screen.Analytics.route) {
+            if (!isAuthenticated()) {
+                LaunchedEffect(Unit) {
+                    navController.navigate(Screen.Login.route) { popUpTo(0) { inclusive = true } }
+                }
+                return@composable
+            }
+            val viewModel = koinInject<com.fivucsas.shared.presentation.viewmodel.AnalyticsViewModel>()
+            AnalyticsScreen(
+                viewModel = viewModel,
+                onNavigateBack = { navController.popBackStack() }
             )
         }
     }

@@ -222,6 +222,58 @@ enum class StringKey {
     CHANGE_PASSWORD,
     CURRENT_PASSWORD,
     NEW_PASSWORD,
+
+    // Voice
+    VOICE_ENROLL,
+    VOICE_VERIFY,
+    VOICE_SEARCH,
+    VOICE_ENROLL_INSTRUCTION,
+    VOICE_VERIFY_INSTRUCTION,
+    VOICE_SEARCH_INSTRUCTION,
+    VOICE_PERMISSION_REQUIRED,
+    VOICE_TAP_TO_RECORD,
+    VOICE_RECORDING,
+    VOICE_VERIFIED,
+    VOICE_NOT_VERIFIED,
+    VOICE_CONFIDENCE,
+    VOICE_USER_FOUND,
+    VOICE_USER_NOT_FOUND,
+
+    // OTP
+    OTP_SEND,
+    OTP_VERIFY,
+    OTP_RESEND,
+    OTP_CODE,
+    OTP_ENTER_CODE,
+    OTP_VERIFIED_SUCCESS,
+
+    // Email OTP
+    EMAIL_OTP_TITLE,
+    EMAIL_OTP_DESCRIPTION,
+
+    // SMS OTP
+    SMS_OTP_TITLE,
+    SMS_OTP_DESCRIPTION,
+    SMS_PHONE_NUMBER,
+    SMS_TWILIO_INFO,
+
+    // TOTP
+    TOTP_TITLE,
+    TOTP_DESCRIPTION,
+    TOTP_SETUP,
+    TOTP_SCAN_QR,
+    TOTP_MANUAL_KEY,
+    TOTP_ENTER_CODE,
+    TOTP_ALREADY_ENABLED,
+    TOTP_SETUP_COMPLETE,
+
+    // Analytics
+    ANALYTICS_TITLE,
+    ANALYTICS_SUBTITLE,
+    ANALYTICS_VERIFICATIONS_TODAY,
+    ANALYTICS_FAILED_ATTEMPTS,
+    ANALYTICS_SUCCESS_RATE,
+    ANALYTICS_PENDING,
 }
 
 private val enStrings = mapOf(
@@ -408,6 +460,58 @@ private val enStrings = mapOf(
     StringKey.CHANGE_PASSWORD to "Change Password",
     StringKey.CURRENT_PASSWORD to "Current Password",
     StringKey.NEW_PASSWORD to "New Password",
+
+    // Voice
+    StringKey.VOICE_ENROLL to "Enroll",
+    StringKey.VOICE_VERIFY to "Verify",
+    StringKey.VOICE_SEARCH to "Search",
+    StringKey.VOICE_ENROLL_INSTRUCTION to "Speak clearly for 3-5 seconds to enroll your voice.",
+    StringKey.VOICE_VERIFY_INSTRUCTION to "Speak to verify your identity against your enrolled voice.",
+    StringKey.VOICE_SEARCH_INSTRUCTION to "Speak to search for a matching user in the system.",
+    StringKey.VOICE_PERMISSION_REQUIRED to "Microphone permission is required",
+    StringKey.VOICE_TAP_TO_RECORD to "Tap the microphone to start recording",
+    StringKey.VOICE_RECORDING to "Recording",
+    StringKey.VOICE_VERIFIED to "Voice Verified",
+    StringKey.VOICE_NOT_VERIFIED to "Voice Not Verified",
+    StringKey.VOICE_CONFIDENCE to "Confidence",
+    StringKey.VOICE_USER_FOUND to "User Found",
+    StringKey.VOICE_USER_NOT_FOUND to "No Matching User Found",
+
+    // OTP
+    StringKey.OTP_SEND to "Send OTP",
+    StringKey.OTP_VERIFY to "Verify OTP",
+    StringKey.OTP_RESEND to "Resend OTP",
+    StringKey.OTP_CODE to "OTP Code",
+    StringKey.OTP_ENTER_CODE to "Enter the 6-digit code",
+    StringKey.OTP_VERIFIED_SUCCESS to "OTP verified successfully!",
+
+    // Email OTP
+    StringKey.EMAIL_OTP_TITLE to "Email OTP Verification",
+    StringKey.EMAIL_OTP_DESCRIPTION to "Enter your email to receive a one-time verification code.",
+
+    // SMS OTP
+    StringKey.SMS_OTP_TITLE to "SMS OTP Verification",
+    StringKey.SMS_OTP_DESCRIPTION to "Enter your phone number to receive a one-time code via SMS.",
+    StringKey.SMS_PHONE_NUMBER to "Phone Number",
+    StringKey.SMS_TWILIO_INFO to "Note: SMS service (Twilio) is not yet activated. This feature is pending activation.",
+
+    // TOTP
+    StringKey.TOTP_TITLE to "TOTP Setup",
+    StringKey.TOTP_DESCRIPTION to "Set up Time-based One-Time Password for two-factor authentication.",
+    StringKey.TOTP_SETUP to "Setup TOTP",
+    StringKey.TOTP_SCAN_QR to "Scan this QR code with your authenticator app (e.g., Google Authenticator)",
+    StringKey.TOTP_MANUAL_KEY to "Manual entry key:",
+    StringKey.TOTP_ENTER_CODE to "Enter the code from your authenticator app",
+    StringKey.TOTP_ALREADY_ENABLED to "TOTP is already enabled",
+    StringKey.TOTP_SETUP_COMPLETE to "TOTP setup complete! Two-factor authentication is now enabled.",
+
+    // Analytics
+    StringKey.ANALYTICS_TITLE to "Analytics",
+    StringKey.ANALYTICS_SUBTITLE to "System statistics and metrics overview",
+    StringKey.ANALYTICS_VERIFICATIONS_TODAY to "Verifications Today",
+    StringKey.ANALYTICS_FAILED_ATTEMPTS to "Failed Attempts",
+    StringKey.ANALYTICS_SUCCESS_RATE to "Success Rate",
+    StringKey.ANALYTICS_PENDING to "Pending Verifications",
 )
 
 private val trStrings = mapOf(
@@ -594,6 +698,58 @@ private val trStrings = mapOf(
     StringKey.CHANGE_PASSWORD to "Sifre Degistir",
     StringKey.CURRENT_PASSWORD to "Mevcut Sifre",
     StringKey.NEW_PASSWORD to "Yeni Sifre",
+
+    // Voice
+    StringKey.VOICE_ENROLL to "Kayit",
+    StringKey.VOICE_VERIFY to "Dogrula",
+    StringKey.VOICE_SEARCH to "Ara",
+    StringKey.VOICE_ENROLL_INSTRUCTION to "Sesinizi kaydetmek icin 3-5 saniye net konusun.",
+    StringKey.VOICE_VERIFY_INSTRUCTION to "Kimliginizi dogrulamak icin konusun.",
+    StringKey.VOICE_SEARCH_INSTRUCTION to "Sistemde eslesen bir kullanici aramak icin konusun.",
+    StringKey.VOICE_PERMISSION_REQUIRED to "Mikrofon izni gerekli",
+    StringKey.VOICE_TAP_TO_RECORD to "Kayit baslatmak icin mikrofona dokunun",
+    StringKey.VOICE_RECORDING to "Kayit yapiliyor",
+    StringKey.VOICE_VERIFIED to "Ses Dogrulandi",
+    StringKey.VOICE_NOT_VERIFIED to "Ses Dogrulanamadi",
+    StringKey.VOICE_CONFIDENCE to "Guven",
+    StringKey.VOICE_USER_FOUND to "Kullanici Bulundu",
+    StringKey.VOICE_USER_NOT_FOUND to "Eslesen Kullanici Bulunamadi",
+
+    // OTP
+    StringKey.OTP_SEND to "OTP Gonder",
+    StringKey.OTP_VERIFY to "OTP Dogrula",
+    StringKey.OTP_RESEND to "OTP Tekrar Gonder",
+    StringKey.OTP_CODE to "OTP Kodu",
+    StringKey.OTP_ENTER_CODE to "6 haneli kodu girin",
+    StringKey.OTP_VERIFIED_SUCCESS to "OTP basariyla dogrulandi!",
+
+    // Email OTP
+    StringKey.EMAIL_OTP_TITLE to "E-posta OTP Dogrulama",
+    StringKey.EMAIL_OTP_DESCRIPTION to "Tek kullanimlik dogrulama kodu almak icin e-postanizi girin.",
+
+    // SMS OTP
+    StringKey.SMS_OTP_TITLE to "SMS OTP Dogrulama",
+    StringKey.SMS_OTP_DESCRIPTION to "SMS ile tek kullanimlik kod almak icin telefon numaranizi girin.",
+    StringKey.SMS_PHONE_NUMBER to "Telefon Numarasi",
+    StringKey.SMS_TWILIO_INFO to "Not: SMS hizmeti (Twilio) henuz aktif edilmedi. Bu ozellik aktivasyon bekliyor.",
+
+    // TOTP
+    StringKey.TOTP_TITLE to "TOTP Kurulumu",
+    StringKey.TOTP_DESCRIPTION to "Iki faktorlu kimlik dogrulama icin Zamana Dayali Tek Kullanimlik Sifre kurun.",
+    StringKey.TOTP_SETUP to "TOTP Kur",
+    StringKey.TOTP_SCAN_QR to "Bu QR kodu dogrulama uygulamanizla tarayin (ornegin Google Authenticator)",
+    StringKey.TOTP_MANUAL_KEY to "Manuel giris anahtari:",
+    StringKey.TOTP_ENTER_CODE to "Dogrulama uygulamanizdan gelen kodu girin",
+    StringKey.TOTP_ALREADY_ENABLED to "TOTP zaten etkin",
+    StringKey.TOTP_SETUP_COMPLETE to "TOTP kurulumu tamamlandi! Iki faktorlu kimlik dogrulama artik etkin.",
+
+    // Analytics
+    StringKey.ANALYTICS_TITLE to "Analitik",
+    StringKey.ANALYTICS_SUBTITLE to "Sistem istatistikleri ve metrikler genel gorunumu",
+    StringKey.ANALYTICS_VERIFICATIONS_TODAY to "Bugunun Dogrulamalari",
+    StringKey.ANALYTICS_FAILED_ATTEMPTS to "Basarisiz Denemeler",
+    StringKey.ANALYTICS_SUCCESS_RATE to "Basari Orani",
+    StringKey.ANALYTICS_PENDING to "Bekleyen Dogrulamalar",
 )
 
 /**

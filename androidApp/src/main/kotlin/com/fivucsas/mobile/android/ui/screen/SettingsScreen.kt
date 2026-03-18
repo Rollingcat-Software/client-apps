@@ -61,6 +61,11 @@ fun SettingsScreen(
     onNavigateToChangePassword: () -> Unit,
     onNavigateToHelp: () -> Unit,
     onNavigateToAbout: () -> Unit,
+    onNavigateToVoiceAuth: () -> Unit = {},
+    onNavigateToEmailOtp: () -> Unit = {},
+    onNavigateToSmsOtp: () -> Unit = {},
+    onNavigateToTotpEnroll: () -> Unit = {},
+    onNavigateToAnalytics: () -> Unit = {},
     onLogout: () -> Unit
 ) {
     val notificationsEnabled = remember { mutableStateOf(true) }
@@ -249,6 +254,65 @@ fun SettingsScreen(
                         .fillMaxWidth()
                         .padding(vertical = 4.dp)
                         .clickable { onNavigateToAbout() }
+                )
+            }
+
+            // Authentication Methods
+            ExpandableCard(
+                title = s(StringKey.BIOMETRIC_AUTH),
+                subtitle = "Voice, OTP, TOTP"
+            ) {
+                Text(
+                    text = s(StringKey.VOICE_RECOGNITION),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = AppColors.Primary,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 6.dp)
+                        .clickable { onNavigateToVoiceAuth() }
+                )
+                Text(
+                    text = s(StringKey.EMAIL_OTP),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = AppColors.Primary,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 6.dp)
+                        .clickable { onNavigateToEmailOtp() }
+                )
+                Text(
+                    text = s(StringKey.SMS_OTP),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = AppColors.Primary,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 6.dp)
+                        .clickable { onNavigateToSmsOtp() }
+                )
+                Text(
+                    text = s(StringKey.TOTP),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = AppColors.Primary,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 6.dp)
+                        .clickable { onNavigateToTotpEnroll() }
+                )
+            }
+
+            // Analytics
+            ExpandableCard(
+                title = s(StringKey.ANALYTICS_TITLE),
+                subtitle = s(StringKey.ANALYTICS_SUBTITLE)
+            ) {
+                Text(
+                    text = s(StringKey.ANALYTICS_TITLE),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = AppColors.Primary,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 6.dp)
+                        .clickable { onNavigateToAnalytics() }
                 )
             }
 

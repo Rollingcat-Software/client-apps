@@ -133,4 +133,32 @@ val repositoryModule = module {
             enrollmentApi = get<EnrollmentApi>()
         )
     }
+
+    // Voice Repository
+    single<com.fivucsas.shared.domain.repository.VoiceRepository> {
+        com.fivucsas.shared.data.repository.VoiceRepositoryImpl(
+            voiceApi = get<com.fivucsas.shared.data.remote.api.VoiceApi>()
+        )
+    }
+
+    // OTP Repository
+    single<com.fivucsas.shared.domain.repository.OtpRepository> {
+        com.fivucsas.shared.data.repository.OtpRepositoryImpl(
+            otpApi = get<com.fivucsas.shared.data.remote.api.OtpApi>()
+        )
+    }
+
+    // TOTP Repository
+    single<com.fivucsas.shared.domain.repository.TotpRepository> {
+        com.fivucsas.shared.data.repository.TotpRepositoryImpl(
+            totpApi = get<com.fivucsas.shared.data.remote.api.TotpApi>()
+        )
+    }
+
+    // Dashboard Repository
+    single<com.fivucsas.shared.domain.repository.DashboardRepository> {
+        com.fivucsas.shared.data.repository.DashboardRepositoryImpl(
+            dashboardApi = get<com.fivucsas.shared.data.remote.api.DashboardApi>()
+        )
+    }
 }
