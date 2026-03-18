@@ -256,11 +256,11 @@ class DesktopNotificationService : INotificationService {
  * Applications should check isAvailable() before attempting camera operations.
  */
 class DesktopCameraService : ICameraService {
-    private val _cameraState = MutableStateFlow<CameraState>(CameraState.Uninitialized)
+    private val _cameraState = MutableStateFlow<CameraState>(CameraState.Idle)
     override val cameraState: StateFlow<CameraState> = _cameraState
 
     override suspend fun initialize(lensFacing: LensFacing): Result<Unit> {
-        _cameraState.value = CameraState.Error("Camera not available on desktop")
+        _cameraState.value = CameraState.Error(UnsupportedOperationException("Camera not available on desktop"))
         return Result.failure(UnsupportedOperationException("Camera not available on desktop platform"))
     }
 
@@ -277,7 +277,7 @@ class DesktopCameraService : ICameraService {
 
     override fun isAvailable(): Boolean = false
     override fun hasCamera(lensFacing: LensFacing): Boolean = false
-    override suspend fun release() { _cameraState.value = CameraState.Uninitialized }
+    override suspend fun release() { _cameraState.value = CameraState.Idle }
     override fun getPreviewDimensions(): Pair<Int, Int> = Pair(0, 0)
     override fun getSupportedResolutions(): List<Pair<Int, Int>> = emptyList()
 }

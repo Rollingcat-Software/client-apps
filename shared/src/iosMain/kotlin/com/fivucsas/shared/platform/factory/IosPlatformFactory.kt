@@ -31,7 +31,7 @@ class IosPlatformServiceFactory : PlatformServiceFactory {
 // --- Stub implementations (real ones injected via Koin) ---
 
 private class StubCameraService : ICameraService {
-    private val _cameraState = MutableStateFlow<CameraState>(CameraState.Uninitialized)
+    private val _cameraState = MutableStateFlow<CameraState>(CameraState.Idle)
     override val cameraState: StateFlow<CameraState> = _cameraState
     override suspend fun initialize(lensFacing: LensFacing): Result<Unit> = Result.failure(UnsupportedOperationException("Use Koin DI"))
     override suspend fun startPreview(): Result<Unit> = Result.failure(UnsupportedOperationException("Use Koin DI"))
