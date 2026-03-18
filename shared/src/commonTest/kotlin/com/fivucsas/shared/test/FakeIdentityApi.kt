@@ -9,35 +9,35 @@ class FakeIdentityApi : IdentityApi {
     private val users = mutableListOf(
         UserDto(
             id = "user-1",
-            name = "Ahmet Yilmaz",
             email = "ahmet@example.com",
+            firstName = "Ahmet",
+            lastName = "Yilmaz",
             idNumber = "ID001",
             phoneNumber = "+1234567890",
             status = "ACTIVE",
-            enrollmentDate = "2025-01-01",
-            hasBiometric = true,
+            biometricEnrolled = true,
             role = "USER"
         ),
         UserDto(
             id = "user-2",
-            name = "Ayse Demir",
             email = "ayse@example.com",
+            firstName = "Ayse",
+            lastName = "Demir",
             idNumber = "ID002",
             phoneNumber = "+0987654321",
             status = "ACTIVE",
-            enrollmentDate = "2025-01-02",
-            hasBiometric = false,
+            biometricEnrolled = false,
             role = "USER"
         ),
         UserDto(
             id = "user-3",
-            name = "Mehmet Kaya",
             email = "mehmet@example.com",
+            firstName = "Mehmet",
+            lastName = "Kaya",
             idNumber = "ID003",
             phoneNumber = "+1111111111",
             status = "INACTIVE",
-            enrollmentDate = "2025-01-03",
-            hasBiometric = false,
+            biometricEnrolled = false,
             role = "USER"
         )
     )
@@ -70,9 +70,10 @@ class FakeIdentityApi : IdentityApi {
 
     override suspend fun searchUsers(query: String): List<UserDto> {
         return users.filter {
-            it.name.contains(query, ignoreCase = true) ||
+            val fullName = listOfNotNull(it.firstName, it.lastName).joinToString(" ")
+            fullName.contains(query, ignoreCase = true) ||
                     it.email.contains(query, ignoreCase = true) ||
-                    it.idNumber.contains(query, ignoreCase = true)
+                    (it.idNumber ?: "").contains(query, ignoreCase = true)
         }
     }
 
@@ -85,5 +86,13 @@ class FakeIdentityApi : IdentityApi {
             successRate = 95.0,
             failedAttempts = 1
         )
+    }
+
+    override suspend fun getMyProfile(): UserDto {
+        return users.first()
+    }
+
+    override suspend fun healthCheck(): Boolean {
+        return true
     }
 }

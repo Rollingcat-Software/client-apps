@@ -4,6 +4,7 @@ import com.fivucsas.shared.domain.model.TenantSettings
 import com.fivucsas.shared.domain.usecase.tenant.GetTenantSettingsUseCase
 import com.fivucsas.shared.domain.usecase.tenant.UpdateTenantSettingsUseCase
 import com.fivucsas.shared.presentation.state.TenantSettingsUiState
+import com.fivucsas.shared.presentation.util.ErrorMapper
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -46,7 +47,7 @@ class TenantSettingsViewModel(
                     _state.update {
                         it.copy(
                             isLoading = false,
-                            errorMessage = error.message ?: "Failed to load settings"
+                            errorMessage = ErrorMapper.mapToUserMessage(error, "load settings")
                         )
                     }
                 }
@@ -112,7 +113,7 @@ class TenantSettingsViewModel(
                     _state.update {
                         it.copy(
                             isLoading = false,
-                            errorMessage = error.message ?: "Failed to save settings"
+                            errorMessage = ErrorMapper.mapToUserMessage(error, "save settings")
                         )
                     }
                 }

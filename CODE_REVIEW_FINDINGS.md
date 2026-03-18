@@ -114,14 +114,48 @@ Even though `ignoreUnknownKeys = true` was correctly set, the serializer couldn'
 - Extension functions for DTO-to-model mapping
 
 ### Recommendations (Non-blocking)
-1. Other ViewModels (AdminViewModel, InviteViewModel, etc.) still pass raw `error.message` to UI. Consider a shared error mapping utility.
-2. The `UserDto` fields don't match the server's user response format (has `name` instead of `firstName`/`lastName`, has `idNumber` as required instead of nullable). This will fail when fetching user lists.
-3. The token refresh interceptor in `NetworkModule.kt` catches 401 and refreshes, but doesn't retry the original request. The user sees a failed request and must retry manually.
+1. ~~Other ViewModels (AdminViewModel, InviteViewModel, etc.) still pass raw `error.message` to UI. Consider a shared error mapping utility.~~ **FIXED** — Created `ErrorMapper` utility, applied to all 14 ViewModels.
+2. ~~The `UserDto` fields don't match the server's user response format (has `name` instead of `firstName`/`lastName`, has `idNumber` as required instead of nullable). This will fail when fetching user lists.~~ **FIXED** — `UserDto` now matches server's `UserResponse` exactly (firstName/lastName, nullable fields, roles list).
+3. The token refresh interceptor in `NetworkModule.kt` catches 401 and refreshes, but doesn't retry the original request. The user sees a failed request and must retry manually. (Ktor `HttpResponseValidator` limitation — would need `HttpSend` plugin for retry, low priority.)
+
+---
+
+## Additional Issues Found and Fixed (Round 2)
+
+### Issue 11: UserDto field mismatch — CRITICAL
+- **File**: `shared/.../dto/UserDto.kt`
+- **Problem**: `UserDto` had `name: String` and `idNumber: String` (required), but the server returns `firstName`/`lastName` (separate) and `idNumber` as nullable. Also missing fields: `roles`, `tenantId`, `emailVerified`, `phoneVerified`, `address`, `biometricEnrolled`, `createdAt`, `updatedAt`, etc.
+- **Fix**: Rewrote `UserDto` to match server's `UserResponse` exactly. Added `PagedUserResponse` wrapper for paginated `/users` endpoint. Updated `toModel()` to combine `firstName + lastName` into the domain `User.name`. Made `idNumber` nullable with safe default.
+
+### Issue 12: IdentityApiImpl — paginated response not handled
+- **File**: `shared/.../api/IdentityApiImpl.kt`
+- **Problem**: `getUsers()` tried to deserialize the paginated response `{ content: [...], page, size, totalPages }` directly as `List<UserDto>`, causing a `JsonDecodingException`.
+- **Fix**: Now deserializes as `PagedUserResponse` and extracts `.content`.
+
+### Issue 13: NetworkModule — `authResponse.role` doesn't exist
+- **File**: `shared/.../di/NetworkModule.kt` (line 142)
+- **Problem**: Token refresh handler referenced `authResponse.role`, but `AuthResponseDto` has no `role` field. The role is inside `authResponse.user?.role`. This would have caused a compilation error.
+- **Fix**: Changed to `authResponse.user?.role ?: authResponse.user?.roles?.firstOrNull() ?: tokenManager.getRole() ?: ""`.
+
+### Issue 14: Raw error messages in all ViewModels
+- **Files**: AdminViewModel, InviteViewModel, ChangePasswordViewModel, QrLoginViewModel, BiometricViewModel, UserProfileViewModel, TenantSettingsViewModel, IdentifyViewModel, KioskViewModel, SessionViewModel, DeviceViewModel, EnrollmentViewModel, AuthFlowViewModel
+- **Problem**: All ViewModels passed raw `error.message` (which can contain serialization stack traces, HTTP response bodies, etc.) directly to the UI.
+- **Fix**: Created `ErrorMapper` utility at `shared/.../presentation/util/ErrorMapper.kt`. Maps HTTP status codes, network errors, serialization errors to user-friendly messages. Applied to all 14 ViewModels.
+
+### Issue 15: FakeIdentityApi test file — old UserDto format
+- **File**: `shared/.../test/FakeIdentityApi.kt`
+- **Problem**: Used old `UserDto` constructor with `name`, `enrollmentDate`, `hasBiometric` fields that no longer exist.
+- **Fix**: Updated to use new `UserDto` with `firstName`, `lastName`, `biometricEnrolled`. Added missing `getMyProfile()` and `healthCheck()` overrides.
 
 ---
 
 ## Summary
 
-**10 issues fixed**, all related to snake_case/camelCase mismatch between the Kotlin DTOs and the Spring Boot server. The login flow should now work correctly.
+**15 issues fixed** across two rounds:
+- **Round 1** (10 issues): snake_case/camelCase DTO mismatch for auth, session, device, enrollment, auth-flow, fingerprint DTOs. Login/Register error messages.
+- **Round 2** (5 issues): UserDto field mismatch, paginated response handling, NetworkModule compilation error, raw error messages in all ViewModels, test file updates.
 
-The root pattern: the DTOs were written assuming a Python/snake_case API, but the Identity Core API is a Spring Boot/Jackson service that returns camelCase by default.
+The root patterns:
+1. DTOs were written assuming a Python/snake_case API, but the Identity Core API is Spring Boot/Jackson (camelCase).
+2. The `UserDto` was designed for a different API shape than what the server actually returns.
+3. Error messages were leaked raw to the UI instead of being mapped to user-friendly text.

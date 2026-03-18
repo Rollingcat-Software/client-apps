@@ -9,6 +9,7 @@ import com.fivucsas.shared.domain.usecase.admin.GetUsersUseCase
 import com.fivucsas.shared.domain.usecase.admin.UpdateUserUseCase
 import com.fivucsas.shared.presentation.state.AdminTab
 import com.fivucsas.shared.presentation.state.AdminUiState
+import com.fivucsas.shared.presentation.util.ErrorMapper
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -105,7 +106,7 @@ class AdminViewModel(
                     _uiState.update {
                         it.copy(
                             isLoading = false,
-                            errorMessage = error.message ?: "Failed to load users"
+                            errorMessage = ErrorMapper.mapToUserMessage(error, "load users")
                         )
                     }
                 }
@@ -178,7 +179,7 @@ class AdminViewModel(
                     _uiState.update {
                         it.copy(
                             isLoading = false,
-                            errorMessage = error.message ?: "Failed to add user"
+                            errorMessage = ErrorMapper.mapToUserMessage(error, "add user")
                         )
                     }
                 }
@@ -206,7 +207,7 @@ class AdminViewModel(
                     _uiState.update {
                         it.copy(
                             isLoading = false,
-                            errorMessage = error.message ?: "Failed to update user"
+                            errorMessage = ErrorMapper.mapToUserMessage(error, "update user")
                         )
                     }
                 }
@@ -254,7 +255,7 @@ class AdminViewModel(
                     _uiState.update {
                         it.copy(
                             isLoading = false,
-                            errorMessage = error.message ?: "Failed to delete user"
+                            errorMessage = ErrorMapper.mapToUserMessage(error, "delete user")
                         )
                     }
                 }
@@ -335,7 +336,7 @@ class AdminViewModel(
                     _uiState.update {
                         it.copy(
                             isLoading = false,
-                            errorMessage = "Connection test failed: ${error.message}"
+                            errorMessage = ErrorMapper.mapToUserMessage(error, "test connection")
                         )
                     }
                 }
@@ -385,7 +386,7 @@ class AdminViewModel(
                             settings = it.settings.copy(
                                 systemHealthStatus = com.fivucsas.shared.presentation.state.HealthStatus.CRITICAL
                             ),
-                            errorMessage = "Health check failed: ${error.message}"
+                            errorMessage = ErrorMapper.mapToUserMessage(error, "check system health")
                         )
                     }
                 }

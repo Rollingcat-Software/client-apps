@@ -8,6 +8,7 @@ import com.fivucsas.shared.domain.usecase.auth.qr.GetQrLoginSessionUseCase
 import com.fivucsas.shared.domain.usecase.auth.qr.StartQrLoginSessionUseCase
 import com.fivucsas.shared.presentation.state.QrLoginState
 import com.fivucsas.shared.presentation.state.QrLoginStatus
+import com.fivucsas.shared.presentation.util.ErrorMapper
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -53,7 +54,7 @@ class QrLoginViewModel(
                     _state.value = QrLoginState(
                         isLoading = false,
                         status = QrLoginStatus.ERROR,
-                        error = error.message ?: "Could not start QR login session"
+                        error = ErrorMapper.mapToUserMessage(error, "start QR login session")
                     )
                 }
             )
@@ -88,7 +89,7 @@ class QrLoginViewModel(
                     _state.value = _state.value.copy(
                         isLoading = false,
                         status = QrLoginStatus.ERROR,
-                        error = error.message ?: "Could not approve QR session"
+                        error = ErrorMapper.mapToUserMessage(error, "approve QR session")
                     )
                 }
             )
@@ -137,7 +138,7 @@ class QrLoginViewModel(
                     onFailure = { error ->
                         _state.value = _state.value.copy(
                             status = QrLoginStatus.ERROR,
-                            error = error.message ?: "Could not refresh QR session status"
+                            error = ErrorMapper.mapToUserMessage(error, "refresh QR session status")
                         )
                         return@launch
                     }

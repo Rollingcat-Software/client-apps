@@ -5,6 +5,7 @@ import com.fivucsas.shared.domain.usecase.invite.CreateInviteUseCase
 import com.fivucsas.shared.domain.usecase.invite.GetInvitesUseCase
 import com.fivucsas.shared.domain.usecase.invite.RevokeInviteUseCase
 import com.fivucsas.shared.presentation.state.InviteUiState
+import com.fivucsas.shared.presentation.util.ErrorMapper
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -43,7 +44,7 @@ class InviteViewModel(
                     _state.update {
                         it.copy(
                             isLoading = false,
-                            errorMessage = error.message ?: "Failed to load invitations"
+                            errorMessage = ErrorMapper.mapToUserMessage(error, "load invitations")
                         )
                     }
                 }
@@ -115,7 +116,7 @@ class InviteViewModel(
                     _state.update {
                         it.copy(
                             isLoading = false,
-                            errorMessage = error.message ?: "Failed to send invitation"
+                            errorMessage = ErrorMapper.mapToUserMessage(error, "send invitation")
                         )
                     }
                 }
@@ -141,7 +142,7 @@ class InviteViewModel(
                     _state.update {
                         it.copy(
                             isLoading = false,
-                            errorMessage = error.message ?: "Failed to revoke invitation"
+                            errorMessage = ErrorMapper.mapToUserMessage(error, "revoke invitation")
                         )
                     }
                 }

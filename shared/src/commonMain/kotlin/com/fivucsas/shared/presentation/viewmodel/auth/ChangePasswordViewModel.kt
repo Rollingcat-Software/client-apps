@@ -2,6 +2,7 @@ package com.fivucsas.shared.presentation.viewmodel.auth
 
 import com.fivucsas.shared.domain.usecase.auth.ChangePasswordUseCase
 import com.fivucsas.shared.presentation.state.ChangePasswordUiState
+import com.fivucsas.shared.presentation.util.ErrorMapper
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -30,7 +31,7 @@ class ChangePasswordViewModel(
                 onFailure = { error ->
                     _state.update {
                         ChangePasswordUiState(
-                            errorMessage = error.message ?: "Failed to change password"
+                            errorMessage = ErrorMapper.mapToUserMessage(error, "change password")
                         )
                     }
                 }

@@ -5,6 +5,7 @@ import com.fivucsas.shared.domain.usecase.enrollment.EnrollUserUseCase
 import com.fivucsas.shared.domain.usecase.verification.VerifyUserUseCase
 import com.fivucsas.shared.presentation.state.BiometricResult
 import com.fivucsas.shared.presentation.state.BiometricState
+import com.fivucsas.shared.presentation.util.ErrorMapper
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -30,7 +31,7 @@ class BiometricViewModel(
             onFailure = { error ->
                 _state.value = BiometricState(
                     isLoading = false,
-                    error = error.message ?: "Face enrollment failed"
+                    error = ErrorMapper.mapToUserMessage(error, "enroll face")
                 )
             }
         )
@@ -50,7 +51,7 @@ class BiometricViewModel(
             onFailure = { error ->
                 _state.value = BiometricState(
                     isLoading = false,
-                    error = error.message ?: "Face verification failed"
+                    error = ErrorMapper.mapToUserMessage(error, "verify face")
                 )
             }
         )

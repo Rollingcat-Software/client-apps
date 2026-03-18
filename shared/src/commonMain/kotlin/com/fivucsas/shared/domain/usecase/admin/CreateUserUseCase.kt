@@ -11,7 +11,7 @@ class CreateUserUseCase(
 ) {
     suspend operator fun invoke(user: User): Result<User> {
         if (user.name.isBlank()) {
-            return Result.failure(ValidationException("Name is required"))
+            return Result.failure(ValidationException("Full name is required"))
         }
 
         val emailValidation = ValidationRules.validateEmail(user.email)

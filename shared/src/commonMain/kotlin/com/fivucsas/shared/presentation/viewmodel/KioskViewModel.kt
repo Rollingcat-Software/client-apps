@@ -8,6 +8,7 @@ import com.fivucsas.shared.domain.usecase.verification.VerifyUserUseCase
 import com.fivucsas.shared.presentation.state.KioskScreen
 import com.fivucsas.shared.presentation.state.KioskUiState
 import com.fivucsas.shared.presentation.state.VerificationResult
+import com.fivucsas.shared.presentation.util.ErrorMapper
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -196,7 +197,10 @@ class KioskViewModel(
                     _uiState.update {
                         it.copy(
                             isLoading = false,
-                            errorMessage = "Enrollment failed: ${result.exceptionOrNull()?.message ?: "Unknown error"}\n\nPlease try again.",
+                            errorMessage = ErrorMapper.mapToUserMessage(
+                                result.exceptionOrNull() ?: Exception("Unknown error"),
+                                "enroll user"
+                            ),
                             successMessage = null
                         )
                     }
@@ -206,7 +210,7 @@ class KioskViewModel(
                 _uiState.update {
                     it.copy(
                         isLoading = false,
-                        errorMessage = "Enrollment failed: ${e.message}\n\nPlease check your connection and try again."
+                        errorMessage = ErrorMapper.mapToUserMessage(e, "enroll user")
                     )
                 }
             }
@@ -244,7 +248,10 @@ class KioskViewModel(
                     _uiState.update {
                         it.copy(
                             isLoading = false,
-                            errorMessage = "Liveness check failed: ${livenessResult.exceptionOrNull()?.message ?: "Please try again"}"
+                            errorMessage = ErrorMapper.mapToUserMessage(
+                                livenessResult.exceptionOrNull() ?: Exception("Unknown error"),
+                                "check liveness"
+                            )
                         )
                     }
                     return@launch
@@ -294,7 +301,10 @@ class KioskViewModel(
                     _uiState.update {
                         it.copy(
                             isLoading = false,
-                            errorMessage = "Verification failed: ${verifyResult.exceptionOrNull()?.message ?: "Unknown error"}"
+                            errorMessage = ErrorMapper.mapToUserMessage(
+                            verifyResult.exceptionOrNull() ?: Exception("Unknown error"),
+                            "verify identity"
+                        )
                         )
                     }
                 }
@@ -303,7 +313,7 @@ class KioskViewModel(
                 _uiState.update {
                     it.copy(
                         isLoading = false,
-                        errorMessage = "Verification service unavailable: ${e.message}"
+                        errorMessage = ErrorMapper.mapToUserMessage(e, "verify identity")
                     )
                 }
             }

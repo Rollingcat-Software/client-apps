@@ -2,6 +2,7 @@ package com.fivucsas.shared.presentation.viewmodel
 
 import com.fivucsas.shared.domain.usecase.admin.GetMyProfileUseCase
 import com.fivucsas.shared.presentation.state.UserProfileUiState
+import com.fivucsas.shared.presentation.util.ErrorMapper
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -36,7 +37,7 @@ class UserProfileViewModel(
                     _state.update {
                         it.copy(
                             isLoading = false,
-                            errorMessage = error.message ?: "Failed to load profile"
+                            errorMessage = ErrorMapper.mapToUserMessage(error, "load profile")
                         )
                     }
                 }

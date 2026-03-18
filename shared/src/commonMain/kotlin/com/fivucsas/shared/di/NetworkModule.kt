@@ -139,7 +139,7 @@ val networkModule = module {
                                         accessToken = authResponse.accessToken,
                                         refreshToken = authResponse.refreshToken,
                                         expiresIn = authResponse.expiresIn,
-                                        role = authResponse.role ?: tokenManager.getRole() ?: ""
+                                        role = authResponse.user?.role ?: authResponse.user?.roles?.firstOrNull() ?: tokenManager.getRole() ?: ""
                                     )
                                 )
                             } else {

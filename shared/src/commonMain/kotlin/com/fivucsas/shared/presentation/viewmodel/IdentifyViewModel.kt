@@ -2,6 +2,7 @@ package com.fivucsas.shared.presentation.viewmodel
 
 import com.fivucsas.shared.domain.usecase.verification.IdentifyUserUseCase
 import com.fivucsas.shared.presentation.state.IdentifyUiState
+import com.fivucsas.shared.presentation.util.ErrorMapper
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -37,7 +38,7 @@ class IdentifyViewModel(
                     _state.update {
                         IdentifyUiState(
                             isLoading = false,
-                            errorMessage = error.message ?: "Face identification failed"
+                            errorMessage = ErrorMapper.mapToUserMessage(error, "identify face")
                         )
                     }
                 }

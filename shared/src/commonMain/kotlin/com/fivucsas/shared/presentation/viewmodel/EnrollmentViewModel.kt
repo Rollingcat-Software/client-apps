@@ -1,9 +1,8 @@
 package com.fivucsas.shared.presentation.viewmodel
 
 import com.fivucsas.shared.domain.repository.EnrollmentRepository
-import com.fivucsas.shared.i18n.StringKey
-import com.fivucsas.shared.i18n.s
 import com.fivucsas.shared.presentation.state.EnrollmentUiState
+import com.fivucsas.shared.presentation.util.ErrorMapper
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -34,7 +33,7 @@ class EnrollmentViewModel(
                     _uiState.update {
                         it.copy(
                             isLoading = false,
-                            errorMessage = error.message ?: s(StringKey.ERROR_LOAD_FAILED)
+                            errorMessage = ErrorMapper.mapToUserMessage(error, "load enrollments")
                         )
                     }
                 }
