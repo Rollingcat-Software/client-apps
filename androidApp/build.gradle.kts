@@ -92,6 +92,9 @@ dependencies {
     // ML Kit Face Detection
     implementation("com.google.mlkit:face-detection:16.1.5")
 
+    // FIDO2 / Credential Manager for WebAuthn hardware token support
+    implementation("com.google.android.gms:play-services-fido:21.1.0")
+
     // Koin for Android
     implementation("io.insert-koin:koin-android:3.5.3")
     implementation("io.insert-koin:koin-androidx-compose:3.5.3")

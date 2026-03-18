@@ -84,6 +84,9 @@ object RouteIds {
     const val SESSIONS = "sessions"
     const val DEVICES = "devices"
     const val ENROLLMENTS_LIST = "enrollments-list"
+    const val LIVENESS_PUZZLE = "liveness-puzzle"
+    const val CARD_DETECTION = "card-detection"
+    const val HARDWARE_TOKEN = "hardware-token"
 
     const val TENANT_MANAGE = "tenant-manage"
     const val PLATFORM_HEALTH = "platform-health"

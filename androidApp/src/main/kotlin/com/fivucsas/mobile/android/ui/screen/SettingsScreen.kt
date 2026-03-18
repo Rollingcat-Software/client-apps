@@ -66,6 +66,9 @@ fun SettingsScreen(
     onNavigateToSmsOtp: () -> Unit = {},
     onNavigateToTotpEnroll: () -> Unit = {},
     onNavigateToAnalytics: () -> Unit = {},
+    onNavigateToLiveness: () -> Unit = {},
+    onNavigateToCardDetection: () -> Unit = {},
+    onNavigateToHardwareToken: () -> Unit = {},
     onLogout: () -> Unit
 ) {
     val notificationsEnabled = remember { mutableStateOf(true) }
@@ -260,7 +263,7 @@ fun SettingsScreen(
             // Authentication Methods
             ExpandableCard(
                 title = s(StringKey.BIOMETRIC_AUTH),
-                subtitle = "Voice, OTP, TOTP"
+                subtitle = "Voice, OTP, TOTP, Liveness, Card, Token"
             ) {
                 Text(
                     text = s(StringKey.VOICE_RECOGNITION),
@@ -297,6 +300,33 @@ fun SettingsScreen(
                         .fillMaxWidth()
                         .padding(vertical = 6.dp)
                         .clickable { onNavigateToTotpEnroll() }
+                )
+                Text(
+                    text = s(StringKey.LIVENESS_TITLE),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = AppColors.Primary,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 6.dp)
+                        .clickable { onNavigateToLiveness() }
+                )
+                Text(
+                    text = s(StringKey.CARD_DETECTION_TITLE),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = AppColors.Primary,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 6.dp)
+                        .clickable { onNavigateToCardDetection() }
+                )
+                Text(
+                    text = s(StringKey.HARDWARE_TOKEN_TITLE),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = AppColors.Primary,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 6.dp)
+                        .clickable { onNavigateToHardwareToken() }
                 )
             }
 

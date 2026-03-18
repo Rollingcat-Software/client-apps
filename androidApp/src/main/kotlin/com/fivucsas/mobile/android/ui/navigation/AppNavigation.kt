@@ -41,6 +41,9 @@ import com.fivucsas.mobile.android.ui.screen.EmailOtpScreen
 import com.fivucsas.mobile.android.ui.screen.SmsOtpScreen
 import com.fivucsas.mobile.android.ui.screen.TotpEnrollScreen
 import com.fivucsas.mobile.android.ui.screen.AnalyticsScreen
+import com.fivucsas.mobile.android.ui.screen.LivenessScreen
+import com.fivucsas.mobile.android.ui.screen.CardDetectionScreen
+import com.fivucsas.mobile.android.ui.screen.HardwareTokenScreen
 import com.fivucsas.shared.data.local.TokenManager
 import com.fivucsas.shared.domain.model.ConfidenceBand
 import com.fivucsas.shared.domain.model.GuestFaceCheckOutcome
@@ -147,6 +150,9 @@ sealed class Screen(val route: String) {
         fun createRoute(userId: String) = "${RouteIds.TOTP_ENROLL}/$userId"
     }
     object Analytics : Screen(RouteIds.ANALYTICS)
+    object LivenessPuzzle : Screen(RouteIds.LIVENESS_PUZZLE)
+    object CardDetection : Screen(RouteIds.CARD_DETECTION)
+    object HardwareToken : Screen(RouteIds.HARDWARE_TOKEN)
 
     object AuthFlows : Screen("${RouteIds.AUTH_FLOWS}/{tenantId}") {
         fun createRoute(tenantId: String) = "${RouteIds.AUTH_FLOWS}/$tenantId"
@@ -799,6 +805,9 @@ fun AppNavigation() {
                 onNavigateToSmsOtp = { navController.navigate(Screen.SmsOtp.createRoute(tokenManager?.getUserId() ?: "me")) },
                 onNavigateToTotpEnroll = { navController.navigate(Screen.TotpEnroll.createRoute(tokenManager?.getUserId() ?: "me")) },
                 onNavigateToAnalytics = { navController.navigate(Screen.Analytics.route) },
+                onNavigateToLiveness = { navController.navigate(Screen.LivenessPuzzle.route) },
+                onNavigateToCardDetection = { navController.navigate(Screen.CardDetection.route) },
+                onNavigateToHardwareToken = { navController.navigate(Screen.HardwareToken.route) },
                 onLogout = {
                     tokenManager?.clearTokens()
                     navController.navigate(Screen.Login.route) {
@@ -1418,6 +1427,51 @@ fun AppNavigation() {
             }
             val viewModel = koinInject<com.fivucsas.shared.presentation.viewmodel.AnalyticsViewModel>()
             AnalyticsScreen(
+                viewModel = viewModel,
+                onNavigateBack = { navController.popBackStack() }
+            )
+        }
+
+        // P1-4: Liveness Puzzle screen
+        composable(Screen.LivenessPuzzle.route) {
+            if (!isAuthenticated()) {
+                LaunchedEffect(Unit) {
+                    navController.navigate(Screen.Login.route) { popUpTo(0) { inclusive = true } }
+                }
+                return@composable
+            }
+            val viewModel = koinInject<com.fivucsas.shared.presentation.viewmodel.LivenessViewModel>()
+            LivenessScreen(
+                viewModel = viewModel,
+                onNavigateBack = { navController.popBackStack() }
+            )
+        }
+
+        // P1-5: Card Detection screen
+        composable(Screen.CardDetection.route) {
+            if (!isAuthenticated()) {
+                LaunchedEffect(Unit) {
+                    navController.navigate(Screen.Login.route) { popUpTo(0) { inclusive = true } }
+                }
+                return@composable
+            }
+            val viewModel = koinInject<com.fivucsas.shared.presentation.viewmodel.CardDetectionViewModel>()
+            CardDetectionScreen(
+                viewModel = viewModel,
+                onNavigateBack = { navController.popBackStack() }
+            )
+        }
+
+        // P1-6: Hardware Token screen
+        composable(Screen.HardwareToken.route) {
+            if (!isAuthenticated()) {
+                LaunchedEffect(Unit) {
+                    navController.navigate(Screen.Login.route) { popUpTo(0) { inclusive = true } }
+                }
+                return@composable
+            }
+            val viewModel = koinInject<com.fivucsas.shared.presentation.viewmodel.HardwareTokenViewModel>()
+            HardwareTokenScreen(
                 viewModel = viewModel,
                 onNavigateBack = { navController.popBackStack() }
             )

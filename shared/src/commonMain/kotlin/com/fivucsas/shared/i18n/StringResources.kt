@@ -274,6 +274,36 @@ enum class StringKey {
     ANALYTICS_FAILED_ATTEMPTS,
     ANALYTICS_SUCCESS_RATE,
     ANALYTICS_PENDING,
+
+    // Liveness
+    LIVENESS_TITLE,
+    LIVENESS_SUBTITLE,
+    LIVENESS_BLINK,
+    LIVENESS_SMILE,
+    LIVENESS_TURN_LEFT,
+    LIVENESS_TURN_RIGHT,
+    LIVENESS_NOD,
+    LIVENESS_OPEN_MOUTH,
+    LIVENESS_CLIENT_SCORE,
+    LIVENESS_SERVER_SCORE,
+    LIVENESS_VERIFIED,
+    LIVENESS_FAILED,
+
+    // Card Detection
+    CARD_DETECTION_TITLE,
+    CARD_DETECTION_SUBTITLE,
+    CARD_DETECTION_CAPTURE,
+    CARD_DETECTION_RESULT,
+    CARD_TYPE,
+    CARD_CONFIDENCE,
+
+    // Hardware Token
+    HARDWARE_TOKEN_TITLE,
+    HARDWARE_TOKEN_SUBTITLE,
+    HARDWARE_TOKEN_REGISTER,
+    HARDWARE_TOKEN_VERIFY,
+    HARDWARE_TOKEN_CREDENTIAL_ID,
+    HARDWARE_TOKEN_TRANSPORTS,
 }
 
 private val enStrings = mapOf(
@@ -512,6 +542,36 @@ private val enStrings = mapOf(
     StringKey.ANALYTICS_FAILED_ATTEMPTS to "Failed Attempts",
     StringKey.ANALYTICS_SUCCESS_RATE to "Success Rate",
     StringKey.ANALYTICS_PENDING to "Pending Verifications",
+
+    // Liveness
+    StringKey.LIVENESS_TITLE to "Face Liveness Puzzle",
+    StringKey.LIVENESS_SUBTITLE to "Complete facial actions to prove liveness",
+    StringKey.LIVENESS_BLINK to "Blink your eyes",
+    StringKey.LIVENESS_SMILE to "Smile",
+    StringKey.LIVENESS_TURN_LEFT to "Turn your head left",
+    StringKey.LIVENESS_TURN_RIGHT to "Turn your head right",
+    StringKey.LIVENESS_NOD to "Nod your head up",
+    StringKey.LIVENESS_OPEN_MOUTH to "Open your mouth",
+    StringKey.LIVENESS_CLIENT_SCORE to "Client Score",
+    StringKey.LIVENESS_SERVER_SCORE to "Server Score",
+    StringKey.LIVENESS_VERIFIED to "Liveness Verified",
+    StringKey.LIVENESS_FAILED to "Liveness Check Failed",
+
+    // Card Detection
+    StringKey.CARD_DETECTION_TITLE to "Card Detection",
+    StringKey.CARD_DETECTION_SUBTITLE to "Detect ID cards using AI",
+    StringKey.CARD_DETECTION_CAPTURE to "Capture Card",
+    StringKey.CARD_DETECTION_RESULT to "Detection Result",
+    StringKey.CARD_TYPE to "Card Type",
+    StringKey.CARD_CONFIDENCE to "Confidence",
+
+    // Hardware Token
+    StringKey.HARDWARE_TOKEN_TITLE to "Hardware Security Key",
+    StringKey.HARDWARE_TOKEN_SUBTITLE to "WebAuthn cross-platform authentication",
+    StringKey.HARDWARE_TOKEN_REGISTER to "Register Token",
+    StringKey.HARDWARE_TOKEN_VERIFY to "Verify Token",
+    StringKey.HARDWARE_TOKEN_CREDENTIAL_ID to "Credential ID",
+    StringKey.HARDWARE_TOKEN_TRANSPORTS to "Transports",
 )
 
 private val trStrings = mapOf(
@@ -750,6 +810,36 @@ private val trStrings = mapOf(
     StringKey.ANALYTICS_FAILED_ATTEMPTS to "Basarisiz Denemeler",
     StringKey.ANALYTICS_SUCCESS_RATE to "Basari Orani",
     StringKey.ANALYTICS_PENDING to "Bekleyen Dogrulamalar",
+
+    // Liveness
+    StringKey.LIVENESS_TITLE to "Yuz Canlilik Bulmacasi",
+    StringKey.LIVENESS_SUBTITLE to "Canlilik kanitlamak icin yuz hareketlerini tamamlayin",
+    StringKey.LIVENESS_BLINK to "Gozlerinizi kirpin",
+    StringKey.LIVENESS_SMILE to "Gulumseyin",
+    StringKey.LIVENESS_TURN_LEFT to "Basinizi sola cevirin",
+    StringKey.LIVENESS_TURN_RIGHT to "Basinizi saga cevirin",
+    StringKey.LIVENESS_NOD to "Basinizi yukari kaldin",
+    StringKey.LIVENESS_OPEN_MOUTH to "Agzinizi acin",
+    StringKey.LIVENESS_CLIENT_SCORE to "Istemci Puani",
+    StringKey.LIVENESS_SERVER_SCORE to "Sunucu Puani",
+    StringKey.LIVENESS_VERIFIED to "Canlilik Dogrulandi",
+    StringKey.LIVENESS_FAILED to "Canlilik Kontrolu Basarisiz",
+
+    // Card Detection
+    StringKey.CARD_DETECTION_TITLE to "Kart Algilama",
+    StringKey.CARD_DETECTION_SUBTITLE to "Yapay zeka ile kimlik karti algilama",
+    StringKey.CARD_DETECTION_CAPTURE to "Kart Yakala",
+    StringKey.CARD_DETECTION_RESULT to "Algilama Sonucu",
+    StringKey.CARD_TYPE to "Kart Turu",
+    StringKey.CARD_CONFIDENCE to "Guven",
+
+    // Hardware Token
+    StringKey.HARDWARE_TOKEN_TITLE to "Donanim Guvenlik Anahtari",
+    StringKey.HARDWARE_TOKEN_SUBTITLE to "WebAuthn coklu platform kimlik dogrulama",
+    StringKey.HARDWARE_TOKEN_REGISTER to "Token Kaydet",
+    StringKey.HARDWARE_TOKEN_VERIFY to "Token Dogrula",
+    StringKey.HARDWARE_TOKEN_CREDENTIAL_ID to "Kimlik Bilgisi ID",
+    StringKey.HARDWARE_TOKEN_TRANSPORTS to "Tasimacilar",
 )
 
 /**
