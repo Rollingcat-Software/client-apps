@@ -177,11 +177,11 @@ private fun SettingsHeader(
     ) {
         Column {
             Text(
-                AdminConstants.SETTINGS_TITLE,
+                s(StringKey.SETTINGS_TITLE),
                 style = MaterialTheme.typography.displaySmall
             )
             Text(
-                "Configure system settings and preferences",
+                s(StringKey.SETTINGS_SUBTITLE),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -198,7 +198,7 @@ private fun SettingsHeader(
                     modifier = Modifier.size(UIDimens.IconSmall)
                 )
                 Spacer(modifier = Modifier.width(UIDimens.SpacingSmall))
-                Text("Reset")
+                Text(s(StringKey.RESET_SETTINGS))
             }
 
             Button(
@@ -218,7 +218,7 @@ private fun SettingsHeader(
                     )
                 }
                 Spacer(modifier = Modifier.width(UIDimens.SpacingSmall))
-                Text("Save Settings")
+                Text(s(StringKey.SAVE_SETTINGS))
             }
         }
     }

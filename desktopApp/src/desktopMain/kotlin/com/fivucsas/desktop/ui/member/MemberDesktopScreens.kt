@@ -35,6 +35,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -328,19 +329,8 @@ fun MemberDesktopActivityHistoryScreen(
     val filters = listOf("all" to "All", "verification" to "Verifications", "enrollment" to "Enrollments")
     var selectedFilter by remember { mutableStateOf("all") }
 
-    val sections = listOf(
-        "Today" to listOf(
-            ActivityHistoryEntry("verification", "Verification Successful", "Confidence: 94%", "10:30 AM", "94%", true),
-            ActivityHistoryEntry("verification", "Verification Successful", "Confidence: 91%", "09:15 AM", "91%", true)
-        ),
-        "Yesterday" to listOf(
-            ActivityHistoryEntry("verification", "Verification Failed", "Low confidence score", "3:14 PM", "62%", false),
-            ActivityHistoryEntry("verification", "Verification Successful", "Confidence: 91%", "3:15 PM", "91%", true)
-        ),
-        "January 28, 2026" to listOf(
-            ActivityHistoryEntry("enrollment", "Face Enrollment Completed", "Quality score: 88%", "2:00 PM", "88%", true)
-        )
-    )
+    // Activity history will be loaded from API when endpoint is available
+    val sections = emptyList<Pair<String, List<ActivityHistoryEntry>>>()
 
     val filteredSections = sections.mapNotNull { (title, entries) ->
         val filtered = if (selectedFilter == "all") entries
@@ -552,14 +542,8 @@ fun MemberDesktopMyInvitationsScreen(
     onBack: () -> Unit,
     onLogout: () -> Unit
 ) {
-    val invites = remember {
-        mutableListOf(
-            ReceivedInvite("1", "Acme Corporation", "admin@acme.com", "TENANT_MEMBER", "2026-02-20", "2026-03-20", ReceivedInviteStatus.PENDING),
-            ReceivedInvite("2", "Globex Inc.", "hr@globex.com", "TENANT_MEMBER", "2026-02-18", "2026-03-18", ReceivedInviteStatus.PENDING),
-            ReceivedInvite("3", "Wayne Enterprises", "ops@wayne.com", "TENANT_MEMBER", "2026-01-15", "2026-02-15", ReceivedInviteStatus.ACCEPTED),
-            ReceivedInvite("4", "Stark Industries", "tony@stark.com", "TENANT_ADMIN", "2026-01-05", "2026-02-05", ReceivedInviteStatus.EXPIRED)
-        )
-    }
+    // Invitations will be loaded from API when endpoint is available
+    val invites = remember { mutableStateListOf<ReceivedInvite>() }
     var successMessage by remember { mutableStateOf<String?>(null) }
 
     DesktopAppShell(
@@ -721,15 +705,8 @@ fun MemberDesktopRequestMembershipScreen(
     onBack: () -> Unit,
     onLogout: () -> Unit
 ) {
-    val allTenants = remember {
-        listOf(
-            TenantInfo("t1", "Acme Corporation", "Global technology solutions provider", 142),
-            TenantInfo("t2", "Globex Inc.", "International logistics and supply chain", 87),
-            TenantInfo("t3", "Wayne Enterprises", "Diversified industrial conglomerate", 312),
-            TenantInfo("t4", "Stark Industries", "Advanced technology and defense", 256),
-            TenantInfo("t5", "Umbrella Corp.", "Pharmaceutical and biotech research", 64)
-        )
-    }
+    // Tenants will be loaded from API when public tenant listing endpoint is available
+    val allTenants = remember { emptyList<TenantInfo>() }
 
     var searchQuery by remember { mutableStateOf("") }
     var requestedTenantIds by remember { mutableStateOf(setOf<String>()) }
@@ -792,9 +769,9 @@ fun MemberDesktopRequestMembershipScreen(
                             modifier = Modifier.size(48.dp)
                         )
                         Spacer(modifier = Modifier.height(12.dp))
-                        Text("No tenants found", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                        Text("No tenants available", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                         Text(
-                            "Try a different search term.",
+                            "Public tenant listing will be available soon.",
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )

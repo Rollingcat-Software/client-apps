@@ -123,15 +123,8 @@ fun AdminDesktopTenantHistoryScreen(
     val filters = listOf("all" to "All", "verification" to "Verifications", "enrollment" to "Enrollments", "admin" to "Admin Actions")
     var selectedFilter by remember { mutableStateOf("all") }
 
-    val entries = listOf(
-        TenantHistoryEntry("Verification", "Jane Doe", "Confidence: 94%", "2026-02-25 10:30", true),
-        TenantHistoryEntry("Verification", "John Smith", "Confidence: 91%", "2026-02-25 09:15", true),
-        TenantHistoryEntry("Enrollment", "Alice Johnson", "Quality: 88%", "2026-02-24 14:00", true),
-        TenantHistoryEntry("Verification", "Bob Wilson", "Low confidence: 62%", "2026-02-24 15:14", false),
-        TenantHistoryEntry("Admin Action", "Admin User", "User role updated", "2026-02-23 11:00", true),
-        TenantHistoryEntry("Enrollment", "Charlie Brown", "Quality: 92%", "2026-02-22 09:30", true),
-        TenantHistoryEntry("Admin Action", "Admin User", "Tenant settings updated", "2026-02-21 16:45", true)
-    )
+    // Tenant history will be loaded from audit log API when endpoint is available
+    val entries = emptyList<TenantHistoryEntry>()
 
     val filteredEntries = if (selectedFilter == "all") entries
     else entries.filter {
@@ -173,7 +166,10 @@ fun AdminDesktopTenantHistoryScreen(
                         }
                     }
                 }
-                OutlinedButton(onClick = { /* Export placeholder */ }) {
+                OutlinedButton(
+                    onClick = { /* Export will be available when audit log API is integrated */ },
+                    enabled = filteredEntries.isNotEmpty()
+                ) {
                     Text("Export CSV")
                 }
             }
@@ -192,6 +188,15 @@ fun AdminDesktopTenantHistoryScreen(
                     Text("Detail", modifier = Modifier.weight(0.3f), style = MaterialTheme.typography.labelLarge)
                     Text("Timestamp", modifier = Modifier.weight(0.2f), style = MaterialTheme.typography.labelLarge)
                     Text("Status", modifier = Modifier.weight(0.1f), style = MaterialTheme.typography.labelLarge)
+                }
+
+                if (filteredEntries.isEmpty()) {
+                    Text(
+                        "No history entries yet. Activity will appear here once the audit log API is integrated.",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(vertical = 16.dp)
+                    )
                 }
 
                 filteredEntries.forEach { entry ->

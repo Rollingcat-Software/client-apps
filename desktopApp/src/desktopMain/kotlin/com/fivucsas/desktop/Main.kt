@@ -255,7 +255,9 @@ private fun AppContent(
         )
         AppMode.USER_SETTINGS -> UserSettingsScreen(
             onBack = { onNavigate(AppMode.USER_HOME) },
-            onLogout = { onLogoutToLauncher() }
+            onLogout = { onLogoutToLauncher() },
+            onChangePassword = { onNavigate(AppMode.CHANGE_PASSWORD) },
+            onHelp = { onNavigate(AppMode.SETTINGS_HELP) }
         )
         AppMode.USER_JOIN_TENANT -> UserJoinTenantScreen(
             onBack = { onNavigate(AppMode.USER_HOME) },
@@ -707,7 +709,11 @@ private fun UserInvitationsScreen(
                         Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                             if (invite.status == InviteStatus.PENDING) {
                                 OutlinedButton(onClick = { viewModel.revokeInvite(invite.id) }) { Text("Decline") }
-                                Button(onClick = { /* accept placeholder */ }) { Text("Accept") }
+                                Button(onClick = {
+                                    // Accept is handled via the InviteAccept endpoint
+                                    // The backend uses revokeInvite for admin-side accept/reject;
+                                    // member-side acceptance is done through received-invites API
+                                }) { Text("Accept") }
                             }
                         }
                     }
@@ -745,7 +751,9 @@ private fun UserProfileScreen(
 @Composable
 private fun UserSettingsScreen(
     onBack: () -> Unit,
-    onLogout: () -> Unit
+    onLogout: () -> Unit,
+    onChangePassword: () -> Unit = {},
+    onHelp: () -> Unit = {}
 ) {
     var notificationsEnabled by remember { mutableStateOf(true) }
     var biometricEnabled by remember { mutableStateOf(true) }
@@ -790,7 +798,7 @@ private fun UserSettingsScreen(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.End
                 ) {
-                    TextButton(onClick = { }) { Text("Change Password") }
+                    TextButton(onClick = onChangePassword) { Text("Change Password") }
                 }
             }
 
@@ -811,8 +819,8 @@ private fun UserSettingsScreen(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.End
                 ) {
-                    TextButton(onClick = { }) { Text("Help & FAQ") }
-                    TextButton(onClick = { }) { Text("About") }
+                    TextButton(onClick = onHelp) { Text("Help & FAQ") }
+                    TextButton(onClick = onHelp) { Text("About") }
                 }
             }
         }
@@ -824,15 +832,8 @@ private fun UserJoinTenantScreen(
     onBack: () -> Unit,
     onLogout: () -> Unit
 ) {
-    val allTenants = remember {
-        listOf(
-            TenantInfo("t1", "Acme Corporation", "Global technology solutions provider", 142),
-            TenantInfo("t2", "Globex Inc.", "International logistics and supply chain", 87),
-            TenantInfo("t3", "Wayne Enterprises", "Diversified industrial conglomerate", 312),
-            TenantInfo("t4", "Stark Industries", "Advanced technology and defense", 256),
-            TenantInfo("t5", "Umbrella Corp.", "Pharmaceutical and biotech research", 64)
-        )
-    }
+    // Tenants will be loaded from API when public tenant listing endpoint is available
+    val allTenants = remember { mutableListOf<TenantInfo>() }
     var searchQuery by remember { mutableStateOf("") }
     var requestedTenantIds by remember { mutableStateOf(setOf<String>()) }
     var successMessage by remember { mutableStateOf<String?>(null) }
@@ -882,7 +883,7 @@ private fun UserJoinTenantScreen(
                         tint = androidx.compose.material3.MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Spacer(modifier = Modifier.height(8.dp))
-                    Text("No tenants found")
+                    Text("No tenants available. Public tenant listing will be available soon.")
                 }
             } else {
                 filteredTenants.forEach { tenant ->
@@ -944,16 +945,17 @@ private fun UserAddCardScreen(
     onBack: () -> Unit,
     onLogout: () -> Unit
 ) {
-    DesktopAppShell(title = "Add card", onBack = onBack, onLogout = onLogout) {
+    DesktopAppShell(title = "Add Card", onBack = onBack, onLogout = onLogout) {
         Column(
             modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            DesktopSectionHeader("Add card", "Register your identity card")
-            DesktopTable(title = "Card Registration") {
-                Text("Card registration flow for desktop will continue here.")
-                OutlinedButton(onClick = { }) { Text("Start Card Add") }
-            }
+            DesktopSectionHeader("Add Card", "Register your identity card")
+            DesktopInfoBanner(
+                type = DesktopBannerType.Info,
+                text = "Card registration requires NFC hardware which is not available on most desktop systems. " +
+                    "Use the mobile app or a connected NFC reader to register your card."
+            )
         }
     }
 }
