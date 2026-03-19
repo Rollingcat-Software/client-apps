@@ -363,7 +363,7 @@ private fun VoicePulseAnimation(modifier: Modifier = Modifier) {
         for (i in 0 until barCount) {
             // Create a sine-wave-like pattern that scrolls with phase
             val normalizedPos = i.toFloat() / barCount
-            val wave = kotlin.math.sin((normalizedPos + phase) * 2 * Math.PI).toFloat()
+            val wave = kotlin.math.sin((normalizedPos + phase) * 2 * kotlin.math.PI).toFloat()
             val barHeight = (maxBarHeight * 0.3f + maxBarHeight * 0.7f * ((wave + 1f) / 2f))
                 .coerceIn(4f, maxBarHeight)
             val x = i * barWidth * 2 + barWidth / 2

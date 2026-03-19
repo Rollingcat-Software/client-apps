@@ -341,7 +341,7 @@ private fun CardResultView(
                     Spacer(modifier = Modifier.height(8.dp))
                     CardDetailRow(
                         label = "Bounding Box",
-                        value = result.boundingBox.joinToString(", ") { "%.1f".format(it) }
+                        value = result.boundingBox.joinToString(", ") { (kotlin.math.round(it * 10) / 10.0).toString() }
                     )
                 }
 
