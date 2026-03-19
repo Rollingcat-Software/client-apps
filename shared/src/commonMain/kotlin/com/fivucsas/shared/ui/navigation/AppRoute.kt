@@ -42,6 +42,10 @@ sealed class AppRoute(val id: String) {
     data class BiometricEnroll(val userId: String) : AppRoute(BIOMETRIC_ENROLL)
     data class BiometricVerify(val userId: String) : AppRoute(BIOMETRIC_VERIFY)
 
+    data class VoiceVerify(val userId: String) : AppRoute(RouteIds.VOICE_AUTH)
+    object FaceLiveness : AppRoute(RouteIds.LIVENESS_PUZZLE)
+    object CardDetection : AppRoute(RouteIds.CARD_DETECTION)
+
     data class Platform(val key: String) : AppRoute(key)
 
     companion object {
