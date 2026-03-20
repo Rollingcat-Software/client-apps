@@ -220,6 +220,7 @@ fun AppNavigation() {
     val navItemsForRole = when (currentUserRole()) {
         UserRole.ROOT -> BottomNavDestinations.rootItems
         UserRole.TENANT_ADMIN -> BottomNavDestinations.adminItems
+        UserRole.TENANT_MEMBER -> BottomNavDestinations.memberItems
         UserRole.USER -> BottomNavDestinations.userItems
         else -> BottomNavDestinations.items
     }
@@ -703,6 +704,7 @@ fun AppNavigation() {
             val profileNavItems = when (userRole) {
                 UserRole.ROOT -> BottomNavDestinations.rootItems
                 UserRole.TENANT_ADMIN -> BottomNavDestinations.adminItems
+                UserRole.TENANT_MEMBER -> BottomNavDestinations.memberItems
                 UserRole.USER -> BottomNavDestinations.userItems
                 else -> BottomNavDestinations.items
             }

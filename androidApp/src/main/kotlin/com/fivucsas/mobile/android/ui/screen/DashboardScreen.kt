@@ -31,12 +31,19 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.fivucsas.mobile.android.ui.model.QuickAction
 import com.fivucsas.mobile.android.ui.navigation.Screen
+import com.fivucsas.shared.domain.repository.SessionRepository
+import org.koin.compose.koinInject
 import com.fivucsas.shared.config.UIDimens
 import com.fivucsas.shared.domain.model.Permission
 import com.fivucsas.shared.domain.model.UserRole
@@ -70,7 +77,8 @@ fun DashboardScreen(
     onNavigateToRequestMembership: () -> Unit,
     onNavigateToCardScan: () -> Unit,
     onNavigateToNfcRead: () -> Unit = {},
-    onNavigateBottom: (String) -> Unit
+    onNavigateBottom: (String) -> Unit,
+    sessionRepository: SessionRepository = koinInject()
 ) {
     val canViewEnrollmentStatus = userRole.hasPermission(Permission.ENROLL_SELF_CREATE) ||
         userRole.hasPermission(Permission.VERIFY_SELF)
@@ -162,8 +170,24 @@ fun DashboardScreen(
         )
     }
 
-    // Activity items will be loaded from API when available; show empty state for now
-    val activityItems = emptyList<ActivityItemData>()
+    var activityItems by remember { mutableStateOf(emptyList<ActivityItemData>()) }
+    LaunchedEffect(Unit) {
+        sessionRepository.getSessions().onSuccess { sessions ->
+            activityItems = sessions.take(5).map { session ->
+                ActivityItemData(
+                    title = session.deviceInfo.ifBlank { "Session" },
+                    description = session.ipAddress.ifBlank { session.userAgent },
+                    timestamp = session.lastActiveAt.ifBlank { session.createdAt },
+                    status = when (session.status) {
+                        "ACTIVE" -> StatusBadgeType.Success
+                        "EXPIRED" -> StatusBadgeType.Warning
+                        "REVOKED" -> StatusBadgeType.Failure
+                        else -> StatusBadgeType.Info
+                    }
+                )
+            }
+        }
+    }
 
     Scaffold(
         topBar = {

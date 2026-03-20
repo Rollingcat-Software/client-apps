@@ -82,7 +82,9 @@ private fun AppNavigation(
             viewModel = loginViewModel,
             onNavigateToRegister = { navigator.navigate(AppRoute.Register) },
             onNavigateToForgotPassword = { navigator.navigate(AppRoute.ForgotPassword) },
-            onNavigateToGuestFaceCheck = { },
+            onNavigateToGuestFaceCheck = {
+                navigator.navigate(AppRoute.GuestFaceCheckCapture)
+            },
             onLoginSuccess = {
                 if (isFingerprintFlowAvailable() && fingerprintViewModel != null) {
                     navigator.navigate(

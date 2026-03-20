@@ -32,9 +32,11 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -42,16 +44,42 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.fivucsas.shared.domain.model.TenantInfo
+import com.fivucsas.shared.domain.repository.RootAdminRepository
 import com.fivucsas.shared.ui.components.atoms.SearchTextField
 import com.fivucsas.shared.ui.theme.AppColors
+import kotlinx.coroutines.launch
+import org.koin.compose.koinInject
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RequestMembershipScreen(
-    onNavigateBack: () -> Unit
+    onNavigateBack: () -> Unit,
+    rootAdminRepository: RootAdminRepository = koinInject()
 ) {
-    // Tenants will be loaded from API when endpoint is available
-    val allTenants = remember { emptyList<TenantInfo>() }
+    var allTenants by remember { mutableStateOf(emptyList<TenantInfo>()) }
+    var isLoading by remember { mutableStateOf(true) }
+    var errorMessage by remember { mutableStateOf<String?>(null) }
+    val scope = rememberCoroutineScope()
+
+    LaunchedEffect(Unit) {
+        rootAdminRepository.getTenants().fold(
+            onSuccess = { tenants ->
+                allTenants = tenants.map { summary ->
+                    TenantInfo(
+                        id = summary.id,
+                        name = summary.name,
+                        description = "Members: ${summary.memberCount}",
+                        memberCount = summary.memberCount
+                    )
+                }
+                isLoading = false
+            },
+            onFailure = { error ->
+                errorMessage = error.message ?: "Failed to load tenants"
+                isLoading = false
+            }
+        )
+    }
 
     var searchQuery by remember { mutableStateOf("") }
     var requestedTenantIds by remember { mutableStateOf(setOf<String>()) }
