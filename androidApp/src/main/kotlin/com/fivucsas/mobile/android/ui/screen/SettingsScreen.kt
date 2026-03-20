@@ -50,8 +50,10 @@ import com.fivucsas.shared.domain.model.hasPermission
 import com.fivucsas.shared.i18n.StringKey
 import com.fivucsas.shared.i18n.StringResources
 import com.fivucsas.shared.i18n.s
+import com.fivucsas.shared.presentation.viewmodel.TenantSettingsViewModel
 import com.fivucsas.shared.ui.components.molecules.ExpandableCard
 import com.fivucsas.shared.ui.theme.AppColors
+import org.koin.compose.koinInject
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -70,7 +72,8 @@ fun SettingsScreen(
     onNavigateToCardDetection: () -> Unit = {},
     onNavigateToHardwareToken: () -> Unit = {},
     onNavigateToBiometricBackup: () -> Unit = {},
-    onLogout: () -> Unit
+    onLogout: () -> Unit,
+    tenantSettingsViewModel: TenantSettingsViewModel = koinInject()
 ) {
     val notificationsEnabled = remember { mutableStateOf(true) }
     val biometricEnabled = remember { mutableStateOf(true) }
@@ -402,7 +405,7 @@ fun SettingsScreen(
                         modifier = Modifier.fillMaxWidth()
                     )
                     Spacer(modifier = Modifier.height(10.dp))
-                    Button(onClick = { /* System settings save not yet implemented */ }) {
+                    Button(onClick = { tenantSettingsViewModel.saveSettings() }) {
                         Text(s(StringKey.SAVE_SETTINGS))
                     }
                 }
