@@ -860,11 +860,25 @@ private fun UserJoinTenantScreen(
     onBack: () -> Unit,
     onLogout: () -> Unit
 ) {
-    // Tenants will be loaded from API when public tenant listing endpoint is available
-    val allTenants = remember { mutableListOf<TenantInfo>() }
+    val rootAdminRepository: com.fivucsas.shared.domain.repository.RootAdminRepository by inject(com.fivucsas.shared.domain.repository.RootAdminRepository::class.java)
+    var allTenants by remember { mutableStateOf(mutableListOf<TenantInfo>()) }
     var searchQuery by remember { mutableStateOf("") }
     var requestedTenantIds by remember { mutableStateOf(setOf<String>()) }
     var successMessage by remember { mutableStateOf<String?>(null) }
+
+    LaunchedEffect(Unit) {
+        rootAdminRepository.getTenants().onSuccess { tenants ->
+            allTenants = tenants.map { summary ->
+                TenantInfo(
+                    id = summary.id,
+                    name = summary.name,
+                    description = "Members: ${summary.memberCount}",
+                    memberCount = summary.memberCount
+                )
+            }.toMutableList()
+        }
+    }
+
     val filteredTenants = if (searchQuery.isBlank()) allTenants else {
         allTenants.filter {
             it.name.contains(searchQuery, ignoreCase = true) ||
