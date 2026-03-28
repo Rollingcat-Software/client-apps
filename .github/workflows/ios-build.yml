@@ -7,6 +7,11 @@ on:
     paths:
       - 'shared/**'
       - 'iosApp/**'
+      - '.github/workflows/ios-build.yml'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build:
