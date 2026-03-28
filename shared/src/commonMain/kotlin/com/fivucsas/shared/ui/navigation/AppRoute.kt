@@ -46,6 +46,9 @@ sealed class AppRoute(val id: String) {
     object FaceLiveness : AppRoute(RouteIds.LIVENESS_PUZZLE)
     object CardDetection : AppRoute(RouteIds.CARD_DETECTION)
 
+    object GuestFaceCheckCapture : AppRoute(RouteIds.GUEST_FACE_CHECK_CAPTURE)
+    object GuestFaceCheckResult : AppRoute(RouteIds.GUEST_FACE_CHECK_RESULT)
+
     data class AuthWidget(
         val clientId: String,
         val flow: String = "login",
