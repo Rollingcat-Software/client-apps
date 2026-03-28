@@ -24,3 +24,6 @@
 
 # Compose
 -dontwarn androidx.compose.**
+
+# SLF4J
+-dontwarn org.slf4j.impl.StaticLoggerBinder
