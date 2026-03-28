@@ -108,4 +108,7 @@ object RouteIds {
 
     // P3: Biometric Backup
     const val BIOMETRIC_BACKUP = "biometric-backup"
+
+    // Embeddable Auth Widget (WebView)
+    const val AUTH_WIDGET = "auth-widget"
 }
