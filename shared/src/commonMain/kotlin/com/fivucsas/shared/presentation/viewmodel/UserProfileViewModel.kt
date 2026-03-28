@@ -5,6 +5,7 @@ import com.fivucsas.shared.domain.model.User
 import com.fivucsas.shared.domain.model.UserRole
 import com.fivucsas.shared.domain.model.UserStatus
 import com.fivucsas.shared.domain.usecase.admin.GetMyProfileUseCase
+import com.fivucsas.shared.domain.usecase.admin.UpdateUserUseCase
 import com.fivucsas.shared.platform.INetworkMonitor
 import com.fivucsas.shared.presentation.state.UserProfileUiState
 import com.fivucsas.shared.presentation.util.ErrorMapper
@@ -20,6 +21,7 @@ import kotlinx.coroutines.launch
 
 class UserProfileViewModel(
     private val getMyProfileUseCase: GetMyProfileUseCase,
+    private val updateUserUseCase: UpdateUserUseCase,
     private val offlineCache: OfflineCache,
     private val networkMonitor: INetworkMonitor
 ) {
@@ -119,6 +121,59 @@ class UserProfileViewModel(
                                 errorMessage = ErrorMapper.mapToUserMessage(error, "load profile")
                             )
                         }
+                    }
+                }
+            )
+        }
+    }
+
+    /**
+     * Update the user's profile (firstName, lastName, phoneNumber).
+     * Calls PUT /users/{id} on the backend.
+     */
+    fun updateProfile(firstName: String, lastName: String, phoneNumber: String) {
+        val currentUser = _state.value.user ?: return
+        _state.update { it.copy(isLoading = true, errorMessage = null, successMessage = null) }
+
+        scope.launch {
+            val fullName = listOf(firstName.trim(), lastName.trim())
+                .filter { it.isNotBlank() }
+                .joinToString(" ")
+                .ifBlank { currentUser.name }
+
+            val updatedUser = currentUser.copy(
+                name = fullName,
+                phoneNumber = phoneNumber.trim()
+            )
+
+            updateUserUseCase(currentUser.id, updatedUser).fold(
+                onSuccess = { savedUser ->
+                    // Update offline cache
+                    offlineCache.cacheUserProfile(
+                        id = savedUser.id,
+                        name = savedUser.name,
+                        email = savedUser.email,
+                        role = savedUser.role.name,
+                        status = savedUser.status.name,
+                        idNumber = savedUser.idNumber,
+                        phoneNumber = savedUser.phoneNumber,
+                        hasBiometric = savedUser.hasBiometric,
+                        enrollmentDate = savedUser.enrollmentDate
+                    )
+                    _state.update {
+                        UserProfileUiState(
+                            user = savedUser,
+                            isLoading = false,
+                            successMessage = "Profile updated successfully"
+                        )
+                    }
+                },
+                onFailure = { error ->
+                    _state.update {
+                        it.copy(
+                            isLoading = false,
+                            errorMessage = ErrorMapper.mapToUserMessage(error, "update profile")
+                        )
                     }
                 }
             )

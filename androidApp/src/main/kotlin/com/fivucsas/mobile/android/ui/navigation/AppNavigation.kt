@@ -760,7 +760,10 @@ fun AppNavigation() {
                 initialPhone = editUser?.phoneNumber ?: "",
                 idNumber = editUser?.idNumber ?: "",
                 onNavigateBack = { navController.popBackStack() },
-                onSave = { _, _, _ -> navController.popBackStack() }
+                onSave = { firstName, lastName, phone ->
+                    editProfileVm.updateProfile(firstName, lastName, phone)
+                    navController.popBackStack()
+                }
             )
         }
 

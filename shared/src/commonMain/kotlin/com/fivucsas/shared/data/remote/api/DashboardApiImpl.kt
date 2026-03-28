@@ -10,10 +10,11 @@ class DashboardApiImpl(
 ) : DashboardApi {
 
     companion object {
-        private const val BASE_PATH = "dashboard"
+        // Backend endpoint is GET /api/v1/statistics (no "dashboard" prefix)
+        private const val STATS_PATH = "statistics"
     }
 
     override suspend fun getStatistics(): StatisticsDto {
-        return client.get("$BASE_PATH/statistics").body()
+        return client.get(STATS_PATH).body()
     }
 }

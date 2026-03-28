@@ -32,6 +32,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -42,7 +43,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.fivucsas.mobile.android.ui.model.QuickAction
 import com.fivucsas.mobile.android.ui.navigation.Screen
+import com.fivucsas.shared.domain.model.Statistics
 import com.fivucsas.shared.domain.repository.SessionRepository
+import com.fivucsas.shared.presentation.viewmodel.AnalyticsViewModel
 import org.koin.compose.koinInject
 import com.fivucsas.shared.config.UIDimens
 import com.fivucsas.shared.domain.model.Permission
@@ -78,8 +81,12 @@ fun DashboardScreen(
     onNavigateToCardScan: () -> Unit,
     onNavigateToNfcRead: () -> Unit = {},
     onNavigateBottom: (String) -> Unit,
-    sessionRepository: SessionRepository = koinInject()
+    sessionRepository: SessionRepository = koinInject(),
+    analyticsViewModel: AnalyticsViewModel = koinInject()
 ) {
+    val analyticsState by analyticsViewModel.uiState.collectAsState()
+    LaunchedEffect(Unit) { analyticsViewModel.loadStatistics() }
+    val stats: Statistics? = analyticsState.statistics
     val canViewEnrollmentStatus = userRole.hasPermission(Permission.ENROLL_SELF_CREATE) ||
         userRole.hasPermission(Permission.VERIFY_SELF)
     val canViewRecentActivity = userRole.hasPermission(Permission.HISTORY_READ_SELF)
@@ -257,11 +264,58 @@ fun DashboardScreen(
                             fontWeight = FontWeight.SemiBold
                         )
                         Spacer(modifier = Modifier.size(8.dp))
-                        Text(
-                            text = "Enroll your face to enable biometric verification.",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = AppColors.OnSurfaceVariant
-                        )
+                        if (stats != null) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Column {
+                                    Text(
+                                        text = "${stats.totalUsers}",
+                                        style = MaterialTheme.typography.titleLarge,
+                                        fontWeight = FontWeight.Bold,
+                                        color = AppColors.Primary
+                                    )
+                                    Text(
+                                        text = "Total Users",
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = AppColors.OnSurfaceVariant
+                                    )
+                                }
+                                Column {
+                                    Text(
+                                        text = "${stats.verificationsToday}",
+                                        style = MaterialTheme.typography.titleLarge,
+                                        fontWeight = FontWeight.Bold,
+                                        color = AppColors.Primary
+                                    )
+                                    Text(
+                                        text = "Verifications Today",
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = AppColors.OnSurfaceVariant
+                                    )
+                                }
+                                Column {
+                                    Text(
+                                        text = "${((stats.successRate) * 100).toInt()}%",
+                                        style = MaterialTheme.typography.titleLarge,
+                                        fontWeight = FontWeight.Bold,
+                                        color = AppColors.Primary
+                                    )
+                                    Text(
+                                        text = "Success Rate",
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = AppColors.OnSurfaceVariant
+                                    )
+                                }
+                            }
+                        } else {
+                            Text(
+                                text = "Enroll your face to enable biometric verification.",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = AppColors.OnSurfaceVariant
+                            )
+                        }
                     }
                 }
             }
