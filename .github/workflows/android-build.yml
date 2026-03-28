@@ -2,6 +2,15 @@ name: Android Build
 
 on:
   workflow_dispatch:
+    inputs:
+      build_type:
+        description: 'Build type'
+        required: true
+        default: 'debug'
+        type: choice
+        options:
+          - debug
+          - release
   push:
     branches: [main, develop]
     paths:
@@ -11,18 +20,26 @@ on:
       - 'settings.gradle.kts'
       - 'gradle/**'
       - '.github/workflows/android-build.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'shared/**'
+      - 'androidApp/**'
+      - 'build.gradle.kts'
+      - 'settings.gradle.kts'
+      - 'gradle/**'
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: android-build-${{ github.ref }}
   cancel-in-progress: true
 
 env:
-  JAVA_VERSION: '17'
+  JAVA_VERSION: '21'
 
 jobs:
   build:
-    name: Build Debug APK
-    runs-on: [self-hosted, linux, x64]
+    name: Build Android APK
+    runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v4
@@ -33,16 +50,34 @@ jobs:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: 'temurin'
 
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
 
-      - name: Build debug APK
-        run: ./gradlew :androidApp:assembleDebug
+      - name: Determine build task
+        id: build-task
+        env:
+          BUILD_TYPE: ${{ github.event.inputs.build_type || 'debug' }}
+        run: |
+          if [ "$BUILD_TYPE" = "release" ]; then
+            echo "task=:androidApp:assembleRelease" >> "$GITHUB_OUTPUT"
+            echo "apk_path=androidApp/build/outputs/apk/release/*.apk" >> "$GITHUB_OUTPUT"
+            echo "artifact_name=fivucsas-release-apk" >> "$GITHUB_OUTPUT"
+          else
+            echo "task=:androidApp:assembleDebug" >> "$GITHUB_OUTPUT"
+            echo "apk_path=androidApp/build/outputs/apk/debug/*.apk" >> "$GITHUB_OUTPUT"
+            echo "artifact_name=fivucsas-debug-apk" >> "$GITHUB_OUTPUT"
+          fi
 
-      - name: Upload debug APK
+      - name: Build APK
+        run: ./gradlew ${{ steps.build-task.outputs.task }} --no-daemon
+
+      - name: Upload APK
         if: success()
         uses: actions/upload-artifact@v4
         with:
-          name: fivucsas-debug-apk
-          path: androidApp/build/outputs/apk/debug/*.apk
+          name: ${{ steps.build-task.outputs.artifact_name }}
+          path: ${{ steps.build-task.outputs.apk_path }}
           retention-days: 30
