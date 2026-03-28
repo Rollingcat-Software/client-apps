@@ -130,7 +130,17 @@ class AppStateManager {
     }
 }
 
-fun main() {
+/**
+ * Default admin password for kiosk exit. Override via --kiosk-password=<password>.
+ */
+private const val DEFAULT_KIOSK_PASSWORD = "fivucsas-admin"
+
+fun main(args: Array<String>) {
+    val kioskMode = args.any { it == "--kiosk" }
+    val kioskPassword = args.firstOrNull { it.startsWith("--kiosk-password=") }
+        ?.substringAfter("=")
+        ?: DEFAULT_KIOSK_PASSWORD
+
     // Install global crash handler — logs to ~/fivucsas-crash-logs/ before re-throwing
     val defaultHandler = Thread.getDefaultUncaughtExceptionHandler()
     Thread.setDefaultUncaughtExceptionHandler { thread, throwable ->
@@ -163,18 +173,54 @@ fun main() {
     application {
         val stateManager = remember { AppStateManager() }
         val currentMode by stateManager.currentMode.collectAsState()
+        var showExitDialog by remember { mutableStateOf(false) }
+
+        // In kiosk mode, start directly in KIOSK and use fullscreen
+        LaunchedEffect(kioskMode) {
+            if (kioskMode) {
+                stateManager.navigateTo(AppMode.KIOSK)
+            }
+        }
+
         Window(
-            onCloseRequest = ::exitApplication,
-            title = "FIVUCSAS - Desktop",
-            state = rememberWindowState(placement = WindowPlacement.Maximized)
+            onCloseRequest = {
+                if (kioskMode) {
+                    // In kiosk mode, require admin password to exit
+                    showExitDialog = true
+                } else {
+                    exitApplication()
+                }
+            },
+            title = if (kioskMode) "FIVUCSAS - Enrollment Station" else "FIVUCSAS - Desktop",
+            state = rememberWindowState(
+                placement = if (kioskMode) WindowPlacement.Fullscreen else WindowPlacement.Maximized
+            ),
+            undecorated = kioskMode,
+            resizable = !kioskMode
         ) {
             DesktopTheme {
                 AppContent(
                     currentMode = currentMode,
-                    onNavigate = stateManager::navigateTo,
+                    onNavigate = { mode ->
+                        if (kioskMode && mode == AppMode.LAUNCHER) {
+                            // In kiosk mode, don't allow going back to launcher
+                            stateManager.navigateTo(AppMode.KIOSK)
+                        } else {
+                            stateManager.navigateTo(mode)
+                        }
+                    },
                     onUnauthorized = stateManager::navigateUnauthorized,
                     unauthorizedMessage = stateManager.unauthorizedMessage.collectAsState().value
                 )
+
+                // Admin password dialog for exiting kiosk mode
+                if (showExitDialog) {
+                    KioskExitDialog(
+                        requiredPassword = kioskPassword,
+                        onDismiss = { showExitDialog = false },
+                        onConfirm = { exitApplication() }
+                    )
+                }
             }
         }
     }
@@ -1100,6 +1146,70 @@ private fun modeForHomeDestination(destination: HomeDestination): AppMode {
         HomeDestination.MemberHome -> AppMode.MEMBER_HOME
         HomeDestination.TenantAdminHome -> AppMode.TENANT_ADMIN_HOME
         HomeDestination.RootHome -> AppMode.ROOT_HOME
+    }
+}
+
+/**
+ * Password-protected exit dialog for kiosk mode.
+ * Prevents unauthorized closing of the enrollment station.
+ */
+@Composable
+private fun KioskExitDialog(
+    requiredPassword: String,
+    onDismiss: () -> Unit,
+    onConfirm: () -> Unit
+) {
+    var passwordInput by remember { mutableStateOf("") }
+    var errorText by remember { mutableStateOf<String?>(null) }
+
+    androidx.compose.ui.window.DialogWindow(
+        onCloseRequest = onDismiss,
+        title = "Exit Kiosk Mode",
+        resizable = false
+    ) {
+        Column(
+            modifier = Modifier.padding(24.dp).fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            Text(
+                text = "Enter admin password to exit kiosk mode",
+                fontWeight = FontWeight.Bold
+            )
+            OutlinedTextField(
+                value = passwordInput,
+                onValueChange = {
+                    passwordInput = it
+                    errorText = null
+                },
+                label = { Text("Admin Password") },
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth(),
+                visualTransformation = androidx.compose.ui.text.input.PasswordVisualTransformation()
+            )
+            if (errorText != null) {
+                Text(
+                    text = errorText!!,
+                    color = androidx.compose.material3.MaterialTheme.colorScheme.error
+                )
+            }
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.End
+            ) {
+                TextButton(onClick = onDismiss) { Text("Cancel") }
+                Spacer(modifier = Modifier.width(8.dp))
+                Button(
+                    onClick = {
+                        if (passwordInput == requiredPassword) {
+                            onConfirm()
+                        } else {
+                            errorText = "Incorrect password"
+                            passwordInput = ""
+                        }
+                    }
+                ) { Text("Exit") }
+            }
+        }
     }
 }
 

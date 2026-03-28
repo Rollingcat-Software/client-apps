@@ -1,7 +1,9 @@
 package com.fivucsas.shared.presentation.viewmodel
 
+import com.fivucsas.shared.data.local.OfflineCache
 import com.fivucsas.shared.domain.model.UserRole
 import com.fivucsas.shared.domain.usecase.auth.LoginUseCase
+import com.fivucsas.shared.platform.ISecureStorage
 import com.fivucsas.shared.presentation.state.LoginState
 import com.fivucsas.shared.presentation.viewmodel.auth.LoginViewModel
 import com.fivucsas.shared.test.FakeAuthRepository
@@ -18,9 +20,9 @@ import kotlin.test.*
  *
  * Tests:
  * - Initial state
- * - Successful login (dev mock behavior)
+ * - Successful login
  * - Error clearing
- * - Role handling via devMockRole
+ * - Role handling
  */
 @OptIn(ExperimentalCoroutinesApi::class)
 class LoginViewModelTest {
@@ -28,6 +30,7 @@ class LoginViewModelTest {
     private lateinit var viewModel: LoginViewModel
     private lateinit var fakeRepository: FakeAuthRepository
     private lateinit var loginUseCase: LoginUseCase
+    private lateinit var offlineCache: OfflineCache
     private val testDispatcher = StandardTestDispatcher()
 
     @BeforeTest
@@ -35,13 +38,13 @@ class LoginViewModelTest {
         Dispatchers.setMain(testDispatcher)
         fakeRepository = FakeAuthRepository()
         loginUseCase = LoginUseCase(fakeRepository)
-        viewModel = LoginViewModel(loginUseCase)
+        offlineCache = OfflineCache(InMemorySecureStorage())
+        viewModel = LoginViewModel(loginUseCase, offlineCache)
     }
 
     @AfterTest
     fun tearDown() {
         Dispatchers.resetMain()
-        LoginViewModel.devMockRole = UserRole.USER
     }
 
     // ============== INITIAL STATE TESTS ==============
@@ -68,13 +71,13 @@ class LoginViewModelTest {
         val state = viewModel.state.value
         assertTrue(state.isSuccess)
         assertNotNull(state.tokens)
-        assertEquals("dev-token", state.tokens?.accessToken)
-        assertEquals("dev-refresh", state.tokens?.refreshToken)
+        assertEquals("fake-access-token", state.tokens?.accessToken)
+        assertEquals("fake-refresh-token", state.tokens?.refreshToken)
     }
 
     @Test
     fun `login sets default USER role`() = runTest {
-        LoginViewModel.devMockRole = UserRole.USER
+        fakeRepository.mockRole = "USER"
 
         viewModel.login("test@fivucsas.com", "Password123!")
 
@@ -83,8 +86,8 @@ class LoginViewModelTest {
     }
 
     @Test
-    fun `login respects devMockRole for TENANT_ADMIN`() = runTest {
-        LoginViewModel.devMockRole = UserRole.TENANT_ADMIN
+    fun `login respects role for TENANT_ADMIN`() = runTest {
+        fakeRepository.mockRole = "TENANT_ADMIN"
 
         viewModel.login("admin@fivucsas.com", "Password123!")
 
@@ -95,8 +98,8 @@ class LoginViewModelTest {
     }
 
     @Test
-    fun `login respects devMockRole for ROOT`() = runTest {
-        LoginViewModel.devMockRole = UserRole.ROOT
+    fun `login respects role for ROOT`() = runTest {
+        fakeRepository.mockRole = "ROOT"
 
         viewModel.login("root@fivucsas.com", "Password123!")
 
@@ -107,8 +110,8 @@ class LoginViewModelTest {
     }
 
     @Test
-    fun `login respects devMockRole for TENANT_MEMBER`() = runTest {
-        LoginViewModel.devMockRole = UserRole.TENANT_MEMBER
+    fun `login respects role for TENANT_MEMBER`() = runTest {
+        fakeRepository.mockRole = "TENANT_MEMBER"
 
         viewModel.login("member@fivucsas.com", "Password123!")
 
@@ -134,11 +137,23 @@ class LoginViewModelTest {
         assertFalse(state.isLoading)
     }
 
+    // ============== ERROR HANDLING TESTS ==============
+
+    @Test
+    fun `login with failed repo sets error state`() = runTest {
+        fakeRepository.shouldSucceed = false
+
+        viewModel.login("test@fivucsas.com", "Password123!")
+
+        val state = viewModel.state.value
+        assertFalse(state.isSuccess)
+        assertNotNull(state.error)
+    }
+
     // ============== ERROR CLEARING TESTS ==============
 
     @Test
     fun `clearError clears error field`() = runTest {
-        // Manually set an error state
         viewModel.login("test@fivucsas.com", "Password123!")
         viewModel.clearError()
 
@@ -167,13 +182,13 @@ class LoginViewModelTest {
 
     @Test
     fun `consecutive logins update state`() = runTest {
-        LoginViewModel.devMockRole = UserRole.USER
+        fakeRepository.mockRole = "USER"
         viewModel.login("first@test.com", "Password1!")
 
         assertTrue(viewModel.state.value.isSuccess)
         assertEquals(UserRole.USER, viewModel.state.value.role)
 
-        LoginViewModel.devMockRole = UserRole.TENANT_ADMIN
+        fakeRepository.mockRole = "TENANT_ADMIN"
         viewModel.login("second@test.com", "Password2!")
 
         assertTrue(viewModel.state.value.isSuccess)
@@ -181,10 +196,32 @@ class LoginViewModelTest {
     }
 
     @Test
-    fun `login with any credentials succeeds in dev mode`() = runTest {
+    fun `login with any credentials succeeds when repo succeeds`() = runTest {
         viewModel.login("any@email.com", "anypassword")
 
         assertTrue(viewModel.state.value.isSuccess)
         assertNotNull(viewModel.state.value.tokens)
     }
+}
+
+/**
+ * In-memory ISecureStorage implementation for testing.
+ */
+private class InMemorySecureStorage : ISecureStorage {
+    private val stringStore = mutableMapOf<String, String>()
+    private val boolStore = mutableMapOf<String, Boolean>()
+    private val intStore = mutableMapOf<String, Int>()
+    private val longStore = mutableMapOf<String, Long>()
+
+    override fun saveString(key: String, value: String) { stringStore[key] = value }
+    override fun getString(key: String): String? = stringStore[key]
+    override fun saveBoolean(key: String, value: Boolean) { boolStore[key] = value }
+    override fun getBoolean(key: String, defaultValue: Boolean): Boolean = boolStore[key] ?: defaultValue
+    override fun saveInt(key: String, value: Int) { intStore[key] = value }
+    override fun getInt(key: String, defaultValue: Int): Int = intStore[key] ?: defaultValue
+    override fun saveLong(key: String, value: Long) { longStore[key] = value }
+    override fun getLong(key: String, defaultValue: Long): Long = longStore[key] ?: defaultValue
+    override fun remove(key: String) { stringStore.remove(key); boolStore.remove(key); intStore.remove(key); longStore.remove(key) }
+    override fun contains(key: String): Boolean = stringStore.containsKey(key) || boolStore.containsKey(key) || intStore.containsKey(key) || longStore.containsKey(key)
+    override fun clear() { stringStore.clear(); boolStore.clear(); intStore.clear(); longStore.clear() }
 }

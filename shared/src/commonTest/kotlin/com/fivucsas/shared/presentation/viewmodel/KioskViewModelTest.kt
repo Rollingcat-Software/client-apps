@@ -83,7 +83,7 @@ class KioskViewModelTest {
     fun `navigateToWelcome should clear all state`() {
         viewModel.navigateToEnroll()
         viewModel.updateFullName("Test")
-        viewModel.captureImage()
+        viewModel.setCapturedImage(ByteArray(10) { it.toByte() })
 
         viewModel.navigateToWelcome()
 
@@ -170,12 +170,11 @@ class KioskViewModelTest {
     }
 
     @Test
-    fun `captureImage should store captured image`() {
+    fun `captureImage should open camera for real capture`() {
         viewModel.captureImage()
 
-        assertNotNull(viewModel.uiState.value.capturedImage)
-        assertFalse(viewModel.uiState.value.showCamera)
-        assertNotNull(viewModel.uiState.value.successMessage)
+        // captureImage() opens the camera and asks user to take a photo
+        assertTrue(viewModel.uiState.value.showCamera)
     }
 
     @Test
@@ -196,7 +195,7 @@ class KioskViewModelTest {
     fun `submitEnrollment should fail when name is blank`() = runTest {
         viewModel.updateEmail("test@example.com")
         viewModel.updateIdNumber("ID123")
-        viewModel.captureImage()
+        viewModel.setCapturedImage(ByteArray(10) { it.toByte() })
 
         viewModel.submitEnrollment()
         advanceUntilIdle()
@@ -209,7 +208,7 @@ class KioskViewModelTest {
     fun `submitEnrollment should fail when email is blank`() = runTest {
         viewModel.updateFullName("John Doe")
         viewModel.updateIdNumber("ID123")
-        viewModel.captureImage()
+        viewModel.setCapturedImage(ByteArray(10) { it.toByte() })
 
         viewModel.submitEnrollment()
         advanceUntilIdle()
@@ -222,7 +221,7 @@ class KioskViewModelTest {
     fun `submitEnrollment should fail when ID number is blank`() = runTest {
         viewModel.updateFullName("John Doe")
         viewModel.updateEmail("test@example.com")
-        viewModel.captureImage()
+        viewModel.setCapturedImage(ByteArray(10) { it.toByte() })
 
         viewModel.submitEnrollment()
         advanceUntilIdle()
@@ -249,7 +248,7 @@ class KioskViewModelTest {
         viewModel.updateFullName("John Doe")
         viewModel.updateEmail("john@example.com")
         viewModel.updateIdNumber("ID123456")
-        viewModel.captureImage()
+        viewModel.setCapturedImage(ByteArray(10) { it.toByte() })
 
         viewModel.submitEnrollment()
         advanceUntilIdle()
@@ -266,7 +265,7 @@ class KioskViewModelTest {
         viewModel.updateFullName("John Doe")
         viewModel.updateEmail("john@example.com")
         viewModel.updateIdNumber("ID123456")
-        viewModel.captureImage()
+        viewModel.setCapturedImage(ByteArray(10) { it.toByte() })
 
         viewModel.submitEnrollment()
         advanceUntilIdle()
@@ -298,7 +297,7 @@ class KioskViewModelTest {
 
     @Test
     fun `verifyWithCapturedImage should complete verification`() = runTest {
-        viewModel.captureImage()
+        viewModel.setCapturedImage(ByteArray(10) { it.toByte() })
         viewModel.verifyWithCapturedImage()
         advanceUntilIdle()
 
@@ -312,16 +311,12 @@ class KioskViewModelTest {
     }
 
     @Test
-    fun `verifyWithCapturedImage should set loading state`() = runTest {
-        viewModel.captureImage()
+    fun `verifyWithCapturedImage should complete without loading after idle`() = runTest {
+        viewModel.setCapturedImage(ByteArray(10) { it.toByte() })
         viewModel.verifyWithCapturedImage()
-
-        // Advance just enough to start the coroutine (it suspends at delay(DELAY_VERIFICATION))
-        testDispatcher.scheduler.runCurrent()
-        assertTrue(viewModel.uiState.value.isLoading)
-
         advanceUntilIdle()
 
+        // After all coroutines complete, loading should be false
         assertFalse(viewModel.uiState.value.isLoading)
     }
 

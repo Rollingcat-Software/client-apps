@@ -77,6 +77,23 @@ class FakeUserRepository(
         }
     }
 
+    override suspend fun getMyProfile(): Result<User> {
+        return if (shouldThrowError) {
+            Result.failure(RuntimeException(errorMessage))
+        } else {
+            users.firstOrNull()?.let { Result.success(it) }
+                ?: Result.failure(NoSuchElementException("No profile found"))
+        }
+    }
+
+    override suspend fun healthCheck(): Result<Boolean> {
+        return if (shouldThrowError) {
+            Result.failure(RuntimeException(errorMessage))
+        } else {
+            Result.success(true)
+        }
+    }
+
     override suspend fun getStatistics(): Result<Statistics> {
         return if (shouldThrowError) {
             Result.failure(RuntimeException(errorMessage))

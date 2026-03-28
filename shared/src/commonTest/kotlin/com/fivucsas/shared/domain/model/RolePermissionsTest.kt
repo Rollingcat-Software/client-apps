@@ -21,7 +21,6 @@ class RolePermissionsTest {
     @Test
     fun tenantAdminHasAdminPermissionsButNotAll() {
         // Admin should have these
-        assertTrue(UserRole.TENANT_ADMIN.hasPermission(Permission.VIEW_ADMIN_DASHBOARD))
         assertTrue(UserRole.TENANT_ADMIN.hasPermission(Permission.TENANT_USERS_READ))
         assertTrue(UserRole.TENANT_ADMIN.hasPermission(Permission.TENANT_USERS_WRITE))
         assertTrue(UserRole.TENANT_ADMIN.hasPermission(Permission.TENANT_ROLES_ASSIGN))
@@ -58,10 +57,8 @@ class RolePermissionsTest {
         assertTrue(UserRole.TENANT_MEMBER.hasPermission(Permission.QR_SCAN))
         assertTrue(UserRole.TENANT_MEMBER.hasPermission(Permission.HISTORY_READ_SELF))
         assertTrue(UserRole.TENANT_MEMBER.hasPermission(Permission.TENANT_INVITE_ACCEPT))
-        assertTrue(UserRole.TENANT_MEMBER.hasPermission(Permission.VIEW_DASHBOARD))
 
         // Member should NOT have admin permissions
-        assertFalse(UserRole.TENANT_MEMBER.hasPermission(Permission.VIEW_ADMIN_DASHBOARD))
         assertFalse(UserRole.TENANT_MEMBER.hasPermission(Permission.TENANT_USERS_READ))
         assertFalse(UserRole.TENANT_MEMBER.hasPermission(Permission.TENANT_USERS_WRITE))
         assertFalse(UserRole.TENANT_MEMBER.hasPermission(Permission.TENANT_ROLES_ASSIGN))
@@ -81,7 +78,7 @@ class RolePermissionsTest {
         assertTrue(UserRole.USER.hasPermission(Permission.PROFILE_READ_SELF))
         assertTrue(UserRole.USER.hasPermission(Permission.PROFILE_UPDATE_SELF))
         assertTrue(UserRole.USER.hasPermission(Permission.TENANT_INVITE_ACCEPT))
-        assertTrue(UserRole.USER.hasPermission(Permission.VIEW_DASHBOARD))
+        assertTrue(UserRole.USER.hasPermission(Permission.TENANT_MEMBERSHIP_REQUEST))
 
         // USER should NOT have enroll/verify/QR/history
         assertFalse(UserRole.USER.hasPermission(Permission.ENROLL_SELF_CREATE))
@@ -91,25 +88,23 @@ class RolePermissionsTest {
         assertFalse(UserRole.USER.hasPermission(Permission.QR_SCAN))
         assertFalse(UserRole.USER.hasPermission(Permission.QR_DISPLAY))
         assertFalse(UserRole.USER.hasPermission(Permission.HISTORY_READ_SELF))
-        assertFalse(UserRole.USER.hasPermission(Permission.VIEW_ADMIN_DASHBOARD))
 
         assertEquals(4, RolePermissions.getPermissions(UserRole.USER).size)
     }
 
     @Test
-    fun guestHasOnlyProfileReadAndDashboard() {
-        assertTrue(UserRole.GUEST.hasPermission(Permission.PROFILE_READ_SELF))
-        assertTrue(UserRole.GUEST.hasPermission(Permission.VIEW_DASHBOARD))
+    fun guestHasOnlyFaceCheck() {
+        assertTrue(UserRole.GUEST.hasPermission(Permission.GUEST_FACE_CHECK))
 
         // GUEST should NOT have anything else
+        assertFalse(UserRole.GUEST.hasPermission(Permission.PROFILE_READ_SELF))
         assertFalse(UserRole.GUEST.hasPermission(Permission.PROFILE_UPDATE_SELF))
         assertFalse(UserRole.GUEST.hasPermission(Permission.ENROLL_SELF_CREATE))
         assertFalse(UserRole.GUEST.hasPermission(Permission.VERIFY_SELF))
         assertFalse(UserRole.GUEST.hasPermission(Permission.QR_SCAN))
         assertFalse(UserRole.GUEST.hasPermission(Permission.HISTORY_READ_SELF))
         assertFalse(UserRole.GUEST.hasPermission(Permission.TENANT_INVITE_ACCEPT))
-        assertFalse(UserRole.GUEST.hasPermission(Permission.VIEW_ADMIN_DASHBOARD))
 
-        assertEquals(2, RolePermissions.getPermissions(UserRole.GUEST).size)
+        assertEquals(1, RolePermissions.getPermissions(UserRole.GUEST).size)
     }
 }

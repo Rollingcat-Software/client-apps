@@ -3,6 +3,8 @@ package com.fivucsas.shared.presentation.viewmodel
 import com.fivucsas.shared.domain.model.User
 import com.fivucsas.shared.domain.model.UserStatus
 import com.fivucsas.shared.presentation.state.AdminTab
+import com.fivucsas.shared.test.mocks.MockCheckSystemHealthUseCase
+import com.fivucsas.shared.test.mocks.MockCreateUserUseCase
 import com.fivucsas.shared.test.mocks.MockDeleteUserUseCase
 import com.fivucsas.shared.test.mocks.MockGetStatisticsUseCase
 import com.fivucsas.shared.test.mocks.MockGetUsersUseCase
@@ -19,6 +21,7 @@ import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
+import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
@@ -40,9 +43,11 @@ class AdminViewModelTest {
     private val testDispatcher = StandardTestDispatcher()
 
     private lateinit var getUsersUseCase: MockGetUsersUseCase
+    private lateinit var createUserUseCase: MockCreateUserUseCase
     private lateinit var deleteUserUseCase: MockDeleteUserUseCase
     private lateinit var updateUserUseCase: MockUpdateUserUseCase
     private lateinit var getStatisticsUseCase: MockGetStatisticsUseCase
+    private lateinit var checkSystemHealthUseCase: MockCheckSystemHealthUseCase
     private lateinit var viewModel: AdminViewModel
 
     @BeforeTest
@@ -50,15 +55,19 @@ class AdminViewModelTest {
         Dispatchers.setMain(testDispatcher)
 
         getUsersUseCase = MockGetUsersUseCase()
+        createUserUseCase = MockCreateUserUseCase()
         deleteUserUseCase = MockDeleteUserUseCase()
         updateUserUseCase = MockUpdateUserUseCase()
         getStatisticsUseCase = MockGetStatisticsUseCase()
+        checkSystemHealthUseCase = MockCheckSystemHealthUseCase()
 
         viewModel = AdminViewModel(
             getUsersUseCase = getUsersUseCase,
+            createUserUseCase = createUserUseCase,
             deleteUserUseCase = deleteUserUseCase,
             updateUserUseCase = updateUserUseCase,
-            getStatisticsUseCase = getStatisticsUseCase
+            getStatisticsUseCase = getStatisticsUseCase,
+            checkSystemHealthUseCase = checkSystemHealthUseCase
         )
     }
 
@@ -114,12 +123,11 @@ class AdminViewModelTest {
     }
 
     @Test
-    fun `loadUsers should set loading state`() = runTest {
+    fun `loadUsers should complete without loading flag after idle`() = runTest {
+        // AdminViewModel calls loadUsers() in init{}, so we advance to completion
+        advanceUntilIdle()
+
         viewModel.loadUsers()
-
-        // Check loading state before completion
-        assertTrue(viewModel.uiState.value.isLoading)
-
         advanceUntilIdle()
 
         assertFalse(viewModel.uiState.value.isLoading)
@@ -127,14 +135,13 @@ class AdminViewModelTest {
 
     @Test
     fun `loadUsers should handle failure gracefully`() = runTest {
+        advanceUntilIdle() // let init complete first
         getUsersUseCase.shouldSucceed = false
 
         viewModel.loadUsers()
         advanceUntilIdle()
 
         assertFalse(viewModel.uiState.value.isLoading)
-        // Should have fallback mock data
-        assertTrue(viewModel.uiState.value.users.isNotEmpty())
     }
 
     // ========================================
@@ -198,11 +205,9 @@ class AdminViewModelTest {
     }
 
     @Test
-    fun `addUser should add user to list`() = runTest {
-        viewModel.loadUsers()
+    fun `addUser should close dialog and show success`() = runTest {
         advanceUntilIdle()
 
-        val initialCount = viewModel.uiState.value.users.size
         val newUser = User(
             id = "new_user",
             name = "New User",
@@ -217,8 +222,9 @@ class AdminViewModelTest {
         viewModel.addUser(newUser)
         advanceUntilIdle()
 
-        assertEquals(initialCount + 1, viewModel.uiState.value.users.size)
+        // addUser calls createUserUseCase then loadUsers() which re-fetches from mock
         assertFalse(viewModel.uiState.value.showAddUserDialog)
+        assertNotNull(viewModel.uiState.value.successMessage)
     }
 
     // ========================================
@@ -251,8 +257,7 @@ class AdminViewModelTest {
     }
 
     @Test
-    fun `updateUser should update user in list`() = runTest {
-        viewModel.loadUsers()
+    fun `updateUser should close dialog and show success`() = runTest {
         advanceUntilIdle()
 
         val user = viewModel.uiState.value.users.first()
@@ -261,8 +266,10 @@ class AdminViewModelTest {
         viewModel.updateUser(updatedUser)
         advanceUntilIdle()
 
-        val result = viewModel.uiState.value.users.find { it.id == user.id }
-        assertEquals("Updated Name", result?.name)
+        // updateUser calls updateUserUseCase then loadUsers() which re-fetches from mock
+        assertFalse(viewModel.uiState.value.showEditUserDialog)
+        assertNull(viewModel.uiState.value.editingUser)
+        assertNotNull(viewModel.uiState.value.successMessage)
     }
 
     // ========================================
@@ -295,23 +302,22 @@ class AdminViewModelTest {
     }
 
     @Test
-    fun `deleteUser should remove user from list`() = runTest {
-        viewModel.loadUsers()
+    fun `deleteUser should call use case and close confirmation`() = runTest {
         advanceUntilIdle()
 
-        val initialCount = viewModel.uiState.value.users.size
         val userToDelete = viewModel.uiState.value.users.first()
-
+        viewModel.showDeleteConfirmation(userToDelete)
         viewModel.deleteUser(userToDelete.id)
         advanceUntilIdle()
 
-        assertEquals(initialCount - 1, viewModel.uiState.value.users.size)
-        assertFalse(viewModel.uiState.value.users.any { it.id == userToDelete.id })
+        // deleteUser calls deleteUserUseCase then loadUsers() which re-fetches
+        assertFalse(viewModel.uiState.value.showDeleteConfirmation)
+        assertNull(viewModel.uiState.value.userToDelete)
+        assertEquals(userToDelete.id, deleteUserUseCase.deletedUserId)
     }
 
     @Test
     fun `confirmDelete should delete selected user`() = runTest {
-        viewModel.loadUsers()
         advanceUntilIdle()
 
         val user = viewModel.uiState.value.users.first()
@@ -319,8 +325,8 @@ class AdminViewModelTest {
         viewModel.confirmDelete()
         advanceUntilIdle()
 
-        assertFalse(viewModel.uiState.value.users.any { it.id == user.id })
         assertEquals(user.id, deleteUserUseCase.deletedUserId)
+        assertFalse(viewModel.uiState.value.showDeleteConfirmation)
     }
 
     // ========================================

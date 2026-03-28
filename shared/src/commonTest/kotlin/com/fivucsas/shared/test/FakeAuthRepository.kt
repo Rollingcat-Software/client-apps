@@ -71,6 +71,10 @@ class FakeAuthRepository : AuthRepository {
         }
     }
 
+    override suspend fun changePassword(currentPassword: String, newPassword: String): Result<Unit> {
+        return if (shouldSucceed) Result.success(Unit) else Result.failure(RuntimeException(errorMessage))
+    }
+
     override suspend fun isAuthenticated(): Boolean = shouldSucceed
 
     override suspend fun getAccessToken(): String? = if (shouldSucceed) mockAccessToken else null

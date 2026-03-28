@@ -6,10 +6,10 @@ import com.fivucsas.shared.domain.repository.UserRepository
 import com.fivucsas.shared.domain.validation.ValidationResult
 import com.fivucsas.shared.domain.validation.ValidationRules
 
-class CreateUserUseCase(
+open class CreateUserUseCase(
     private val userRepository: UserRepository
 ) {
-    suspend operator fun invoke(user: User): Result<User> {
+    open suspend operator fun invoke(user: User): Result<User> {
         if (user.name.isBlank()) {
             return Result.failure(ValidationException("Full name is required"))
         }

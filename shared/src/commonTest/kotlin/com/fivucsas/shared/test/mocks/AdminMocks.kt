@@ -3,6 +3,8 @@ package com.fivucsas.shared.test.mocks
 import com.fivucsas.shared.domain.model.Statistics
 import com.fivucsas.shared.domain.model.User
 import com.fivucsas.shared.domain.model.UserStatus
+import com.fivucsas.shared.domain.usecase.admin.CheckSystemHealthUseCase
+import com.fivucsas.shared.domain.usecase.admin.CreateUserUseCase
 import com.fivucsas.shared.domain.usecase.admin.DeleteUserUseCase
 import com.fivucsas.shared.domain.usecase.admin.GetStatisticsUseCase
 import com.fivucsas.shared.domain.usecase.admin.GetUsersUseCase
@@ -75,6 +77,35 @@ class MockUpdateUserUseCase : UpdateUserUseCase(FakeUserRepository()) {
         updatedUser = user
         return if (shouldSucceed) {
             Result.success(user)
+        } else {
+            Result.failure(Exception(errorMessage))
+        }
+    }
+}
+
+class MockCreateUserUseCase : CreateUserUseCase(FakeUserRepository()) {
+    var shouldSucceed = true
+    var createdUser: User? = null
+    var errorMessage = "Failed to create user"
+
+    override suspend fun invoke(user: User): Result<User> {
+        createdUser = user
+        return if (shouldSucceed) {
+            Result.success(user)
+        } else {
+            Result.failure(Exception(errorMessage))
+        }
+    }
+}
+
+class MockCheckSystemHealthUseCase : CheckSystemHealthUseCase(FakeUserRepository()) {
+    var shouldSucceed = true
+    var isHealthy = true
+    var errorMessage = "Health check failed"
+
+    override suspend fun invoke(): Result<Boolean> {
+        return if (shouldSucceed) {
+            Result.success(isHealthy)
         } else {
             Result.failure(Exception(errorMessage))
         }
