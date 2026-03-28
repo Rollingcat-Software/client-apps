@@ -89,7 +89,8 @@ fun AuthResponseDto.toModel(): AuthTokens {
         role = user?.role ?: user?.roles?.firstOrNull() ?: "USER",
         userName = fullName,
         userEmail = user?.email ?: "",
-        userId = user?.id ?: ""
+        userId = user?.id ?: "",
+        tenantId = user?.tenantId ?: ""
     )
 }
 

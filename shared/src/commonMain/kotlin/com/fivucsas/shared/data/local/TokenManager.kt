@@ -17,6 +17,7 @@ class TokenManager(
     private var cachedUserName: String? = null
     private var cachedUserEmail: String? = null
     private var cachedUserId: String? = null
+    private var cachedTenantId: String? = null
 
     /**
      * Save authentication tokens
@@ -38,6 +39,10 @@ class TokenManager(
         if (tokens.userId.isNotBlank()) {
             tokenStorage.saveUserId(tokens.userId)
             cachedUserId = tokens.userId
+        }
+        if (tokens.tenantId.isNotBlank()) {
+            tokenStorage.saveTenantId(tokens.tenantId)
+            cachedTenantId = tokens.tenantId
         }
     }
 
@@ -91,6 +96,13 @@ class TokenManager(
     }
 
     /**
+     * Get current tenant id
+     */
+    fun getTenantId(): String? {
+        return cachedTenantId ?: tokenStorage.getTenantId()
+    }
+
+    /**
      * Clear all tokens (logout)
      */
     fun clearTokens() {
@@ -99,12 +111,14 @@ class TokenManager(
         cachedUserName = null
         cachedUserEmail = null
         cachedUserId = null
+        cachedTenantId = null
         tokenStorage.clearToken()
         tokenStorage.clearRefreshToken()
         tokenStorage.clearRole()
         tokenStorage.clearUserName()
         tokenStorage.clearUserEmail()
         tokenStorage.clearUserId()
+        tokenStorage.clearTenantId()
     }
 
     /**

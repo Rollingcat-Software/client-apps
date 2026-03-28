@@ -1,5 +1,6 @@
 package com.fivucsas.shared.di
 
+import com.fivucsas.shared.data.local.TokenStorage
 import com.fivucsas.shared.platform.DefaultNetworkMonitor
 import com.fivucsas.shared.platform.ICameraService
 import com.fivucsas.shared.platform.INetworkMonitor
@@ -10,6 +11,7 @@ import com.fivucsas.shared.platform.IPushNotificationService
 import com.fivucsas.shared.platform.IosCameraService
 import com.fivucsas.shared.platform.IosSecureStorage
 import com.fivucsas.shared.platform.IosLogger
+import com.fivucsas.shared.platform.IosTokenStorage
 import com.fivucsas.shared.platform.INfcService
 import com.fivucsas.shared.platform.NoOpNfcService
 import com.fivucsas.shared.platform.NoOpPushNotificationService
@@ -42,6 +44,9 @@ actual val platformModule = module {
 
     // Secure Storage - Singleton for consistent data access
     single<ISecureStorage> { IosSecureStorage() }
+
+    // Token Storage - Keychain-backed via IosSecureStorage adapter
+    single<TokenStorage> { IosTokenStorage(get()) }
 
     // Logger - Singleton for centralized logging
     single<ILogger> { IosLogger() }

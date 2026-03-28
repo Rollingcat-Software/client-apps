@@ -98,4 +98,5 @@ object StorageKeys {
     const val LANGUAGE = "language"
     const val LAST_SYNC = "last_sync"
     const val USER_ROLE = "user_role"
+    const val TENANT_ID = "tenant_id"
 }

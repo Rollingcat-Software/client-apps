@@ -19,4 +19,7 @@ interface TokenStorage {
     fun saveUserId(id: String) {}
     fun getUserId(): String? = null
     fun clearUserId() {}
+    fun saveTenantId(tenantId: String) {}
+    fun getTenantId(): String? = null
+    fun clearTenantId() {}
 }

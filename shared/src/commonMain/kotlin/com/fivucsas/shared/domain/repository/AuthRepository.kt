@@ -73,5 +73,6 @@ data class AuthTokens(
     val role: String = "USER",
     val userName: String = "",
     val userEmail: String = "",
-    val userId: String = ""
+    val userId: String = "",
+    val tenantId: String = ""
 )

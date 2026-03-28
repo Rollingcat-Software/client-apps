@@ -29,7 +29,7 @@ import com.fivucsas.shared.data.remote.api.TenantSettingsApi
 import com.fivucsas.shared.data.remote.api.TenantSettingsApiImpl
 import com.fivucsas.shared.data.remote.config.ApiConfig
 import com.fivucsas.shared.data.remote.dto.AuthResponseDto
-import com.fivucsas.shared.domain.repository.AuthTokens
+import com.fivucsas.shared.data.remote.dto.toModel
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.plugins.HttpResponseValidator
@@ -111,6 +111,9 @@ val networkModule = module {
                     header(HttpHeaders.Authorization, "Bearer $accessToken")
                 }
 
+                // Include tenant context for multi-tenant API calls
+                tokenManager.getTenantId()?.let { header("X-Tenant-Id", it) }
+
                 stepUpTokenManager.getToken()?.let { header("X-Step-Up-Token", it) }
             }
 
@@ -134,14 +137,7 @@ val networkModule = module {
                             }
                             if (refreshResponse.status == HttpStatusCode.OK) {
                                 val authResponse = refreshResponse.body<AuthResponseDto>()
-                                tokenManager.updateTokens(
-                                    AuthTokens(
-                                        accessToken = authResponse.accessToken,
-                                        refreshToken = authResponse.refreshToken,
-                                        expiresIn = authResponse.expiresIn,
-                                        role = authResponse.user?.role ?: authResponse.user?.roles?.firstOrNull() ?: tokenManager.getRole() ?: ""
-                                    )
-                                )
+                                tokenManager.updateTokens(authResponse.toModel())
                             } else {
                                 // Refresh failed — clear tokens to force re-login
                                 tokenManager.clearTokens()
