@@ -1,24 +1,118 @@
 name: iOS Build
 
 on:
-  workflow_dispatch: # manual only — requires macOS runner (billing-gated)
+  workflow_dispatch:
+    inputs:
+      target:
+        description: 'iOS target architecture'
+        required: true
+        default: 'iosSimulatorArm64'
+        type: choice
+        options:
+          - iosSimulatorArm64
+          - iosArm64
+          - iosX64
+      build_type:
+        description: 'Build type'
+        required: true
+        default: 'debug'
+        type: choice
+        options:
+          - debug
+          - release
+  push:
+    branches: [main, develop]
+    paths:
+      - 'shared/**'
+      - 'build.gradle.kts'
+      - 'settings.gradle.kts'
+      - 'gradle/**'
+      - '.github/workflows/ios-build.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'shared/**'
+      - 'build.gradle.kts'
+      - 'settings.gradle.kts'
+      - 'gradle/**'
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: ios-build-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  JAVA_VERSION: '21'
+
 jobs:
-  build:
+  build-framework:
     name: Build iOS Framework
     runs-on: macos-latest
+
     steps:
       - uses: actions/checkout@v4
-      - name: Set up JDK 17
+
+      - name: Set up JDK
         uses: actions/setup-java@v4
         with:
-          java-version: '17'
+          java-version: ${{ env.JAVA_VERSION }}
           distribution: 'temurin'
+
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
+
+      - name: Determine build task
+        id: build-task
+        env:
+          TARGET: ${{ github.event.inputs.target || 'iosSimulatorArm64' }}
+          BUILD_TYPE: ${{ github.event.inputs.build_type || 'debug' }}
+        run: |
+          # Capitalize first letter of build type for Gradle task name
+          TYPE_CAP="$(echo "${BUILD_TYPE:0:1}" | tr '[:lower:]' '[:upper:]')${BUILD_TYPE:1}"
+          # Capitalize first letter of target
+          TARGET_CAP="$(echo "${TARGET:0:1}" | tr '[:lower:]' '[:upper:]')${TARGET:1}"
+
+          TASK=":shared:link${TYPE_CAP}Framework${TARGET_CAP}"
+          echo "task=${TASK}" >> "$GITHUB_OUTPUT"
+          echo "target=${TARGET}" >> "$GITHUB_OUTPUT"
+          echo "build_type=${BUILD_TYPE}" >> "$GITHUB_OUTPUT"
+          echo "framework_path=shared/build/bin/${TARGET}/${BUILD_TYPE}Framework" >> "$GITHUB_OUTPUT"
+          echo "artifact_name=fivucsas-ios-framework-${TARGET}-${BUILD_TYPE}" >> "$GITHUB_OUTPUT"
+          echo "Building: ${TASK}"
+
       - name: Build shared iOS framework
-        run: ./gradlew :shared:linkReleaseFrameworkIosSimulatorArm64
+        run: ./gradlew ${{ steps.build-task.outputs.task }} --no-daemon
+
+      - name: Verify framework output
+        run: |
+          FRAMEWORK_DIR="${{ steps.build-task.outputs.framework_path }}"
+          if [ -d "${FRAMEWORK_DIR}/shared.framework" ]; then
+            echo "Framework built successfully:"
+            ls -la "${FRAMEWORK_DIR}/shared.framework/"
+            echo ""
+            echo "Framework size:"
+            du -sh "${FRAMEWORK_DIR}/shared.framework/"
+          else
+            echo "Warning: Framework directory not found at ${FRAMEWORK_DIR}/shared.framework"
+            echo "Searching for framework output..."
+            find shared/build -name "*.framework" -type d 2>/dev/null || echo "No .framework found"
+          fi
+
+      - name: Upload framework artifact
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.build-task.outputs.artifact_name }}
+          path: ${{ steps.build-task.outputs.framework_path }}/
+          retention-days: 30
+
+      # Note: No xcodebuild step — there is no iosApp/ Xcode project yet.
+      # The shared KMP framework is built as a static .framework that can be
+      # embedded in a future SwiftUI app. To create a full iOS app:
+      #
+      # 1. Create iosApp/ directory with an Xcode project
+      # 2. Add the shared.framework as a dependency
+      # 3. Add an xcodebuild step here:
+      #    xcodebuild -project iosApp/iosApp.xcodeproj \
+      #      -scheme iosApp -sdk iphonesimulator \
+      #      -destination 'platform=iOS Simulator,name=iPhone 15' \
+      #      -configuration Debug build
