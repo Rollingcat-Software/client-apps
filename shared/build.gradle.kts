@@ -1,6 +1,7 @@
 ﻿plugins {
     kotlin("multiplatform")
     kotlin("plugin.serialization")
+    kotlin("plugin.compose")
     id("com.android.library")
     id("org.jetbrains.compose")
 }
@@ -33,26 +34,26 @@ kotlin {
                 implementation(compose.materialIconsExtended)
 
                 // Ktor (Networking)
-                implementation("io.ktor:ktor-client-core:2.3.5")
-                implementation("io.ktor:ktor-client-content-negotiation:2.3.5")
-                implementation("io.ktor:ktor-serialization-kotlinx-json:2.3.5")
-                implementation("io.ktor:ktor-client-logging:2.3.5")
+                implementation("io.ktor:ktor-client-core:3.1.1")
+                implementation("io.ktor:ktor-client-content-negotiation:3.1.1")
+                implementation("io.ktor:ktor-serialization-kotlinx-json:3.1.1")
+                implementation("io.ktor:ktor-client-logging:3.1.1")
 
                 // Kotlinx Serialization
-                implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
+                implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
 
                 // Coroutines
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.1")
 
                 // DateTime
-                implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.1")
+                implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.1")
 
                 // Multiplatform Settings (SharedPreferences)
-                implementation("com.russhwolf:multiplatform-settings:1.1.0")
+                implementation("com.russhwolf:multiplatform-settings:1.3.0")
 
                 // Koin for Dependency Injection
-                implementation("io.insert-koin:koin-core:3.5.3")
-                implementation("io.insert-koin:koin-compose:1.1.0")
+                implementation("io.insert-koin:koin-core:4.0.2")
+                implementation("io.insert-koin:koin-compose:4.0.2")
             }
         }
 
@@ -61,10 +62,10 @@ kotlin {
                 implementation(kotlin("test"))
 
                 // Coroutines Test
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.1")
 
                 // Turbine (for Flow testing)
-                implementation("app.cash.turbine:turbine:1.0.0")
+                implementation("app.cash.turbine:turbine:1.2.0")
 
                 // MockK (for mocking) - Note: Common MockK doesn't exist, we'll use expect/actual pattern
                 // For now, we'll create our own test doubles
@@ -73,15 +74,15 @@ kotlin {
 
         val androidMain by getting {
             dependencies {
-                implementation("io.ktor:ktor-client-okhttp:2.3.5")
+                implementation("io.ktor:ktor-client-okhttp:3.1.1")
 
                 // ViewModel - Android only
-                implementation("androidx.lifecycle:lifecycle-viewmodel:2.6.2")
-                implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.2")
+                implementation("androidx.lifecycle:lifecycle-viewmodel:2.8.7")
+                implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.7")
 
                 // Android specific
                 implementation("androidx.security:security-crypto:1.1.0-alpha06")
-                implementation("androidx.activity:activity-compose:1.8.1")
+                implementation("androidx.activity:activity-compose:1.9.3")
 
                 // CameraX (used by AndroidCameraService + preview)
                 implementation("androidx.camera:camera-core:1.4.1")
@@ -97,7 +98,7 @@ kotlin {
 
 
                 // Koin for Android
-                implementation("io.insert-koin:koin-android:3.5.3")
+                implementation("io.insert-koin:koin-android:4.0.2")
 
                 // BiometricPrompt support
                 implementation("androidx.biometric:biometric:1.1.0")
@@ -106,7 +107,7 @@ kotlin {
 
         val desktopMain by getting {
             dependencies {
-                implementation("io.ktor:ktor-client-cio:2.3.5")
+                implementation("io.ktor:ktor-client-cio:3.1.1")
                 implementation(compose.desktop.currentOs)
                 // Webcam capture - JavaCV (used by DesktopCameraServiceImpl)
                 implementation("org.bytedeco:javacv-platform:1.5.10")
@@ -123,7 +124,7 @@ kotlin {
             iosSimulatorArm64Main.dependsOn(this)
 
             dependencies {
-                implementation("io.ktor:ktor-client-darwin:2.3.5")
+                implementation("io.ktor:ktor-client-darwin:3.1.1")
             }
         }
     }
@@ -131,7 +132,7 @@ kotlin {
 
 android {
     namespace = "com.fivucsas.mobile.shared"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         minSdk = 24
@@ -140,14 +141,6 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_21
         targetCompatibility = JavaVersion.VERSION_21
-    }
-
-    buildFeatures {
-        compose = true
-    }
-
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.8"
     }
 }
 
