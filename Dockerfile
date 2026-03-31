@@ -35,7 +35,7 @@ LABEL description="FIVUCSAS Facial Identity Verification - Desktop App Runtime"
 LABEL version="1.0.0"
 
 # Install runtime dependencies
-RUN apt-get update && apt-get install -y \
+RUN apt-get update && apt-get install -y --no-install-recommends \
     libx11-6 \
     libxext6 \
     libxrender1 \
