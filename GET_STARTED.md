@@ -1,148 +1,80 @@
-# 🚀 Get Started - FIVUCSAS Mobile App
+# Get Started - FIVUCSAS Client Apps
 
-Welcome! This is your **mobile-app** folder for the FIVUCSAS project.
+Welcome! This is the **client-apps** module for the FIVUCSAS project --- a Kotlin Multiplatform (KMP) application targeting Android, iOS, and Desktop.
 
-## 📋 What You Have
+## What You Have
 
-This folder is ready to become a Flutter cross-platform mobile application with:
+This project is a fully working Kotlin Multiplatform application with:
 
-- ✅ **README.md** - Detailed documentation about the mobile app
-- ✅ **QUICKSTART.md** - Quick setup and initialization guide
-- ✅ **.env.example** - Environment configuration template
-- ✅ **setup.bat** - Automated setup script for Windows
-- ✅ **FLUTTER_APP_GUIDE.md** - Complete implementation guide (in parent folder)
+- **shared/** -- Common business logic, ViewModels, UI components (Compose Multiplatform)
+- **androidApp/** -- Android application module
+- **desktopApp/** -- Desktop (JVM) application module
+- **iOS target** -- Ready for SwiftUI wrappers
 
-## 🎯 Quick Start (Choose Your Path)
+## Quick Start
 
-### 🎨 Option 1: Android Studio (RECOMMENDED) ⭐
+### Prerequisites
 
-**Best for:** Full IDE experience, visual tools, debugging
+- **JDK 17+** (Temurin/Corretto recommended)
+- **Android Studio Ladybug+** with Kotlin Multiplatform plugin
+- **Android SDK** (API 34+ recommended)
+- **Gradle 8.0+** (wrapper included)
 
-1. **Install Android Studio** from https://developer.android.com/studio
-2. **Install Flutter plugin** (File → Settings → Plugins → Search "Flutter")
-3. **Open** this folder in Android Studio
-4. **Follow** [ANDROID_STUDIO_SETUP.md](ANDROID_STUDIO_SETUP.md) for complete guide
+### Option 1: Android Studio (Recommended)
 
-**Advantages:**
+1. Open this folder in Android Studio
+2. Install the **Kotlin Multiplatform** plugin (Settings -> Plugins)
+3. Sync Gradle (automatic on open)
+4. Select `androidApp` run configuration
+5. Click Run
 
-- ✅ Visual interface
-- ✅ Built-in emulator
-- ✅ Hot reload UI button
-- ✅ Debugger tools
-- ✅ Flutter Inspector
-- ✅ Cross-platform (Android + iOS)
-
-### ⚡ Option 2: Automated Setup (Command Line)
-
-**Best for:** Quick setup via terminal
+### Option 2: Command Line
 
 ```bash
-# Just run the setup script
-setup.bat
+# Build Android debug APK
+./gradlew :androidApp:assembleDebug
+
+# Run desktop app
+./gradlew :desktopApp:run
+
+# Run shared module tests
+./gradlew :shared:testDebugUnitTest
 ```
 
-This will:
-
-- Check Flutter installation
-- Initialize the Flutter project
-- Create the project structure
-- Set up environment files
-- Get all dependencies
-
-### 💻 Option 3: Manual Setup
-
-**Best for:** VS Code users or manual control
-
-```bash
-# 1. Initialize Flutter project
-flutter create --org com.fivucsas --project-name fivucsas_mobile .
-
-# 2. Get dependencies
-flutter pub get
-
-# 3. Run the app
-flutter run
-```
-
-## 📚 Documentation Guide
-
-1. **GET_STARTED.md** (this file) - Start here!
-2. **ANDROID_STUDIO_SETUP.md** - Android Studio setup & workflow ⭐
-3. **QUICKSTART.md** - Detailed setup instructions
-4. **README.md** - Full mobile app documentation
-5. **../FLUTTER_APP_GUIDE.md** - Complete coding guide with examples
-
-## 🛠️ Prerequisites
-
-Before starting, make sure you have:
-
-### Required
-
-- [ ] **Flutter SDK 3.24+** - [Install Guide](https://docs.flutter.dev/get-started/install/windows)
-- [ ] **Dart SDK 3.5+** (comes with Flutter)
-- [ ] **Android Studio** with Android SDK
-- [ ] **Git**
-
-### Optional (but recommended)
-
-- [ ] **Android Studio** (Recommended! Best for Flutter) ⭐
-- [ ] **Visual Studio Code** with Flutter extension (Alternative)
-- [ ] **Xcode** (macOS only, for iOS development)
-- [ ] **Android Emulator** or physical device
-
-## ✅ Verify Installation
-
-Run this command to check your setup:
-
-```bash
-flutter doctor
-```
-
-Fix any issues before proceeding.
-
-## 🏗️ Project Structure (After Setup)
+## Project Structure
 
 ```
-mobile-app/
-├── android/                    # Android native code
-├── ios/                        # iOS native code
-├── lib/                        # Dart source code
-│   ├── core/                   # Core utilities
-│   │   ├── config/            # App configuration
-│   │   ├── constants/         # Constants
-│   │   ├── network/           # API client
-│   │   ├── theme/             # App theme
-│   │   ├── errors/            # Error handling
-│   │   └── utils/             # Utilities
-│   ├── features/              # Feature modules
-│   │   ├── auth/              # Authentication
-│   │   ├── biometric/         # Biometric features
-│   │   ├── home/              # Home screen
-│   │   └── profile/           # User profile
-│   ├── shared/                # Shared widgets
-│   ├── app.dart               # App widget
-│   ├── main.dart              # Entry point
-│   └── injection_container.dart  # Dependency injection
-├── assets/                    # Images, fonts, etc.
-├── test/                      # Tests
-├── pubspec.yaml              # Dependencies
-├── .env                       # Environment variables
-└── README.md                  # Documentation
+client-apps/
+├── shared/                        # Shared KMP module
+│   └── src/
+│       ├── commonMain/            # Common Kotlin code
+│       │   └── kotlin/com/fivucsas/shared/
+│       │       ├── config/        # AppConfig, UIDimens, BiometricConfig
+│       │       ├── domain/        # Models, use cases, repository interfaces
+│       │       ├── data/          # Repository implementations, API services
+│       │       ├── presentation/  # ViewModels, UI state classes
+│       │       ├── platform/      # Platform abstraction interfaces
+│       │       └── ui/            # Shared Compose UI (theme, components)
+│       └── commonTest/            # Shared unit tests
+├── androidApp/                    # Android application
+│   └── src/main/
+│       ├── kotlin/                # Android-specific code
+│       └── AndroidManifest.xml    # Permissions (CAMERA, INTERNET, RECORD_AUDIO, etc.)
+├── desktopApp/                    # Desktop (JVM) application
+│   └── src/desktopMain/kotlin/    # Desktop-specific code
+├── build.gradle.kts               # Root build configuration
+├── settings.gradle.kts            # Module declarations
+└── gradle.properties              # Kotlin/Compose versions
 ```
 
-## 🎨 Architecture
+## Architecture
 
-This app follows **Clean Architecture** with:
-
-- **BLoC Pattern** - State management
-- **Repository Pattern** - Data abstraction
-- **Use Cases** - Business logic
-- **Dependency Injection** - GetIt
+This app follows **Clean Architecture + MVVM** with Kotlin Multiplatform:
 
 ```
 ┌──────────────────────────────────┐
 │     Presentation Layer           │
-│  (BLoC + UI + Widgets)           │
+│  (Compose UI + ViewModels)       │
 └────────────┬─────────────────────┘
              │
 ┌────────────▼─────────────────────┐
@@ -152,247 +84,100 @@ This app follows **Clean Architecture** with:
              │
 ┌────────────▼─────────────────────┐
 │       Data Layer                 │
-│  (Models + Repositories + API)   │
+│  (Repositories + API clients)    │
 └──────────────────────────────────┘
 ```
 
-## 📱 Features to Implement
+- **ViewModels** in shared module (AdminViewModel, KioskViewModel)
+- **Compose Multiplatform** for shared UI
+- **Platform interfaces** (ICameraService, ILogger, ISecureStorage) for testability
 
-### Phase 1: Core Features
+## Features
 
-- [ ] User authentication (login/register)
-- [ ] JWT token management
-- [ ] Profile management
-- [ ] App navigation
+### Implemented
+- [x] Admin Dashboard (user management, analytics)
+- [x] Kiosk Mode (enrollment, verification)
+- [x] Face detection and liveness
+- [x] NFC document reading
+- [x] Voice verification
+- [x] FIDO2/WebAuthn integration (Credential Manager)
+- [x] Shared UI component library (Atomic Design)
+- [x] Centralized configuration system
+- [x] 50+ ViewModel unit tests
 
-### Phase 2: Biometric Features
+### Upcoming
+- [ ] iOS SwiftUI wrappers
+- [ ] Desktop NFC (javax.smartcardio)
+- [ ] Windows Hello (JNA)
+- [ ] Offline caching
 
-- [ ] Camera integration
-- [ ] Face detection with ML Kit
-- [ ] Biometric enrollment
-- [ ] Liveness detection (Biometric Puzzle)
-
-### Phase 3: Advanced Features
-
-- [ ] Offline support
-- [ ] Push notifications
-- [ ] QR code scanning
-- [ ] Biometric history
-
-## 🔧 Development Workflow
+## Development Workflow
 
 ### 1. Start Backend Services
 
-Before running the mobile app, start your backend:
-
 ```bash
 cd ../identity-core-api
-./gradlew bootRun
+docker compose -f docker-compose.prod.yml --env-file .env.prod up -d
 
 cd ../biometric-processor
-python -m uvicorn app.main:app --reload
+docker compose -f docker-compose.prod.yml --env-file .env.prod up -d
 ```
 
-### 2. Configure API Endpoints
-
-Edit `.env` file:
-
-```env
-# For Android Emulator
-API_BASE_URL=http://10.0.2.2:8080/api/v1
-
-# For iOS Simulator
-API_BASE_URL=http://localhost:8080/api/v1
-
-# For Physical Device (replace with your PC's IP)
-API_BASE_URL=http://192.168.1.100:8080/api/v1
-```
-
-### 3. Run the App
+### 2. Build and Run
 
 ```bash
-# List available devices
-flutter devices
+# Android (debug APK)
+./gradlew :androidApp:assembleDebug
 
-# Run on specific device
-flutter run -d <device-id>
+# Desktop
+./gradlew :desktopApp:run
 
-# Or just run (will prompt for device)
-flutter run
+# All tests
+./gradlew test
 ```
 
-### 4. Hot Reload
-
-While app is running:
-
-- Press `r` for hot reload
-- Press `R` for hot restart
-- Press `q` to quit
-
-## 🧪 Testing
+### 3. Common Tasks
 
 ```bash
-# Run all tests
-flutter test
+# Clean build
+./gradlew clean
 
-# Run with coverage
-flutter test --coverage
+# Check for dependency updates
+./gradlew dependencyUpdates
 
-# Run specific test
-flutter test test/features/auth/auth_bloc_test.dart
+# Lint
+./gradlew lint
 ```
 
-## 📦 Building for Production
+## Troubleshooting
 
-### Android
+### "SDK location not found"
+Set `ANDROID_HOME` environment variable or create `local.properties` with `sdk.dir=/path/to/android/sdk`.
 
+### Gradle sync fails
 ```bash
-# Build APK
-flutter build apk --release
-
-# Build App Bundle (for Play Store)
-flutter build appbundle --release
+./gradlew --stop
+./gradlew clean
+./gradlew :shared:compileKotlinAndroid
 ```
 
-### iOS
+### "Unable to connect to API"
+Check that backend services are running and API URLs in `AppConfig.kt` are correct.
 
-```bash
-# Build for iOS
-flutter build ios --release
+## Documentation
 
-# Build IPA
-flutter build ipa --release
-```
+1. **GET_STARTED.md** (this file) -- Start here
+2. **QUICKSTART.md** -- Detailed setup steps
+3. **QUICK_REFERENCE.md** -- Command reference and architecture overview
+4. **README.md** -- Full project documentation
 
-## 🐛 Common Issues & Solutions
+## Learning Resources
 
-### Issue: "Flutter command not found"
-
-**Solution:** Add Flutter to PATH
-
-```bash
-# Windows
-set PATH=%PATH%;C:\src\flutter\bin
-
-# Permanent: Add to System Environment Variables
-```
-
-### Issue: "Android licenses not accepted"
-
-**Solution:**
-
-```bash
-flutter doctor --android-licenses
-```
-
-### Issue: "Unable to connect to API"
-
-**Solutions:**
-
-1. Check backend is running
-2. Check firewall settings
-3. Use correct IP address:
-    - Android Emulator: `10.0.2.2`
-    - iOS Simulator: `localhost`
-    - Physical device: Your computer's IP
-
-### Issue: Build errors after adding dependencies
-
-**Solution:**
-
-```bash
-flutter clean
-flutter pub get
-flutter run
-```
-
-## 📖 Learning Resources
-
-### Flutter Basics
-
-- [Flutter Documentation](https://docs.flutter.dev/)
-- [Dart Language Tour](https://dart.dev/guides/language/language-tour)
-- [Flutter Widget Catalog](https://docs.flutter.dev/development/ui/widgets)
-
-### Architecture & Patterns
-
-- [BLoC Pattern](https://bloclibrary.dev/)
-- [Clean Architecture](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html)
-- [Flutter Best Practices](https://docs.flutter.dev/development/ui/layout/best-practices)
-
-### ML & Camera
-
-- [ML Kit Face Detection](https://developers.google.com/ml-kit/vision/face-detection)
-- [Camera Plugin](https://pub.dev/packages/camera)
-
-## 🆘 Need Help?
-
-1. **Check documentation:**
-    - QUICKSTART.md - Setup help
-    - README.md - Feature documentation
-    - FLUTTER_APP_GUIDE.md - Implementation guide
-
-2. **Common commands:**
-   ```bash
-   flutter doctor          # Check setup
-   flutter clean           # Clean build
-   flutter pub get         # Get dependencies
-   flutter analyze         # Check code
-   ```
-
-3. **Project documentation:**
-    - Main README: `../README.md`
-    - Implementation guide: `../IMPLEMENTATION_GUIDE.md`
-
-## 🎯 Next Steps
-
-1. ✅ **Read this file** (you're here!)
-2. 📦 **Run setup:** Execute `setup.bat` or follow QUICKSTART.md
-3. 🏃 **Test it:** Run `flutter run` to see the default app
-4. 📚 **Learn:** Read FLUTTER_APP_GUIDE.md for implementation
-5. 💻 **Code:** Start implementing features!
-
-## 🎨 Visual Studio Code Setup (Optional)
-
-Install these extensions for better development experience:
-
-1. **Flutter** - Dart Code
-2. **Dart** - Dart Code
-3. **Flutter Widget Snippets**
-4. **Awesome Flutter Snippets**
-5. **Error Lens**
-6. **Better Comments**
-
-### Recommended VS Code Settings
-
-Create `.vscode/settings.json`:
-
-```json
-{
-  "editor.formatOnSave": true,
-  "editor.codeActionsOnSave": {
-    "source.fixAll": true
-  },
-  "dart.lineLength": 80,
-  "dart.debugExternalPackageLibraries": true,
-  "dart.debugSdkLibraries": false
-}
-```
-
-## 🚀 Ready to Start?
-
-Run the setup script and start building your mobile app:
-
-```bash
-# Windows
-setup.bat
-
-# Then start coding!
-code .
-```
-
-**Good luck with your FIVUCSAS mobile app development!** 🎉
+- [Kotlin Multiplatform docs](https://kotlinlang.org/docs/multiplatform.html)
+- [Compose Multiplatform](https://www.jetbrains.com/compose-multiplatform/)
+- [Kotlin coroutines](https://kotlinlang.org/docs/coroutines-overview.html)
+- [Android Credential Manager (FIDO2)](https://developer.android.com/identity/sign-in/credential-manager)
 
 ---
 
-*Last updated: 2025-01-23*
+*Last updated: 2026-04-04*

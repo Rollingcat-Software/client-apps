@@ -1,403 +1,211 @@
-# Quick Start Guide - FIVUCSAS Mobile App
+# Quick Start Guide - FIVUCSAS Client Apps
 
-This guide will help you initialize and set up the Flutter mobile app in this folder.
+This guide will help you set up and build the Kotlin Multiplatform client applications.
 
 ## Prerequisites
 
-1. **Install Flutter SDK**
-    - Download from: https://docs.flutter.dev/get-started/install/windows
-    - Extract to `C:\src\flutter`
-    - Add to PATH: `C:\src\flutter\bin`
+1. **JDK 17+**
+   - Download from: https://adoptium.net/ (Eclipse Temurin recommended)
+   - Verify: `java -version`
 
-2. **Verify Installation**
+2. **Android SDK**
+   - Install via Android Studio or command-line tools
+   - Set `ANDROID_HOME` environment variable
+   - Install API 34+ via SDK Manager
+
+3. **Android Studio** (recommended)
+   - Download from: https://developer.android.com/studio
+   - Install Kotlin Multiplatform plugin
+
+4. **Verify Installation**
    ```bash
-   flutter doctor
+   java -version          # JDK 17+
+   echo $ANDROID_HOME     # Should point to Android SDK
+   ./gradlew --version    # Gradle wrapper
    ```
 
-## Step-by-Step Initialization
+## Step-by-Step Setup
 
-### 1. Initialize Flutter Project (in this folder)
-
-```bash
-# Navigate to mobile-app directory
-cd C:\Users\ahabg\OneDrive\Belgeler\GitHub\FIVUCSAS\mobile-app
-
-# Initialize Flutter project (this will create files in current directory)
-flutter create --org com.fivucsas --project-name fivucsas_mobile .
-
-# Get dependencies
-flutter pub get
-```
-
-### 2. Update pubspec.yaml
-
-Replace the contents of `pubspec.yaml` with:
-
-```yaml
-name: fivucsas_mobile
-description: FIVUCSAS Mobile Application for Biometric Authentication
-publish_to: 'none'
-version: 1.0.0+1
-
-environment:
-  sdk: '>=3.5.0 <4.0.0'
-  flutter: ">=3.24.0"
-
-dependencies:
-  flutter:
-    sdk: flutter
-  flutter_localizations:
-    sdk: flutter
-
-  # State Management
-  flutter_bloc: ^8.1.3
-  equatable: ^2.0.5
-  get_it: ^7.6.4
-
-  # Networking
-  dio: ^5.4.0
-  retrofit: ^4.0.3
-  retrofit_generator: ^8.0.6
-  pretty_dio_logger: ^1.3.1
-  json_annotation: ^4.8.1
-
-  # Local Storage
-  hive: ^2.2.3
-  hive_flutter: ^1.1.0
-  shared_preferences: ^2.2.2
-  flutter_secure_storage: ^9.0.0
-
-  # Camera & ML
-  camera: ^0.10.5+5
-  google_mlkit_face_detection: ^0.10.0
-  image: ^4.1.3
-
-  # UI Components
-  flutter_svg: ^2.0.9
-  lottie: ^2.7.0
-  shimmer: ^3.0.0
-  flutter_screenutil: ^5.9.0
-  cached_network_image: ^3.3.0
-  
-  # Utilities
-  intl: ^0.19.0
-  qr_code_scanner: ^1.0.1
-  permission_handler: ^11.1.0
-  connectivity_plus: ^5.0.2
-  path_provider: ^2.1.1
-  logger: ^2.0.2+1
-  dartz: ^0.10.1
-  encrypt: ^5.0.3
-
-dev_dependencies:
-  flutter_test:
-    sdk: flutter
-  flutter_lints: ^3.0.1
-  
-  # Code Generation
-  build_runner: ^2.4.6
-  json_serializable: ^6.7.1
-  hive_generator: ^2.0.1
-  
-  # Testing
-  mockito: ^5.4.3
-  bloc_test: ^9.1.5
-
-flutter:
-  uses-material-design: true
-  
-  assets:
-    - assets/images/
-    - assets/icons/
-    - assets/animations/
-```
-
-Then run:
+### 1. Clone and Open
 
 ```bash
-flutter pub get
+# If cloning the parent repo
+git clone --recurse-submodules <fivucsas-repo-url>
+cd fivucsas/client-apps
+
+# Or if already cloned
+cd client-apps
 ```
 
-### 3. Create Project Structure
+Open this folder in Android Studio as a Gradle project.
 
-**Windows PowerShell:**
+### 2. Sync Gradle
 
-```powershell
-# Navigate to lib directory
-cd lib
+Android Studio will auto-sync on open. If not:
+- File -> Sync Project with Gradle Files
+- Or from terminal: `./gradlew :shared:compileKotlinAndroid`
 
-# Create core directories
-New-Item -ItemType Directory -Force -Path "core\constants"
-New-Item -ItemType Directory -Force -Path "core\theme"
-New-Item -ItemType Directory -Force -Path "core\utils"
-New-Item -ItemType Directory -Force -Path "core\errors"
-New-Item -ItemType Directory -Force -Path "core\network"
-New-Item -ItemType Directory -Force -Path "core\config"
-
-# Create feature directories
-New-Item -ItemType Directory -Force -Path "features\auth\data\models"
-New-Item -ItemType Directory -Force -Path "features\auth\data\datasources"
-New-Item -ItemType Directory -Force -Path "features\auth\data\repositories"
-New-Item -ItemType Directory -Force -Path "features\auth\domain\entities"
-New-Item -ItemType Directory -Force -Path "features\auth\domain\repositories"
-New-Item -ItemType Directory -Force -Path "features\auth\domain\usecases"
-New-Item -ItemType Directory -Force -Path "features\auth\presentation\bloc"
-New-Item -ItemType Directory -Force -Path "features\auth\presentation\pages"
-New-Item -ItemType Directory -Force -Path "features\auth\presentation\widgets"
-
-New-Item -ItemType Directory -Force -Path "features\biometric\data\models"
-New-Item -ItemType Directory -Force -Path "features\biometric\data\datasources"
-New-Item -ItemType Directory -Force -Path "features\biometric\data\repositories"
-New-Item -ItemType Directory -Force -Path "features\biometric\data\services"
-New-Item -ItemType Directory -Force -Path "features\biometric\domain\entities"
-New-Item -ItemType Directory -Force -Path "features\biometric\domain\repositories"
-New-Item -ItemType Directory -Force -Path "features\biometric\domain\usecases"
-New-Item -ItemType Directory -Force -Path "features\biometric\presentation\bloc"
-New-Item -ItemType Directory -Force -Path "features\biometric\presentation\pages"
-New-Item -ItemType Directory -Force -Path "features\biometric\presentation\widgets"
-
-New-Item -ItemType Directory -Force -Path "features\home\presentation\pages"
-New-Item -ItemType Directory -Force -Path "features\home\presentation\widgets"
-
-New-Item -ItemType Directory -Force -Path "features\profile\data\models"
-New-Item -ItemType Directory -Force -Path "features\profile\data\datasources"
-New-Item -ItemType Directory -Force -Path "features\profile\data\repositories"
-New-Item -ItemType Directory -Force -Path "features\profile\domain\entities"
-New-Item -ItemType Directory -Force -Path "features\profile\domain\repositories"
-New-Item -ItemType Directory -Force -Path "features\profile\domain\usecases"
-New-Item -ItemType Directory -Force -Path "features\profile\presentation\bloc"
-New-Item -ItemType Directory -Force -Path "features\profile\presentation\pages"
-New-Item -ItemType Directory -Force -Path "features\profile\presentation\widgets"
-
-# Create shared directory
-New-Item -ItemType Directory -Force -Path "shared\widgets"
-
-# Go back to mobile-app root
-cd ..
-```
-
-**Or use CMD:**
-
-```cmd
-cd lib
-mkdir core\constants core\theme core\utils core\errors core\network core\config
-mkdir features\auth\data\models features\auth\data\datasources features\auth\data\repositories
-mkdir features\auth\domain\entities features\auth\domain\repositories features\auth\domain\usecases
-mkdir features\auth\presentation\bloc features\auth\presentation\pages features\auth\presentation\widgets
-mkdir features\biometric\data\models features\biometric\data\datasources features\biometric\data\repositories features\biometric\data\services
-mkdir features\biometric\domain\entities features\biometric\domain\repositories features\biometric\domain\usecases
-mkdir features\biometric\presentation\bloc features\biometric\presentation\pages features\biometric\presentation\widgets
-mkdir features\home\presentation\pages features\home\presentation\widgets
-mkdir features\profile\data\models features\profile\data\datasources features\profile\data\repositories
-mkdir features\profile\domain\entities features\profile\domain\repositories features\profile\domain\usecases
-mkdir features\profile\presentation\bloc features\profile\presentation\pages features\profile\presentation\widgets
-mkdir shared\widgets
-cd ..
-```
-
-### 4. Create Assets Directories
-
-```powershell
-New-Item -ItemType Directory -Force -Path "assets\images"
-New-Item -ItemType Directory -Force -Path "assets\icons"
-New-Item -ItemType Directory -Force -Path "assets\animations"
-New-Item -ItemType Directory -Force -Path "assets\fonts"
-```
-
-### 5. Verify Everything is Working
+### 3. Build Android APK
 
 ```bash
-# Check for issues
-flutter doctor
+# Debug build
+./gradlew :androidApp:assembleDebug
 
-# Run the app (connect a device or start emulator first)
-flutter run
+# APK location: androidApp/build/outputs/apk/debug/androidApp-debug.apk
 ```
 
-## Your Project Structure Should Look Like This:
+### 4. Run Desktop App
 
-```
-mobile-app/
-├── android/                    # Android-specific code
-├── ios/                        # iOS-specific code
-├── lib/
-│   ├── core/
-│   │   ├── config/
-│   │   ├── constants/
-│   │   ├── errors/
-│   │   ├── network/
-│   │   ├── theme/
-│   │   └── utils/
-│   ├── features/
-│   │   ├── auth/
-│   │   │   ├── data/
-│   │   │   ├── domain/
-│   │   │   └── presentation/
-│   │   ├── biometric/
-│   │   │   ├── data/
-│   │   │   ├── domain/
-│   │   │   └── presentation/
-│   │   ├── home/
-│   │   │   └── presentation/
-│   │   └── profile/
-│   │       ├── data/
-│   │       ├── domain/
-│   │       └── presentation/
-│   ├── shared/
-│   │   └── widgets/
-│   ├── app.dart
-│   ├── injection_container.dart
-│   └── main.dart
-├── assets/
-│   ├── images/
-│   ├── icons/
-│   ├── animations/
-│   └── fonts/
-├── test/
-├── pubspec.yaml
-├── README.md
-└── .env.example
+```bash
+./gradlew :desktopApp:run
 ```
 
-## Next Steps
+### 5. Run Tests
 
-1. Follow the detailed implementation guide in `../FLUTTER_APP_GUIDE.md`
-2. Start implementing features one by one:
-    - Core configuration
-    - Authentication feature
-    - Biometric feature
-    - UI components
+```bash
+# Shared module unit tests
+./gradlew :shared:testDebugUnitTest
+
+# All tests
+./gradlew test
+```
+
+## Project Structure
+
+```
+client-apps/
+├── shared/                           # Shared KMP module
+│   └── src/
+│       ├── commonMain/kotlin/com/fivucsas/shared/
+│       │   ├── config/              # AppConfig, UIDimens, BiometricConfig
+│       │   ├── domain/              # Models, use cases, repository interfaces
+│       │   ├── data/                # Repository impls, API services
+│       │   ├── presentation/        # ViewModels, UI state
+│       │   ├── platform/            # ICameraService, ILogger, ISecureStorage
+│       │   └── ui/                  # Shared Compose components
+│       │       ├── theme/           # AppColors, AppTypography, AppShapes
+│       │       └── components/      # atoms/, molecules/, organisms/
+│       └── commonTest/              # ViewModel tests + mocks
+├── androidApp/                      # Android app module
+│   └── src/main/
+│       ├── kotlin/                  # Android-specific implementations
+│       └── AndroidManifest.xml      # Permissions
+├── desktopApp/                      # Desktop (JVM) app module
+│   └── src/desktopMain/kotlin/      # Desktop-specific implementations
+├── build.gradle.kts
+├── settings.gradle.kts
+└── gradle.properties
+```
+
+## Configuration
+
+### API Endpoints
+
+Edit `shared/src/commonMain/kotlin/com/fivucsas/shared/config/AppConfig.kt`:
+
+```kotlin
+object Api {
+    const val BASE_URL = "https://auth.rollingcatsoftware.com/api/v1"
+    // For local development:
+    // const val BASE_URL = "http://10.0.2.2:8080/api/v1"  // Android emulator
+    // const val BASE_URL = "http://localhost:8080/api/v1"  // Desktop/iOS
+}
+```
+
+### Android Permissions
+
+The `AndroidManifest.xml` includes:
+- `INTERNET` -- API communication
+- `CAMERA` -- Face detection/enrollment
+- `RECORD_AUDIO` -- Voice verification
+- `NFC` -- Document reading
+
+## Build for Production
+
+### Android
+
+```bash
+# Release APK (requires signing config)
+./gradlew :androidApp:assembleRelease
+
+# GitHub Actions builds APK automatically on push to main
+```
+
+### Desktop
+
+```bash
+# Run
+./gradlew :desktopApp:run
+
+# Package (platform-specific installer)
+./gradlew :desktopApp:packageDistributionForCurrentOS
+```
 
 ## Useful Commands
 
 ```bash
 # Clean build
-flutter clean
+./gradlew clean
 
-# Get dependencies
-flutter pub get
+# Dependency tree
+./gradlew :shared:dependencies
 
-# Run code generation
-flutter pub run build_runner build --delete-conflicting-outputs
+# Run linter
+./gradlew lint
 
-# Run on specific device
-flutter devices
-flutter run -d <device-id>
+# Check for outdated dependencies
+./gradlew dependencyUpdates
 
-# Build APK
-flutter build apk --release
-
-# Check for outdated packages
-flutter pub outdated
-
-# Analyze code
-flutter analyze
-
-# Format code
-dart format lib/
-```
-
-## Testing Your Setup
-
-After initialization, test that everything works:
-
-```bash
-# Run the default Flutter app
-flutter run
-
-# You should see the default Flutter counter app
-# This confirms your setup is working correctly
-```
-
-## Environment Configuration
-
-Create `.env` file for development (copy from `.env.example`):
-
-```env
-API_BASE_URL=http://10.0.2.2:8080/api/v1
-BIOMETRIC_API_URL=http://10.0.2.2:8001/api/v1
-ENVIRONMENT=development
-```
-
-## Android Emulator Setup
-
-1. Open Android Studio
-2. Go to Tools > Device Manager
-3. Create a new Virtual Device
-4. Choose a device (Pixel 6 recommended)
-5. Choose Android API 34
-6. Click Finish
-
-Then run:
-
-```bash
-flutter emulators
-flutter emulators --launch <emulator-id>
-flutter run
-```
-
-## iOS Simulator Setup (macOS only)
-
-```bash
-# List simulators
-xcrun simctl list devices
-
-# Boot a simulator
-open -a Simulator
-
-# Run app
-flutter run
+# List all available tasks
+./gradlew tasks --all
 ```
 
 ## Troubleshooting
 
-### Issue: Flutter command not found
-
-**Solution:** Add Flutter to PATH
-
-```powershell
-$env:Path += ";C:\src\flutter\bin"
-```
-
-### Issue: Android licenses not accepted
-
-**Solution:**
-
+### Gradle sync fails
 ```bash
-flutter doctor --android-licenses
+./gradlew --stop
+./gradlew clean
+./gradlew :shared:compileKotlinAndroid
 ```
 
-### Issue: Gradle build errors
+### "SDK location not found"
+Create `local.properties` in the project root:
+```properties
+sdk.dir=/path/to/android/sdk
+```
 
-**Solution:**
-
+### Build errors after adding dependencies
 ```bash
-cd android
-.\gradlew clean
-cd ..
-flutter clean
-flutter pub get
+./gradlew clean
+./gradlew :androidApp:assembleDebug
 ```
 
-### Issue: iOS build errors
-
-**Solution:**
-
+### Desktop app crashes on launch
+Ensure JDK 17+ is used:
 ```bash
-cd ios
-pod deintegrate
-pod install
-cd ..
-flutter clean
-flutter pub get
+java -version
 ```
+
+## CI/CD
+
+Both Android and iOS builds run automatically via GitHub Actions:
+- **Android Build**: triggers on push to `main`, produces debug APK artifact
+- **iOS Build**: triggers on push to `main`, builds framework
+
+## Next Steps
+
+1. Read `README.md` for full documentation
+2. Explore the `shared/` module for business logic
+3. Check `QUICK_REFERENCE.md` for command cheatsheet
+4. Start backend services before running the app
 
 ## Support
 
-- Check the main guide: `../FLUTTER_APP_GUIDE.md`
-- Flutter documentation: https://docs.flutter.dev
-- FIVUCSAS README: `../README.md`
+- Architecture docs: `README.md`
+- Parent project: `../CLAUDE.md`
+- API docs: https://auth.rollingcatsoftware.com/swagger-ui.html
 
 ---
 
-**Ready to start coding? Follow the FLUTTER_APP_GUIDE.md for detailed implementation!** 🚀
+*Last updated: 2026-04-04*

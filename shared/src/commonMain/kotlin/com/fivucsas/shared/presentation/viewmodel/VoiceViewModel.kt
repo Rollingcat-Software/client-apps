@@ -2,6 +2,7 @@ package com.fivucsas.shared.presentation.viewmodel
 
 import com.fivucsas.shared.domain.repository.VoiceRepository
 import com.fivucsas.shared.presentation.state.VoiceMode
+import com.fivucsas.shared.presentation.state.VoiceSearchUiMatch
 import com.fivucsas.shared.presentation.state.VoiceSearchUiResult
 import com.fivucsas.shared.presentation.state.VoiceUiState
 import com.fivucsas.shared.presentation.state.VoiceVerifyUiResult

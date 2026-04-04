@@ -26,10 +26,18 @@ data class VoiceVerifyResponseDto(
 )
 
 @Serializable
+data class VoiceSearchMatchDto(
+    @SerialName("user_id")
+    val userId: String,
+    val similarity: Float = 0f
+)
+
+@Serializable
 data class VoiceSearchResponseDto(
     val found: Boolean = false,
     @SerialName("user_id")
     val userId: String? = null,
     val confidence: Float = 0f,
-    val message: String = ""
+    val message: String = "",
+    val matches: List<VoiceSearchMatchDto> = emptyList()
 )

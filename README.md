@@ -2,12 +2,13 @@
 
 **Cross-Platform Applications for Face and Identity Verification Using Cloud-based SaaS**
 
-## 🎯 Project Status
+## Project Status
 
-**Version:** 1.0.0
-**Status:** ✅ **PRODUCTION READY** (Architecture Refactored!)
+**Version:** 1.1.0
+**Status:** PRODUCTION READY (Phase 1 complete -- build fixes, FIDO2/WebAuthn, permissions)
 **Architecture:** Clean Architecture + MVVM + Kotlin Multiplatform
-**Platforms:** Desktop ✅, Android ✅, iOS (ready)
+**Platforms:** Android (APK releases), Desktop (JVM), iOS (CI ready)
+**CI/CD:** Android Build + iOS Build workflows GREEN (GitHub Actions, self-hosted runner)
 
 ---
 
@@ -189,30 +190,56 @@ Desktop implementations are in `desktopApp/.../platform/`.
 
 ---
 
-## 🚀 Getting Started
+## Recent Changes (Phase 1 -- 2026-04-04)
+
+- Build fixes: deprecated API migrations, Gradle compatibility
+- FIDO2/WebAuthn integration via Android Credential Manager (1,058 lines, 19 files)
+- RECORD_AUDIO permission added for voice verification
+- INTERNET permission fix (app was crashing without it)
+- Android + iOS CI workflows both GREEN
+
+## Getting Started
 
 ### Prerequisites
 
 - JDK 17+
-- Kotlin 1.9+
-- Gradle 8.0+
+- Kotlin 2.0+
+- Gradle 8.0+ (wrapper included)
+- Android SDK (API 34+)
 
 ### Build & Run
 
 ```bash
+# Android debug APK
+./gradlew :androidApp:assembleDebug
+
 # Desktop application
 ./gradlew :desktopApp:run
 
-# Android application
-./gradlew :androidApp:assembleDebug
-
-# Run tests
+# Run all tests
 ./gradlew test
+
+# Run shared module tests only
+./gradlew :shared:testDebugUnitTest
 ```
 
 ---
 
-## 📋 Recent Refactoring (Phase 0)
+## FIDO2/WebAuthn Integration
+
+The Android app integrates FIDO2/WebAuthn via the Credential Manager API:
+
+- Passkey registration and authentication
+- Platform authenticator (fingerprint/face unlock) support
+- Server-side challenge generation and verification
+- Integrated with the identity-core-api WebAuthn endpoints
+
+Key files:
+- `androidApp/.../fido2/` -- Credential Manager wrapper
+- `shared/.../domain/usecase/` -- WebAuthn use cases
+- `shared/.../data/remote/` -- API client for WebAuthn endpoints
+
+## Architecture Refactoring History (Phase 0)
 
 The codebase underwent a comprehensive 14-day architectural refactoring:
 
@@ -245,8 +272,8 @@ The codebase underwent a comprehensive 14-day architectural refactoring:
 
 Part of the FIVUCSAS platform developed at Marmara University.
 
-Copyright © 2025 FIVUCSAS Team. All rights reserved.
+Copyright 2025-2026 FIVUCSAS Team. All rights reserved.
 
 ---
 
-**Built with Kotlin Multiplatform** | FIVUCSAS Team © 2025
+**Built with Kotlin Multiplatform + Compose Multiplatform** | FIVUCSAS Team 2025-2026

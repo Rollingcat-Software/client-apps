@@ -18,9 +18,17 @@ data class VoiceVerifyResult(
     val message: String
 )
 
+data class VoiceSearchMatch(
+    val userId: String,
+    val similarity: Float,
+    val userName: String? = null,
+    val userEmail: String? = null
+)
+
 data class VoiceSearchResult(
     val found: Boolean,
     val userId: String?,
     val confidence: Float,
-    val message: String
+    val message: String,
+    val matches: List<VoiceSearchMatch> = emptyList()
 )
