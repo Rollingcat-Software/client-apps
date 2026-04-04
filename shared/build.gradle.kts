@@ -102,6 +102,10 @@ kotlin {
 
                 // BiometricPrompt support
                 implementation("androidx.biometric:biometric:1.1.0")
+
+                // AndroidX Credential Manager for WebAuthn/FIDO2 (passkeys)
+                implementation("androidx.credentials:credentials:1.5.0")
+                implementation("androidx.credentials:credentials-play-services-auth:1.5.0")
             }
         }
 

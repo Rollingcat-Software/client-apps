@@ -199,6 +199,11 @@ val networkModule = module {
     single<DeviceApi> { DeviceApiImpl(get(named("identityClient"))) }
     single<EnrollmentApi> { EnrollmentApiImpl(get(named("identityClient"))) }
 
+    // WebAuthn API for FIDO2 credential registration/verification
+    single<com.fivucsas.shared.data.remote.api.WebAuthnApi> {
+        com.fivucsas.shared.data.remote.api.WebAuthnApiImpl(get(named("identityClient")))
+    }
+
     // New API clients for voice, OTP, TOTP, dashboard
     single<com.fivucsas.shared.data.remote.api.VoiceApi> {
         com.fivucsas.shared.data.remote.api.VoiceApiImpl(get(named("identityClient")))

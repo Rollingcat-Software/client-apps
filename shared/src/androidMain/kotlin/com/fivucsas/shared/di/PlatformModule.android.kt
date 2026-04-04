@@ -3,6 +3,8 @@ package com.fivucsas.shared.di
 import com.fivucsas.shared.platform.AndroidCameraService
 import com.fivucsas.shared.platform.AndroidSecureStorage
 import com.fivucsas.shared.platform.FingerprintAuthenticator
+import com.fivucsas.shared.platform.WebAuthnAuthenticator
+import com.fivucsas.shared.platform.provideWebAuthnAuthenticator
 import com.fivucsas.shared.platform.AndroidTokenStorage
 import com.fivucsas.shared.platform.ICameraService
 import com.fivucsas.shared.platform.INetworkMonitor
@@ -51,6 +53,9 @@ actual val platformModule = module {
     }
 
     single<FingerprintAuthenticator> { providePlatformFingerprintAuthenticator() }
+
+    // WebAuthn authenticator — uses AndroidX Credential Manager for FIDO2 operations
+    single<WebAuthnAuthenticator> { provideWebAuthnAuthenticator() }
 
     // NFC Service — default no-op; overridden in androidApp with AndroidNfcService
     single<INfcService> {

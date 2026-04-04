@@ -163,6 +163,14 @@ val repositoryModule = module {
         )
     }
 
+    // WebAuthn Repository
+    single<com.fivucsas.shared.domain.repository.WebAuthnRepository> {
+        com.fivucsas.shared.data.repository.WebAuthnRepositoryImpl(
+            webAuthnApi = get<com.fivucsas.shared.data.remote.api.WebAuthnApi>(),
+            webAuthnAuthenticator = get()
+        )
+    }
+
     // Offline Cache
     single { OfflineCache(storage = get()) }
 }

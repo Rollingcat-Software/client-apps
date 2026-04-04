@@ -6,6 +6,8 @@ import com.fivucsas.shared.platform.ICameraService
 import com.fivucsas.shared.platform.DesktopCameraServiceImpl
 import com.fivucsas.shared.platform.DesktopTokenStorage
 import com.fivucsas.shared.platform.FingerprintAuthenticator
+import com.fivucsas.shared.platform.WebAuthnAuthenticator
+import com.fivucsas.shared.platform.provideWebAuthnAuthenticator
 import com.fivucsas.shared.platform.INetworkMonitor
 import com.fivucsas.shared.platform.ISecureStorage
 import com.fivucsas.shared.platform.IPushNotificationService
@@ -37,6 +39,7 @@ actual val platformModule = module {
     // Uses Java Preferences for persistent storage
     single { DesktopTokenStorage() } bind TokenStorage::class
     single<FingerprintAuthenticator> { providePlatformFingerprintAuthenticator() }
+    single<WebAuthnAuthenticator> { provideWebAuthnAuthenticator() }
     // Push notifications not supported on desktop
     single<IPushNotificationService> { NoOpPushNotificationService() }
     // Secure Storage for offline cache

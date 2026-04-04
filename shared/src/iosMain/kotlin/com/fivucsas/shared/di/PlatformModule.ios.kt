@@ -7,6 +7,8 @@ import com.fivucsas.shared.platform.INetworkMonitor
 import com.fivucsas.shared.platform.ISecureStorage
 import com.fivucsas.shared.platform.ILogger
 import com.fivucsas.shared.platform.FingerprintAuthenticator
+import com.fivucsas.shared.platform.WebAuthnAuthenticator
+import com.fivucsas.shared.platform.provideWebAuthnAuthenticator
 import com.fivucsas.shared.platform.IPushNotificationService
 import com.fivucsas.shared.platform.IosCameraService
 import com.fivucsas.shared.platform.IosSecureStorage
@@ -53,6 +55,9 @@ actual val platformModule = module {
 
     // Fingerprint Authenticator - iOS stub for now
     single<FingerprintAuthenticator> { providePlatformFingerprintAuthenticator() }
+
+    // WebAuthn Authenticator - stub until ASAuthorizationController is integrated
+    single<WebAuthnAuthenticator> { provideWebAuthnAuthenticator() }
 
     // Push Notification Service - stub until APNs is configured
     single<IPushNotificationService> { NoOpPushNotificationService() }

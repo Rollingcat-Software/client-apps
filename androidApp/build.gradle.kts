@@ -96,6 +96,10 @@ dependencies {
     // FIDO2 / Credential Manager for WebAuthn hardware token support
     implementation("com.google.android.gms:play-services-fido:21.1.0")
 
+    // AndroidX Credential Manager for WebAuthn (passkeys, platform & cross-platform authenticators)
+    implementation("androidx.credentials:credentials:1.5.0")
+    implementation("androidx.credentials:credentials-play-services-auth:1.5.0")
+
     // Koin for Android
     implementation("io.insert-koin:koin-android:4.0.2")
     implementation("io.insert-koin:koin-androidx-compose:4.0.2")

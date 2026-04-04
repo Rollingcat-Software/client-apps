@@ -1,11 +1,17 @@
 package com.fivucsas.shared.presentation.viewmodel
 
+import com.fivucsas.shared.data.local.TokenManager
+import com.fivucsas.shared.domain.repository.WebAuthnRepository
+import com.fivucsas.shared.domain.repository.WebAuthnStep
+import com.fivucsas.shared.platform.FingerprintAuthException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 /**
  * WebAuthn credential info displayed on screen.
@@ -28,95 +34,164 @@ data class HardwareTokenUiState(
     val isRegistered: Boolean = false,
     val isVerified: Boolean = false,
     val errorMessage: String? = null,
-    val successMessage: String? = null
+    val successMessage: String? = null,
+    val stepDescription: String? = null
 )
 
 /**
  * ViewModel for hardware token (WebAuthn cross-platform) registration and verification.
  *
- * Uses Android's Credential Manager API or FIDO2 API for cross-platform
- * authenticator attachment (e.g., YubiKey, hardware security keys).
+ * Uses WebAuthnRepository to coordinate the full FIDO2 flow:
+ * 1. Fetch challenge from server
+ * 2. Invoke Android Credential Manager (platform or cross-platform authenticator)
+ * 3. Send attestation/assertion back to server for verification
  *
- * Registration flow:
- * 1. Request creation options from server
- * 2. Call FIDO2 API with authenticatorAttachment: "cross-platform"
- * 3. Send attestation response to server
- *
- * Verification flow:
- * 1. Request assertion options from server
- * 2. Call FIDO2 API to get assertion
- * 3. Send assertion response to server
+ * The authenticatorAttachment can be set to "platform" (fingerprint/face) or
+ * "cross-platform" (USB/NFC security keys like YubiKey).
  */
-class HardwareTokenViewModel {
-    private val viewModelScope = CoroutineScope(Dispatchers.Main)
+class HardwareTokenViewModel(
+    private val webAuthnRepository: WebAuthnRepository,
+    private val tokenManager: TokenManager
+) {
+    private val viewModelScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 
     private val _uiState = MutableStateFlow(HardwareTokenUiState())
     val uiState: StateFlow<HardwareTokenUiState> = _uiState.asStateFlow()
 
     /**
-     * Start hardware token registration.
-     * In production, this would:
-     * 1. Fetch challenge from server (GET /api/v1/webauthn/register/options)
-     * 2. Call Android FIDO2 / Credential Manager API
-     * 3. Send attestation to server (POST /api/v1/webauthn/register/verify)
+     * Register a cross-platform hardware security key (USB/NFC/BLE).
      */
     fun register() {
+        registerWithAttachment("cross-platform", "Security Key")
+    }
+
+    /**
+     * Register a platform authenticator (fingerprint/face unlock).
+     */
+    fun registerPlatform() {
+        registerWithAttachment("platform", "Android Biometric")
+    }
+
+    private fun registerWithAttachment(attachment: String, deviceName: String) {
+        val userId = tokenManager.getUserId()
+        if (userId.isNullOrBlank()) {
+            _uiState.update {
+                it.copy(errorMessage = "Not logged in. Please sign in first.")
+            }
+            return
+        }
+
         _uiState.update {
             it.copy(
                 isRegistering = true,
                 errorMessage = null,
-                successMessage = null
+                successMessage = null,
+                stepDescription = "Preparing..."
             )
         }
 
-        // Simulate registration flow for now.
-        // Real implementation requires Activity context (Android-specific),
-        // so the actual FIDO2 call is triggered from the Screen composable.
-        _uiState.update {
-            it.copy(
-                isRegistering = false,
-                isRegistered = true,
-                credential = HardwareTokenCredential(
-                    credentialId = "pending-fido2-integration",
-                    publicKeyAlgorithm = "ES256",
-                    attestationFormat = "packed",
-                    transports = listOf("usb", "nfc", "ble"),
-                    registeredAt = "Pending FIDO2 integration"
-                ),
-                successMessage = "Hardware token registration requires FIDO2 API integration. " +
-                        "Connect a hardware security key (e.g., YubiKey) via USB, NFC, or BLE."
+        viewModelScope.launch {
+            val result = webAuthnRepository.registerCredential(
+                userId = userId,
+                authenticatorAttachment = attachment,
+                deviceName = deviceName,
+                onStep = { step ->
+                    _uiState.update {
+                        it.copy(stepDescription = stepToDescription(step))
+                    }
+                }
+            )
+
+            result.fold(
+                onSuccess = { createResult ->
+                    _uiState.update {
+                        it.copy(
+                            isRegistering = false,
+                            isRegistered = true,
+                            stepDescription = null,
+                            credential = HardwareTokenCredential(
+                                credentialId = createResult.credentialId.take(32) + "...",
+                                publicKeyAlgorithm = createResult.publicKeyAlgorithm,
+                                attestationFormat = createResult.attestationFormat,
+                                transports = createResult.transports.split(",").filter { t -> t.isNotBlank() },
+                                registeredAt = "Just now"
+                            ),
+                            successMessage = "Credential registered successfully!"
+                        )
+                    }
+                },
+                onFailure = { throwable ->
+                    _uiState.update {
+                        it.copy(
+                            isRegistering = false,
+                            stepDescription = null,
+                            errorMessage = mapErrorMessage(throwable)
+                        )
+                    }
+                }
             )
         }
     }
 
     /**
-     * Start hardware token verification.
-     * In production, this would:
-     * 1. Fetch assertion challenge from server
-     * 2. Call FIDO2 API for cross-platform assertion
-     * 3. Send assertion to server for verification
+     * Verify (authenticate) using an existing WebAuthn credential.
      */
     fun verify() {
-        _uiState.update {
-            it.copy(
-                isVerifying = true,
-                errorMessage = null,
-                successMessage = null
-            )
+        val userId = tokenManager.getUserId()
+        if (userId.isNullOrBlank()) {
+            _uiState.update {
+                it.copy(errorMessage = "Not logged in. Please sign in first.")
+            }
+            return
         }
 
         _uiState.update {
             it.copy(
-                isVerifying = false,
-                isVerified = true,
-                successMessage = "Hardware token verification requires FIDO2 API integration. " +
-                        "Use your registered security key to authenticate."
+                isVerifying = true,
+                errorMessage = null,
+                successMessage = null,
+                stepDescription = "Preparing..."
+            )
+        }
+
+        viewModelScope.launch {
+            val result = webAuthnRepository.verifyCredential(
+                userId = userId,
+                allowCredentialIds = emptyList(),
+                onStep = { step ->
+                    _uiState.update {
+                        it.copy(stepDescription = stepToDescription(step))
+                    }
+                }
+            )
+
+            result.fold(
+                onSuccess = {
+                    _uiState.update {
+                        it.copy(
+                            isVerifying = false,
+                            isVerified = true,
+                            stepDescription = null,
+                            successMessage = "Hardware token verified successfully!"
+                        )
+                    }
+                },
+                onFailure = { throwable ->
+                    _uiState.update {
+                        it.copy(
+                            isVerifying = false,
+                            stepDescription = null,
+                            errorMessage = mapErrorMessage(throwable)
+                        )
+                    }
+                }
             )
         }
     }
 
     /**
      * Called from the Android screen after a successful FIDO2 registration.
+     * Kept for backward compatibility with direct Credential Manager calls from UI.
      */
     fun onRegistrationComplete(
         credentialId: String,
@@ -172,5 +247,24 @@ class HardwareTokenViewModel {
 
     fun reset() {
         _uiState.value = HardwareTokenUiState()
+    }
+
+    private fun stepToDescription(step: WebAuthnStep): String = when (step) {
+        WebAuthnStep.FetchingOptions -> "Requesting challenge from server..."
+        WebAuthnStep.WaitingForAuthenticator -> "Waiting for authenticator..."
+        WebAuthnStep.VerifyingWithServer -> "Verifying with server..."
+        WebAuthnStep.Complete -> "Complete!"
+    }
+
+    private fun mapErrorMessage(throwable: Throwable): String {
+        if (throwable is FingerprintAuthException) return throwable.message ?: "WebAuthn operation failed."
+        val msg = throwable.message ?: "Unknown error"
+        return when {
+            msg.contains("cancelled", ignoreCase = true) -> "Operation was cancelled."
+            msg.contains("timeout", ignoreCase = true) -> "Operation timed out. Please try again."
+            msg.contains("not supported", ignoreCase = true) -> "WebAuthn is not supported on this device."
+            msg.contains("no credential", ignoreCase = true) -> "No matching credential found. Register first."
+            else -> "WebAuthn error: $msg"
+        }
     }
 }
