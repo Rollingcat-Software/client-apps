@@ -444,6 +444,28 @@ enum class StringKey {
     AUDIT_COLUMN_STATUS,
     AUDIT_LOAD_MORE,
     NO_AUDIT_LOGS,
+
+    // Verification Pipeline (Phase 2.2)
+    VERIFICATION_DASHBOARD_TITLE,
+    VERIFICATION_DASHBOARD_SUBTITLE,
+    VERIFICATION_NO_SESSIONS,
+    VERIFICATION_SESSION,
+    VERIFICATION_SESSION_ID,
+    VERIFICATION_USER_ID,
+    VERIFICATION_STARTED,
+    VERIFICATION_COMPLETED_AT,
+    VERIFICATION_LEVEL,
+    VERIFICATION_PROGRESS,
+    VERIFICATION_STEPS,
+    VERIFICATION_CONFIDENCE,
+    VERIFICATION_STEP_SKIPPED,
+    VERIFICATION_STATUS_PENDING,
+    VERIFICATION_STATUS_IN_PROGRESS,
+    VERIFICATION_STATUS_COMPLETED,
+    VERIFICATION_STATUS_FAILED,
+    VERIFICATION_STATUS_EXPIRED,
+    VERIFICATION_FILTER_ALL,
+    NAV_VERIFICATION,
 }
 
 private val enStrings = mapOf(
@@ -852,6 +874,28 @@ private val enStrings = mapOf(
     StringKey.AUDIT_COLUMN_STATUS to "Status",
     StringKey.AUDIT_LOAD_MORE to "Load More",
     StringKey.NO_AUDIT_LOGS to "No audit logs found",
+
+    // Verification Pipeline (Phase 2.2)
+    StringKey.VERIFICATION_DASHBOARD_TITLE to "Verification Sessions",
+    StringKey.VERIFICATION_DASHBOARD_SUBTITLE to "Track identity verification sessions and results",
+    StringKey.VERIFICATION_NO_SESSIONS to "No verification sessions",
+    StringKey.VERIFICATION_SESSION to "Verification Session",
+    StringKey.VERIFICATION_SESSION_ID to "Session ID",
+    StringKey.VERIFICATION_USER_ID to "User ID",
+    StringKey.VERIFICATION_STARTED to "Started",
+    StringKey.VERIFICATION_COMPLETED_AT to "Completed",
+    StringKey.VERIFICATION_LEVEL to "Verification Level",
+    StringKey.VERIFICATION_PROGRESS to "Progress",
+    StringKey.VERIFICATION_STEPS to "Verification Steps",
+    StringKey.VERIFICATION_CONFIDENCE to "Confidence",
+    StringKey.VERIFICATION_STEP_SKIPPED to "SKIPPED",
+    StringKey.VERIFICATION_STATUS_PENDING to "PENDING",
+    StringKey.VERIFICATION_STATUS_IN_PROGRESS to "IN PROGRESS",
+    StringKey.VERIFICATION_STATUS_COMPLETED to "COMPLETED",
+    StringKey.VERIFICATION_STATUS_FAILED to "FAILED",
+    StringKey.VERIFICATION_STATUS_EXPIRED to "EXPIRED",
+    StringKey.VERIFICATION_FILTER_ALL to "All",
+    StringKey.NAV_VERIFICATION to "Verification",
 )
 
 private val trStrings = mapOf(
