@@ -19,9 +19,9 @@ actual fun createPlatformServiceFactory(): PlatformServiceFactory {
 }
 
 class IosPlatformServiceFactory : PlatformServiceFactory {
-    override fun createCameraService(): ICameraService = StubCameraService()
-    override fun createLogger(): ILogger = IosStubLogger()
-    override fun createSecureStorage(): ISecureStorage = StubSecureStorage()
+    override fun createCameraService(): ICameraService = IosCameraService()
+    override fun createLogger(): ILogger = IosLogger()
+    override fun createSecureStorage(): ISecureStorage = IosSecureStorage()
     override fun createNavigationService(): INavigationService = StubNavigationService()
     override fun createDialogService(): IDialogService = StubDialogService()
     override fun createNotificationService(): INotificationService = StubNotificationService()

@@ -37,7 +37,9 @@ actual val platformModule = module {
     // Token Storage
     // Uses Java Preferences for persistent storage
     single { DesktopTokenStorage() } bind TokenStorage::class
+    // Fingerprint — software ECDSA P-256 authenticator (PKCS12 key store)
     single<FingerprintAuthenticator> { providePlatformFingerprintAuthenticator() }
+    // WebAuthn — software-based credential store with ECDSA signing
     single<WebAuthnAuthenticator> { provideWebAuthnAuthenticator() }
     // Push notifications not supported on desktop
     single<IPushNotificationService> { NoOpPushNotificationService() }

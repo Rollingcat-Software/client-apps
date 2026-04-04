@@ -14,7 +14,10 @@ import com.fivucsas.shared.ui.screen.MissingRouteScreen
 import com.fivucsas.shared.ui.screen.OnboardingScreen
 import com.fivucsas.shared.ui.screen.RegisterScreen
 import com.fivucsas.shared.ui.screen.SplashScreen
+import com.fivucsas.shared.ui.screen.DeveloperPortalScreen
 import com.fivucsas.shared.ui.screen.WidgetDemoScreen
+import com.fivucsas.shared.presentation.viewmodel.DeveloperPortalViewModel
+import org.koin.mp.KoinPlatform.getKoin
 
 data class AppStartState(
     val isFirstLaunch: Boolean,
@@ -151,6 +154,14 @@ private fun AppNavigation(
         AppRoute.WidgetDemo -> WidgetDemoScreen(
             onBack = { navigator.pop() }
         )
+
+        AppRoute.DeveloperPortal -> {
+            val viewModel: DeveloperPortalViewModel = getKoin().get()
+            DeveloperPortalScreen(
+                viewModel = viewModel,
+                onBack = { navigator.pop() }
+            )
+        }
 
         else -> {
             val content = platformRoutes[route.id]

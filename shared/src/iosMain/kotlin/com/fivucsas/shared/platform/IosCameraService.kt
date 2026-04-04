@@ -3,15 +3,21 @@ package com.fivucsas.shared.platform
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.suspendCancellableCoroutine
 import platform.AVFoundation.*
 import platform.CoreMedia.*
 import platform.CoreVideo.*
 import platform.Foundation.NSError
 import platform.UIKit.UIDevice
+import platform.UIKit.UIImage
+import platform.UIKit.UIImageJPEGRepresentation
 import kotlinx.cinterop.*
 import platform.darwin.NSObject
+import platform.darwin.dispatch_get_main_queue
 import platform.CoreGraphics.*
 import platform.Foundation.NSData
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
 
 /**
  * iOS Camera Service Implementation
@@ -45,6 +51,12 @@ class IosCameraService : ICameraService {
 
     private var previewWidth: Int = 1920
     private var previewHeight: Int = 1080
+
+    /** Delegate that captures a single photo and resumes a continuation. */
+    private var photoCaptureDelegate: PhotoCaptureDelegate? = null
+
+    /** Delegate that captures the latest video sample buffer. */
+    private var videoSampleDelegate: VideoSampleDelegate? = null
 
     override suspend fun initialize(lensFacing: LensFacing): Result<Unit> {
         return try {
@@ -89,6 +101,12 @@ class IosCameraService : ICameraService {
             videoOut.videoSettings = mapOf(
                 kCVPixelBufferPixelFormatTypeKey to kCVPixelFormatType_32BGRA
             )
+            videoOut.alwaysDiscardsLateVideoFrames = true
+
+            // Attach a sample buffer delegate so captureFrame() can grab the latest frame
+            val sampleDelegate = VideoSampleDelegate()
+            videoSampleDelegate = sampleDelegate
+            videoOut.setSampleBufferDelegate(sampleDelegate, dispatch_get_main_queue())
 
             if (session.canAddOutput(videoOut)) {
                 session.addOutput(videoOut)
@@ -144,15 +162,32 @@ class IosCameraService : ICameraService {
             val output = photoOutput
                 ?: return Result.failure(Exception("Photo output not initialized"))
 
-            // Create photo settings
             val settings = AVCapturePhotoSettings.photoSettings()
 
-            // Note: Actual photo capture requires callback implementation
-            // This is a simplified version - in production, use AVCapturePhotoCaptureDelegate
-            // For now, return failure with instruction
-            _cameraState.value = CameraState.Previewing
-            Result.failure(Exception("Photo capture requires Swift/Objective-C delegate implementation"))
+            val imageBytes = suspendCancellableCoroutine<ByteArray> { continuation ->
+                val delegate = PhotoCaptureDelegate { data, error ->
+                    if (data != null) {
+                        val uiImage = UIImage(data = data)
+                        val jpegData = UIImageJPEGRepresentation(uiImage, 0.85)
+                        if (jpegData != null) {
+                            val bytes = ByteArray(jpegData.length.toInt())
+                            jpegData.getBytes(bytes.refTo(0), jpegData.length)
+                            continuation.resume(bytes)
+                        } else {
+                            continuation.resumeWithException(Exception("JPEG conversion failed"))
+                        }
+                    } else {
+                        continuation.resumeWithException(
+                            Exception("Photo capture failed: ${error?.localizedDescription ?: "unknown"}")
+                        )
+                    }
+                }
+                photoCaptureDelegate = delegate
+                output.capturePhotoWithSettings(settings, delegate = delegate)
+            }
 
+            _cameraState.value = CameraState.Previewing
+            Result.success(imageBytes)
         } catch (e: Exception) {
             _cameraState.value = CameraState.Error(e)
             Result.failure(e)
@@ -163,14 +198,14 @@ class IosCameraService : ICameraService {
         return try {
             _cameraState.value = CameraState.Capturing
 
-            val output = videoOutput
-                ?: return Result.failure(Exception("Video output not initialized"))
+            val delegate = videoSampleDelegate
+                ?: return Result.failure(Exception("Video output delegate not initialized"))
 
-            // Note: Frame capture requires sample buffer delegate
-            // This is a simplified version
+            val imageData = delegate.lastFrameAsJpeg()
+                ?: return Result.failure(Exception("No frame available yet — camera may still be starting"))
+
             _cameraState.value = CameraState.Previewing
-            Result.failure(Exception("Frame capture requires Swift/Objective-C delegate implementation"))
-
+            Result.success(imageData)
         } catch (e: Exception) {
             _cameraState.value = CameraState.Error(e)
             Result.failure(e)
@@ -198,6 +233,8 @@ class IosCameraService : ICameraService {
             currentInput = null
             photoOutput = null
             videoOutput = null
+            photoCaptureDelegate = null
+            videoSampleDelegate = null
 
             _cameraState.value = CameraState.Released
         } catch (e: Exception) {
@@ -233,4 +270,68 @@ class IosCameraService : ICameraService {
             position
         )
     }
+}
+
+/**
+ * AVCapturePhotoCaptureDelegate implementation via Kotlin/Native.
+ *
+ * Receives the captured photo data and forwards it to the provided callback.
+ */
+@OptIn(ExperimentalForeignApi::class)
+private class PhotoCaptureDelegate(
+    private val onCapture: (NSData?, NSError?) -> Unit
+) : NSObject(), AVCapturePhotoCaptureDelegateProtocol {
+
+    override fun captureOutput(
+        output: AVCapturePhotoOutput,
+        didFinishProcessingPhoto: AVCapturePhoto,
+        error: NSError?
+    ) {
+        val data = didFinishProcessingPhoto.fileDataRepresentation()
+        onCapture(data, error)
+    }
+}
+
+/**
+ * AVCaptureVideoDataOutputSampleBufferDelegate implementation.
+ *
+ * Holds the latest video frame so captureFrame() can grab it on demand
+ * without blocking on a callback.
+ */
+@OptIn(ExperimentalForeignApi::class)
+private class VideoSampleDelegate : NSObject(), AVCaptureVideoDataOutputSampleBufferDelegateProtocol {
+
+    private var latestImageData: ByteArray? = null
+
+    override fun captureOutput(
+        output: AVCaptureOutput,
+        didOutputSampleBuffer: CMSampleBufferRef?,
+        fromConnection: AVCaptureConnection
+    ) {
+        val sampleBuffer = didOutputSampleBuffer ?: return
+        val imageBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) ?: return
+
+        CVPixelBufferLockBaseAddress(imageBuffer, 0u)
+
+        val ciImage = platform.CoreImage.CIImage(cVPixelBuffer = imageBuffer)
+        val context = platform.CoreImage.CIContext()
+        val cgImage = context.createCGImage(ciImage, fromRect = ciImage.extent)
+
+        CVPixelBufferUnlockBaseAddress(imageBuffer, 0u)
+
+        if (cgImage != null) {
+            val uiImage = UIImage(cGImage = cgImage)
+            val jpegData = UIImageJPEGRepresentation(uiImage, 0.80)
+            if (jpegData != null) {
+                val bytes = ByteArray(jpegData.length.toInt())
+                jpegData.getBytes(bytes.refTo(0), jpegData.length)
+                latestImageData = bytes
+            }
+        }
+    }
+
+    /**
+     * Returns the latest captured frame as JPEG bytes, or null if no frame yet.
+     */
+    fun lastFrameAsJpeg(): ByteArray? = latestImageData
 }

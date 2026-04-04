@@ -53,10 +53,10 @@ actual val platformModule = module {
     // Logger - Singleton for centralized logging
     single<ILogger> { IosLogger() }
 
-    // Fingerprint Authenticator - iOS stub for now
+    // Fingerprint Authenticator - real LocalAuthentication (Face ID / Touch ID) + Keychain keys
     single<FingerprintAuthenticator> { providePlatformFingerprintAuthenticator() }
 
-    // WebAuthn Authenticator - stub until ASAuthorizationController is integrated
+    // WebAuthn Authenticator - real ASAuthorizationController passkeys (iOS 16+)
     single<WebAuthnAuthenticator> { provideWebAuthnAuthenticator() }
 
     // Push Notification Service - stub until APNs is configured
