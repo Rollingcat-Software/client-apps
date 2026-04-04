@@ -25,5 +25,16 @@
 # Compose
 -dontwarn androidx.compose.**
 
+# FIDO2 / Credential Manager
+-keep class com.google.android.gms.fido.** { *; }
+-keep class androidx.credentials.** { *; }
+-dontwarn androidx.credentials.**
+
+# CameraX
+-keep class androidx.camera.** { *; }
+
+# Coil
+-dontwarn coil.**
+
 # SLF4J
 -dontwarn org.slf4j.impl.StaticLoggerBinder

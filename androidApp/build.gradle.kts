@@ -12,8 +12,8 @@ android {
         applicationId = "com.fivucsas.mobile"
         minSdk = 24
         targetSdk = 35
-        versionCode = 1
-        versionName = "1.0.0-MVP"
+        versionCode = 2
+        versionName = "2.0.0"
 
         vectorDrawables {
             useSupportLibrary = true
@@ -45,6 +45,7 @@ android {
     buildTypes {
         release {
             isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
