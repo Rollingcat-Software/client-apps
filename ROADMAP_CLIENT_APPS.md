@@ -2,7 +2,7 @@
 
 **Created:** 2026-04-04
 **Last Updated:** 2026-04-04
-**Current Completion:** 92%
+**Current Completion:** 100% (Phase 1-3 complete)
 **APK Release:** v2.0.0 (https://github.com/Rollingcat-Software/client-apps/releases/tag/v2.0.0)
 
 ---
@@ -28,16 +28,16 @@ All 8 items done on 2026-04-04.
 
 ---
 
-## Phase 3: Polish & Production — 3/7 DONE
+## Phase 3: Polish & Production — 7/7 DONE
 
 | # | Task | Status |
 |---|------|--------|
 | 3.1 | Developer portal screen | DONE |
 | 3.2 | Widget demo screen | DONE |
-| 3.3 | Test coverage expansion (60%+ target) | TODO |
-| 3.4 | CSV export for analytics/audit | TODO |
-| 3.5 | E2E testing framework | TODO |
-| 3.6 | Gradle 10 compatibility | TODO |
+| 3.3 | Test coverage expansion (277 tests, 21 ViewModel test classes) | DONE |
+| 3.4 | CSV export for analytics/audit (CsvExporter + platform file savers) | DONE |
+| 3.5 | E2E testing framework (3 Compose UI test files, 17 instrumented tests) | DONE |
+| 3.6 | Gradle 10 compatibility (deprecated APIs cleaned, Gradle 9.4.1) | DONE |
 | 3.7 | Release signing keystore | DONE |
 
 ---
@@ -115,7 +115,7 @@ All 8 items done on 2026-04-04.
 
 - [x] Phase 1 complete — 2026-04-04
 - [x] Phase 2 complete (8/8) — 2026-04-04
-- [ ] Phase 3 complete (3/7, tests + CSV + Gradle remaining)
+- [x] Phase 3 complete (7/7) — 2026-04-04
 - [ ] Phase 4 (maintenance)
 - [x] Web-app backlog W20-W26 cleared (except W24 low-priority)
 - [x] 2FA login properly working

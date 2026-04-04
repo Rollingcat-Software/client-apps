@@ -4,6 +4,8 @@ import com.fivucsas.shared.data.local.TokenStorage
 import com.fivucsas.shared.platform.DefaultNetworkMonitor
 import com.fivucsas.shared.platform.ICameraService
 import com.fivucsas.shared.platform.INetworkMonitor
+import com.fivucsas.shared.platform.IFileSaver
+import com.fivucsas.shared.platform.IosFileSaver
 import com.fivucsas.shared.platform.ISecureStorage
 import com.fivucsas.shared.platform.ILogger
 import com.fivucsas.shared.platform.FingerprintAuthenticator
@@ -67,4 +69,6 @@ actual val platformModule = module {
 
     // NFC Service — no-op on iOS until Core NFC is integrated
     single<INfcService> { NoOpNfcService() }
+    // File Saver — writes to temp directory for share sheet presentation
+    single<IFileSaver> { IosFileSaver() }
 }

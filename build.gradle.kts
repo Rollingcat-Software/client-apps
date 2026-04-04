@@ -8,10 +8,3 @@ plugins {
     id("org.jetbrains.compose").version("1.7.3").apply(false)
 }
 
-allprojects {
-    repositories {
-        google()
-        mavenCentral()
-        gradlePluginPortal()
-    }
-}

@@ -14,5 +14,9 @@ data class AuditLogDashboardUiState(
 
     // Pagination
     val currentPage: Int = 0,
-    val hasMorePages: Boolean = true
+    val hasMorePages: Boolean = true,
+
+    // CSV export state
+    val isExporting: Boolean = false,
+    val exportSuccessMessage: String? = null
 )

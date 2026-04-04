@@ -10,6 +10,8 @@ import com.fivucsas.shared.platform.WebAuthnAuthenticator
 import com.fivucsas.shared.platform.provideWebAuthnAuthenticator
 import com.fivucsas.shared.platform.INetworkMonitor
 import com.fivucsas.shared.platform.ISecureStorage
+import com.fivucsas.shared.platform.IFileSaver
+import com.fivucsas.shared.platform.DesktopFileSaver
 import com.fivucsas.shared.platform.IPushNotificationService
 import com.fivucsas.shared.platform.NoOpPushNotificationService
 import com.fivucsas.shared.platform.providePlatformFingerprintAuthenticator
@@ -47,4 +49,6 @@ actual val platformModule = module {
     single<ISecureStorage> { com.fivucsas.shared.platform.factory.DesktopSecureStorage() }
     // Network Monitor — always-online default on desktop
     single<INetworkMonitor> { DefaultNetworkMonitor() }
+    // File Saver — JFileChooser save dialog for CSV export
+    single<IFileSaver> { DesktopFileSaver() }
 }

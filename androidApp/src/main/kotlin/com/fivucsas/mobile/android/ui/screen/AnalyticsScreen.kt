@@ -16,6 +16,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Login
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Error
@@ -297,7 +298,7 @@ fun AnalyticsScreen(
                     ActivityCard(
                         title = s(StringKey.ANALYTICS_LOGINS_TODAY),
                         value = stats?.loginsToday?.toString() ?: "0",
-                        icon = Icons.Default.Login,
+                        icon = Icons.AutoMirrored.Filled.Login,
                         color = BlueInfo,
                         modifier = Modifier.weight(1f)
                     )

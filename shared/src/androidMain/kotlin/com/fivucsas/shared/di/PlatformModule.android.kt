@@ -8,6 +8,8 @@ import com.fivucsas.shared.platform.provideWebAuthnAuthenticator
 import com.fivucsas.shared.platform.AndroidTokenStorage
 import com.fivucsas.shared.platform.ICameraService
 import com.fivucsas.shared.platform.INetworkMonitor
+import com.fivucsas.shared.platform.IFileSaver
+import com.fivucsas.shared.platform.AndroidFileSaver
 import com.fivucsas.shared.platform.INfcService
 import com.fivucsas.shared.platform.IPushNotificationService
 import com.fivucsas.shared.platform.ISecureStorage
@@ -78,4 +80,7 @@ actual val platformModule = module {
     single<INetworkMonitor> {
         com.fivucsas.shared.platform.DefaultNetworkMonitor()
     }
+
+    // File Saver — writes CSV to public Downloads directory
+    single<IFileSaver> { AndroidFileSaver(androidContext()) }
 }
