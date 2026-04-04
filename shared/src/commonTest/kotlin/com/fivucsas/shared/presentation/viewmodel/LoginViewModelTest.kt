@@ -3,6 +3,7 @@ package com.fivucsas.shared.presentation.viewmodel
 import com.fivucsas.shared.data.local.OfflineCache
 import com.fivucsas.shared.domain.model.UserRole
 import com.fivucsas.shared.domain.usecase.auth.LoginUseCase
+import com.fivucsas.shared.platform.IPushNotificationService
 import com.fivucsas.shared.platform.ISecureStorage
 import com.fivucsas.shared.presentation.state.LoginState
 import com.fivucsas.shared.presentation.viewmodel.auth.LoginViewModel
@@ -39,7 +40,7 @@ class LoginViewModelTest {
         fakeRepository = FakeAuthRepository()
         loginUseCase = LoginUseCase(fakeRepository)
         offlineCache = OfflineCache(InMemorySecureStorage())
-        viewModel = LoginViewModel(loginUseCase, offlineCache)
+        viewModel = LoginViewModel(loginUseCase, offlineCache, FakePushService())
     }
 
     @AfterTest
@@ -204,9 +205,12 @@ class LoginViewModelTest {
     }
 }
 
-/**
- * In-memory ISecureStorage implementation for testing.
- */
+private class FakePushService : IPushNotificationService {
+    override suspend fun registerToken(userId: String, token: String) {}
+    override suspend fun getToken(): String? = null
+    override fun isSupported(): Boolean = false
+}
+
 private class InMemorySecureStorage : ISecureStorage {
     private val stringStore = mutableMapOf<String, String>()
     private val boolStore = mutableMapOf<String, Boolean>()

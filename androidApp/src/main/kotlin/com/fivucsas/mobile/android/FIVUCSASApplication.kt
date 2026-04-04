@@ -35,7 +35,7 @@ class FIVUCSASApplication : Application() {
         // Android-app-specific module: overrides shared no-op services with real implementations
         val androidAppModule = module {
             single<INfcService> { AndroidNfcService(androidContext()) }
-            single<IPushNotificationService> { AndroidPushNotificationService() }
+            single<IPushNotificationService> { AndroidPushNotificationService(get()) }
             single<INetworkMonitor> { AndroidNetworkMonitor(androidContext()) }
         }
 

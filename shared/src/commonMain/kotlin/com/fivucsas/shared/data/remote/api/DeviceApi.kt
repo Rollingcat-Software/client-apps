@@ -10,9 +10,16 @@ import com.fivucsas.shared.data.remote.dto.WebAuthnCredentialDto
  * - GET    /devices?userId={userId}                    → getDevices()
  * - DELETE /devices/{id}                               → removeDevice()
  * - GET    /devices/webauthn/credentials/{userId}      → getWebAuthnCredentials()
+ * - POST   /devices/push-token                         → registerPushToken()
  */
 interface DeviceApi {
     suspend fun getDevices(userId: String): List<DeviceDto>
     suspend fun removeDevice(deviceId: String)
     suspend fun getWebAuthnCredentials(userId: String): List<WebAuthnCredentialDto>
+
+    /**
+     * Register a push notification token for the given user.
+     * Backend uses this to send push-based auth approval requests.
+     */
+    suspend fun registerPushToken(userId: String, token: String, platform: String)
 }

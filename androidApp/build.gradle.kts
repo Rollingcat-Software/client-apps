@@ -2,6 +2,7 @@
     kotlin("android")
     kotlin("plugin.compose")
     id("com.android.application")
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -116,6 +117,10 @@ dependencies {
     // Koin for Android
     implementation("io.insert-koin:koin-android:4.0.2")
     implementation("io.insert-koin:koin-androidx-compose:4.0.2")
+
+    // Firebase (Cloud Messaging for push notifications)
+    implementation(platform("com.google.firebase:firebase-bom:33.7.0"))
+    implementation("com.google.firebase:firebase-messaging")
 
     // BouncyCastle for NFC SOD validation (e-Passport/eID)
     implementation("org.bouncycastle:bcprov-jdk18on:1.78.1")

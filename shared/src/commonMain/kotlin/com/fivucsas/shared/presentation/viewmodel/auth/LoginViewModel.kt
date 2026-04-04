@@ -3,6 +3,7 @@ package com.fivucsas.shared.presentation.viewmodel.auth
 import com.fivucsas.shared.data.local.OfflineCache
 import com.fivucsas.shared.domain.model.UserRole
 import com.fivucsas.shared.domain.usecase.auth.LoginUseCase
+import com.fivucsas.shared.platform.IPushNotificationService
 import com.fivucsas.shared.presentation.state.LoginState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -10,7 +11,8 @@ import kotlinx.coroutines.flow.asStateFlow
 
 class LoginViewModel(
     private val loginUseCase: LoginUseCase,
-    private val offlineCache: OfflineCache
+    private val offlineCache: OfflineCache,
+    private val pushService: IPushNotificationService
 ) {
     private val _state = MutableStateFlow(LoginState())
     val state: StateFlow<LoginState> = _state.asStateFlow()
@@ -32,6 +34,9 @@ class LoginViewModel(
                     isSuccess = true,
                     role = UserRole.fromString(tokens.role)
                 )
+
+                // Register FCM push token with the backend (fire-and-forget)
+                registerPushToken(tokens.userId)
             },
             onFailure = { error ->
                 _state.value = LoginState(
@@ -40,6 +45,20 @@ class LoginViewModel(
                 )
             }
         )
+    }
+
+    /**
+     * Register the device push token with the backend after login.
+     * Best-effort: failures are silently ignored (user can still use the app).
+     */
+    private suspend fun registerPushToken(userId: String) {
+        if (!pushService.isSupported()) return
+        try {
+            val token = pushService.getToken() ?: return
+            pushService.registerToken(userId, token)
+        } catch (_: Exception) {
+            // Non-critical — push notifications are a convenience feature
+        }
     }
 
     /**
@@ -76,7 +95,5 @@ class LoginViewModel(
         _state.value = _state.value.copy(error = null)
     }
 
-    fun resetState() {
-        _state.value = LoginState()
-    }
+    fun resetState(){_state.value=LoginState()}
 }

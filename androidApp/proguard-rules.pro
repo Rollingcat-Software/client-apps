@@ -36,5 +36,9 @@
 # Coil
 -dontwarn coil.**
 
+# Firebase Cloud Messaging
+-keep class com.google.firebase.** { *; }
+-dontwarn com.google.firebase.**
+
 # SLF4J
 -dontwarn org.slf4j.impl.StaticLoggerBinder
