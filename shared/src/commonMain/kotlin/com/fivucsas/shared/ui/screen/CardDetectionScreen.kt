@@ -327,7 +327,7 @@ private fun CardResultView(
                 // Confidence bar
                 Spacer(modifier = Modifier.height(4.dp))
                 LinearProgressIndicator(
-                    progress = result.confidence.coerceIn(0f, 1f),
+                    progress = { result.confidence.coerceIn(0f, 1f) },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(8.dp),

@@ -297,7 +297,7 @@ fun VoiceVerifyScreen(
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     LinearProgressIndicator(
-                        progress = result.confidence.coerceIn(0f, 1f),
+                        progress = { result.confidence.coerceIn(0f, 1f) },
                         modifier = Modifier.fillMaxWidth().height(8.dp),
                         color = if (result.confidence >= 0.7f)
                             MaterialTheme.colorScheme.primary

@@ -15,7 +15,6 @@ import com.fivucsas.shared.platform.NoOpPushNotificationService
 import com.fivucsas.shared.platform.providePlatformFingerprintAuthenticator
 import org.koin.dsl.bind
 import org.koin.dsl.module
-import org.koin.dsl.single
 
 /**
  * Desktop Platform Module

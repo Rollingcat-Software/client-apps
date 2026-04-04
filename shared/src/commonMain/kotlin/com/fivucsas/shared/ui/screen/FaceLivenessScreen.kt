@@ -206,9 +206,11 @@ private fun LivenessChallengeView(
                 Spacer(modifier = Modifier.height(8.dp))
 
                 LinearProgressIndicator(
-                    progress = if (uiState.totalSteps > 0)
-                        uiState.completedSteps.toFloat() / uiState.totalSteps
-                    else 0f,
+                    progress = {
+                        if (uiState.totalSteps > 0)
+                            uiState.completedSteps.toFloat() / uiState.totalSteps
+                        else 0f
+                    },
                     modifier = Modifier.fillMaxWidth(),
                     color = MaterialTheme.colorScheme.primary
                 )
@@ -510,7 +512,7 @@ private fun ScoreRow(label: String, score: Float) {
         )
     }
     LinearProgressIndicator(
-        progress = score.coerceIn(0f, 1f),
+        progress = { score.coerceIn(0f, 1f) },
         modifier = Modifier
             .fillMaxWidth()
             .height(8.dp),

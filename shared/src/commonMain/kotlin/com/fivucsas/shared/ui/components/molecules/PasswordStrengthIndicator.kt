@@ -39,7 +39,7 @@ fun PasswordStrengthIndicator(
         }
         Spacer(modifier = Modifier.height(6.dp))
         LinearProgressIndicator(
-            progress = progress,
+            progress = { progress },
             color = color,
             trackColor = AppColors.Gray200,
             modifier = Modifier.fillMaxWidth()
