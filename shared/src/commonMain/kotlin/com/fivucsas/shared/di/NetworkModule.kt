@@ -9,6 +9,8 @@ import com.fivucsas.shared.data.remote.api.AuthApi
 import com.fivucsas.shared.data.remote.api.AuthApiImpl
 import com.fivucsas.shared.data.remote.api.AuthFlowApi
 import com.fivucsas.shared.data.remote.api.AuthFlowApiImpl
+import com.fivucsas.shared.data.remote.api.AuthSessionApi
+import com.fivucsas.shared.data.remote.api.AuthSessionApiImpl
 import com.fivucsas.shared.data.remote.api.BiometricApi
 import com.fivucsas.shared.data.remote.api.BiometricApiImpl
 import com.fivucsas.shared.data.remote.api.DeviceApi
@@ -196,6 +198,7 @@ val networkModule = module {
     single<RootAdminApi> { RootAdminApiImpl(get(named("identityClient"))) }
     single<AuthFlowApi> { AuthFlowApiImpl(get(named("identityClient"))) }
     single<SessionApi> { SessionApiImpl(get(named("identityClient"))) }
+    single<AuthSessionApi> { AuthSessionApiImpl(get(named("identityClient"))) }
     single<DeviceApi> { DeviceApiImpl(get(named("identityClient"))) }
     single<EnrollmentApi> { EnrollmentApiImpl(get(named("identityClient"))) }
 

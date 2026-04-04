@@ -75,6 +75,7 @@ object RouteIds {
     const val DESKTOP_REQUEST_MEMBERSHIP = "desktop/request-membership"
 
     const val VOICE_AUTH = "voice-auth"
+    const val VOICE_SEARCH = "voice-search"
     const val EMAIL_OTP = "email-otp"
     const val SMS_OTP = "sms-otp"
     const val TOTP_ENROLL = "totp-enroll"

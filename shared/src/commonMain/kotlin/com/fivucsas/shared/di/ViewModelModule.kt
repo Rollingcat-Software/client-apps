@@ -5,6 +5,7 @@ import com.fivucsas.shared.presentation.viewmodel.AuthFlowViewModel
 import com.fivucsas.shared.presentation.viewmodel.BiometricBackupViewModel
 import com.fivucsas.shared.presentation.viewmodel.DeviceViewModel
 import com.fivucsas.shared.presentation.viewmodel.EnrollmentViewModel
+import com.fivucsas.shared.presentation.viewmodel.MultiStepAuthViewModel
 import com.fivucsas.shared.presentation.viewmodel.IdentifyViewModel
 import com.fivucsas.shared.presentation.viewmodel.InviteViewModel
 import com.fivucsas.shared.presentation.viewmodel.KioskViewModel
@@ -56,4 +57,5 @@ val viewModelModule = module {
     factoryOf(::CardDetectionViewModel)
     factoryOf(::HardwareTokenViewModel)
     factoryOf(::BiometricBackupViewModel)
+    factoryOf(::MultiStepAuthViewModel)
 }

@@ -141,6 +141,7 @@ sealed class Screen(val route: String) {
     object VoiceAuth : Screen("${RouteIds.VOICE_AUTH}/{userId}") {
         fun createRoute(userId: String) = "${RouteIds.VOICE_AUTH}/$userId"
     }
+    object VoiceSearch : Screen(RouteIds.VOICE_SEARCH)
     object EmailOtp : Screen("${RouteIds.EMAIL_OTP}/{userId}") {
         fun createRoute(userId: String) = "${RouteIds.EMAIL_OTP}/$userId"
     }
@@ -810,6 +811,7 @@ fun AppNavigation() {
                 onNavigateToHelp = { navController.navigate(Screen.Help.route) },
                 onNavigateToAbout = { navController.navigate(Screen.About.route) },
                 onNavigateToVoiceAuth = { navController.navigate(Screen.VoiceAuth.createRoute(tokenManager?.getUserId() ?: "me")) },
+                onNavigateToVoiceSearch = { navController.navigate(Screen.VoiceSearch.route) },
                 onNavigateToEmailOtp = { navController.navigate(Screen.EmailOtp.createRoute(tokenManager?.getUserId() ?: "me")) },
                 onNavigateToSmsOtp = { navController.navigate(Screen.SmsOtp.createRoute(tokenManager?.getUserId() ?: "me")) },
                 onNavigateToTotpEnroll = { navController.navigate(Screen.TotpEnroll.createRoute(tokenManager?.getUserId() ?: "me")) },
@@ -1362,6 +1364,21 @@ fun AppNavigation() {
             val viewModel = koinInject<com.fivucsas.shared.presentation.viewmodel.VoiceViewModel>()
             VoiceEnrollScreen(
                 userId = userId,
+                viewModel = viewModel,
+                onNavigateBack = { navController.popBackStack() }
+            )
+        }
+
+        // Voice Search (1:N speaker identification) screen
+        composable(route = Screen.VoiceSearch.route) {
+            if (!isAuthenticated()) {
+                LaunchedEffect(Unit) {
+                    navController.navigate(Screen.Login.route) { popUpTo(0) { inclusive = true } }
+                }
+                return@composable
+            }
+            val viewModel = koinInject<com.fivucsas.shared.presentation.viewmodel.VoiceViewModel>()
+            com.fivucsas.mobile.android.ui.screen.AndroidVoiceSearchScreen(
                 viewModel = viewModel,
                 onNavigateBack = { navController.popBackStack() }
             )

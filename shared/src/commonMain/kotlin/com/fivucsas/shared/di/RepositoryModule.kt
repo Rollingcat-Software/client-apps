@@ -6,6 +6,7 @@ import com.fivucsas.shared.data.local.StepUpTokenManager
 import com.fivucsas.shared.data.remote.api.AuthBiometricApi
 import com.fivucsas.shared.data.remote.api.AuthApi
 import com.fivucsas.shared.data.remote.api.AuthFlowApi
+import com.fivucsas.shared.data.remote.api.AuthSessionApi
 import com.fivucsas.shared.data.remote.api.RootAdminApi
 import com.fivucsas.shared.data.remote.api.BiometricApi
 import com.fivucsas.shared.data.remote.api.DeviceApi
@@ -15,6 +16,7 @@ import com.fivucsas.shared.data.remote.api.InviteApi
 import com.fivucsas.shared.data.remote.api.SessionApi
 import com.fivucsas.shared.data.remote.api.TenantSettingsApi
 import com.fivucsas.shared.data.repository.AuthFlowRepositoryImpl
+import com.fivucsas.shared.data.repository.AuthSessionRepositoryImpl
 import com.fivucsas.shared.data.repository.AuthRepositoryImpl
 import com.fivucsas.shared.data.repository.BiometricRepositoryImpl
 import com.fivucsas.shared.data.repository.DeviceRepositoryImpl
@@ -27,6 +29,7 @@ import com.fivucsas.shared.data.repository.QrLoginRepositoryImpl
 import com.fivucsas.shared.data.repository.RootAdminRepositoryImpl
 import com.fivucsas.shared.data.repository.UserRepositoryImpl
 import com.fivucsas.shared.domain.repository.AuthFlowRepository
+import com.fivucsas.shared.domain.repository.AuthSessionRepository
 import com.fivucsas.shared.domain.repository.AuthRepository
 import com.fivucsas.shared.domain.repository.BiometricRepository
 import com.fivucsas.shared.domain.repository.DeviceRepository
@@ -111,6 +114,13 @@ val repositoryModule = module {
     single<AuthFlowRepository> {
         AuthFlowRepositoryImpl(
             authFlowApi = get<AuthFlowApi>()
+        )
+    }
+
+    // Auth Session Repository (multi-step auth flow)
+    single<AuthSessionRepository> {
+        AuthSessionRepositoryImpl(
+            authSessionApi = get<AuthSessionApi>()
         )
     }
 

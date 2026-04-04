@@ -64,6 +64,7 @@ fun SettingsScreen(
     onNavigateToHelp: () -> Unit,
     onNavigateToAbout: () -> Unit,
     onNavigateToVoiceAuth: () -> Unit = {},
+    onNavigateToVoiceSearch: () -> Unit = {},
     onNavigateToEmailOtp: () -> Unit = {},
     onNavigateToSmsOtp: () -> Unit = {},
     onNavigateToTotpEnroll: () -> Unit = {},
@@ -267,7 +268,7 @@ fun SettingsScreen(
             // Authentication Methods
             ExpandableCard(
                 title = s(StringKey.BIOMETRIC_AUTH),
-                subtitle = "Voice, OTP, TOTP, Liveness, Card, Token"
+                subtitle = "Voice, Voice Search, OTP, TOTP, Liveness, Card, Token"
             ) {
                 Text(
                     text = s(StringKey.VOICE_RECOGNITION),
@@ -277,6 +278,15 @@ fun SettingsScreen(
                         .fillMaxWidth()
                         .padding(vertical = 6.dp)
                         .clickable { onNavigateToVoiceAuth() }
+                )
+                Text(
+                    text = s(StringKey.VOICE_SEARCH_TITLE),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = AppColors.Primary,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 6.dp)
+                        .clickable { onNavigateToVoiceSearch() }
                 )
                 Text(
                     text = s(StringKey.EMAIL_OTP),

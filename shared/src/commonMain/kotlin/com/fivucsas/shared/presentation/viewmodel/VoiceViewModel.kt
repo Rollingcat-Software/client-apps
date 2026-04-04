@@ -106,7 +106,15 @@ class VoiceViewModel(
                                 found = result.found,
                                 userId = result.userId,
                                 confidence = result.confidence,
-                                message = result.message
+                                message = result.message,
+                                matches = result.matches.map { m ->
+                                    VoiceSearchUiMatch(
+                                        userId = m.userId,
+                                        similarity = m.similarity,
+                                        userName = m.userName,
+                                        userEmail = m.userEmail
+                                    )
+                                }
                             )
                         )
                     }

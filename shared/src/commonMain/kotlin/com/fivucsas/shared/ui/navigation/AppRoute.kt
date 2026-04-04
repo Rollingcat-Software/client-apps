@@ -43,6 +43,7 @@ sealed class AppRoute(val id: String) {
     data class BiometricVerify(val userId: String) : AppRoute(BIOMETRIC_VERIFY)
 
     data class VoiceVerify(val userId: String) : AppRoute(RouteIds.VOICE_AUTH)
+    object VoiceSearch : AppRoute(RouteIds.VOICE_SEARCH)
     object FaceLiveness : AppRoute(RouteIds.LIVENESS_PUZZLE)
     object CardDetection : AppRoute(RouteIds.CARD_DETECTION)
 
