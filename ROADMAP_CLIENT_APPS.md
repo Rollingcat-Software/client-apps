@@ -24,9 +24,9 @@
 
 | # | Task | Effort | Priority | Status |
 |---|------|--------|----------|--------|
-| 2.1 | Multi-step auth flow UI (orchestrator + step progress indicator) | 8-10 hrs | HIGH | TODO |
+| 2.1 | Multi-step auth flow UI (orchestrator + step progress indicator) | 8-10 hrs | HIGH | DONE |
 | 2.2 | Verification pipeline screens (8 screens: doc scan, OCR results, face match, data verify, address proof, watchlist, age verify, video interview) | 12-15 hrs | HIGH | TODO |
-| 2.3 | Voice search UI (1:N speaker identification screen with results) | 8-12 hrs | HIGH | TODO |
+| 2.3 | Voice search UI (1:N speaker identification screen with results) | 8-12 hrs | HIGH | DONE |
 | 2.4 | Step-up authentication screen (challenge UI, multi-factor confirmation) | 6-8 hrs | HIGH | TODO |
 | 2.5 | Role/permission management UI (admin CRUD for roles + permissions) | 8-10 hrs | MEDIUM | TODO |
 | 2.6 | Audit log admin dashboard (full audit view, not just user activity) | 6-8 hrs | MEDIUM | TODO |
