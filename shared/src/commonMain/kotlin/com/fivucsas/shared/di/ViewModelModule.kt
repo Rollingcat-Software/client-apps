@@ -24,6 +24,7 @@ import com.fivucsas.shared.presentation.viewmodel.auth.ChangePasswordViewModel
 import com.fivucsas.shared.presentation.viewmodel.auth.FingerprintViewModel
 import com.fivucsas.shared.presentation.viewmodel.auth.LoginViewModel
 import com.fivucsas.shared.presentation.viewmodel.auth.QrLoginViewModel
+import com.fivucsas.shared.presentation.viewmodel.DeveloperPortalViewModel
 import com.fivucsas.shared.presentation.viewmodel.auth.RegisterViewModel
 import org.koin.core.module.dsl.factoryOf
 import org.koin.dsl.module
@@ -58,4 +59,5 @@ val viewModelModule = module {
     factoryOf(::HardwareTokenViewModel)
     factoryOf(::BiometricBackupViewModel)
     factoryOf(::MultiStepAuthViewModel)
+    factoryOf(::DeveloperPortalViewModel)
 }

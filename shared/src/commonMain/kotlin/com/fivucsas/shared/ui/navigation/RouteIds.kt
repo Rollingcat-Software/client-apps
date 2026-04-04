@@ -112,4 +112,14 @@ object RouteIds {
 
     // Embeddable Auth Widget (WebView)
     const val AUTH_WIDGET = "auth-widget"
+
+    // Verification Pipeline (Phase 2.2)
+    const val VERIFICATION_DASHBOARD = "verification-dashboard"
+    const val VERIFICATION_SESSION_DETAIL = "verification-session-detail"
+
+    // Widget Demo (Phase 3.2)
+    const val WIDGET_DEMO = "widget-demo"
+
+    // Developer Portal
+    const val DEVELOPER_PORTAL = "developer-portal"
 }

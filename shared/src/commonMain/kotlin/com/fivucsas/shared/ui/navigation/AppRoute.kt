@@ -56,6 +56,12 @@ sealed class AppRoute(val id: String) {
         val userId: String? = null
     ) : AppRoute(RouteIds.AUTH_WIDGET)
 
+    object VerificationDashboard : AppRoute(RouteIds.VERIFICATION_DASHBOARD)
+    data class VerificationSessionDetail(val sessionId: String) : AppRoute(RouteIds.VERIFICATION_SESSION_DETAIL)
+
+    object WidgetDemo : AppRoute(RouteIds.WIDGET_DEMO)
+    object DeveloperPortal : AppRoute(RouteIds.DEVELOPER_PORTAL)
+
     data class Platform(val key: String) : AppRoute(key)
 
     companion object {

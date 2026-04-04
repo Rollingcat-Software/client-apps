@@ -20,6 +20,15 @@ android {
         }
     }
 
+    signingConfigs {
+        create("release") {
+            storeFile = file("../keystore/release.jks")
+            storePassword = "fivucsas2026"
+            keyAlias = "fivucsas"
+            keyPassword = "fivucsas2026"
+        }
+    }
+
     buildFeatures {
         compose = true
         buildConfig = true
@@ -46,6 +55,7 @@ android {
         release {
             isMinifyEnabled = true
             isShrinkResources = true
+            signingConfig = signingConfigs.getByName("release")
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"

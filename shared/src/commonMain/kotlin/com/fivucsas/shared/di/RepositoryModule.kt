@@ -181,6 +181,13 @@ val repositoryModule = module {
         )
     }
 
+    // OAuth2 Client Repository (Developer Portal)
+    single<com.fivucsas.shared.domain.repository.OAuth2ClientRepository> {
+        com.fivucsas.shared.data.repository.OAuth2ClientRepositoryImpl(
+            oAuth2ClientApi = get<com.fivucsas.shared.data.remote.api.OAuth2ClientApi>()
+        )
+    }
+
     // Offline Cache
     single { OfflineCache(storage = get()) }
 }

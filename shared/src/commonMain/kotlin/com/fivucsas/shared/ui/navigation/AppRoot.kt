@@ -14,6 +14,7 @@ import com.fivucsas.shared.ui.screen.MissingRouteScreen
 import com.fivucsas.shared.ui.screen.OnboardingScreen
 import com.fivucsas.shared.ui.screen.RegisterScreen
 import com.fivucsas.shared.ui.screen.SplashScreen
+import com.fivucsas.shared.ui.screen.WidgetDemoScreen
 
 data class AppStartState(
     val isFirstLaunch: Boolean,
@@ -146,6 +147,10 @@ private fun AppNavigation(
                 onBack = { navigator.pop() }
             )
         }
+
+        AppRoute.WidgetDemo -> WidgetDemoScreen(
+            onBack = { navigator.pop() }
+        )
 
         else -> {
             val content = platformRoutes[route.id]

@@ -220,4 +220,14 @@ val networkModule = module {
     single<com.fivucsas.shared.data.remote.api.DashboardApi> {
         com.fivucsas.shared.data.remote.api.DashboardApiImpl(get(named("identityClient")))
     }
+
+    // Verification Pipeline API
+    single<com.fivucsas.shared.data.remote.api.VerificationApi> {
+        com.fivucsas.shared.data.remote.api.VerificationApiImpl(get(named("identityClient")))
+    }
+
+    // OAuth2 Client API (Developer Portal)
+    single<com.fivucsas.shared.data.remote.api.OAuth2ClientApi> {
+        com.fivucsas.shared.data.remote.api.OAuth2ClientApiImpl(get(named("identityClient")))
+    }
 }
