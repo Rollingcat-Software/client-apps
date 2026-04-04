@@ -42,13 +42,13 @@
 
 | # | Task | Effort | Priority | Status |
 |---|------|--------|----------|--------|
-| 3.1 | Developer portal screen (SDK docs, API key management) | 10-15 hrs | MEDIUM | TODO |
-| 3.2 | Widget demo screen (preview, config builder, code snippets) | 6-8 hrs | MEDIUM | TODO |
+| 3.1 | Developer portal screen (SDK docs, API key management) | 10-15 hrs | MEDIUM | DONE |
+| 3.2 | Widget demo screen (preview, config builder, code snippets) | 6-8 hrs | MEDIUM | DONE |
 | 3.3 | Test coverage expansion (target 60%+ from ~18%) | 15-20 hrs | HIGH | TODO |
 | 3.4 | CSV export for analytics/audit logs | 4-6 hrs | LOW | TODO |
 | 3.5 | E2E testing framework (Appium or similar) | 10-15 hrs | LOW | TODO |
 | 3.6 | Gradle 10 compatibility fixes | 1-2 hrs | LOW | TODO |
-| 3.7 | Release signing keystore creation | 1 hr | HIGH | TODO |
+| 3.7 | Release signing keystore creation | 1 hr | HIGH | DONE |
 
 ---
 
