@@ -11,10 +11,10 @@
 
 | # | Task | Effort | Status |
 |---|------|--------|--------|
-| 1.1 | Fix Desktop DI import error (PlatformModule.desktop.kt:18) | 5 min | IN PROGRESS |
-| 1.2 | Add RECORD_AUDIO permission to AndroidManifest.xml | 15 min | IN PROGRESS |
-| 1.3 | Fix 16 deprecated Compose APIs (LinearProgressIndicator, ArrowBack, Divider) | 2-3 hrs | IN PROGRESS |
-| 1.4 | Archive outdated 100_PERCENT_COMPLETE.md | 5 min | IN PROGRESS |
+| 1.1 | Fix Desktop DI import error (PlatformModule.desktop.kt:18) | 5 min | DONE |
+| 1.2 | Add RECORD_AUDIO permission to AndroidManifest.xml | 15 min | DONE |
+| 1.3 | Fix 16 deprecated Compose APIs (LinearProgressIndicator, ArrowBack, Divider) | 2-3 hrs | DONE |
+| 1.4 | Archive outdated 100_PERCENT_COMPLETE.md | 5 min | DONE |
 
 **Phase 1 Total:** ~3 hours
 
@@ -104,7 +104,7 @@
 
 ## Completion Tracking
 
-- [ ] Phase 1 complete (build fixes)
+- [x] Phase 1 complete (build fixes) — 2026-04-04
 - [ ] Phase 2 complete (core features)
 - [ ] Phase 3 complete (polish)
 - [ ] Phase 4 complete (maintenance)
