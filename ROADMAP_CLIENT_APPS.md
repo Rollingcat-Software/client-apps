@@ -1,7 +1,7 @@
 # FIVUCSAS Client-Apps & Web-App Completion Roadmap
 
 **Created:** 2026-04-04
-**Last Updated:** 2026-04-04
+**Last Updated:** 2026-04-05
 **Current Completion:** 100% (Phase 1-3 complete)
 **APK Release:** v2.0.0 (https://github.com/Rollingcat-Software/client-apps/releases/tag/v2.0.0)
 
@@ -69,9 +69,9 @@ All 8 items done on 2026-04-04.
 | W11 | Notifications: user activity via /my/activity endpoint | FIXED |
 | W12 | User activity/summary page | PARTIALLY DONE (dashboard has it) |
 | W13 | OAuth widget demo tenant (Marmara Exam Portal created) | DONE |
-| W14 | GitHub repos organization/cleanup | TODO |
+| W14 | GitHub repos organization/cleanup (all 8 repos tagged) | DONE |
 | W15 | User audit log view (via /my/activity endpoint) | FIXED |
-| W16 | Cross-device session awareness | TODO |
+| W16 | Cross-device session awareness (SessionsSection in Settings, i18n EN+TR) | DONE |
 | W17 | Voice STT verification (speech-to-text matching) | FUTURE |
 | W18 | BYOD (Bring Your Own Database) | FUTURE |
 | W19 | BaaS per-feature API rental model | FUTURE |
@@ -84,7 +84,7 @@ All 8 items done on 2026-04-04.
 | W21 | 2FA login flow crashes (SecondaryAuthFlow ErrorBoundary) | HIGH | FIXED |
 | W22 | Hardcoded strings audit across entire app (centralize to i18n) | MEDIUM | FIXED |
 | W23 | Terms/Privacy policy pages need real content | LOW | PLACEHOLDER DONE |
-| W24 | Settings page duplicates enrollment features | LOW | TODO (remove or link) |
+| W24 | Settings page duplicates enrollment features (removed) | LOW | DONE |
 | W25 | Dashboard "from" text not translated | LOW | FIXED |
 | W26 | Notification dates need proper formatting | LOW | FIXED |
 
@@ -117,6 +117,6 @@ All 8 items done on 2026-04-04.
 - [x] Phase 2 complete (8/8) — 2026-04-04
 - [x] Phase 3 complete (7/7) — 2026-04-04
 - [ ] Phase 4 (maintenance)
-- [x] Web-app backlog W20-W26 cleared (except W24 low-priority)
+- [x] Web-app backlog W20-W26 all cleared (W24 done 2026-04-05)
 - [x] 2FA login properly working
 - [x] 100% feature parity achieved
