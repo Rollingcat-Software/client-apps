@@ -1,5 +1,6 @@
 package com.fivucsas.shared.platform
 
+import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import platform.Foundation.NSTemporaryDirectory
@@ -16,6 +17,7 @@ import platform.Foundation.writeToFile
  *
  * Hexagonal Architecture Role: ADAPTER (implements IFileSaver port)
  */
+@OptIn(ExperimentalForeignApi::class)
 class IosFileSaver : IFileSaver {
 
     override suspend fun saveTextFile(

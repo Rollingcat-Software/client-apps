@@ -2,6 +2,7 @@ package com.fivucsas.shared.platform
 
 import kotlinx.cinterop.*
 import kotlinx.coroutines.suspendCancellableCoroutine
+import platform.CoreFoundation.CFErrorCopyDescription
 import platform.Foundation.*
 import platform.LocalAuthentication.LAContext
 import platform.LocalAuthentication.LAPolicyDeviceOwnerAuthenticationWithBiometrics
@@ -38,7 +39,7 @@ private class IosFingerprintAuthenticator : FingerprintAuthenticator {
     override suspend fun isSupported(): Boolean {
         val context = LAContext()
         return memScoped {
-            val error = alloc<ObjCObjectVar<NSError?>>()
+            val error = alloc<CPointerVar<__CFError>>()
             context.canEvaluatePolicy(
                 LAPolicyDeviceOwnerAuthenticationWithBiometrics,
                 error = error.ptr
@@ -154,7 +155,7 @@ private class IosFingerprintAuthenticator : FingerprintAuthenticator {
             kSecPrivateKeyAttrs to privateKeyAttrs
         )
 
-        val error = alloc<ObjCObjectVar<CFErrorRef?>>()
+        val error = alloc<CPointerVar<__CFError>>()
         val privateKey = SecKeyCreateRandomKey(attributes as CFDictionaryRef, error.ptr)
 
         if (privateKey == null) {
@@ -204,7 +205,7 @@ private class IosFingerprintAuthenticator : FingerprintAuthenticator {
         val nsData = data.toNSData()
         val cfData = nsData as CFDataRef
 
-        val error = alloc<ObjCObjectVar<CFErrorRef?>>()
+        val error = alloc<CPointerVar<__CFError>>()
         val signature = SecKeyCreateSignature(
             privateKey,
             kSecKeyAlgorithmECDSASignatureMessageX962SHA256,
@@ -227,13 +228,15 @@ private class IosFingerprintAuthenticator : FingerprintAuthenticator {
      * Build an EC JWK JSON string from the public key.
      */
     private fun buildEcJwk(keyId: String, publicKey: SecKeyRef): String = memScoped {
-        val error = alloc<ObjCObjectVar<CFErrorRef?>>()
+        val error = alloc<CPointerVar<__CFError>>()
         val keyData = SecKeyCopyExternalRepresentation(publicKey, error.ptr)
             ?: throw FingerprintAuthException("Cannot export public key", false)
 
         val nsKeyData = keyData as NSData
         val bytes = ByteArray(nsKeyData.length.toInt())
-        nsKeyData.getBytes(bytes.refTo(0), nsKeyData.length)
+        bytes.usePinned { pinned ->
+            nsKeyData.getBytes(pinned.addressOf(0), nsKeyData.length)
+        }
 
         // EC P-256 uncompressed point: 0x04 + 32 bytes X + 32 bytes Y = 65 bytes
         if (bytes.size != 65 || bytes[0] != 0x04.toByte()) {
@@ -243,15 +246,13 @@ private class IosFingerprintAuthenticator : FingerprintAuthenticator {
         val x = bytes.copyOfRange(1, 33)
         val y = bytes.copyOfRange(33, 65)
 
-        val xB64 = NSData.create(
-            bytes = x.refTo(0),
-            length = x.size.toULong()
-        ).base64EncodedStringWithOptions(0u).trimBase64Url()
+        val xB64 = x.usePinned { pinned ->
+            NSData.create(bytes = pinned.addressOf(0), length = x.size.toULong())
+        }.base64EncodedStringWithOptions(0u).trimBase64Url()
 
-        val yB64 = NSData.create(
-            bytes = y.refTo(0),
-            length = y.size.toULong()
-        ).base64EncodedStringWithOptions(0u).trimBase64Url()
+        val yB64 = y.usePinned { pinned ->
+            NSData.create(bytes = pinned.addressOf(0), length = y.size.toULong())
+        }.base64EncodedStringWithOptions(0u).trimBase64Url()
 
         """{"kty":"EC","crv":"P-256","kid":"$keyId","x":"$xB64","y":"$yB64"}"""
     }
@@ -269,7 +270,7 @@ private class IosFingerprintAuthenticator : FingerprintAuthenticator {
 @OptIn(ExperimentalForeignApi::class)
 private fun ByteArray.toNSData(): NSData {
     if (isEmpty()) return NSData()
-    return memScoped {
-        NSData.create(bytes = this@toNSData.refTo(0), length = this@toNSData.size.toULong())
+    return this.usePinned { pinned ->
+        NSData.create(bytes = pinned.addressOf(0), length = this.size.toULong())
     }
 }

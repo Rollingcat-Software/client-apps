@@ -171,7 +171,9 @@ class IosCameraService : ICameraService {
                         val jpegData = UIImageJPEGRepresentation(uiImage, 0.85)
                         if (jpegData != null) {
                             val bytes = ByteArray(jpegData.length.toInt())
-                            jpegData.getBytes(bytes.refTo(0), jpegData.length)
+                            bytes.usePinned { pinned ->
+                                jpegData.getBytes(pinned.addressOf(0), jpegData.length)
+                            }
                             continuation.resume(bytes)
                         } else {
                             continuation.resumeWithException(Exception("JPEG conversion failed"))
@@ -314,19 +316,18 @@ private class VideoSampleDelegate : NSObject(), AVCaptureVideoDataOutputSampleBu
         CVPixelBufferLockBaseAddress(imageBuffer, 0u)
 
         val ciImage = platform.CoreImage.CIImage(cVPixelBuffer = imageBuffer)
-        val context = platform.CoreImage.CIContext()
-        val cgImage = context.createCGImage(ciImage, fromRect = ciImage.extent)
 
         CVPixelBufferUnlockBaseAddress(imageBuffer, 0u)
 
-        if (cgImage != null) {
-            val uiImage = UIImage(cGImage = cgImage)
-            val jpegData = UIImageJPEGRepresentation(uiImage, 0.80)
-            if (jpegData != null) {
-                val bytes = ByteArray(jpegData.length.toInt())
-                jpegData.getBytes(bytes.refTo(0), jpegData.length)
-                latestImageData = bytes
+        // Convert CIImage to UIImage directly (avoids CIContext.createCGImage K/N binding issues)
+        val uiImage = UIImage(cIImage = ciImage)
+        val jpegData = UIImageJPEGRepresentation(uiImage, 0.80)
+        if (jpegData != null) {
+            val bytes = ByteArray(jpegData.length.toInt())
+            bytes.usePinned { pinned ->
+                jpegData.getBytes(pinned.addressOf(0), jpegData.length)
             }
+            latestImageData = bytes
         }
     }
 

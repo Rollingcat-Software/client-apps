@@ -56,6 +56,34 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
 
+      - name: Create dummy google-services.json for CI
+        run: |
+          cat > androidApp/google-services.json << 'GSEOF'
+          {
+            "project_info": {
+              "project_number": "000000000000",
+              "project_id": "fivucsas-ci-dummy",
+              "storage_bucket": "fivucsas-ci-dummy.appspot.com"
+            },
+            "client": [
+              {
+                "client_info": {
+                  "mobilesdk_app_id": "1:000000000000:android:0000000000000000",
+                  "android_client_info": {
+                    "package_name": "com.fivucsas.mobile"
+                  }
+                },
+                "api_key": [
+                  {
+                    "current_key": "AIzaSyCI-DUMMY-KEY-FOR-CI-BUILD"
+                  }
+                ]
+              }
+            ],
+            "configuration_version": "1"
+          }
+          GSEOF
+
       - name: Determine build task
         id: build-task
         env:

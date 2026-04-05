@@ -28,6 +28,7 @@ actual fun provideWebAuthnAuthenticator(): WebAuthnAuthenticator {
     return IosWebAuthnAuthenticator()
 }
 
+@OptIn(ExperimentalForeignApi::class)
 actual fun isWebAuthnAvailable(): Boolean {
     // ASAuthorizationPlatformPublicKeyCredentialProvider is available on iOS 16+
     return NSProcessInfo.processInfo.operatingSystemVersion.useContents {
@@ -214,7 +215,7 @@ private class AuthorizationDelegate(
 @OptIn(ExperimentalForeignApi::class)
 private fun ByteArray.toNSData(): NSData {
     if (isEmpty()) return NSData()
-    return memScoped {
-        NSData.create(bytes = this@toNSData.refTo(0), length = this@toNSData.size.toULong())
+    return this.usePinned { pinned ->
+        NSData.create(bytes = pinned.addressOf(0), length = this.size.toULong())
     }
 }

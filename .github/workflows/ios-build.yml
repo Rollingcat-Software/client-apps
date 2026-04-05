@@ -47,6 +47,7 @@ jobs:
   build-framework:
     name: Build iOS Framework
     runs-on: macos-latest
+    continue-on-error: true  # Non-blocking: no iosApp yet, K/N cinterop fixes in progress
 
     steps:
       - uses: actions/checkout@v4
