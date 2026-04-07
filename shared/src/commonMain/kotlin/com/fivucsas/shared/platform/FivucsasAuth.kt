@@ -32,7 +32,7 @@ data class AuthWidgetConfig(
     val userId: String? = null,
     val sessionId: String? = null,
     val apiBaseUrl: String = AppConfig.Api.BASE_URL,
-    val verifyUrl: String = "https://ica-fivucsas.rollingcatsoftware.com/verify/",
+    val verifyUrl: String = "https://app.fivucsas.com/verify/",
     val locale: String = "en"
 ) {
     /**

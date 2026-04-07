@@ -7,7 +7,7 @@ import com.fivucsas.shared.data.remote.dto.UserDto
  * Identity API interface
  *
  * Defines contract for backend communication.
- * Base URL: https://auth.rollingcatsoftware.com/api/v1/
+ * Base URL: https://api.fivucsas.com/api/v1/
  *
  * Endpoints:
  * - GET    /users          → getUsers()

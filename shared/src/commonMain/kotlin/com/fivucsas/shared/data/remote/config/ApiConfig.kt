@@ -23,16 +23,16 @@ object ApiConfig {
     /**
      * Identity Core API URLs per environment (Auth, Users, RBAC)
      */
-    private const val DEV_IDENTITY_URL = "https://auth.rollingcatsoftware.com/api/v1"
-    private const val STAGING_IDENTITY_URL = "https://auth.rollingcatsoftware.com/api/v1"
-    private const val PROD_IDENTITY_URL = "https://auth.rollingcatsoftware.com/api/v1"
+    private const val DEV_IDENTITY_URL = "https://api.fivucsas.com/api/v1"
+    private const val STAGING_IDENTITY_URL = "https://api.fivucsas.com/api/v1"
+    private const val PROD_IDENTITY_URL = "https://api.fivucsas.com/api/v1"
 
     /**
      * Biometric Processor API URLs per environment (Face detection, Verification)
      */
-    private const val DEV_BIOMETRIC_URL = "https://bpa-fivucsas.rollingcatsoftware.com/api/v1"
-    private const val STAGING_BIOMETRIC_URL = "https://bpa-fivucsas.rollingcatsoftware.com/api/v1"
-    private const val PROD_BIOMETRIC_URL = "https://bpa-fivucsas.rollingcatsoftware.com/api/v1"
+    private const val DEV_BIOMETRIC_URL = "https://bio.fivucsas.com/api/v1"
+    private const val STAGING_BIOMETRIC_URL = "https://bio.fivucsas.com/api/v1"
+    private const val PROD_BIOMETRIC_URL = "https://bio.fivucsas.com/api/v1"
 
     /**
      * Get Identity Core API base URL for current environment

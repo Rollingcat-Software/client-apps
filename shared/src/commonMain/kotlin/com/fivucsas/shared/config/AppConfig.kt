@@ -15,7 +15,7 @@ object AppConfig {
      * API Configuration
      */
     object Api {
-        const val BASE_URL = "https://auth.rollingcatsoftware.com/api/v1"
+        const val BASE_URL = "https://api.fivucsas.com/api/v1"
         const val API_VERSION = "v1"
         const val TIMEOUT_SECONDS = 30L
         const val MAX_RETRIES = 3

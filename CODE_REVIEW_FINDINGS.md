@@ -90,7 +90,7 @@ Even though `ignoreUnknownKeys = true` was correctly set, the serializer couldn'
 
 1. **JSON configuration** (`NetworkModule.kt`): `ignoreUnknownKeys = true` was already set. This prevents crashes from extra fields the DTO doesn't declare (like the new `user` object).
 
-2. **API base URLs** (`ApiConfig.kt`): All pointing to correct production URLs (`https://auth.rollingcatsoftware.com/api/v1`).
+2. **API base URLs** (`ApiConfig.kt`): All pointing to correct production URLs (`https://api.fivucsas.com/api/v1`).
 
 3. **Biometric DTOs** (`BiometricDto.kt`): Correctly use snake_case `@SerialName` because the biometric-processor is Python/FastAPI which uses snake_case by default.
 

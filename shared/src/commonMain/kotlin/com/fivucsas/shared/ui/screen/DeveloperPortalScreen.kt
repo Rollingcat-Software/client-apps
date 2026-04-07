@@ -791,7 +791,7 @@ const code = params.get('code');
 
 if (code) {
   const response = await fetch(
-    'https://auth.rollingcatsoftware.com/api/v1/oauth2/token',
+    'https://api.fivucsas.com/api/v1/oauth2/token',
     {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },

@@ -22,7 +22,7 @@
 No certificate pinning found anywhere in the codebase. Ktor `HttpClient` uses default platform trust. The `.env.example` references `CERTIFICATE_PIN_SHA256` but it is never consumed.
 
 **Severity:** MEDIUM
-**Recommendation:** Add Ktor `CertificatePinner` plugin with SHA-256 pins for `auth.rollingcatsoftware.com` and `bpa-fivucsas.rollingcatsoftware.com`. Include a backup pin for certificate rotation.
+**Recommendation:** Add Ktor `CertificatePinner` plugin with SHA-256 pins for `api.fivucsas.com` and `bio.fivucsas.com`. Include a backup pin for certificate rotation.
 
 ### 1.3 Root/Jailbreak Detection -- NOT IMPLEMENTED
 

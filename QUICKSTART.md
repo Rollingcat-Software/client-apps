@@ -105,7 +105,7 @@ Edit `shared/src/commonMain/kotlin/com/fivucsas/shared/config/AppConfig.kt`:
 
 ```kotlin
 object Api {
-    const val BASE_URL = "https://auth.rollingcatsoftware.com/api/v1"
+    const val BASE_URL = "https://api.fivucsas.com/api/v1"
     // For local development:
     // const val BASE_URL = "http://10.0.2.2:8080/api/v1"  // Android emulator
     // const val BASE_URL = "http://localhost:8080/api/v1"  // Desktop/iOS
@@ -204,7 +204,7 @@ Both Android and iOS builds run automatically via GitHub Actions:
 
 - Architecture docs: `README.md`
 - Parent project: `../CLAUDE.md`
-- API docs: https://auth.rollingcatsoftware.com/swagger-ui.html
+- API docs: https://api.fivucsas.com/swagger-ui.html
 
 ---
 

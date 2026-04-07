@@ -39,7 +39,7 @@ interface WebAuthnAuthenticator {
     /**
      * Create a new WebAuthn credential (registration / attestation).
      *
-     * @param rpId relying party ID (e.g., "auth.rollingcatsoftware.com")
+     * @param rpId relying party ID (e.g., "api.fivucsas.com")
      * @param rpName relying party display name
      * @param userId opaque user handle (UUID)
      * @param userName user display name / email
