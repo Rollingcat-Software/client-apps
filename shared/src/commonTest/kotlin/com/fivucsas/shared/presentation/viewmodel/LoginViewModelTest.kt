@@ -203,6 +203,35 @@ class LoginViewModelTest {
         assertTrue(viewModel.state.value.isSuccess)
         assertNotNull(viewModel.state.value.tokens)
     }
+
+    // ============== MFA FLOW TESTS ==============
+
+    @Test
+    fun `login with MFA required sets mfa state`() = runTest {
+        fakeRepository.mfaRequired = true
+
+        viewModel.login("test@fivucsas.com", "Password123!")
+
+        val state = viewModel.state.value
+        assertFalse(state.isSuccess)
+        assertNull(state.tokens)
+        assertTrue(state.mfaRequired)
+        assertNotNull(state.mfaSessionToken)
+        assertEquals("fake-mfa-session-token", state.mfaSessionToken)
+        assertEquals(1, state.mfaCurrentStep)
+        assertEquals(2, state.mfaTotalSteps)
+        assertNotNull(state.mfaAvailableMethods)
+        assertTrue(state.mfaAvailableMethods!!.isNotEmpty())
+    }
+
+    @Test
+    fun `login with MFA required does not set loading after completion`() = runTest {
+        fakeRepository.mfaRequired = true
+
+        viewModel.login("test@fivucsas.com", "Password123!")
+
+        assertFalse(viewModel.state.value.isLoading)
+    }
 }
 
 private class FakePushService : IPushNotificationService {

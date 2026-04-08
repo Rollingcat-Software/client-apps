@@ -45,6 +45,7 @@ import com.fivucsas.mobile.android.ui.screen.LivenessScreen
 import com.fivucsas.mobile.android.ui.screen.CardDetectionScreen
 import com.fivucsas.mobile.android.ui.screen.HardwareTokenScreen
 import com.fivucsas.mobile.android.ui.screen.BiometricBackupScreen
+import com.fivucsas.mobile.android.ui.screen.MfaFlowScreen
 import com.fivucsas.shared.data.local.TokenManager
 import com.fivucsas.shared.domain.model.ConfidenceBand
 import com.fivucsas.shared.domain.model.GuestFaceCheckOutcome
@@ -158,6 +159,7 @@ sealed class Screen(val route: String) {
     object LivenessPuzzle : Screen(RouteIds.LIVENESS_PUZZLE)
     object CardDetection : Screen(RouteIds.CARD_DETECTION)
     object HardwareToken : Screen(RouteIds.HARDWARE_TOKEN)
+    object MfaFlow : Screen(RouteIds.MFA_FLOW)
 
     object AuthFlows : Screen("${RouteIds.AUTH_FLOWS}/{tenantId}") {
         fun createRoute(tenantId: String) = "${RouteIds.AUTH_FLOWS}/$tenantId"
@@ -293,6 +295,9 @@ fun AppNavigation() {
                     navController.navigate(Screen.FingerprintGate.createRoute(destination)) {
                         popUpTo(Screen.Login.route) { inclusive = true }
                     }
+                },
+                onMfaRequired = {
+                    navController.navigate(Screen.MfaFlow.route)
                 }
             )
         }
@@ -1521,6 +1526,49 @@ fun AppNavigation() {
                 viewModel = viewModel,
                 userId = userId,
                 onNavigateBack = { navController.popBackStack() }
+            )
+        }
+
+        // N-step MFA flow (public — shown after login when mfaRequired=true)
+        composable(Screen.MfaFlow.route) {
+            val mfaViewModel = koinInject<com.fivucsas.shared.presentation.viewmodel.auth.MfaFlowViewModel>()
+            // Retrieve MFA session data from the LoginViewModel that triggered the flow
+            val loginViewModel = koinInject<LoginViewModel>()
+            val loginState = loginViewModel.state.collectAsState().value
+
+            // Initialize MFA flow with data from login response
+            LaunchedEffect(Unit) {
+                if (loginState.mfaSessionToken != null) {
+                    mfaViewModel.initialize(
+                        sessionToken = loginState.mfaSessionToken!!,
+                        methods = loginState.mfaAvailableMethods ?: emptyList(),
+                        step = loginState.mfaCurrentStep,
+                        total = loginState.mfaTotalSteps
+                    )
+                }
+            }
+
+            // Observe auth result and navigate to dashboard on completion
+            val authResult by mfaViewModel.authResult.collectAsState()
+            LaunchedEffect(authResult) {
+                authResult?.let { result ->
+                    tokenManager?.saveTokens(result.tokens)
+                    val destination = NavigationPolicy.loginSuccessRoute(result.role)
+                    navController.navigate(destination) {
+                        popUpTo(Screen.Login.route) { inclusive = true }
+                    }
+                }
+            }
+
+            MfaFlowScreen(
+                viewModel = mfaViewModel,
+                onAuthenticated = {
+                    // Handled by LaunchedEffect above via authResult
+                },
+                onCancel = {
+                    loginViewModel.resetState()
+                    navController.popBackStack(Screen.Login.route, inclusive = false)
+                }
             )
         }
     }

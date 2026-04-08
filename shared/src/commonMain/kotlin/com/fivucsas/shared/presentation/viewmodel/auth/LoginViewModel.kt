@@ -2,6 +2,7 @@ package com.fivucsas.shared.presentation.viewmodel.auth
 
 import com.fivucsas.shared.data.local.OfflineCache
 import com.fivucsas.shared.domain.model.UserRole
+import com.fivucsas.shared.domain.repository.LoginResult
 import com.fivucsas.shared.domain.usecase.auth.LoginUseCase
 import com.fivucsas.shared.platform.IPushNotificationService
 import com.fivucsas.shared.presentation.state.LoginState
@@ -20,23 +21,39 @@ class LoginViewModel(
     suspend fun login(email: String, password: String) {
         _state.value = LoginState(isLoading = true)
         loginUseCase(email, password).fold(
-            onSuccess = { tokens ->
-                // Cache login data for offline mode
-                offlineCache.cacheLoginData(
-                    userId = tokens.userId,
-                    userName = tokens.userName,
-                    userEmail = tokens.userEmail,
-                    role = tokens.role
-                )
-                _state.value = LoginState(
-                    isLoading = false,
-                    tokens = tokens,
-                    isSuccess = true,
-                    role = UserRole.fromString(tokens.role)
-                )
+            onSuccess = { loginResult ->
+                when (loginResult) {
+                    is LoginResult.Authenticated -> {
+                        val tokens = loginResult.tokens
+                        // Cache login data for offline mode
+                        offlineCache.cacheLoginData(
+                            userId = tokens.userId,
+                            userName = tokens.userName,
+                            userEmail = tokens.userEmail,
+                            role = tokens.role
+                        )
+                        _state.value = LoginState(
+                            isLoading = false,
+                            tokens = tokens,
+                            isSuccess = true,
+                            role = UserRole.fromString(tokens.role)
+                        )
 
-                // Register FCM push token with the backend (fire-and-forget)
-                registerPushToken(tokens.userId)
+                        // Register FCM push token with the backend (fire-and-forget)
+                        registerPushToken(tokens.userId)
+                    }
+
+                    is LoginResult.MfaChallenge -> {
+                        _state.value = LoginState(
+                            isLoading = false,
+                            mfaRequired = true,
+                            mfaSessionToken = loginResult.mfaSessionToken,
+                            mfaAvailableMethods = loginResult.availableMethods,
+                            mfaCurrentStep = loginResult.currentStep,
+                            mfaTotalSteps = loginResult.totalSteps
+                        )
+                    }
+                }
             },
             onFailure = { error ->
                 _state.value = LoginState(

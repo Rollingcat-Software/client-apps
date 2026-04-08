@@ -1,5 +1,9 @@
 package com.fivucsas.shared.domain.repository
 
+import com.fivucsas.shared.data.remote.dto.AvailableMethodDto
+import com.fivucsas.shared.data.remote.dto.MfaQrTokenResponse
+import com.fivucsas.shared.data.remote.dto.MfaStepResponse
+
 /**
  * Authentication repository interface
  *
@@ -10,9 +14,9 @@ interface AuthRepository {
      * Login user
      * @param email User email
      * @param password User password
-     * @return Result with auth tokens or error
+     * @return Result with login result (tokens or MFA challenge)
      */
-    suspend fun login(email: String, password: String): Result<AuthTokens>
+    suspend fun login(email: String, password: String): Result<LoginResult>
 
     /**
      * Register new user
@@ -61,6 +65,39 @@ interface AuthRepository {
      * @return Access token or null
      */
     suspend fun getAccessToken(): String?
+
+    /**
+     * Verify an MFA step
+     * @return MfaStepResponse with status and optional tokens
+     */
+    suspend fun verifyMfaStep(
+        sessionToken: String,
+        method: String,
+        data: Map<String, String> = emptyMap()
+    ): Result<MfaStepResponse>
+
+    /**
+     * Send OTP for MFA (EMAIL_OTP or SMS_OTP)
+     */
+    suspend fun sendMfaOtp(sessionToken: String, method: String): Result<Unit>
+
+    /**
+     * Generate QR token for MFA QR_CODE method
+     */
+    suspend fun generateMfaQr(sessionToken: String): Result<MfaQrTokenResponse>
+}
+
+/**
+ * Login result — either direct tokens or an MFA challenge.
+ */
+sealed class LoginResult {
+    data class Authenticated(val tokens: AuthTokens) : LoginResult()
+    data class MfaChallenge(
+        val mfaSessionToken: String,
+        val availableMethods: List<AvailableMethodDto>,
+        val currentStep: Int,
+        val totalSteps: Int
+    ) : LoginResult()
 }
 
 /**

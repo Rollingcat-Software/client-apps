@@ -122,4 +122,7 @@ object RouteIds {
 
     // Developer Portal
     const val DEVELOPER_PORTAL = "developer-portal"
+
+    // MFA Flow
+    const val MFA_FLOW = "mfa-flow"
 }

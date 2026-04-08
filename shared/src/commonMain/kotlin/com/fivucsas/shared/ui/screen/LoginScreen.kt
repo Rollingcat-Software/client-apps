@@ -41,7 +41,8 @@ fun LoginScreen(
     onNavigateToRegister: () -> Unit,
     onNavigateToForgotPassword: () -> Unit,
     onNavigateToGuestFaceCheck: () -> Unit,
-    onLoginSuccess: () -> Unit
+    onLoginSuccess: () -> Unit,
+    onMfaRequired: () -> Unit = {}
 ) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -53,6 +54,13 @@ fun LoginScreen(
     LaunchedEffect(state.isSuccess) {
         if (state.isSuccess && state.tokens != null) {
             onLoginSuccess()
+        }
+    }
+
+    // Navigate to MFA flow when MFA is required
+    LaunchedEffect(state.mfaRequired) {
+        if (state.mfaRequired && state.mfaSessionToken != null) {
+            onMfaRequired()
         }
     }
 

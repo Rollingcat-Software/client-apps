@@ -109,7 +109,8 @@ val networkModule = module {
 
                 if (accessToken != null &&
                     !url.toString().contains("/auth/login") &&
-                    !url.toString().contains("/auth/register")) {
+                    !url.toString().contains("/auth/register") &&
+                    !url.toString().contains("/auth/mfa/")) {
                     header(HttpHeaders.Authorization, "Bearer $accessToken")
                 }
 

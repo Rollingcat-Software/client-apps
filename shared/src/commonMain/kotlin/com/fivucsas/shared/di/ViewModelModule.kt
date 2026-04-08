@@ -23,6 +23,7 @@ import com.fivucsas.shared.presentation.viewmodel.auth.BiometricViewModel
 import com.fivucsas.shared.presentation.viewmodel.auth.ChangePasswordViewModel
 import com.fivucsas.shared.presentation.viewmodel.auth.FingerprintViewModel
 import com.fivucsas.shared.presentation.viewmodel.auth.LoginViewModel
+import com.fivucsas.shared.presentation.viewmodel.auth.MfaFlowViewModel
 import com.fivucsas.shared.presentation.viewmodel.auth.QrLoginViewModel
 import com.fivucsas.shared.presentation.viewmodel.AuditLogDashboardViewModel
 import com.fivucsas.shared.presentation.viewmodel.DeveloperPortalViewModel
@@ -60,6 +61,7 @@ val viewModelModule = module {
     factoryOf(::HardwareTokenViewModel)
     factoryOf(::BiometricBackupViewModel)
     factoryOf(::MultiStepAuthViewModel)
+    factoryOf(::MfaFlowViewModel)
     factoryOf(::DeveloperPortalViewModel)
     factoryOf(::AuditLogDashboardViewModel)
 }

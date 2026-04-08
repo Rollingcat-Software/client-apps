@@ -5,10 +5,15 @@ import com.fivucsas.shared.data.local.TokenManager
 import com.fivucsas.shared.data.remote.api.AuthApi
 import com.fivucsas.shared.data.remote.dto.ChangePasswordRequestDto
 import com.fivucsas.shared.data.remote.dto.LoginRequestDto
+import com.fivucsas.shared.data.remote.dto.MfaQrTokenResponse
+import com.fivucsas.shared.data.remote.dto.MfaSendOtpRequest
+import com.fivucsas.shared.data.remote.dto.MfaStepRequest
+import com.fivucsas.shared.data.remote.dto.MfaStepResponse
 import com.fivucsas.shared.data.remote.dto.RegisterRequestDto
 import com.fivucsas.shared.data.remote.dto.toModel
 import com.fivucsas.shared.domain.repository.AuthRepository
 import com.fivucsas.shared.domain.repository.AuthTokens
+import com.fivucsas.shared.domain.repository.LoginResult
 
 /**
  * Real implementation of AuthRepository
@@ -22,16 +27,27 @@ class AuthRepositoryImpl(
     private val stepUpTokenManager: StepUpTokenManager? = null
 ) : AuthRepository {
 
-    override suspend fun login(email: String, password: String): Result<AuthTokens> {
+    override suspend fun login(email: String, password: String): Result<LoginResult> {
         return try {
             val request = LoginRequestDto(email = email, password = password)
             val response = authApi.login(request)
-            val tokens = response.toModel()
 
-            // Store tokens in TokenManager
-            tokenManager.saveTokens(tokens)
-
-            Result.success(tokens)
+            if (response.mfaRequired) {
+                // MFA challenge — do NOT store tokens yet
+                Result.success(
+                    LoginResult.MfaChallenge(
+                        mfaSessionToken = response.mfaSessionToken ?: "",
+                        availableMethods = response.availableMethods ?: emptyList(),
+                        currentStep = response.currentStep ?: 1,
+                        totalSteps = response.totalSteps ?: 1
+                    )
+                )
+            } else {
+                // Direct authentication — store tokens
+                val tokens = response.toModel()
+                tokenManager.saveTokens(tokens)
+                Result.success(LoginResult.Authenticated(tokens))
+            }
         } catch (e: Exception) {
             Result.failure(e)
         }
@@ -112,5 +128,48 @@ class AuthRepositoryImpl(
 
     override suspend fun getAccessToken(): String? {
         return tokenManager.getAccessToken()
+    }
+
+    override suspend fun verifyMfaStep(
+        sessionToken: String,
+        method: String,
+        data: Map<String, String>
+    ): Result<MfaStepResponse> {
+        return try {
+            val request = MfaStepRequest(
+                sessionToken = sessionToken,
+                method = method,
+                data = data
+            )
+            val response = authApi.verifyMfaStep(request)
+
+            // If authenticated, store tokens
+            if (response.status == "AUTHENTICATED" && response.accessToken != null) {
+                val tokens = response.toModel()
+                tokenManager.saveTokens(tokens)
+            }
+
+            Result.success(response)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun sendMfaOtp(sessionToken: String, method: String): Result<Unit> {
+        return try {
+            authApi.sendMfaOtp(MfaSendOtpRequest(sessionToken = sessionToken, method = method))
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun generateMfaQr(sessionToken: String): Result<MfaQrTokenResponse> {
+        return try {
+            val response = authApi.generateMfaQr(sessionToken)
+            Result.success(response)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
     }
 }
