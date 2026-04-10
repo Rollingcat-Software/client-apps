@@ -7,10 +7,13 @@ import com.fivucsas.shared.data.remote.dto.toModel
 import com.fivucsas.shared.domain.model.UserRole
 import com.fivucsas.shared.domain.repository.AuthRepository
 import com.fivucsas.shared.domain.repository.AuthTokens
+import com.fivucsas.shared.i18n.StringKey
+import com.fivucsas.shared.i18n.s
 import com.fivucsas.shared.platform.IPushNotificationService
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.withTimeoutOrNull
 
 /**
  * MFA Flow ViewModel
@@ -31,6 +34,7 @@ class MfaFlowViewModel(
     private var availableMethods: List<AvailableMethodDto> = emptyList()
     private var currentStep: Int = 1
     private var totalSteps: Int = 1
+    private val usedMethods: MutableSet<String> = mutableSetOf()
 
     // Expose tokens and role after successful authentication
     private val _authResult = MutableStateFlow<MfaAuthResult?>(null)
@@ -49,6 +53,7 @@ class MfaFlowViewModel(
         availableMethods = methods
         currentStep = step
         totalSteps = total
+        usedMethods.clear()
         _uiState.value = MfaFlowUiState.MethodSelection(
             availableMethods = availableMethods,
             currentStep = currentStep,
@@ -80,62 +85,87 @@ class MfaFlowViewModel(
 
     /**
      * Verify an MFA step with the given method and data.
+     * Applies a 30-second timeout to prevent hanging on unresponsive network.
      */
     suspend fun verifyStep(method: String, data: Map<String, String> = emptyMap()) {
         _uiState.value = MfaFlowUiState.Verifying
 
-        authRepository.verifyMfaStep(mfaSessionToken, method, data).fold(
-            onSuccess = { response ->
-                when (response.status) {
-                    "AUTHENTICATED" -> {
-                        val tokens = response.toModel()
-                        // Cache login data for offline mode
-                        offlineCache.cacheLoginData(
-                            userId = tokens.userId,
-                            userName = tokens.userName,
-                            userEmail = tokens.userEmail,
-                            role = tokens.role
-                        )
-                        _authResult.value = MfaAuthResult(
-                            tokens = tokens,
-                            role = UserRole.fromString(tokens.role)
-                        )
-                        _uiState.value = MfaFlowUiState.Authenticated(
-                            userId = tokens.userId
-                        )
-                        // Register FCM push token (fire-and-forget)
-                        registerPushToken(tokens.userId)
-                    }
+        try {
+            val result = withTimeoutOrNull(30_000L) {
+                authRepository.verifyMfaStep(mfaSessionToken, method, data)
+            }
 
-                    "STEP_COMPLETED" -> {
-                        // Move to next step — backend may send nextStep or currentStep
-                        currentStep = response.nextStep
-                            ?: response.currentStep
-                            ?: (currentStep + 1)
-                        totalSteps = response.totalSteps ?: totalSteps
-                        availableMethods = response.availableMethods ?: availableMethods
-                        _uiState.value = MfaFlowUiState.MethodSelection(
-                            availableMethods = availableMethods,
-                            currentStep = currentStep,
-                            totalSteps = totalSteps
-                        )
-                    }
-
-                    else -> {
-                        _uiState.value = MfaFlowUiState.Error(
-                            message = response.message ?: "Verification failed.",
-                            canRetry = true
-                        )
-                    }
-                }
-            },
-            onFailure = { error ->
+            if (result == null) {
+                // Timeout occurred
                 _uiState.value = MfaFlowUiState.Error(
-                    message = mapErrorMessage(error),
+                    message = s(StringKey.MFA_TIMEOUT),
                     canRetry = true
                 )
+                return
             }
-        )
+
+            result.fold(
+                onSuccess = { response ->
+                    when (response.status) {
+                        "AUTHENTICATED" -> {
+                            val tokens = response.toModel()
+                            // Cache login data for offline mode
+                            offlineCache.cacheLoginData(
+                                userId = tokens.userId,
+                                userName = tokens.userName,
+                                userEmail = tokens.userEmail,
+                                role = tokens.role
+                            )
+                            _authResult.value = MfaAuthResult(
+                                tokens = tokens,
+                                role = UserRole.fromString(tokens.role)
+                            )
+                            _uiState.value = MfaFlowUiState.Authenticated(
+                                userId = tokens.userId
+                            )
+                            // Register FCM push token (fire-and-forget)
+                            registerPushToken(tokens.userId)
+                        }
+
+                        "STEP_COMPLETED" -> {
+                            // Track used method so it can be excluded from next step
+                            usedMethods.add(method)
+                            // Move to next step — backend may send nextStep or currentStep
+                            currentStep = response.nextStep
+                                ?: response.currentStep
+                                ?: (currentStep + 1)
+                            totalSteps = response.totalSteps ?: totalSteps
+                            // Merge backend list, then filter out already-used methods
+                            val backendMethods = response.availableMethods ?: availableMethods
+                            availableMethods = backendMethods.filter { it.methodType !in usedMethods }
+                            _uiState.value = MfaFlowUiState.MethodSelection(
+                                availableMethods = availableMethods,
+                                currentStep = currentStep,
+                                totalSteps = totalSteps
+                            )
+                        }
+
+                        else -> {
+                            _uiState.value = MfaFlowUiState.Error(
+                                message = response.message ?: s(StringKey.MFA_GENERIC_ERROR),
+                                canRetry = true
+                            )
+                        }
+                    }
+                },
+                onFailure = { error ->
+                    _uiState.value = MfaFlowUiState.Error(
+                        message = mapErrorMessage(error),
+                        canRetry = true
+                    )
+                }
+            )
+        } catch (e: Exception) {
+            _uiState.value = MfaFlowUiState.Error(
+                message = s(StringKey.MFA_GENERIC_ERROR),
+                canRetry = true
+            )
+        }
     }
 
     /**
@@ -174,13 +204,13 @@ class MfaFlowViewModel(
     }
 
     private fun mapErrorMessage(error: Throwable): String {
-        val message = error.message ?: return "Verification failed. Please try again."
+        val message = error.message ?: return s(StringKey.MFA_GENERIC_ERROR)
         return when {
-            "401" in message || "Unauthorized" in message -> "Invalid verification code."
-            "429" in message || "Too many" in message -> "Too many attempts. Please wait."
-            "timeout" in message.lowercase() -> "Connection timed out. Please try again."
-            "expired" in message.lowercase() -> "MFA session expired. Please log in again."
-            else -> "Verification failed. Please try again."
+            "401" in message || "Unauthorized" in message -> s(StringKey.MFA_INVALID_CODE)
+            "429" in message || "Too many" in message -> s(StringKey.MFA_TOO_MANY_ATTEMPTS)
+            "timeout" in message.lowercase() -> s(StringKey.MFA_TIMEOUT)
+            "expired" in message.lowercase() -> s(StringKey.MFA_SESSION_EXPIRED)
+            else -> s(StringKey.MFA_GENERIC_ERROR)
         }
     }
 }

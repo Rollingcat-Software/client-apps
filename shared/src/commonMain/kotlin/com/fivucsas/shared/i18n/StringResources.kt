@@ -549,6 +549,10 @@ enum class StringKey {
     MFA_METHOD_NFC,
     MFA_AUTHENTICATED,
     MFA_ERROR_RETRY,
+    MFA_TIMEOUT,
+    MFA_INVALID_CODE,
+    MFA_TOO_MANY_ATTEMPTS,
+    MFA_GENERIC_ERROR,
 }
 
 private val enStrings = mapOf(
@@ -1062,6 +1066,10 @@ private val enStrings = mapOf(
     StringKey.MFA_METHOD_NFC to "NFC Document",
     StringKey.MFA_AUTHENTICATED to "Authentication complete!",
     StringKey.MFA_ERROR_RETRY to "Retry",
+    StringKey.MFA_TIMEOUT to "Verification timed out. Please try again.",
+    StringKey.MFA_INVALID_CODE to "Invalid verification code.",
+    StringKey.MFA_TOO_MANY_ATTEMPTS to "Too many attempts. Please wait.",
+    StringKey.MFA_GENERIC_ERROR to "Verification failed. Please try again.",
 )
 
 private val trStrings = mapOf(
@@ -1575,6 +1583,10 @@ private val trStrings = mapOf(
     StringKey.MFA_METHOD_NFC to "NFC Belge",
     StringKey.MFA_AUTHENTICATED to "Kimlik dogrulama tamamlandi!",
     StringKey.MFA_ERROR_RETRY to "Tekrar Dene",
+    StringKey.MFA_TIMEOUT to "Dogrulama zaman asimina ugradi. Lutfen tekrar deneyin.",
+    StringKey.MFA_INVALID_CODE to "Gecersiz dogrulama kodu.",
+    StringKey.MFA_TOO_MANY_ATTEMPTS to "Cok fazla deneme. Lutfen bekleyin.",
+    StringKey.MFA_GENERIC_ERROR to "Dogrulama basarisiz. Lutfen tekrar deneyin.",
 )
 
 /**
