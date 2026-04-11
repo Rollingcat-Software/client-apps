@@ -121,6 +121,9 @@ firebase_options.dart
 # Coverage
 coverage/
 
+# Kotlin build
+.kotlin/
+
 # Localization
 *.arb.json
 
