@@ -18,6 +18,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Face
@@ -87,6 +88,25 @@ fun MfaFlowScreen(
         }
     }
 
+    // Overlay QR scanner when requested from QR_CODE step
+    var showQrScanner by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
+
+    if (showQrScanner) {
+        QrScannerScreen(
+            onQrScanned = { rawValue ->
+                showQrScanner = false
+                scope.launch {
+                    viewModel.verifyStep("QR_CODE", mapOf("token" to rawValue))
+                }
+            },
+            onBack = { showQrScanner = false },
+            title = s(StringKey.MFA_METHOD_QR_CODE),
+            instruction = s(StringKey.MFA_POINT_CAMERA_AT_QR)
+        )
+        return
+    }
+
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
@@ -129,7 +149,8 @@ fun MfaFlowScreen(
                         currentStep = state.currentStep,
                         totalSteps = state.totalSteps,
                         viewModel = viewModel,
-                        onBack = { viewModel.backToMethodSelection() }
+                        onBack = { viewModel.backToMethodSelection() },
+                        onOpenQrScanner = { showQrScanner = true }
                     )
                 }
 
@@ -236,7 +257,8 @@ private fun MfaStepInputContent(
     currentStep: Int,
     totalSteps: Int,
     viewModel: MfaFlowViewModel,
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    onOpenQrScanner: () -> Unit = {}
 ) {
     val scope = rememberCoroutineScope()
 
@@ -279,6 +301,7 @@ private fun MfaStepInputContent(
         "QR_CODE" -> {
             QrCodeStepInput(
                 viewModel = viewModel,
+                onOpenQrScanner = onOpenQrScanner,
                 onVerify = {
                     scope.launch {
                         viewModel.verifyStep(method)
@@ -411,11 +434,11 @@ private fun OtpStepInput(
 @Composable
 private fun QrCodeStepInput(
     viewModel: MfaFlowViewModel,
+    onOpenQrScanner: () -> Unit,
     onVerify: () -> Unit
 ) {
     var qrToken by remember { mutableStateOf<String?>(null) }
     var loading by remember { mutableStateOf(true) }
-    val scope = rememberCoroutineScope()
 
     LaunchedEffect(Unit) {
         viewModel.generateQr().fold(
@@ -456,7 +479,24 @@ private fun QrCodeStepInput(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        Button(onClick = onVerify, modifier = Modifier.fillMaxWidth()) {
+        // Primary action: scan the QR code shown on the web/desktop with the camera
+        Button(
+            onClick = onOpenQrScanner,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Icon(
+                imageVector = Icons.Default.CameraAlt,
+                contentDescription = null,
+                modifier = Modifier.size(20.dp)
+            )
+            Spacer(modifier = Modifier.size(8.dp))
+            Text(s(StringKey.MFA_SCAN_QR_CAMERA))
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        // Secondary action: confirm that another device already scanned this app's QR
+        OutlinedButton(onClick = onVerify, modifier = Modifier.fillMaxWidth()) {
             Text(s(StringKey.MFA_VERIFY))
         }
     } else {
