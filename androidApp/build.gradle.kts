@@ -122,6 +122,9 @@ dependencies {
     implementation(platform("com.google.firebase:firebase-bom:33.7.0"))
     implementation("com.google.firebase:firebase-messaging")
 
+    // QR Code rendering (Compose Multiplatform, also works on Android)
+    implementation("io.github.alexzhirkevich:qrose:1.0.1")
+
     // BouncyCastle for NFC SOD validation (e-Passport/eID)
     implementation("org.bouncycastle:bcprov-jdk18on:1.78.1")
     implementation("org.bouncycastle:bcpkix-jdk18on:1.78.1")

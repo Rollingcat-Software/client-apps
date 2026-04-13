@@ -1,5 +1,7 @@
 package com.fivucsas.mobile.android.ui.screen
 
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -48,9 +50,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import io.github.alexzhirkevich.qrose.rememberQrCodePainter
 import com.fivucsas.shared.data.remote.dto.AvailableMethodDto
 import com.fivucsas.shared.i18n.StringKey
 import com.fivucsas.shared.i18n.StringResources
@@ -436,18 +440,17 @@ private fun QrCodeStepInput(
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        // Display the QR token as text (in a real app, render as QR image)
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surfaceVariant
-            )
+        // Render QR code as a visual image using qrose
+        Box(
+            modifier = Modifier
+                .size(220.dp)
+                .background(Color.White),
+            contentAlignment = Alignment.Center
         ) {
-            Text(
-                text = qrToken ?: "",
-                modifier = Modifier.padding(16.dp),
-                style = MaterialTheme.typography.bodyMedium,
-                textAlign = TextAlign.Center
+            Image(
+                painter = rememberQrCodePainter(data = qrToken ?: ""),
+                contentDescription = s(StringKey.MFA_SCAN_QR),
+                modifier = Modifier.size(200.dp)
             )
         }
 
