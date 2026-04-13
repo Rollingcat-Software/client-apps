@@ -8,6 +8,8 @@ import com.fivucsas.shared.domain.usecase.auth.qr.GetQrLoginSessionUseCase
 import com.fivucsas.shared.domain.usecase.auth.qr.StartQrLoginSessionUseCase
 import com.fivucsas.shared.presentation.state.QrLoginState
 import com.fivucsas.shared.presentation.state.QrLoginStatus
+import com.fivucsas.shared.i18n.StringKey
+import com.fivucsas.shared.i18n.s
 import com.fivucsas.shared.presentation.util.ErrorMapper
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -113,8 +115,11 @@ class QrLoginViewModel(
     private fun startPolling(sessionId: String) {
         pollJob?.cancel()
         pollJob = scope.launch {
-            while (true) {
+            var retries = 0
+            val maxRetries = 90
+            while (retries < maxRetries) {
                 delay(2000)
+                retries++
                 val result = getQrLoginSessionUseCase(sessionId)
                 result.fold(
                     onSuccess = { session ->
@@ -144,6 +149,11 @@ class QrLoginViewModel(
                     }
                 )
             }
+            // Polling exhausted — QR code has timed out (3 minutes)
+            _state.value = _state.value.copy(
+                status = QrLoginStatus.ERROR,
+                error = s(StringKey.MFA_TIMEOUT)
+            )
         }
     }
 
