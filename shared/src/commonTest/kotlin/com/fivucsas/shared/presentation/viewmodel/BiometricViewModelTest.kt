@@ -62,12 +62,20 @@ class BiometricViewModelTest {
 
     @Test
     fun `enrollFace should set success result`() = runTest {
+        // NOTE: the success path must pass every ValidationRules check, otherwise the
+        // use case short-circuits with a ValidationException and state.isSuccess stays
+        // false. The original test used placeholders that happened to be invalid:
+        //   - idNumber "12345678901" fails the Turkish ID checksum (d10 should be 5, is 0)
+        //   - address "Istanbul" is 8 chars, below the 10-char minimum
+        // Replaced with values that satisfy every rule. Other enrollFace tests keep the
+        // placeholder ID because they only assert that an error is raised (they don't
+        // care whether the error comes from validation or the repository).
         val enrollmentData = EnrollmentData(
             fullName = "John Doe",
             email = "john@test.com",
-            idNumber = "12345678901",
+            idNumber = "10000000078",
             phoneNumber = "+905551234567",
-            address = "Istanbul"
+            address = "Istanbul, Turkey"
         )
 
         viewModel.enrollFace(enrollmentData, byteArrayOf(1, 2, 3, 4, 5))
