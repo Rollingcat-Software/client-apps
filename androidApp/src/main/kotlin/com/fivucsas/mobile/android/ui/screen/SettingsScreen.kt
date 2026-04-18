@@ -75,6 +75,7 @@ fun SettingsScreen(
     onNavigateToCardDetection: () -> Unit = {},
     onNavigateToHardwareToken: () -> Unit = {},
     onNavigateToBiometricBackup: () -> Unit = {},
+    onNavigateToAuthenticator: () -> Unit = {},
     onLogout: () -> Unit,
     tenantSettingsViewModel: TenantSettingsViewModel = koinInject()
 ) {
@@ -316,6 +317,15 @@ fun SettingsScreen(
                         .fillMaxWidth()
                         .padding(vertical = 6.dp)
                         .clickable { onNavigateToTotpEnroll() }
+                )
+                Text(
+                    text = s(StringKey.AUTH_TITLE),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = AppColors.Primary,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 6.dp)
+                        .clickable { onNavigateToAuthenticator() }
                 )
                 Text(
                     text = s(StringKey.LIVENESS_TITLE),

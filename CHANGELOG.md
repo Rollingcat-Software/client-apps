@@ -2,6 +2,15 @@
 
 All notable changes to the FIVUCSAS client apps (Android, iOS, Desktop).
 
+## [5.1.0] - 2026-04-18
+- TOTP authenticator engine (RFC 6238) in shared `commonMain`: HMAC-SHA1/256/512, configurable digits and period
+- `otpauth://` URI parser with Google/Microsoft-authenticator-compatible examples covered by tests
+- `EncryptedSharedPreferences`-backed `TotpVault` for account storage (AES256-GCM, hardware-keystore-backed master key)
+- Compose Material 3 `AuthenticatorScreen` (Android): grouped code display, per-account countdown ring, tap-to-copy, swipe/delete confirm, manual entry bottom sheet
+- Full i18n coverage (EN + TR) for the new screen; no hardcoded strings
+- QR code scanning deferred to a follow-up (manual entry only in 5.1.0); tracked in `docs/TODO.md`
+- All RFC 6238 Appendix B test vectors pass for SHA1, SHA256, and SHA512
+
 ## [5.0.0] - 2026-04-08
 - N-step MFA flow integration in mobile app
 - MFA timeout handling, i18n error messages, method deduplication

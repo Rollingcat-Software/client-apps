@@ -556,6 +556,27 @@ enum class StringKey {
     MFA_INVALID_CODE,
     MFA_TOO_MANY_ATTEMPTS,
     MFA_GENERIC_ERROR,
+
+    // Authenticator (standalone TOTP app)
+    AUTH_TITLE,
+    AUTH_EMPTY,
+    AUTH_EMPTY_HINT,
+    AUTH_ADD_ACCOUNT,
+    AUTH_SCAN_QR,
+    AUTH_ENTER_MANUALLY,
+    AUTH_ISSUER,
+    AUTH_ACCOUNT_NAME,
+    AUTH_SECRET,
+    AUTH_ALGORITHM,
+    AUTH_DIGITS,
+    AUTH_PERIOD_SECONDS,
+    AUTH_SAVE,
+    AUTH_DELETE_CONFIRM_TITLE,
+    AUTH_DELETE_CONFIRM_MESSAGE,
+    AUTH_COPIED,
+    AUTH_INVALID_SECRET,
+    AUTH_QR_SCAN_SOON,
+    AUTH_RENAME,
 }
 
 private val enStrings = mapOf(
@@ -1076,6 +1097,27 @@ private val enStrings = mapOf(
     StringKey.MFA_INVALID_CODE to "Invalid verification code.",
     StringKey.MFA_TOO_MANY_ATTEMPTS to "Too many attempts. Please wait.",
     StringKey.MFA_GENERIC_ERROR to "Verification failed. Please try again.",
+
+    // Authenticator (standalone TOTP app)
+    StringKey.AUTH_TITLE to "Authenticator",
+    StringKey.AUTH_EMPTY to "No accounts yet",
+    StringKey.AUTH_EMPTY_HINT to "Add an account to start generating codes.",
+    StringKey.AUTH_ADD_ACCOUNT to "Add account",
+    StringKey.AUTH_SCAN_QR to "Scan QR code",
+    StringKey.AUTH_ENTER_MANUALLY to "Enter manually",
+    StringKey.AUTH_ISSUER to "Issuer",
+    StringKey.AUTH_ACCOUNT_NAME to "Account name",
+    StringKey.AUTH_SECRET to "Secret (base32)",
+    StringKey.AUTH_ALGORITHM to "Algorithm",
+    StringKey.AUTH_DIGITS to "Digits",
+    StringKey.AUTH_PERIOD_SECONDS to "Period (seconds)",
+    StringKey.AUTH_SAVE to "Save account",
+    StringKey.AUTH_DELETE_CONFIRM_TITLE to "Delete account?",
+    StringKey.AUTH_DELETE_CONFIRM_MESSAGE to "This will permanently remove the account from this device.",
+    StringKey.AUTH_COPIED to "Code copied",
+    StringKey.AUTH_INVALID_SECRET to "Invalid base32 secret",
+    StringKey.AUTH_QR_SCAN_SOON to "QR scanning coming soon — use manual entry for now.",
+    StringKey.AUTH_RENAME to "Rename",
 )
 
 private val trStrings = mapOf(
@@ -1596,6 +1638,27 @@ private val trStrings = mapOf(
     StringKey.MFA_INVALID_CODE to "Gecersiz dogrulama kodu.",
     StringKey.MFA_TOO_MANY_ATTEMPTS to "Cok fazla deneme. Lutfen bekleyin.",
     StringKey.MFA_GENERIC_ERROR to "Dogrulama basarisiz. Lutfen tekrar deneyin.",
+
+    // Authenticator (standalone TOTP app)
+    StringKey.AUTH_TITLE to "Dogrulayici",
+    StringKey.AUTH_EMPTY to "Henuz hesap yok",
+    StringKey.AUTH_EMPTY_HINT to "Kod uretmeye baslamak icin bir hesap ekleyin.",
+    StringKey.AUTH_ADD_ACCOUNT to "Hesap ekle",
+    StringKey.AUTH_SCAN_QR to "QR kodu tara",
+    StringKey.AUTH_ENTER_MANUALLY to "Elle gir",
+    StringKey.AUTH_ISSUER to "Saglayici",
+    StringKey.AUTH_ACCOUNT_NAME to "Hesap adi",
+    StringKey.AUTH_SECRET to "Gizli anahtar (base32)",
+    StringKey.AUTH_ALGORITHM to "Algoritma",
+    StringKey.AUTH_DIGITS to "Hane sayisi",
+    StringKey.AUTH_PERIOD_SECONDS to "Periyot (saniye)",
+    StringKey.AUTH_SAVE to "Hesabi kaydet",
+    StringKey.AUTH_DELETE_CONFIRM_TITLE to "Hesap silinsin mi?",
+    StringKey.AUTH_DELETE_CONFIRM_MESSAGE to "Bu islem hesabi bu cihazdan kalici olarak siler.",
+    StringKey.AUTH_COPIED to "Kod kopyalandi",
+    StringKey.AUTH_INVALID_SECRET to "Gecersiz base32 gizli anahtari",
+    StringKey.AUTH_QR_SCAN_SOON to "QR tarama yakinda — simdilik elle girisi kullanin.",
+    StringKey.AUTH_RENAME to "Yeniden adlandir",
 )
 
 /**

@@ -1,6 +1,7 @@
 ﻿plugins {
     kotlin("android")
     kotlin("plugin.compose")
+    kotlin("plugin.serialization")
     id("com.android.application")
     id("com.google.gms.google-services")
 }
@@ -41,8 +42,8 @@ android {
         applicationId = "com.fivucsas.mobile"
         minSdk = 24
         targetSdk = 35
-        versionCode = 5
-        versionName = "5.0.0"
+        versionCode = 6
+        versionName = "5.1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -164,6 +165,12 @@ dependencies {
 
     // QR Code rendering (Compose Multiplatform, also works on Android)
     implementation("io.github.alexzhirkevich:qrose:1.0.1")
+
+    // Authenticator vault serialization
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
+
+    // EncryptedSharedPreferences for TOTP vault
+    implementation("androidx.security:security-crypto:1.1.0-alpha06")
 
     // BouncyCastle for NFC SOD validation (e-Passport/eID)
     implementation("org.bouncycastle:bcprov-jdk18on:1.78.1")

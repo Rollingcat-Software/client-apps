@@ -46,6 +46,7 @@ import com.fivucsas.mobile.android.ui.screen.CardDetectionScreen
 import com.fivucsas.mobile.android.ui.screen.HardwareTokenScreen
 import com.fivucsas.mobile.android.ui.screen.BiometricBackupScreen
 import com.fivucsas.mobile.android.ui.screen.MfaFlowScreen
+import com.fivucsas.authenticator.ui.AuthenticatorScreen
 import com.fivucsas.shared.data.local.TokenManager
 import com.fivucsas.shared.domain.model.ConfidenceBand
 import com.fivucsas.shared.domain.model.GuestFaceCheckOutcome
@@ -160,6 +161,7 @@ sealed class Screen(val route: String) {
     object CardDetection : Screen(RouteIds.CARD_DETECTION)
     object HardwareToken : Screen(RouteIds.HARDWARE_TOKEN)
     object MfaFlow : Screen(RouteIds.MFA_FLOW)
+    object Authenticator : Screen(RouteIds.AUTHENTICATOR)
 
     object AuthFlows : Screen("${RouteIds.AUTH_FLOWS}/{tenantId}") {
         fun createRoute(tenantId: String) = "${RouteIds.AUTH_FLOWS}/$tenantId"
@@ -825,6 +827,7 @@ fun AppNavigation() {
                 onNavigateToCardDetection = { navController.navigate(Screen.CardDetection.route) },
                 onNavigateToHardwareToken = { navController.navigate(Screen.HardwareToken.route) },
                 onNavigateToBiometricBackup = { navController.navigate(Screen.BiometricBackup.createRoute(tokenManager?.getUserId() ?: "me")) },
+                onNavigateToAuthenticator = { navController.navigate(Screen.Authenticator.route) },
                 onLogout = {
                     tokenManager?.clearTokens()
                     navController.navigate(Screen.Login.route) {
@@ -1445,6 +1448,13 @@ fun AppNavigation() {
             TotpEnrollScreen(
                 userId = userId,
                 viewModel = viewModel,
+                onNavigateBack = { navController.popBackStack() }
+            )
+        }
+
+        // Standalone TOTP Authenticator (Google/Microsoft Authenticator replacement)
+        composable(Screen.Authenticator.route) {
+            AuthenticatorScreen(
                 onNavigateBack = { navController.popBackStack() }
             )
         }

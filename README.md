@@ -2,6 +2,26 @@
 
 **Cross-Platform Applications for Face and Identity Verification Using Cloud-based SaaS**
 
+## Authenticator
+
+Starting in v5.1.0 the Android app ships a standalone TOTP authenticator
+(`com.fivucsas.authenticator.*`) that works as a drop-in replacement for
+Google Authenticator or Microsoft Authenticator:
+
+- RFC 6238 TOTP with HMAC-SHA1/SHA256/SHA512
+- Configurable digits (6/8) and period, 30-second default
+- `otpauth://` URI parser compatible with major issuers
+- AES256-GCM `EncryptedSharedPreferences` vault (master key held in the
+  hardware Keystore)
+- Compose Material 3 UI: grouped code, per-account countdown ring,
+  tap-to-copy, swipe-delete confirmation, manual account entry
+
+The core engine lives in `shared/src/commonMain/kotlin/com/fivucsas/authenticator/totp/`
+via KMP `expect`/`actual`, so iOS and Desktop will reuse it once their HMAC
+actuals land (tracked in `docs/TODO.md`). QR code scanning is deferred; manual
+entry is the supported flow in 5.1.0.
+
+
 ## Project Status
 
 **Version:** 1.1.0

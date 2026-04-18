@@ -125,4 +125,7 @@ object RouteIds {
 
     // MFA Flow
     const val MFA_FLOW = "mfa-flow"
+
+    // Standalone TOTP Authenticator (Google/Microsoft Authenticator replacement)
+    const val AUTHENTICATOR = "authenticator"
 }
