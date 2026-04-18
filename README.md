@@ -22,6 +22,31 @@ actuals land (tracked in `docs/TODO.md`). QR code scanning is deferred; manual
 entry is the supported flow in 5.1.0.
 
 
+## Feature coverage matrix
+
+The web dashboard (`app.fivucsas.com`) sets the 20/20 reference for feature
+parity across clients. As of 2026-04-18e the Android client is at **~15/20**
+with the following five gaps queued for v5.2.0:
+
+| # | Gap | Status |
+|---|-----|--------|
+| 1 | Passport BAC MFA integration — NFC crypto (5,447 LOC) already ported under `androidApp/data/nfc/`; needs `NfcStepScreen` + ported `MrzScannerScreen` + `MfaFlowScreen.kt:324` dispatcher change. | Planned — v5.2.0 |
+| 2 | GDPR/KVKK export mobile UI — backend shipped 2026-04-16b, web-app wired 2026-04-18, mobile has zero UI. | Planned — v5.2.0 |
+| 3 | FCM action buttons + `fivucsas://nfc-session` deep-link per `NFC_PUSH_APPROVAL_PROTOCOL.md` — current service shows plain notifications. | Planned — v5.2.0 |
+| 4 | Dark mode toggle in Settings — palettes already present in `AppColors.kt`; user has no override. | Planned — v5.2.0 |
+| 5 | Authenticator QR scanner — v5.1.0 shipped manual entry only; bottom-sheet "Scan QR" is a Toast. | Planned — v5.2.0 |
+
+**Canonical plan:** [`../docs/plans/PATH_TO_20_20.md`](../docs/plans/PATH_TO_20_20.md)
+covers the wave sequencing (Wave 1 docs → Wave 2 five parallel code agents →
+Wave 4 consolidation + v5.2.0 tag), per-gap file-level breakdown, and
+verification steps (gradle commands + manual smoke tests).
+
+**iOS + Desktop parity** remain Phase 2 and Phase 3 respectively per
+[`../docs/plans/CLIENT_APPS_PARITY.md`](../docs/plans/CLIENT_APPS_PARITY.md).
+iOS HMAC actuals for the TOTP engine are the first iOS blocker; see
+`docs/TODO.md` Phase B.
+
+
 ## Project Status
 
 **Version:** 1.1.0
@@ -168,6 +193,7 @@ The project includes comprehensive ViewModel tests with mock implementations:
 
 ### Test Coverage
 
+- **Total Kotlin tests:** 424 (v5.1.0 added ~23 covering the TOTP engine + `otpauth://` parser)
 - **AdminViewModel**: 25+ tests (navigation, CRUD, search, dialogs)
 - **KioskViewModel**: 25+ tests (navigation, enrollment, verification)
 

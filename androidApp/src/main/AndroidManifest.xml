@@ -45,6 +45,17 @@
             <meta-data
                 android:name="android.nfc.action.TECH_DISCOVERED"
                 android:resource="@xml/nfc_tech_filter" />
+
+            <!--
+              fivucsas://nfc-session/<sessionId> deep link for the NFC
+              push-approval protocol. See docs/plans/NFC_PUSH_APPROVAL_PROTOCOL.md §4.2.
+            -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="fivucsas" android:host="nfc-session" />
+            </intent-filter>
         </activity>
         <!-- Firebase Cloud Messaging service for push notifications -->
         <service
@@ -54,5 +65,27 @@
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
+
+        <!-- Broadcast receiver for Allow / Deny notification action buttons -->
+        <receiver
+            android:name=".data.push.ApprovalActionReceiver"
+            android:exported="false" />
+
+        <!--
+          FileProvider used by DataExportFileWriter / ExportDataRow to share
+          the GDPR/KVKK JSON export via ACTION_SEND without triggering
+          FileUriExposedException on API 24+.
+          Authority must be "${applicationId}.fileprovider" to match the
+          helper (context.packageName + ".fileprovider").
+        -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_provider_paths" />
+        </provider>
     </application>
 </manifest>

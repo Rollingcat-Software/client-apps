@@ -44,6 +44,8 @@ import com.fivucsas.shared.ui.components.molecules.ErrorMessage
 import com.fivucsas.shared.ui.components.molecules.SuccessMessage
 import com.fivucsas.shared.ui.components.atoms.SectionHeader
 import androidx.compose.material3.CircularProgressIndicator
+import com.fivucsas.mobile.android.ui.component.ExportDataRow
+import com.fivucsas.mobile.android.ui.viewmodel.DataExportViewModel
 import com.fivucsas.shared.ui.components.organisms.BottomNavBar
 import com.fivucsas.shared.ui.theme.AppColors
 
@@ -64,7 +66,9 @@ fun ProfileScreen(
     onReEnroll: () -> Unit,
     onDeleteEnrollment: () -> Unit,
     onOpenSettings: () -> Unit,
-    navItems: List<com.fivucsas.shared.ui.components.organisms.BottomNavItem> = com.fivucsas.mobile.android.ui.navigation.BottomNavDestinations.items
+    navItems: List<com.fivucsas.shared.ui.components.organisms.BottomNavItem> = com.fivucsas.mobile.android.ui.navigation.BottomNavDestinations.items,
+    userId: String = "",
+    dataExportViewModel: DataExportViewModel? = null,
 ) {
     val isSelfBiometricRole = userRole == UserRole.USER || userRole == UserRole.TENANT_MEMBER
     var showDeleteDialog by remember { mutableStateOf(false) }
@@ -201,6 +205,19 @@ fun ProfileScreen(
 
             if (showDeleteSuccess) {
                 SuccessMessage(message = "Enrollment deleted successfully.")
+            }
+
+            // ── "My Data" (GDPR Art. 20 / KVKK data portability) ──
+            // Only rendered when we have both a user id + a VM wired in by
+            // the navigation layer. Positioned below privacy/settings per the
+            // ProfileScreen spec (Agent 20B; Agent 20D owns Settings).
+            if (dataExportViewModel != null && userId.isNotBlank()) {
+                // TODO(i18n): DATA_EXPORT_* keys in /tmp/i18n_agent_20B.txt
+                SectionHeader(title = "My Data")
+                ExportDataRow(
+                    userId = userId,
+                    viewModel = dataExportViewModel,
+                )
             }
         }
     }

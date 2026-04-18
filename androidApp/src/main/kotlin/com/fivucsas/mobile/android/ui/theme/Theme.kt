@@ -1,14 +1,22 @@
 package com.fivucsas.mobile.android.ui.theme
 
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Typography
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+import com.fivucsas.mobile.android.data.preferences.ThemePreferences
+import com.fivucsas.shared.ui.theme.LocalThemeMode
+import com.fivucsas.shared.ui.theme.ThemeMode
+import org.koin.compose.koinInject
 
 // Design tokens aligned with web-app theme.ts
 // Primary: Indigo (#6366f1), Secondary: Purple (#8b5cf6)
@@ -153,16 +161,43 @@ private val AppTypography = Typography(
     )
 )
 
+/**
+ * Application theme.
+ *
+ * Self-wiring: collects [ThemePreferences] from Koin and publishes the
+ * user's selected [ThemeMode] on [LocalThemeMode] before rendering the
+ * MaterialTheme. Any callsite already wrapped in `FIVUCSASTheme { ... }`
+ * (including `MainActivity`) picks up the toggle automatically, so
+ * `SettingsScreen` just needs to call `ThemePreferences.setThemeMode(...)`
+ * to repaint the whole app.
+ *
+ * The [darkTheme] parameter is kept for callers that want to force a
+ * specific palette (e.g. screenshot tests) and wins over the preference
+ * when non-null. Resolution order when [darkTheme] is null:
+ *  - `LIGHT` → light palette
+ *  - `DARK` → dark palette
+ *  - `SYSTEM` → `isSystemInDarkTheme()`
+ */
 @Composable
 fun FIVUCSASTheme(
-    darkTheme: Boolean = false,
+    darkTheme: Boolean? = null,
     content: @Composable () -> Unit
 ) {
-    val colors = if (darkTheme) DarkColors else LightColors
+    val prefs: ThemePreferences = koinInject()
+    val mode by prefs.themeMode.collectAsState()
 
-    MaterialTheme(
-        colorScheme = colors,
-        typography = AppTypography,
-        content = content
-    )
+    CompositionLocalProvider(LocalThemeMode provides mode) {
+        val useDark = darkTheme ?: when (mode) {
+            ThemeMode.LIGHT -> false
+            ThemeMode.DARK -> true
+            ThemeMode.SYSTEM -> isSystemInDarkTheme()
+        }
+        val colors = if (useDark) DarkColors else LightColors
+
+        MaterialTheme(
+            colorScheme = colors,
+            typography = AppTypography,
+            content = content
+        )
+    }
 }

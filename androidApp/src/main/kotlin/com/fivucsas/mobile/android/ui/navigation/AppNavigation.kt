@@ -46,8 +46,10 @@ import com.fivucsas.mobile.android.ui.screen.CardDetectionScreen
 import com.fivucsas.mobile.android.ui.screen.HardwareTokenScreen
 import com.fivucsas.mobile.android.ui.screen.BiometricBackupScreen
 import com.fivucsas.mobile.android.ui.screen.MfaFlowScreen
+import com.fivucsas.mobile.android.ui.viewmodel.DataExportViewModel as AndroidDataExportViewModel
 import com.fivucsas.authenticator.ui.AuthenticatorScreen
 import com.fivucsas.shared.data.local.TokenManager
+import com.fivucsas.shared.domain.repository.DataExportRepository
 import com.fivucsas.shared.domain.model.ConfidenceBand
 import com.fivucsas.shared.domain.model.GuestFaceCheckOutcome
 import com.fivucsas.shared.domain.model.Permission
@@ -718,6 +720,14 @@ fun AppNavigation() {
             }
             val profileUserName = profileState.user?.name ?: tokenManager?.getUserName() ?: "User"
             val profileUserEmail = profileState.user?.email ?: tokenManager?.getUserEmail() ?: ""
+            val dataExportRepository = koinInject<DataExportRepository>()
+            val profileContext = LocalContext.current.applicationContext
+            val dataExportVm = remember(dataExportRepository) {
+                AndroidDataExportViewModel(
+                    repository = dataExportRepository,
+                    appContext = profileContext,
+                )
+            }
             ProfileScreen(
                 userName = profileUserName,
                 userEmail = profileUserEmail,
@@ -743,7 +753,9 @@ fun AppNavigation() {
                 onReEnroll = { navController.navigate(Screen.BiometricEnroll.createRoute(tokenManager?.getUserId() ?: "me")) },
                 onDeleteEnrollment = { /* Enrollment deletion not yet available */ },
                 onOpenSettings = { navController.navigate(Screen.Settings.route) },
-                navItems = profileNavItems
+                navItems = profileNavItems,
+                userId = profileState.user?.id ?: tokenManager?.getUserId() ?: "",
+                dataExportViewModel = dataExportVm,
             )
         }
 

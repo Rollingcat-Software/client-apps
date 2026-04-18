@@ -321,7 +321,18 @@ private fun MfaStepInputContent(
             )
         }
 
-        "FACE", "VOICE", "NFC_DOCUMENT", "HARDWARE_KEY" -> {
+        "NFC_DOCUMENT" -> {
+            // Passport / eID BAC read → payload sent to NfcDocumentAuthHandler.
+            NfcStepScreen(
+                onVerify = { data ->
+                    scope.launch {
+                        viewModel.verifyStep(method, data)
+                    }
+                }
+            )
+        }
+
+        "FACE", "VOICE", "HARDWARE_KEY" -> {
             // Generic placeholder for methods that require platform-specific flows.
             // These will be wired to existing screens later.
             GenericMethodStepInput(

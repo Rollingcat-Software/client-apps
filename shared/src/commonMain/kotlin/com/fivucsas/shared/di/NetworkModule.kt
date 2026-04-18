@@ -13,6 +13,8 @@ import com.fivucsas.shared.data.remote.api.AuthSessionApi
 import com.fivucsas.shared.data.remote.api.AuthSessionApiImpl
 import com.fivucsas.shared.data.remote.api.BiometricApi
 import com.fivucsas.shared.data.remote.api.BiometricApiImpl
+import com.fivucsas.shared.data.remote.api.DataExportApi
+import com.fivucsas.shared.data.remote.api.DataExportApiImpl
 import com.fivucsas.shared.data.remote.api.DeviceApi
 import com.fivucsas.shared.data.remote.api.DeviceApiImpl
 import com.fivucsas.shared.data.remote.api.EnrollmentApi
@@ -202,6 +204,7 @@ val networkModule = module {
     single<AuthSessionApi> { AuthSessionApiImpl(get(named("identityClient"))) }
     single<DeviceApi> { DeviceApiImpl(get(named("identityClient"))) }
     single<EnrollmentApi> { EnrollmentApiImpl(get(named("identityClient"))) }
+    single<DataExportApi> { DataExportApiImpl(get(named("identityClient"))) }
 
     // WebAuthn API for FIDO2 credential registration/verification
     single<com.fivucsas.shared.data.remote.api.WebAuthnApi> {
@@ -230,5 +233,10 @@ val networkModule = module {
     // OAuth2 Client API (Developer Portal)
     single<com.fivucsas.shared.data.remote.api.OAuth2ClientApi> {
         com.fivucsas.shared.data.remote.api.OAuth2ClientApiImpl(get(named("identityClient")))
+    }
+
+    // NFC Approval API (push-approval decide endpoint)
+    single<com.fivucsas.shared.data.remote.api.NfcApprovalApi> {
+        com.fivucsas.shared.data.remote.api.NfcApprovalApiImpl(get(named("identityClient")))
     }
 }

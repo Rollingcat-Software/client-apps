@@ -68,6 +68,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.fivucsas.authenticator.storage.TotpVault
 import com.fivucsas.authenticator.totp.TotpAlgorithm
+import com.fivucsas.mobile.android.ui.screen.OtpQrScannerScreen
 import com.fivucsas.shared.i18n.StringKey
 import com.fivucsas.shared.i18n.s
 import kotlinx.coroutines.launch
@@ -94,9 +95,32 @@ fun AuthenticatorScreen(
 
     var showSheet by remember { mutableStateOf(false) }
     var showManualForm by remember { mutableStateOf(false) }
+    var showQrScanner by remember { mutableStateOf(false) }
     var pendingDeleteId by remember { mutableStateOf<String?>(null) }
     val sheetState = rememberModalBottomSheetState()
     val scope = rememberCoroutineScope()
+
+    // Full-screen overlay: while the scanner is active, replace the
+    // authenticator list entirely (same pattern as MfaFlowScreen → QrScannerScreen).
+    if (showQrScanner) {
+        OtpQrScannerScreen(
+            onAccepted = { uri ->
+                val result = viewModel.addFromUri(uri)
+                showQrScanner = false
+                if (result.isFailure) {
+                    // TODO(i18n): promote to StringKey.OTP_SCAN_UNSUPPORTED once string table is updated.
+                    // Tracked in /tmp/i18n_agent_20E.txt (agent 20E).
+                    Toast.makeText(
+                        context,
+                        "Unsupported QR code",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            },
+            onBack = { showQrScanner = false }
+        )
+        return
+    }
 
     Scaffold(
         topBar = {
@@ -155,15 +179,10 @@ fun AuthenticatorScreen(
                     text = { Text(s(StringKey.AUTH_SCAN_QR)) },
                     leadingIcon = { Icon(Icons.Default.QrCodeScanner, contentDescription = null) },
                     onClick = {
-                        Toast.makeText(
-                            context,
-                            s(StringKey.AUTH_QR_SCAN_SOON),
-                            Toast.LENGTH_LONG
-                        ).show()
                         scope.launch {
                             sheetState.hide()
                             showSheet = false
-                            showManualForm = true
+                            showQrScanner = true
                         }
                     }
                 )

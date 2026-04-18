@@ -30,12 +30,14 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.Button
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -45,6 +47,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.layout.height
+import com.fivucsas.mobile.android.data.preferences.ThemePreferences
 import com.fivucsas.shared.config.UIDimens
 import com.fivucsas.shared.domain.model.Permission
 import com.fivucsas.shared.domain.model.UserRole
@@ -55,6 +58,7 @@ import com.fivucsas.shared.i18n.s
 import com.fivucsas.shared.presentation.viewmodel.TenantSettingsViewModel
 import com.fivucsas.shared.ui.components.molecules.ExpandableCard
 import com.fivucsas.shared.ui.theme.AppColors
+import com.fivucsas.shared.ui.theme.ThemeMode
 import org.koin.compose.koinInject
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -77,7 +81,8 @@ fun SettingsScreen(
     onNavigateToBiometricBackup: () -> Unit = {},
     onNavigateToAuthenticator: () -> Unit = {},
     onLogout: () -> Unit,
-    tenantSettingsViewModel: TenantSettingsViewModel = koinInject()
+    tenantSettingsViewModel: TenantSettingsViewModel = koinInject(),
+    themePreferences: ThemePreferences = koinInject()
 ) {
     val notificationsEnabled = remember { mutableStateOf(true) }
     val biometricEnabled = remember { mutableStateOf(true) }
@@ -156,6 +161,45 @@ fun SettingsScreen(
                                 )
                             }
                         }
+                    }
+                }
+            }
+
+            // Appearance / Theme mode (SYSTEM / LIGHT / DARK)
+            val currentThemeMode by themePreferences.themeMode.collectAsState()
+            val themeSubtitle = when (currentThemeMode) {
+                ThemeMode.SYSTEM -> s(StringKey.THEME_SYSTEM)
+                ThemeMode.LIGHT -> s(StringKey.THEME_LIGHT)
+                ThemeMode.DARK -> s(StringKey.THEME_DARK)
+            }
+            ExpandableCard(
+                // TODO(i18n-20D): replace with StringKey.THEME_SECTION_TITLE once added
+                // to StringResources.kt. See /tmp/i18n_agent_20D.txt.
+                title = s(StringKey.THEME),
+                subtitle = themeSubtitle
+            ) {
+                val options = listOf(
+                    ThemeMode.SYSTEM to s(StringKey.THEME_SYSTEM),
+                    ThemeMode.LIGHT to s(StringKey.THEME_LIGHT),
+                    ThemeMode.DARK to s(StringKey.THEME_DARK),
+                )
+                options.forEach { (mode, label) ->
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { themePreferences.setThemeMode(mode) }
+                            .padding(vertical = 4.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        RadioButton(
+                            selected = currentThemeMode == mode,
+                            onClick = { themePreferences.setThemeMode(mode) }
+                        )
+                        Spacer(modifier = Modifier.size(8.dp))
+                        Text(
+                            text = label,
+                            style = MaterialTheme.typography.bodyMedium
+                        )
                     }
                 }
             }

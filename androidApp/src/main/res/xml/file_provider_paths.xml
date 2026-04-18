@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  FileProvider paths for sharing user-facing exports (GDPR / KVKK data
+  export JSON files).
+
+  external-path maps Environment.getExternalStorageDirectory(), which
+  covers the public Downloads directory written to by AndroidFileSaver /
+  DataExportViewModel.saveJsonToDownloads on API < 29 devices.
+
+  On API 29+ the ViewModel uses MediaStore.Downloads and returns a
+  content:// URI directly, so FileProvider is only consulted for the
+  legacy code path.
+-->
+<paths>
+    <external-path name="external_downloads" path="." />
+    <external-files-path name="app_downloads" path="." />
+</paths>

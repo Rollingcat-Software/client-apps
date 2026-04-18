@@ -111,6 +111,13 @@ android {
         sourceCompatibility = JavaVersion.VERSION_21
         targetCompatibility = JavaVersion.VERSION_21
     }
+
+    // Allow JVM unit tests to stub android.* methods (Log, Base64) as no-ops
+    // instead of throwing "Method not mocked" — enables pure-JVM ViewModel tests
+    // without Robolectric.
+    testOptions {
+        unitTests.isReturnDefaultValues = true
+    }
 }
 
 kotlin {
@@ -148,6 +155,10 @@ dependencies {
     // ML Kit Face Detection
     implementation("com.google.mlkit:face-detection:16.1.5")
 
+    // ML Kit Text Recognition (latin script) — used by MrzAnalyzer for
+    // passport / ID-card MRZ OCR.
+    implementation("com.google.mlkit:text-recognition:16.0.1")
+
     // FIDO2 / Credential Manager for WebAuthn hardware token support
     implementation("com.google.android.gms:play-services-fido:21.1.0")
 
@@ -177,6 +188,11 @@ dependencies {
     implementation("org.bouncycastle:bcpkix-jdk18on:1.78.1")
 
     debugImplementation("androidx.compose.ui:ui-tooling")
+
+    // ── JVM Unit Testing (src/test) ──
+    testImplementation("junit:junit:4.13.2")
+    testImplementation("org.jetbrains.kotlin:kotlin-test-junit")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.1")
 
     // ── E2E / Instrumented Testing ──
     androidTestImplementation(platform("androidx.compose:compose-bom:2024.12.01"))

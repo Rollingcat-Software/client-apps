@@ -4,6 +4,7 @@ import android.app.Application
 import android.util.Log
 import com.fivucsas.mobile.android.data.AndroidNetworkMonitor
 import com.fivucsas.mobile.android.data.nfc.AndroidNfcService
+import com.fivucsas.mobile.android.data.preferences.ThemePreferences
 import com.fivucsas.mobile.android.data.push.AndroidPushNotificationService
 import com.fivucsas.shared.di.getAppModules
 import com.fivucsas.shared.platform.INetworkMonitor
@@ -37,6 +38,7 @@ class FIVUCSASApplication : Application() {
             single<INfcService> { AndroidNfcService(androidContext()) }
             single<IPushNotificationService> { AndroidPushNotificationService(get()) }
             single<INetworkMonitor> { AndroidNetworkMonitor(androidContext()) }
+            single { ThemePreferences(androidContext()) }
         }
 
         // Initialize Koin

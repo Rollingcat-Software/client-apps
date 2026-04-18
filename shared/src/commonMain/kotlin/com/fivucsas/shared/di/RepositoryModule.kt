@@ -9,6 +9,7 @@ import com.fivucsas.shared.data.remote.api.AuthFlowApi
 import com.fivucsas.shared.data.remote.api.AuthSessionApi
 import com.fivucsas.shared.data.remote.api.RootAdminApi
 import com.fivucsas.shared.data.remote.api.BiometricApi
+import com.fivucsas.shared.data.remote.api.DataExportApi
 import com.fivucsas.shared.data.remote.api.DeviceApi
 import com.fivucsas.shared.data.remote.api.EnrollmentApi
 import com.fivucsas.shared.data.remote.api.IdentityApi
@@ -19,6 +20,7 @@ import com.fivucsas.shared.data.repository.AuthFlowRepositoryImpl
 import com.fivucsas.shared.data.repository.AuthSessionRepositoryImpl
 import com.fivucsas.shared.data.repository.AuthRepositoryImpl
 import com.fivucsas.shared.data.repository.BiometricRepositoryImpl
+import com.fivucsas.shared.data.repository.DataExportRepositoryImpl
 import com.fivucsas.shared.data.repository.DeviceRepositoryImpl
 import com.fivucsas.shared.data.repository.EnrollmentRepositoryImpl
 import com.fivucsas.shared.data.repository.FingerprintRepositoryImpl
@@ -32,6 +34,7 @@ import com.fivucsas.shared.domain.repository.AuthFlowRepository
 import com.fivucsas.shared.domain.repository.AuthSessionRepository
 import com.fivucsas.shared.domain.repository.AuthRepository
 import com.fivucsas.shared.domain.repository.BiometricRepository
+import com.fivucsas.shared.domain.repository.DataExportRepository
 import com.fivucsas.shared.domain.repository.DeviceRepository
 import com.fivucsas.shared.domain.repository.EnrollmentRepository
 import com.fivucsas.shared.domain.repository.FingerprintRepository
@@ -86,6 +89,13 @@ val repositoryModule = module {
     single<UserRepository> {
         UserRepositoryImpl(
             identityApi = get<IdentityApi>()
+        )
+    }
+
+    // Data Export Repository (GDPR Art. 20 / KVKK) - with DataExportApi
+    single<DataExportRepository> {
+        DataExportRepositoryImpl(
+            dataExportApi = get<DataExportApi>()
         )
     }
 
@@ -185,6 +195,13 @@ val repositoryModule = module {
     single<com.fivucsas.shared.domain.repository.OAuth2ClientRepository> {
         com.fivucsas.shared.data.repository.OAuth2ClientRepositoryImpl(
             oAuth2ClientApi = get<com.fivucsas.shared.data.remote.api.OAuth2ClientApi>()
+        )
+    }
+
+    // NFC Approval Repository (push-approval protocol)
+    single<com.fivucsas.shared.domain.repository.NfcApprovalRepository> {
+        com.fivucsas.shared.data.repository.NfcApprovalRepositoryImpl(
+            api = get<com.fivucsas.shared.data.remote.api.NfcApprovalApi>()
         )
     }
 

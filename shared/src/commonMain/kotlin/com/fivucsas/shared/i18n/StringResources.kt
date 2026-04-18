@@ -334,6 +334,56 @@ enum class StringKey {
     BIOMETRIC_BACKUP_GDPR_TITLE,
     BIOMETRIC_BACKUP_GDPR_DESC,
 
+    // GDPR / KVKK data export (referenced by shared DataExportViewModel)
+    DATA_EXPORT_ERROR_GENERIC,
+    DATA_EXPORT_ERROR_RATE_LIMITED,
+
+    // NFC MFA step (Android 20A — v5.2.0)
+    NFC_STEP_IDLE_PROMPT,
+    NFC_STEP_START_BUTTON,
+    NFC_STEP_MRZ_CAPTURE_HINT,
+    NFC_STEP_REOPEN_DIALOG,
+    NFC_STEP_SCANNING,
+    NFC_STEP_SUCCESS,
+    NFC_STEP_SUBMIT_BUTTON,
+    NFC_STEP_RETRY_BUTTON,
+    NFC_STEP_MRZ_DIALOG_TITLE,
+    NFC_STEP_SCAN_MRZ_CAMERA,
+    NFC_STEP_OR_MANUAL,
+    NFC_STEP_PRIVACY_NOTE,
+    NFC_STEP_AUTHENTICATE_BUTTON,
+
+    // GDPR/KVKK "My Data" export UI (Android 20B — v5.2.0)
+    MY_DATA,
+    DATA_EXPORT_TITLE,
+    DATA_EXPORT_DESCRIPTION,
+    DATA_EXPORT_BUTTON,
+    DATA_EXPORT_IN_PROGRESS,
+    DATA_EXPORT_SUCCESS,
+    DATA_EXPORT_RATE_LIMITED,
+    DATA_EXPORT_ERROR,
+    DATA_EXPORT_SHARE_SHEET_TITLE,
+
+    // FCM push approval (Android 20C — v5.2.0)
+    APPROVAL_NOTIFICATION_TITLE,
+    APPROVAL_NOTIFICATION_BODY,
+    APPROVAL_ACTION_ALLOW,
+    APPROVAL_ACTION_DENY,
+    APPROVAL_TOAST_APPROVED,
+    APPROVAL_TOAST_DENIED,
+
+    // Theme mode toggle (Android 20D — v5.2.0)
+    THEME_SECTION_TITLE,
+    THEME_MODE_SYSTEM,
+    THEME_MODE_LIGHT,
+    THEME_MODE_DARK,
+
+    // Authenticator QR scanner (Android 20E — v5.2.0)
+    OTP_SCAN_TITLE,
+    OTP_SCAN_HINT,
+    OTP_SCAN_UNSUPPORTED,
+    OTP_SCAN_INVALID_QR,
+
     // Desktop NFC (P3)
     DESKTOP_NFC_TITLE,
     DESKTOP_NFC_SUBTITLE,
@@ -875,6 +925,56 @@ private val enStrings = mapOf(
     StringKey.BIOMETRIC_BACKUP_GDPR_TITLE to "Your Data Rights (GDPR/KVKK)",
     StringKey.BIOMETRIC_BACKUP_GDPR_DESC to "You have the right to view, export, and delete your biometric data at any time. Deleting your data will unenroll you from all biometric authentication methods.",
 
+    // GDPR / KVKK data export (referenced by shared DataExportViewModel)
+    StringKey.DATA_EXPORT_ERROR_GENERIC to "Data export failed. Please try again later.",
+    StringKey.DATA_EXPORT_ERROR_RATE_LIMITED to "Too many export requests. Please wait and try again.",
+
+    // NFC MFA step (Android 20A — v5.2.0)
+    StringKey.NFC_STEP_IDLE_PROMPT to "Place your passport or eID near the back of your phone when prompted.",
+    StringKey.NFC_STEP_START_BUTTON to "Enter or scan MRZ",
+    StringKey.NFC_STEP_MRZ_CAPTURE_HINT to "Provide the MRZ from the back of your document.",
+    StringKey.NFC_STEP_REOPEN_DIALOG to "Open MRZ entry",
+    StringKey.NFC_STEP_SCANNING to "Hold the document against the back of your phone. Do not move it.",
+    StringKey.NFC_STEP_SUCCESS to "Document read successfully.",
+    StringKey.NFC_STEP_SUBMIT_BUTTON to "Continue",
+    StringKey.NFC_STEP_RETRY_BUTTON to "Try again",
+    StringKey.NFC_STEP_MRZ_DIALOG_TITLE to "Identity Document Authentication",
+    StringKey.NFC_STEP_SCAN_MRZ_CAMERA to "Scan MRZ with Camera",
+    StringKey.NFC_STEP_OR_MANUAL to "Or enter the MRZ data manually:",
+    StringKey.NFC_STEP_PRIVACY_NOTE to "Your MRZ data is used only for card authentication and is not stored.",
+    StringKey.NFC_STEP_AUTHENTICATE_BUTTON to "Authenticate",
+
+    // GDPR/KVKK "My Data" export UI (Android 20B — v5.2.0)
+    StringKey.MY_DATA to "My Data",
+    StringKey.DATA_EXPORT_TITLE to "Export my data",
+    StringKey.DATA_EXPORT_DESCRIPTION to "Download a JSON copy of all personal data we store about you (GDPR Art. 20 / KVKK).",
+    StringKey.DATA_EXPORT_BUTTON to "Export",
+    StringKey.DATA_EXPORT_IN_PROGRESS to "Preparing your export…",
+    StringKey.DATA_EXPORT_SUCCESS to "Export saved. Use the share sheet to forward it.",
+    StringKey.DATA_EXPORT_RATE_LIMITED to "Rate-limited. Please try again in {seconds} seconds.",
+    StringKey.DATA_EXPORT_ERROR to "Export failed: {reason}",
+    StringKey.DATA_EXPORT_SHARE_SHEET_TITLE to "Share your data export",
+
+    // FCM push approval (Android 20C — v5.2.0)
+    StringKey.APPROVAL_NOTIFICATION_TITLE to "Approve sign-in?",
+    StringKey.APPROVAL_NOTIFICATION_BODY to "A new sign-in request is waiting for your approval. Tap Allow or Deny below.",
+    StringKey.APPROVAL_ACTION_ALLOW to "Allow",
+    StringKey.APPROVAL_ACTION_DENY to "Deny",
+    StringKey.APPROVAL_TOAST_APPROVED to "Access approved",
+    StringKey.APPROVAL_TOAST_DENIED to "Access denied",
+
+    // Theme mode toggle (Android 20D — v5.2.0)
+    StringKey.THEME_SECTION_TITLE to "Appearance",
+    StringKey.THEME_MODE_SYSTEM to "Follow system",
+    StringKey.THEME_MODE_LIGHT to "Light",
+    StringKey.THEME_MODE_DARK to "Dark",
+
+    // Authenticator QR scanner (Android 20E — v5.2.0)
+    StringKey.OTP_SCAN_TITLE to "Scan authenticator QR",
+    StringKey.OTP_SCAN_HINT to "Point the camera at an otpauth:// QR code",
+    StringKey.OTP_SCAN_UNSUPPORTED to "Unsupported QR code",
+    StringKey.OTP_SCAN_INVALID_QR to "Unsupported QR code",
+
     // Desktop NFC (P3)
     StringKey.DESKTOP_NFC_TITLE to "Desktop NFC",
     StringKey.DESKTOP_NFC_SUBTITLE to "NFC reader status for desktop",
@@ -1415,6 +1515,56 @@ private val trStrings = mapOf(
     StringKey.BIOMETRIC_BACKUP_DELETE_CONFIRM to "Bu islem tum biyometrik kayitlarinizi (yuz, ses, parmak izi) kalici olarak silecektir. Bu islem geri alinamaz. Emin misiniz?",
     StringKey.BIOMETRIC_BACKUP_GDPR_TITLE to "Veri Haklariniz (GDPR/KVKK)",
     StringKey.BIOMETRIC_BACKUP_GDPR_DESC to "Biyometrik verilerinizi istediginiz zaman goruntuleme, disa aktarma ve silme hakkiniz vardir. Verilerinizi silmek, tum biyometrik kimlik dogrulama yontemlerinden kaydınızı kaldıracaktır.",
+
+    // GDPR / KVKK data export (referenced by shared DataExportViewModel)
+    StringKey.DATA_EXPORT_ERROR_GENERIC to "Veri dışa aktarma başarısız oldu. Lütfen daha sonra tekrar deneyin.",
+    StringKey.DATA_EXPORT_ERROR_RATE_LIMITED to "Çok fazla dışa aktarma isteği. Lütfen bekleyip tekrar deneyin.",
+
+    // NFC MFA step (Android 20A — v5.2.0)
+    StringKey.NFC_STEP_IDLE_PROMPT to "Istendiginde pasaportunuzu veya kimliginizi telefonunuzun arkasina yaklastirin.",
+    StringKey.NFC_STEP_START_BUTTON to "MRZ gir veya tara",
+    StringKey.NFC_STEP_MRZ_CAPTURE_HINT to "Belgenizin arkasindaki MRZ bilgilerini girin.",
+    StringKey.NFC_STEP_REOPEN_DIALOG to "MRZ girisini ac",
+    StringKey.NFC_STEP_SCANNING to "Belgeyi telefonun arkasina tutun. Hareket ettirmeyin.",
+    StringKey.NFC_STEP_SUCCESS to "Belge basariyla okundu.",
+    StringKey.NFC_STEP_SUBMIT_BUTTON to "Devam",
+    StringKey.NFC_STEP_RETRY_BUTTON to "Tekrar dene",
+    StringKey.NFC_STEP_MRZ_DIALOG_TITLE to "Kimlik Belgesi Dogrulama",
+    StringKey.NFC_STEP_SCAN_MRZ_CAMERA to "Kamera ile MRZ Tara",
+    StringKey.NFC_STEP_OR_MANUAL to "Veya MRZ verisini elle girin:",
+    StringKey.NFC_STEP_PRIVACY_NOTE to "MRZ veriniz yalnizca kart dogrulama icin kullanilir ve saklanmaz.",
+    StringKey.NFC_STEP_AUTHENTICATE_BUTTON to "Dogrula",
+
+    // GDPR/KVKK "My Data" export UI (Android 20B — v5.2.0)
+    StringKey.MY_DATA to "Verilerim",
+    StringKey.DATA_EXPORT_TITLE to "Verilerimi dışa aktar",
+    StringKey.DATA_EXPORT_DESCRIPTION to "Hakkınızda tuttuğumuz tüm kişisel verilerin bir JSON kopyasını indirin (GDPR Madde 20 / KVKK).",
+    StringKey.DATA_EXPORT_BUTTON to "Dışa Aktar",
+    StringKey.DATA_EXPORT_IN_PROGRESS to "Dışa aktarmanız hazırlanıyor…",
+    StringKey.DATA_EXPORT_SUCCESS to "Dışa aktarma kaydedildi. İletmek için paylaş menüsünü kullanın.",
+    StringKey.DATA_EXPORT_RATE_LIMITED to "Hız sınırı aşıldı. Lütfen {seconds} saniye sonra tekrar deneyin.",
+    StringKey.DATA_EXPORT_ERROR to "Dışa aktarma başarısız: {reason}",
+    StringKey.DATA_EXPORT_SHARE_SHEET_TITLE to "Veri dışa aktarmanızı paylaşın",
+
+    // FCM push approval (Android 20C — v5.2.0)
+    StringKey.APPROVAL_NOTIFICATION_TITLE to "Giriş onaylanıyor mu?",
+    StringKey.APPROVAL_NOTIFICATION_BODY to "Yeni bir giriş isteği onayınızı bekliyor. Aşağıdan İzin Ver veya Reddet seçin.",
+    StringKey.APPROVAL_ACTION_ALLOW to "İzin Ver",
+    StringKey.APPROVAL_ACTION_DENY to "Reddet",
+    StringKey.APPROVAL_TOAST_APPROVED to "Erişim onaylandı",
+    StringKey.APPROVAL_TOAST_DENIED to "Erişim reddedildi",
+
+    // Theme mode toggle (Android 20D — v5.2.0)
+    StringKey.THEME_SECTION_TITLE to "Gorunum",
+    StringKey.THEME_MODE_SYSTEM to "Sistemi takip et",
+    StringKey.THEME_MODE_LIGHT to "Acik",
+    StringKey.THEME_MODE_DARK to "Koyu",
+
+    // Authenticator QR scanner (Android 20E — v5.2.0)
+    StringKey.OTP_SCAN_TITLE to "Dogrulayici QR kodunu tara",
+    StringKey.OTP_SCAN_HINT to "Kamerayi otpauth:// QR koduna dogrultun",
+    StringKey.OTP_SCAN_UNSUPPORTED to "Desteklenmeyen QR kodu",
+    StringKey.OTP_SCAN_INVALID_QR to "Desteklenmeyen QR kodu",
 
     // Desktop NFC (P3)
     StringKey.DESKTOP_NFC_TITLE to "Masaustu NFC",
