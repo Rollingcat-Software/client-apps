@@ -88,19 +88,49 @@ jobs:
         id: build-task
         env:
           BUILD_TYPE: ${{ github.event.inputs.build_type || 'debug' }}
+          EVENT_NAME: ${{ github.event_name }}
         run: |
-          if [ "$BUILD_TYPE" = "release" ]; then
+          # PRs (including forks) and pushes always build debug — only the
+          # manual `workflow_dispatch` with build_type=release performs a
+          # real signed release build. This keeps release signing off the
+          # hot path and off PR builds.
+          if [ "$EVENT_NAME" = "workflow_dispatch" ] && [ "$BUILD_TYPE" = "release" ]; then
             echo "task=:androidApp:assembleRelease" >> "$GITHUB_OUTPUT"
             echo "apk_path=androidApp/build/outputs/apk/release/*.apk" >> "$GITHUB_OUTPUT"
             echo "artifact_name=fivucsas-release-apk" >> "$GITHUB_OUTPUT"
+            echo "needs_signing=true" >> "$GITHUB_OUTPUT"
           else
             echo "task=:androidApp:assembleDebug" >> "$GITHUB_OUTPUT"
             echo "apk_path=androidApp/build/outputs/apk/debug/*.apk" >> "$GITHUB_OUTPUT"
             echo "artifact_name=fivucsas-debug-apk" >> "$GITHUB_OUTPUT"
+            echo "needs_signing=false" >> "$GITHUB_OUTPUT"
           fi
 
+      - name: Decode release keystore
+        if: steps.build-task.outputs.needs_signing == 'true'
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+        run: |
+          if [ -z "${ANDROID_KEYSTORE_BASE64}" ]; then
+            echo "::error::ANDROID_KEYSTORE_BASE64 secret is not set — cannot build signed release."
+            exit 1
+          fi
+          mkdir -p "$RUNNER_TEMP/keystore"
+          printf '%s' "$ANDROID_KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/keystore/release.jks"
+          echo "ANDROID_KEYSTORE_PATH=$RUNNER_TEMP/keystore/release.jks" >> "$GITHUB_ENV"
+
       - name: Build APK
+        env:
+          # These are only non-empty on signed release builds. assembleDebug
+          # ignores them entirely; assembleRelease reads them via build.gradle.kts.
+          ANDROID_KEYSTORE_PASSWORD: ${{ steps.build-task.outputs.needs_signing == 'true' && secrets.ANDROID_KEYSTORE_PASSWORD || '' }}
+          ANDROID_KEY_ALIAS: ${{ steps.build-task.outputs.needs_signing == 'true' && secrets.ANDROID_KEY_ALIAS || '' }}
+          ANDROID_KEY_PASSWORD: ${{ steps.build-task.outputs.needs_signing == 'true' && secrets.ANDROID_KEY_PASSWORD || '' }}
         run: ./gradlew ${{ steps.build-task.outputs.task }} --no-daemon
+
+      - name: Wipe decoded keystore
+        if: always() && steps.build-task.outputs.needs_signing == 'true'
+        run: rm -f "$RUNNER_TEMP/keystore/release.jks"
 
       - name: Upload APK
         if: success()

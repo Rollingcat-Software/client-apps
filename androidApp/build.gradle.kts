@@ -5,6 +5,34 @@
     id("com.google.gms.google-services")
 }
 
+// ──────────────────────────────────────────────────────────────────────────────
+// Release signing config (env-var / gradle-property driven, NEVER hardcoded).
+//
+// Resolution order for each value:
+//   1. OS environment variable   (used by GitHub Actions / CI)
+//   2. Gradle property           (read from local.properties for dev machines)
+//   3. Sensible default          (path + alias only — never a password)
+//
+// If keystorePassword resolves to null OR the keystore file does not exist
+// the release build falls back to the debug signing config. This keeps
+// unsigned CI builds (PRs, forks) working without exposing any secret.
+//
+// See docs/RELEASE.md for rotation + CI secret setup.
+// ──────────────────────────────────────────────────────────────────────────────
+val keystorePath: String = System.getenv("ANDROID_KEYSTORE_PATH")
+    ?: (findProperty("android.keystore.path") as? String)
+    ?: "${rootDir}/keystore/release.jks"
+val keystorePassword: String? = System.getenv("ANDROID_KEYSTORE_PASSWORD")
+    ?: (findProperty("android.keystore.password") as? String)
+val releaseKeyAlias: String = System.getenv("ANDROID_KEY_ALIAS")
+    ?: (findProperty("android.key.alias") as? String)
+    ?: "fivucsas"
+val releaseKeyPassword: String? = System.getenv("ANDROID_KEY_PASSWORD")
+    ?: (findProperty("android.key.password") as? String)
+    ?: keystorePassword
+
+val hasReleaseSigning: Boolean = keystorePassword != null && file(keystorePath).exists()
+
 android {
     namespace = "com.fivucsas.mobile.android"
     compileSdk = 35
@@ -25,10 +53,12 @@ android {
 
     signingConfigs {
         create("release") {
-            storeFile = file("../keystore/release.jks")
-            storePassword = "fivucsas2026"
-            keyAlias = "fivucsas"
-            keyPassword = "fivucsas2026"
+            if (hasReleaseSigning) {
+                storeFile = file(keystorePath)
+                storePassword = keystorePassword
+                keyAlias = releaseKeyAlias
+                keyPassword = releaseKeyPassword!!
+            }
         }
     }
 
@@ -58,7 +88,17 @@ android {
         release {
             isMinifyEnabled = true
             isShrinkResources = true
-            signingConfig = signingConfigs.getByName("release")
+            signingConfig = if (hasReleaseSigning) {
+                signingConfigs.getByName("release")
+            } else {
+                // Fall back to debug signing so PR builds on forks still produce
+                // an installable APK. Production release MUST set the env vars.
+                logger.lifecycle(
+                    "⚠ ANDROID_KEYSTORE_PASSWORD not set or keystore missing at " +
+                            "$keystorePath — release APK will be debug-signed."
+                )
+                signingConfigs.getByName("debug")
+            }
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"

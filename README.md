@@ -210,7 +210,7 @@ Desktop implementations are in `desktopApp/.../platform/`.
 ### Build & Run
 
 ```bash
-# Android debug APK
+# Android debug APK (no keystore or secrets needed)
 ./gradlew :androidApp:assembleDebug
 
 # Desktop application
@@ -222,6 +222,28 @@ Desktop implementations are in `desktopApp/.../platform/`.
 # Run shared module tests only
 ./gradlew :shared:testDebugUnitTest
 ```
+
+### Signed release builds
+
+Signed Android release builds read the keystore path + passwords from
+environment variables (CI) or Gradle properties (local dev). **No passwords
+are committed.**
+
+For local signed builds add to `local.properties` (already `.gitignored`):
+
+```
+android.keystore.path=/absolute/path/to/keystore/release.jks
+android.keystore.password=<current-store-password>
+android.key.alias=fivucsas
+android.key.password=<current-key-password>
+```
+
+See [`docs/RELEASE.md`](docs/RELEASE.md) for the keystore rotation procedure,
+required GitHub secrets, and emergency revocation playbook.
+
+If no password is configured, `assembleRelease` falls back to debug signing
+with a warning — this is intentional so that new contributors and forks can
+still produce an installable APK.
 
 ---
 
