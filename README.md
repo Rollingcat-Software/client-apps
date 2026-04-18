@@ -22,29 +22,34 @@ actuals land (tracked in `docs/TODO.md`). QR code scanning is deferred; manual
 entry is the supported flow in 5.1.0.
 
 
-## Feature coverage matrix
+## Feature coverage matrix (hosted-first, since 2026-04-16)
 
-The web dashboard (`app.fivucsas.com`) sets the 20/20 reference for feature
-parity across clients. As of 2026-04-18e the Android client is at **~15/20**
-with the following five gaps queued for v5.2.0:
+On 2026-04-16 FIVUCSAS pivoted to **hosted-first authentication**: native
+clients are thin OAuth 2.0 / OIDC clients that hand off to
+`verify.fivucsas.com/login` and receive an `?code=…&state=…` callback. Face,
+Voice, Fingerprint, and NFC live on the hosted login page — native apps no
+longer reimplement them. The parity matrix collapsed from 20 reference
+columns to **13 thin-OAuth-client columns**: OAuth login, secure token
+storage, token refresh, deep-link handler, account dashboard, cross-device
+sessions, GDPR/KVKK export, offline display, push/WebSocket approval
+handler, TOTP authenticator (companion), QR display + scanner, signed
+release artifact, public distribution.
 
-| # | Gap | Status |
-|---|-----|--------|
-| 1 | Passport BAC MFA integration — NFC crypto (5,447 LOC) already ported under `androidApp/data/nfc/`; needs `NfcStepScreen` + ported `MrzScannerScreen` + `MfaFlowScreen.kt:324` dispatcher change. | Planned — v5.2.0 |
-| 2 | GDPR/KVKK export mobile UI — backend shipped 2026-04-16b, web-app wired 2026-04-18, mobile has zero UI. | Planned — v5.2.0 |
-| 3 | FCM action buttons + `fivucsas://nfc-session` deep-link per `NFC_PUSH_APPROVAL_PROTOCOL.md` — current service shows plain notifications. | Planned — v5.2.0 |
-| 4 | Dark mode toggle in Settings — palettes already present in `AppColors.kt`; user has no override. | Planned — v5.2.0 |
-| 5 | Authenticator QR scanner — v5.1.0 shipped manual entry only; bottom-sheet "Scan QR" is a Toast. | Planned — v5.2.0 |
+**Platform status (2026-04-18e):**
 
-**Canonical plan:** [`../docs/plans/PATH_TO_20_20.md`](../docs/plans/PATH_TO_20_20.md)
-covers the wave sequencing (Wave 1 docs → Wave 2 five parallel code agents →
-Wave 4 consolidation + v5.2.0 tag), per-gap file-level breakdown, and
-verification steps (gradle commands + manual smoke tests).
+- **Android: 13 / 13** — v5.2.0-rc1 shipped 2026-04-18e.
+- **Desktop (Windows + Linux): scaffolding in flight** — Agents B/C/D on OAuth loopback + secure storage + installers (e.g. `desktopApp/.../security/SecureTokenStorage.kt`).
+- **iOS: 0 / 13** — Phase 2 (July 2026), blocked on Apple Developer enrollment; no `iosApp/` module yet.
+- **macOS: out of scope** — no Mac available for `codesign` / `notarytool`.
 
-**iOS + Desktop parity** remain Phase 2 and Phase 3 respectively per
-[`../docs/plans/CLIENT_APPS_PARITY.md`](../docs/plans/CLIENT_APPS_PARITY.md).
-iOS HMAC actuals for the TOTP engine are the first iOS blocker; see
-`docs/TODO.md` Phase B.
+**Canonical plan:** [`../docs/plans/CLIENT_APPS_PARITY.md`](../docs/plans/CLIENT_APPS_PARITY.md)
+— rewritten 2026-04-18 with the 13-column matrix, per-platform gap analysis,
+release criteria, test strategy, and the pre-pivot 20-row matrix archived in
+its Appendix A.
+
+Pivot context: [`../web-app/docs/AUDIT_REPORT_2026-04-16.md`](../web-app/docs/AUDIT_REPORT_2026-04-16.md)
+and [`../web-app/docs/plans/HOSTED_LOGIN_INTEGRATION.md`](../web-app/docs/plans/HOSTED_LOGIN_INTEGRATION.md)
+(PR-1 hosted-login spec, merged to `main` 2026-04-16).
 
 
 ## Project Status

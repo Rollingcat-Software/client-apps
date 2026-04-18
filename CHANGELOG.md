@@ -2,6 +2,51 @@
 
 All notable changes to the FIVUCSAS client apps (Android, iOS, Desktop).
 
+## [Unreleased] — architecture note 2026-04-18e
+
+The client-apps feature-parity matrix shrank from **20 columns to 13**
+following the 2026-04-16 hosted-first pivot (see
+`../web-app/docs/AUDIT_REPORT_2026-04-16.md` and
+`../web-app/docs/plans/HOSTED_LOGIN_INTEGRATION.md`, PR-1 merged to `main`
+on both `web-app` and `identity-core-api`).
+
+**What changed:**
+
+- Face, Voice, Fingerprint (WebAuthn platform authenticator), Hardware Key,
+  Passport NFC, TCKN NFC, Istanbulkart NFC, Student card NFC, Password
+  login, Email OTP entry, SMS OTP entry, and the biometric enrollment flow
+  are **no longer native client responsibilities**. Users authenticate on
+  the hosted login page (`verify.fivucsas.com/login`) via a system-trusted
+  browser surface — Chrome Custom Tabs on Android, `ASWebAuthenticationSession`
+  on iOS, RFC 8252 loopback on Desktop.
+- Native code now owns only a **thin OAuth 2.0 / OIDC client** (13 columns):
+  OAuth login, secure token storage, token refresh, deep-link handler,
+  account dashboard, cross-device sessions, GDPR/KVKK export, offline
+  display, push / WebSocket approval handler, TOTP authenticator
+  (companion), QR display + scanner, signed release artifact, public
+  distribution.
+- **macOS desktop** is explicitly **out of scope for v6** — no Mac hardware
+  available for `codesign` + `notarytool`. Revisit with Mac procurement.
+- **Platform status (2026-04-18e):**
+  - Android: **13 / 13** (v5.2.0-rc1, Phase I complete).
+  - Desktop (Windows + Linux): **2 / 13** — scaffolding work in flight
+    (`SecureTokenStorage.kt` interface + DPAPI / libsecret impls; OAuth
+    loopback client; Compose dashboard skeleton).
+  - iOS: **0 / 13** — Phase 2 (July 2026), blocked on Apple Developer
+    enrollment. No `iosApp/` module exists yet.
+
+**Why the matrix shrank:** native biometric / NFC crypto reimplementation
+tripled the maintenance surface with near-zero cross-platform reuse (Apple
+CoreNFC ≠ Android NfcAdapter ≠ PC/SC), iframe-embedded widgets cannot
+drive Web NFC / WebAuthn / autofill in top-level context, and every modern
+IdP (Auth0, Okta, Entra, Google, Apple, Keycloak, AWS Cognito, Stripe,
+Turkish banks, e-Devlet) is hosted-first. One hosted surface, one audit,
+one threat model.
+
+Canonical plan: [`../docs/plans/CLIENT_APPS_PARITY.md`](../docs/plans/CLIENT_APPS_PARITY.md)
+— rewritten 2026-04-18 with the 13-column matrix. Pre-pivot 20-row matrix
+preserved in Appendix A.
+
 ## [Unreleased] — v5.2.0 planning
 
 Five Android feature-parity gaps identified by the 2026-04-18e cross-platform
