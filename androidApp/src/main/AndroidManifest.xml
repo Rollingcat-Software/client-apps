@@ -6,6 +6,8 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.NFC" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <!-- MO-H6 (2026-04-19 audit): required for FCM push notifications on Android 13+ -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <!-- Features -->
     <uses-feature
@@ -23,7 +25,10 @@
 
     <application
         android:name=".FIVUCSASApplication"
-        android:allowBackup="true"
+        android:allowBackup="false"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:extractNativeLibs="false"
+        android:networkSecurityConfig="@xml/network_security_config"
         android:label="FIVUCSAS"
         android:supportsRtl="true"
         android:theme="@android:style/Theme.Material.Light.NoActionBar"

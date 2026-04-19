@@ -2,6 +2,73 @@
 
 All notable changes to the FIVUCSAS client apps (Android, iOS, Desktop).
 
+## [2026-04-19] Audit remediation (MO-H1/H3/H4/H6/C3)
+
+Addresses the four mobile findings from
+`/opt/projects/fivucsas/docs/audits/AUDIT_2026-04-19.md` (Audit 4).
+
+### Security
+
+- **MO-H1 — iOS Keychain accessibility class.**
+  `shared/src/iosMain/.../IosSecureStorage.kt`: replaced
+  `kSecAttrAccessibleWhenUnlocked` with
+  `kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly`. Prevents token
+  exfiltration via iCloud Keychain sync / encrypted iCloud backup restore.
+- **MO-H3 — Desktop fallback refuses headless.**
+  `desktopApp/.../security/FallbackTokenStorage.kt`: when DPAPI / libsecret
+  are unavailable AND `/etc/machine-id` is not readable, we no longer derive
+  a key from `hostname+user+os.name`. Instead we throw a new
+  `SecureStorageUnavailableException`. CI / headless test rigs can opt in
+  via `FIVUCSAS_ALLOW_INSECURE_FALLBACK=1` (env) or
+  `-Dfivucsas.allowInsecureFallback=true` (system property), which prints a
+  loud stderr warning. Production builds must never set this.
+- **MO-H4 — Android hardening.**
+  `androidApp/src/main/AndroidManifest.xml`:
+  `android:allowBackup="false"`,
+  `android:extractNativeLibs="false"`,
+  `android:dataExtractionRules="@xml/data_extraction_rules"`,
+  `android:networkSecurityConfig="@xml/network_security_config"`.
+  New `res/xml/data_extraction_rules.xml` denies cloud-backup +
+  device-transfer across root/file/database/sharedpref/external domains
+  (Android 12+). New `res/xml/network_security_config.xml` forbids
+  cleartext globally and pins `api.fivucsas.com` + `verify.fivucsas.com`
+  to the system trust store only (user-installed CAs not trusted in prod).
+  True SPKI pinning deliberately deferred until we land a backup-pin /
+  rotation plan.
+- **MO-H6 — Android POST_NOTIFICATIONS permission.**
+  Added `<uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>`
+  so FCM push notifications are not silently no-op on Android 13+.
+
+### Changed
+
+- **MO-C3 — Desktop SecureTokenStorage dedupe.**
+  Two parallel `SecureTokenStorage` interfaces used to coexist:
+  `desktopApp/.../auth/SecureTokenStorage.kt` (bundle-level) and
+  `desktopApp/.../security/SecureTokenStorage.kt` (key/value,
+  DPAPI/libsecret/fallback). Kept the key/value primitive and folded
+  `AuthStateManager` on top of it directly: the full token bundle is
+  serialized to JSON via `kotlinx.serialization` and stored under the key
+  `oauth_tokens`. Deleted `auth/SecureTokenStorage.kt` interface and the
+  `auth/FileBackedTokenStorage.kt` adapter. `Main.kt` updated to
+  `AuthStateManager()` (defaults to `TokenStorageFactory.create()`).
+  `OAuthLoopbackClientTest` and `FallbackTokenStorageTest` untouched —
+  neither references the deleted interface. No other production call sites
+  were affected.
+
+### Files touched
+
+- `shared/src/iosMain/kotlin/com/fivucsas/shared/platform/IosSecureStorage.kt`
+- `androidApp/src/main/AndroidManifest.xml`
+- `androidApp/src/main/res/xml/data_extraction_rules.xml` (new)
+- `androidApp/src/main/res/xml/network_security_config.xml` (new)
+- `desktopApp/src/desktopMain/kotlin/com/fivucsas/desktop/auth/AuthStateManager.kt`
+- `desktopApp/src/desktopMain/kotlin/com/fivucsas/desktop/auth/SecureTokenStorage.kt` (deleted)
+- `desktopApp/src/desktopMain/kotlin/com/fivucsas/desktop/auth/FileBackedTokenStorage.kt` (deleted)
+- `desktopApp/src/desktopMain/kotlin/com/fivucsas/desktop/security/SecureTokenStorage.kt`
+  (added `SecureStorageUnavailableException`)
+- `desktopApp/src/desktopMain/kotlin/com/fivucsas/desktop/security/FallbackTokenStorage.kt`
+- `desktopApp/src/desktopMain/kotlin/com/fivucsas/desktop/Main.kt`
+
 ## [Unreleased] — 2026-04-18f
 
 ### Fixed

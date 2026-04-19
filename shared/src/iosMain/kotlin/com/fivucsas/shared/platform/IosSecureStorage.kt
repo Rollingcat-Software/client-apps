@@ -23,7 +23,8 @@ import kotlinx.cinterop.*
  * - Access control with biometric authentication
  *
  * Security Properties:
- * - kSecAttrAccessibleWhenUnlocked: Data accessible only when device unlocked
+ * - kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly: Data accessible after first unlock,
+ *   bound to this device, never synced to iCloud Keychain or restored from backup
  * - kSecClassGenericPassword: Generic password storage class
  */
 @OptIn(ExperimentalForeignApi::class)
@@ -41,7 +42,10 @@ class IosSecureStorage : ISecureStorage {
         // Create query dictionary
         val query = createKeychainQuery(key).apply {
             this[kSecValueData] = (value as NSString).dataUsingEncoding(NSUTF8StringEncoding)
-            this[kSecAttrAccessible] = kSecAttrAccessibleWhenUnlocked
+            // MO-H1 (2026-04-19 audit): use AfterFirstUnlockThisDeviceOnly so tokens do NOT
+            // sync to iCloud Keychain and are not included in encrypted iCloud backups.
+            // Token exfil via iCloud Keychain sync is the documented attack vector.
+            this[kSecAttrAccessible] = kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly
         }
 
         // Add to keychain

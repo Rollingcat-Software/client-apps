@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  MO-H4 (2026-04-19 audit) — Network Security Config.
+
+  Policy:
+  * No cleartext traffic anywhere (base-config cleartextTrafficPermitted="false").
+  * FIVUCSAS production hosts (api.fivucsas.com, verify.fivucsas.com) use the
+    system CA store only — user/admin-installed CAs are NOT trusted, which defeats
+    casual MITM via installed proxy certs on dev/rooted devices.
+  * Debug builds may still trust user CAs via AGP-generated debug overrides; this
+    file does not opt into them, so production APKs pin against the system store.
+
+  Note: true SPKI pinning via <pin-set> is intentionally omitted at this step to
+  avoid brick-risk if Let's Encrypt rotates the cert pin. Phase J1 tracking:
+  once we land a backup pin + rotation plan we can harden further.
+-->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="false">
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
+    <domain-config cleartextTrafficPermitted="false">
+        <domain includeSubdomains="true">api.fivucsas.com</domain>
+        <domain includeSubdomains="true">verify.fivucsas.com</domain>
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </domain-config>
+</network-security-config>

@@ -60,6 +60,7 @@ class FallbackTokenStorage(
         ensureDirectory(file.parentFile)
     }
 
+
     override fun save(key: String, value: String) = synchronized(lock) {
         val props = readProps()
         props.setProperty(key, encrypt(value))
@@ -199,8 +200,31 @@ class FallbackTokenStorage(
         }
 
         /**
-         * Derive a stable machine secret. Falls back through several sources so
-         * the storage still works in containers / restricted filesystems.
+         * Environment variable / system property used to opt in to the insecure
+         * file-based fallback when no real keystore is available. Intended only
+         * for CI / headless integration tests; production builds must never set
+         * this.
+         */
+        const val INSECURE_FALLBACK_ENV = "FIVUCSAS_ALLOW_INSECURE_FALLBACK"
+        const val INSECURE_FALLBACK_PROP = "fivucsas.allowInsecureFallback"
+
+        private fun insecureFallbackAllowed(): Boolean {
+            val env = System.getenv(INSECURE_FALLBACK_ENV)?.trim()
+            if (env == "1" || env.equals("true", ignoreCase = true)) return true
+            val prop = System.getProperty(INSECURE_FALLBACK_PROP)?.trim()
+            return prop.equals("true", ignoreCase = true) || prop == "1"
+        }
+
+        /**
+         * Derive a stable machine secret.
+         *
+         * MO-H3 (2026-04-19 audit): previously fell back to a
+         * `hostname+user+os.name` string when `/etc/machine-id` was unavailable,
+         * which is a trivially guessable "encryption" key. We now REFUSE to
+         * derive a secret in that case and throw
+         * [SecureStorageUnavailableException]. CI / headless test rigs may
+         * opt in explicitly via [INSECURE_FALLBACK_ENV] /
+         * [INSECURE_FALLBACK_PROP]; those paths emit a loud warning to stderr.
          */
         private fun readMachineSecret(): ByteArray {
             val candidates = listOf(
@@ -213,6 +237,18 @@ class FallbackTokenStorage(
                     if (!txt.isNullOrBlank()) return txt.toByteArray(StandardCharsets.UTF_8)
                 }
             }
+            if (!insecureFallbackAllowed()) {
+                throw SecureStorageUnavailableException(
+                    "No platform keystore available (DPAPI/libsecret failed) and no readable " +
+                        "machine-id — refusing to derive an encryption key from hostname+user. " +
+                        "Set $INSECURE_FALLBACK_ENV=1 only if you understand the risk (CI / headless tests).",
+                )
+            }
+            System.err.println(
+                "[FallbackTokenStorage] WARNING: $INSECURE_FALLBACK_ENV override in effect. " +
+                    "Deriving encryption key from hostname+user+os.name — this is INSECURE and " +
+                    "must never be used in production.",
+            )
             val host = try { InetAddress.getLocalHost().hostName } catch (_: Exception) { "unknown-host" }
             val user = System.getProperty("user.name") ?: "unknown-user"
             val os = System.getProperty("os.name") ?: "unknown-os"

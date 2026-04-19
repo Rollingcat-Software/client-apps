@@ -47,3 +47,20 @@ interface SecureTokenStorage {
  */
 class StorageUnavailableException(message: String, cause: Throwable? = null) :
     RuntimeException(message, cause)
+
+/**
+ * MO-H3 (2026-04-19 audit).
+ *
+ * Thrown by [FallbackTokenStorage] when no real keystore is available AND the
+ * environment did not opt in to the insecure file-based fallback. Callers
+ * (typically the OAuth flow) should surface this to the user as
+ * "secure storage unavailable — please sign in interactively" rather than
+ * silently deriving an encryption key from world-readable `/etc/machine-id`.
+ *
+ * Opt-in override: set the environment variable
+ * `FIVUCSAS_ALLOW_INSECURE_FALLBACK=1` (or the system property
+ * `fivucsas.allowInsecureFallback=true`). Intended only for CI / headless
+ * tests; production MUST NOT enable this.
+ */
+class SecureStorageUnavailableException(message: String, cause: Throwable? = null) :
+    RuntimeException(message, cause)

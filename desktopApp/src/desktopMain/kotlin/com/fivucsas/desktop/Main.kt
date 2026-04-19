@@ -68,7 +68,6 @@ import com.fivucsas.desktop.ui.admin.AdminDesktopTenantHistoryScreen
 import com.fivucsas.desktop.ui.admin.AdminDesktopUsersScreen
 import com.fivucsas.desktop.auth.AccessTokens
 import com.fivucsas.desktop.auth.AuthStateManager
-import com.fivucsas.desktop.auth.FileBackedTokenStorage
 import com.fivucsas.desktop.auth.OAuthLoginScreen
 import com.fivucsas.desktop.ui.auth.GuestFaceCheckScreen
 import com.fivucsas.desktop.ui.auth.QrLoginScreen
@@ -251,7 +250,7 @@ private fun AppContent(
     val currentRole = tokenManager.getRole()?.let { UserRole.fromString(it) }
     var rootSelectedTenantId by remember { mutableStateOf<String?>(null) }
     // Hosted-first OAuth state — stub storage until Agent C wires DPAPI/libsecret.
-    val authStateManager = remember { AuthStateManager(FileBackedTokenStorage()) }
+    val authStateManager = remember { AuthStateManager() }
     LaunchedEffect(Unit) { authStateManager.restore() }
     val onLogoutToLauncher = {
         tokenManager.clearTokens()

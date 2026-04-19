@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  MO-H4 (2026-04-19 audit) — deny-all cloud-backup and device-to-device transfer rules.
+  Android 12+ (API 31+) honors this file in addition to (or instead of) the legacy
+  android:allowBackup / android:fullBackupContent flags. We also set
+  android:allowBackup="false" in the manifest as a belt-and-suspenders measure.
+
+  Intent: tokens in EncryptedSharedPreferences and any local identity/biometric state
+  must never leave the device via Google auto-backup or Smart Switch-style transfers.
+-->
+<data-extraction-rules>
+    <cloud-backup>
+        <exclude domain="root" />
+        <exclude domain="file" />
+        <exclude domain="database" />
+        <exclude domain="sharedpref" />
+        <exclude domain="external" />
+    </cloud-backup>
+    <device-transfer>
+        <exclude domain="root" />
+        <exclude domain="file" />
+        <exclude domain="database" />
+        <exclude domain="sharedpref" />
+        <exclude domain="external" />
+    </device-transfer>
+</data-extraction-rules>
