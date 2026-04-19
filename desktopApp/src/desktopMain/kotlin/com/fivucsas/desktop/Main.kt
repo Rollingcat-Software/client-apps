@@ -66,6 +66,10 @@ import com.fivucsas.desktop.ui.admin.AdminDesktopInviteManagementScreen
 import com.fivucsas.desktop.ui.admin.AdminDesktopSettingsScreen
 import com.fivucsas.desktop.ui.admin.AdminDesktopTenantHistoryScreen
 import com.fivucsas.desktop.ui.admin.AdminDesktopUsersScreen
+import com.fivucsas.desktop.auth.AccessTokens
+import com.fivucsas.desktop.auth.AuthStateManager
+import com.fivucsas.desktop.auth.FileBackedTokenStorage
+import com.fivucsas.desktop.auth.OAuthLoginScreen
 import com.fivucsas.desktop.ui.auth.GuestFaceCheckScreen
 import com.fivucsas.desktop.ui.auth.QrLoginScreen
 import com.fivucsas.desktop.ui.components.DesktopAppShell
@@ -140,6 +144,10 @@ fun main(args: Array<String>) {
     val kioskPassword = args.firstOrNull { it.startsWith("--kiosk-password=") }
         ?.substringAfter("=")
         ?: DEFAULT_KIOSK_PASSWORD
+    // Hidden debug flag that still routes to the deprecated native auth screens
+    // (LoginScreen / RegisterScreen / ForgotPasswordScreen). Scheduled for removal
+    // one release cycle after hosted-first OAuth ships (2026-04-18 pivot).
+    val debugNativeAuth = args.any { it == "--debug-native-auth" }
 
     // Install global crash handler — logs to ~/fivucsas-crash-logs/ before re-throwing
     val defaultHandler = Thread.getDefaultUncaughtExceptionHandler()
@@ -201,6 +209,7 @@ fun main(args: Array<String>) {
             DesktopTheme {
                 AppContent(
                     currentMode = currentMode,
+                    debugNativeAuth = debugNativeAuth,
                     onNavigate = { mode ->
                         if (kioskMode && mode == AppMode.LAUNCHER) {
                             // In kiosk mode, don't allow going back to launcher
@@ -229,6 +238,7 @@ fun main(args: Array<String>) {
 @Composable
 private fun AppContent(
     currentMode: AppMode,
+    debugNativeAuth: Boolean,
     onNavigate: (AppMode) -> Unit,
     onUnauthorized: (String) -> Unit,
     unauthorizedMessage: String
@@ -240,8 +250,12 @@ private fun AppContent(
     val qrState by qrLoginViewModel.state.collectAsState()
     val currentRole = tokenManager.getRole()?.let { UserRole.fromString(it) }
     var rootSelectedTenantId by remember { mutableStateOf<String?>(null) }
+    // Hosted-first OAuth state — stub storage until Agent C wires DPAPI/libsecret.
+    val authStateManager = remember { AuthStateManager(FileBackedTokenStorage()) }
+    LaunchedEffect(Unit) { authStateManager.restore() }
     val onLogoutToLauncher = {
         tokenManager.clearTokens()
+        authStateManager.logout()
         loginViewModel.resetState()
         onNavigate(AppMode.LAUNCHER)
     }
@@ -253,10 +267,28 @@ private fun AppContent(
     when (currentMode) {
         AppMode.LAUNCHER -> LauncherScreen(
             onKioskSelected = { onNavigate(AppMode.KIOSK) },
-            onDashboardSelected = { onNavigate(AppMode.LOGIN) },
+            // Hosted-first OAuth is the default dashboard entry point (2026-04-18 pivot).
+            // `--debug-native-auth` CLI flag still routes to the deprecated LoginScreen.
+            onDashboardSelected = {
+                onNavigate(if (debugNativeAuth) AppMode.LOGIN else AppMode.OAUTH_LOGIN)
+            },
             onGuestFaceCheckSelected = { onNavigate(AppMode.GUEST_FACE_CHECK) },
             onQrLoginSelected = { qrLoginViewModel.startDesktopSession(); onNavigate(AppMode.QR_LOGIN) }
         )
+        AppMode.OAUTH_LOGIN -> OAuthLoginScreen(
+            onLoggedIn = { tokens ->
+                authStateManager.onLoginSuccess(tokens)
+                // Bridge to the legacy TokenManager so existing API calls keep working.
+                tokenManager.saveTokens(tokens.toSharedAuthTokens())
+                // Role isn't carried in the minimal OAuth flow — default to USER home.
+                // When id_token parsing lands (Phase B/C), route by role.
+                onNavigate(modeForHomeDestination(homeDestinationFor(UserRole.USER)))
+            },
+            onDebugNativeAuth = if (debugNativeAuth) {{ onNavigate(AppMode.LOGIN) }} else null,
+        )
+        // DEPRECATED (2026-04-18 hosted-first pivot): native LoginScreen reachable only
+        // via `--debug-native-auth`. Scheduled for removal one release cycle after OAuth
+        // login ships. Do NOT add new features here.
         AppMode.LOGIN -> LoginScreen(
             viewModel = loginViewModel,
             onNavigateToRegister = { onNavigate(AppMode.REGISTER) },
@@ -268,6 +300,9 @@ private fun AppContent(
                 onNavigate(modeForHomeDestination(homeDestinationFor(role)))
             }
         )
+        // DEPRECATED (2026-04-18 hosted-first pivot): registration now happens at
+        // verify.fivucsas.com/login. This native RegisterScreen remains reachable only
+        // through the legacy path for one release cycle.
         AppMode.REGISTER -> RegisterScreen(
             viewModel = registerViewModel,
             onNavigateBack = { onNavigate(AppMode.LOGIN) },
@@ -277,6 +312,8 @@ private fun AppContent(
                 onNavigate(modeForHomeDestination(homeDestinationFor(role)))
             }
         )
+        // DEPRECATED (2026-04-18 hosted-first pivot): forgot-password flows are served
+        // by the hosted login page. Native screen kept for one release cycle.
         AppMode.FORGOT_PASSWORD -> ForgotPasswordScreen(
             onNavigateBack = { onNavigate(AppMode.LOGIN) },
             onNavigateToLogin = { onNavigate(AppMode.LOGIN) }
@@ -1134,6 +1171,23 @@ private fun LauncherScreen(
     }
 }
 
+/**
+ * Bridge OAuth [AccessTokens] to the legacy shared [com.fivucsas.shared.domain.repository.AuthTokens]
+ * model so the existing [TokenManager] / Ktor plumbing in `shared/` keeps working while the
+ * rest of the hosted-first migration catches up. id_token parsing (role, tenantId, email, name)
+ * is deferred to Phase B/C.
+ */
+private fun AccessTokens.toSharedAuthTokens(): com.fivucsas.shared.domain.repository.AuthTokens {
+    val nowMs = System.currentTimeMillis()
+    val expiresInSec = ((expiresAt - nowMs) / 1000L).coerceAtLeast(0L)
+    return com.fivucsas.shared.domain.repository.AuthTokens(
+        accessToken = accessToken,
+        refreshToken = refreshToken.orEmpty(),
+        expiresIn = expiresInSec,
+        role = UserRole.USER.name,
+    )
+}
+
 private fun modeForRole(role: UserRole): AppMode = modeForHomeDestination(homeDestinationFor(role))
 
 private fun backTargetForAuth(role: UserRole?): AppMode {
@@ -1215,8 +1269,13 @@ private fun KioskExitDialog(
 
 enum class AppMode {
     LAUNCHER,
+    /** Hosted-first OAuth 2.0 loopback login (default since 2026-04-18 pivot). */
+    OAUTH_LOGIN,
+    /** @deprecated use [OAUTH_LOGIN]. Kept reachable via `--debug-native-auth`. */
     LOGIN,
+    /** @deprecated hosted page handles registration. */
     REGISTER,
+    /** @deprecated hosted page handles password reset. */
     FORGOT_PASSWORD,
     KIOSK,
     GUEST_FACE_CHECK,

@@ -1,0 +1,114 @@
+name: Desktop Installers
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'desktop-v*'
+
+# Cancel older runs on the same tag/branch.
+concurrency:
+  group: desktop-installers-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  # ── Linux .deb ─────────────────────────────────────────────────────────────
+  # Signing is OFF in CI for now (see client-apps/docs/SIGNING.md).
+  # Users can verify the pubkey at https://fivucsas.com/pgp.asc and sign
+  # locally with dpkg-sig before uploading to /releases/.
+  build-linux:
+    name: Build .deb (Linux)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+      - name: Cache Gradle
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: gradle-${{ runner.os }}-
+
+      - name: Grant execute on gradlew
+        run: chmod +x ./gradlew
+
+      - name: Package .deb
+        run: ./gradlew :desktopApp:packageDeb --no-daemon --stacktrace
+
+      - name: Compute SHA256 + file info
+        run: |
+          set -euo pipefail
+          DEB_FILE=$(find desktopApp/build/compose/binaries/main/deb -name "*.deb" | head -1)
+          echo "Built: $DEB_FILE"
+          ls -l "$DEB_FILE"
+          sha256sum "$DEB_FILE" | tee "$DEB_FILE.sha256"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: fivucsas-linux-deb
+          path: |
+            desktopApp/build/compose/binaries/main/deb/*.deb
+            desktopApp/build/compose/binaries/main/deb/*.sha256
+          if-no-files-found: error
+          retention-days: 30
+
+  # ── Windows .msi ───────────────────────────────────────────────────────────
+  # MSI cannot be built on Linux: jpackage needs WiX Toolset, which is
+  # Windows-only. Authenticode signing is deferred — ship unsigned + document
+  # the SmartScreen workaround on the download page.
+  build-windows:
+    name: Build .msi (Windows)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+      - name: Cache Gradle
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: gradle-${{ runner.os }}-
+
+      - name: Package .msi
+        shell: pwsh
+        run: ./gradlew.bat :desktopApp:packageMsi --no-daemon --stacktrace
+
+      - name: Compute SHA256
+        shell: pwsh
+        run: |
+          $msi = Get-ChildItem -Path desktopApp/build/compose/binaries/main/msi -Filter *.msi | Select-Object -First 1
+          if (-not $msi) { throw "No .msi produced" }
+          Write-Host "Built: $($msi.FullName)"
+          (Get-FileHash -Algorithm SHA256 $msi.FullName).Hash.ToLower() + "  " + $msi.Name |
+            Out-File -Encoding ascii "$($msi.FullName).sha256"
+          Get-Content "$($msi.FullName).sha256"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: fivucsas-windows-msi
+          path: |
+            desktopApp/build/compose/binaries/main/msi/*.msi
+            desktopApp/build/compose/binaries/main/msi/*.sha256
+          if-no-files-found: error
+          retention-days: 30
