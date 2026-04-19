@@ -130,7 +130,18 @@ fun MfaFlowScreen(
 
             when (val state = uiState) {
                 is MfaFlowUiState.Idle -> {
-                    CircularProgressIndicator()
+                    CircularProgressIndicator(modifier = Modifier.size(48.dp))
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text(
+                        text = s(StringKey.MFA_PREPARING),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        textAlign = TextAlign.Center
+                    )
+                    Spacer(modifier = Modifier.height(24.dp))
+                    TextButton(onClick = onCancel) {
+                        Text(s(StringKey.CANCEL))
+                    }
                 }
 
                 is MfaFlowUiState.MethodSelection -> {

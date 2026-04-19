@@ -1557,16 +1557,28 @@ fun AppNavigation() {
             // Retrieve MFA session data from the LoginViewModel that triggered the flow
             val loginViewModel = koinInject<LoginViewModel>()
             val loginState = loginViewModel.state.collectAsState().value
+            val mfaUiState by mfaViewModel.uiState.collectAsState()
 
-            // Initialize MFA flow with data from login response
-            LaunchedEffect(Unit) {
-                if (loginState.mfaSessionToken != null) {
-                    mfaViewModel.initialize(
-                        sessionToken = loginState.mfaSessionToken!!,
-                        methods = loginState.mfaAvailableMethods ?: emptyList(),
-                        step = loginState.mfaCurrentStep,
-                        total = loginState.mfaTotalSteps
-                    )
+            // Initialize MFA flow with data from login response.
+            // If the session token is lost (process death / reload), bail back to
+            // Login instead of stranding the user on a silent spinner.
+            LaunchedEffect(loginState.mfaSessionToken) {
+                val token = loginState.mfaSessionToken
+                if (token != null) {
+                    if (mfaUiState is com.fivucsas.shared.presentation.viewmodel.auth.MfaFlowUiState.Idle) {
+                        mfaViewModel.initialize(
+                            sessionToken = token,
+                            methods = loginState.mfaAvailableMethods ?: emptyList(),
+                            step = loginState.mfaCurrentStep,
+                            total = loginState.mfaTotalSteps
+                        )
+                    }
+                } else if (mfaUiState is com.fivucsas.shared.presentation.viewmodel.auth.MfaFlowUiState.Idle) {
+                    // No session token and nothing in flight — the flow can't continue.
+                    loginViewModel.resetState()
+                    navController.navigate(Screen.Login.route) {
+                        popUpTo(Screen.Login.route) { inclusive = true }
+                    }
                 }
             }
 

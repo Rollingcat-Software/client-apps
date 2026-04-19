@@ -2,6 +2,31 @@
 
 All notable changes to the FIVUCSAS client apps (Android, iOS, Desktop).
 
+## [Unreleased] — 2026-04-18f
+
+### Fixed
+
+- **Android — MFA flow no longer hangs on reload.** On process death or
+  configuration change after `mfaRequired=true`, `LoginViewModel` state was
+  reset, `loginState.mfaSessionToken` came back `null`, `LaunchedEffect(Unit)`
+  skipped `initialize()`, and the screen sat on `MfaFlowUiState.Idle`
+  rendering a bare `CircularProgressIndicator()` with no escape. Now:
+  `AppNavigation.kt` re-keys the init `LaunchedEffect` on the session
+  token, and if the token is missing while the VM is still `Idle` the
+  route pops back to Login (clears the trap instead of stranding the
+  user). Defense-in-depth: the `Idle` branch in `MfaFlowScreen.kt` now
+  renders `MFA_PREPARING` copy + a visible Cancel button.
+- **Turkish localisation — diacritics restored across `StringResources.kt`.**
+  ~600 `trStrings` entries had been flattened to ASCII (`Giris` →
+  `Giriş`, `Sifre` → `Şifre`, `Dogrulama` → `Doğrulama`, `Kullanici` →
+  `Kullanıcı`, etc.). Restored by hand, verified `compileDebugKotlinAndroid`
+  green. English map + `StringKey` enum untouched.
+
+### Added
+
+- `StringKey.MFA_PREPARING` (EN: "Preparing verification...", TR:
+  "Doğrulama hazırlanıyor...") for the Idle-state fallback.
+
 ## [Unreleased] — architecture note 2026-04-18e
 
 The client-apps feature-parity matrix shrank from **20 columns to 13**
