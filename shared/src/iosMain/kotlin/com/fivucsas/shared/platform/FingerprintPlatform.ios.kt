@@ -157,7 +157,7 @@ private class IosFingerprintAuthenticator : FingerprintAuthenticator {
             kSecPrivateKeyAttrs to privateKeyAttrs
         )
 
-        val error = alloc<CPointerVar<__CFError>>()
+        val error = alloc<CPointerVar<cnames.structs.__CFError>>()
         val privateKey = SecKeyCreateRandomKey(attributes as CFDictionaryRef, error.ptr)
 
         if (privateKey == null) {
@@ -207,7 +207,7 @@ private class IosFingerprintAuthenticator : FingerprintAuthenticator {
         val nsData = data.toNSData()
         val cfData = nsData as CFDataRef
 
-        val error = alloc<CPointerVar<__CFError>>()
+        val error = alloc<CPointerVar<cnames.structs.__CFError>>()
         val signature = SecKeyCreateSignature(
             privateKey,
             kSecKeyAlgorithmECDSASignatureMessageX962SHA256,
@@ -230,7 +230,7 @@ private class IosFingerprintAuthenticator : FingerprintAuthenticator {
      * Build an EC JWK JSON string from the public key.
      */
     private fun buildEcJwk(keyId: String, publicKey: SecKeyRef): String = memScoped {
-        val error = alloc<CPointerVar<__CFError>>()
+        val error = alloc<CPointerVar<cnames.structs.__CFError>>()
         val keyData = SecKeyCopyExternalRepresentation(publicKey, error.ptr)
             ?: throw FingerprintAuthException(
                 "Cannot export public key: ${CFErrorCopyDescription(error.value)}",
