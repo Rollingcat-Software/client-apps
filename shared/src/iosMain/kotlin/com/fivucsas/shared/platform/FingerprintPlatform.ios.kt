@@ -157,12 +157,12 @@ private class IosFingerprintAuthenticator : FingerprintAuthenticator {
             kSecPrivateKeyAttrs to privateKeyAttrs
         )
 
-        val error = alloc<ObjCObjectVar<NSError?>>()
+        val error = alloc<CPointerVar<__CFError>>()
         val privateKey = SecKeyCreateRandomKey(attributes as CFDictionaryRef, error.ptr)
 
         if (privateKey == null) {
             throw FingerprintAuthException(
-                "Failed to create key pair: ${error.value?.localizedDescription ?: "unknown"}",
+                "Failed to create key pair: ${CFErrorCopyDescription(error.value)}",
                 false
             )
         }
@@ -207,7 +207,7 @@ private class IosFingerprintAuthenticator : FingerprintAuthenticator {
         val nsData = data.toNSData()
         val cfData = nsData as CFDataRef
 
-        val error = alloc<ObjCObjectVar<NSError?>>()
+        val error = alloc<CPointerVar<__CFError>>()
         val signature = SecKeyCreateSignature(
             privateKey,
             kSecKeyAlgorithmECDSASignatureMessageX962SHA256,
@@ -217,7 +217,7 @@ private class IosFingerprintAuthenticator : FingerprintAuthenticator {
 
         if (signature == null) {
             throw FingerprintAuthException(
-                "Signing failed: ${error.value?.localizedDescription ?: "unknown"}",
+                "Signing failed: ${CFErrorCopyDescription(error.value)}",
                 false
             )
         }
@@ -230,10 +230,10 @@ private class IosFingerprintAuthenticator : FingerprintAuthenticator {
      * Build an EC JWK JSON string from the public key.
      */
     private fun buildEcJwk(keyId: String, publicKey: SecKeyRef): String = memScoped {
-        val error = alloc<ObjCObjectVar<NSError?>>()
+        val error = alloc<CPointerVar<__CFError>>()
         val keyData = SecKeyCopyExternalRepresentation(publicKey, error.ptr)
             ?: throw FingerprintAuthException(
-                "Cannot export public key: ${error.value?.localizedDescription ?: "unknown"}",
+                "Cannot export public key: ${CFErrorCopyDescription(error.value)}",
                 false
             )
 
