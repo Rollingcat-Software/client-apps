@@ -28,6 +28,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import com.fivucsas.shared.config.UIDimens
+import com.fivucsas.shared.i18n.StringKey
+import com.fivucsas.shared.i18n.s
 import com.fivucsas.shared.ui.components.atoms.AppTextField
 import com.fivucsas.shared.ui.components.molecules.ErrorMessage
 import com.fivucsas.shared.ui.components.molecules.PasswordStrengthIndicator
@@ -51,10 +53,10 @@ fun ChangePasswordScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Change Password") },
+                title = { Text(s(StringKey.CHANGE_PASSWORD_TITLE)) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = s(StringKey.BACK))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -75,7 +77,7 @@ fun ChangePasswordScreen(
             AppTextField(
                 value = currentPassword.value,
                 onValueChange = { currentPassword.value = it },
-                label = "Current Password",
+                label = s(StringKey.CHANGE_PASSWORD_CURRENT),
                 leadingIcon = Icons.Default.Lock,
                 singleLine = true,
                 visualTransformation = PasswordVisualTransformation()
@@ -83,7 +85,7 @@ fun ChangePasswordScreen(
             AppTextField(
                 value = newPassword.value,
                 onValueChange = { newPassword.value = it },
-                label = "New Password",
+                label = s(StringKey.CHANGE_PASSWORD_NEW),
                 leadingIcon = Icons.Default.Lock,
                 singleLine = true,
                 visualTransformation = PasswordVisualTransformation()
@@ -92,7 +94,7 @@ fun ChangePasswordScreen(
             AppTextField(
                 value = confirmPassword.value,
                 onValueChange = { confirmPassword.value = it },
-                label = "Confirm Password",
+                label = s(StringKey.CHANGE_PASSWORD_CONFIRM),
                 leadingIcon = Icons.Default.Lock,
                 singleLine = true,
                 visualTransformation = PasswordVisualTransformation()
@@ -120,10 +122,10 @@ fun ChangePasswordScreen(
                     )
                     Spacer(modifier = Modifier.size(8.dp))
                 }
-                Text("Update Password")
+                Text(s(StringKey.CHANGE_PASSWORD_SUBMIT))
             }
             Text(
-                text = "Password must be at least 8 characters and include upper/lowercase and a number.",
+                text = s(StringKey.CHANGE_PASSWORD_HINT),
                 style = MaterialTheme.typography.bodySmall,
                 color = AppColors.OnSurfaceVariant
             )

@@ -67,6 +67,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import com.fivucsas.mobile.android.ui.util.toCompressedJpegBytes
+import com.fivucsas.shared.i18n.StringKey
+import com.fivucsas.shared.i18n.s
 import com.fivucsas.shared.presentation.viewmodel.IdentifyViewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
@@ -111,14 +113,14 @@ fun IdentifyTenantScreen(
             TopAppBar(
                 title = {
                     Text(
-                        "Identify (1:N)",
+                        s(StringKey.IDENTIFY_TITLE),
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.SemiBold
                     )
                 },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.Default.ArrowBack, contentDescription = s(StringKey.BACK))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -150,7 +152,7 @@ fun IdentifyTenantScreen(
 
                                 override fun onError(exception: ImageCaptureException) {
                                     viewModel.onCaptureError(
-                                        "Failed to capture image: ${exception.message}"
+                                        s(StringKey.FACE_VERIFY_CAPTURE_ERROR, exception.message ?: "")
                                     )
                                 }
                             }
@@ -227,14 +229,14 @@ private fun IdentifyCameraContent(
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = "1:N Identification",
+                        text = s(StringKey.IDENTIFY_HEADER),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onPrimaryContainer
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        text = "Position the subject's face in frame and tap Identify to search all enrolled users.",
+                        text = s(StringKey.IDENTIFY_INSTRUCTIONS),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onPrimaryContainer,
                         textAlign = TextAlign.Center
@@ -265,7 +267,7 @@ private fun IdentifyCameraContent(
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = "Identifying...",
+                        text = s(StringKey.IDENTIFY_LOADING),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onSecondaryContainer
@@ -332,7 +334,7 @@ private fun IdentifyCameraContent(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(16.dp)
                 ) {
-                    Text("Try Again")
+                    Text(s(StringKey.COMMON_TRY_AGAIN))
                 }
             }
 
@@ -364,7 +366,7 @@ private fun IdentifyCameraContent(
                         )
                         Spacer(modifier = Modifier.height(16.dp))
                         Text(
-                            text = if (result.isMatch) "Match Found" else "No Match",
+                            text = if (result.isMatch) s(StringKey.IDENTIFY_MATCH_FOUND) else s(StringKey.IDENTIFY_NO_MATCH),
                             style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.Bold,
                             color = if (result.isMatch)
@@ -385,7 +387,7 @@ private fun IdentifyCameraContent(
                             ) {
                                 Column {
                                     Text(
-                                        text = "Name",
+                                        text = s(StringKey.IDENTIFY_NAME_LABEL),
                                         style = MaterialTheme.typography.bodySmall,
                                         color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
                                     )
@@ -398,7 +400,7 @@ private fun IdentifyCameraContent(
                                 }
                                 Column(horizontalAlignment = Alignment.End) {
                                     Text(
-                                        text = "Confidence",
+                                        text = s(StringKey.FACE_VERIFY_CONFIDENCE_LABEL),
                                         style = MaterialTheme.typography.bodySmall,
                                         color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
                                     )
@@ -412,7 +414,7 @@ private fun IdentifyCameraContent(
                             }
                             Spacer(modifier = Modifier.height(4.dp))
                             Text(
-                                text = "User ID: ${result.userId}",
+                                text = s(StringKey.IDENTIFY_USER_ID_LABEL, result.userId),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
                             )
@@ -424,10 +426,10 @@ private fun IdentifyCameraContent(
                             horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
                             OutlinedButton(onClick = onRetry, modifier = Modifier.weight(1f)) {
-                                Text("Scan Again")
+                                Text(s(StringKey.IDENTIFY_SCAN_AGAIN))
                             }
                             Button(onClick = onDone, modifier = Modifier.weight(1f)) {
-                                Text("Done")
+                                Text(s(StringKey.COMMON_DONE))
                             }
                         }
                     }
@@ -450,12 +452,12 @@ private fun IdentifyCameraContent(
                             color = MaterialTheme.colorScheme.onPrimary
                         )
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text("Identifying...", style = MaterialTheme.typography.titleMedium)
+                        Text(s(StringKey.IDENTIFY_LOADING), style = MaterialTheme.typography.titleMedium)
                     } else {
                         Icon(Icons.Default.PersonSearch, contentDescription = null)
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            "Identify Face",
+                            s(StringKey.IDENTIFY_BUTTON),
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.SemiBold
                         )
@@ -487,7 +489,7 @@ private fun IdentifyPermissionContent(
         )
         Spacer(modifier = Modifier.height(24.dp))
         Text(
-            text = "Camera Permission Required",
+            text = s(StringKey.COMMON_CAMERA_PERMISSION_REQUIRED),
             style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center
@@ -495,9 +497,9 @@ private fun IdentifyPermissionContent(
         Spacer(modifier = Modifier.height(8.dp))
         Text(
             text = if (permanentlyDenied) {
-                "Camera permission was permanently denied. Please enable it in app settings to continue."
+                s(StringKey.IDENTIFY_PERMISSION_PERMANENTLY_DENIED)
             } else {
-                "We need camera access for 1:N face identification within the tenant."
+                s(StringKey.IDENTIFY_PERMISSION_RATIONALE)
             },
             style = MaterialTheme.typography.bodyMedium,
             textAlign = TextAlign.Center,
@@ -508,11 +510,11 @@ private fun IdentifyPermissionContent(
             Button(onClick = onOpenSettings, modifier = Modifier.fillMaxWidth()) {
                 Icon(Icons.Default.Settings, contentDescription = null)
                 Spacer(modifier = Modifier.width(8.dp))
-                Text("Open App Settings")
+                Text(s(StringKey.COMMON_OPEN_APP_SETTINGS))
             }
         } else {
             Button(onClick = onRequestPermission, modifier = Modifier.fillMaxWidth()) {
-                Text("Grant Camera Permission")
+                Text(s(StringKey.COMMON_GRANT_CAMERA_PERMISSION))
             }
         }
     }

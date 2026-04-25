@@ -107,9 +107,7 @@ fun OtpQrScannerScreen(
     // or otpauth parse check. Cleared automatically by the next valid scan.
     var errorMessage by remember { mutableStateOf<String?>(null) }
 
-    // TODO(i18n): promote to StringKey.OTP_SCAN_UNSUPPORTED once string table is updated.
-    // Tracked in /tmp/i18n_agent_20E.txt (agent 20E).
-    val invalidQrText = "Unsupported QR code"
+    val invalidQrText = s(StringKey.OTP_SCAN_UNSUPPORTED)
     val barcodeScanner = remember { BarcodeScanning.getClient() }
 
     LaunchedEffect(cameraPermissionState.status.isGranted) {
@@ -175,8 +173,7 @@ fun OtpQrScannerScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                // TODO(i18n): promote to StringKey.OTP_SCAN_TITLE once string table is updated.
-                title = { Text("Scan authenticator QR") },
+                title = { Text(s(StringKey.OTP_SCAN_TITLE)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(
@@ -201,8 +198,7 @@ fun OtpQrScannerScreen(
             verticalArrangement = Arrangement.Top
         ) {
             Text(
-                // TODO(i18n): promote to StringKey.OTP_SCAN_HINT once string table is updated.
-                text = "Point the camera at an otpauth:// QR code",
+                text = s(StringKey.OTP_SCAN_HINT),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center
@@ -286,12 +282,12 @@ fun OtpQrScannerScreen(
                         ) {
                             Text(
                                 text = when (cameraState) {
-                                    CameraState.Initializing -> "Initializing camera..."
-                                    CameraState.Ready -> "Starting preview..."
-                                    is CameraState.Error -> "Camera error"
-                                    CameraState.Idle -> "Camera not initialized"
-                                    CameraState.Capturing -> "Camera busy"
-                                    CameraState.Released -> "Camera released"
+                                    CameraState.Initializing -> s(StringKey.OTP_SCAN_CAM_INITIALIZING)
+                                    CameraState.Ready -> s(StringKey.OTP_SCAN_CAM_STARTING_PREVIEW)
+                                    is CameraState.Error -> s(StringKey.OTP_SCAN_CAM_ERROR)
+                                    CameraState.Idle -> s(StringKey.OTP_SCAN_CAM_NOT_INITIALIZED)
+                                    CameraState.Capturing -> s(StringKey.OTP_SCAN_CAM_BUSY)
+                                    CameraState.Released -> s(StringKey.OTP_SCAN_CAM_RELEASED)
                                     CameraState.Previewing -> ""
                                 },
                                 style = MaterialTheme.typography.bodyMedium,
@@ -329,9 +325,9 @@ fun OtpQrScannerScreen(
                         Spacer(modifier = Modifier.height(12.dp))
                         Text(
                             text = if (permanentlyDenied) {
-                                "Camera permission was denied. Enable it in Settings to scan QR codes."
+                                s(StringKey.OTP_SCAN_PERMISSION_DENIED)
                             } else {
-                                "Camera permission is required to scan QR codes."
+                                s(StringKey.OTP_SCAN_PERMISSION_RATIONALE)
                             },
                             style = MaterialTheme.typography.bodyMedium,
                             color = Color.White,
@@ -353,7 +349,7 @@ fun OtpQrScannerScreen(
                                 }
                             }
                         ) {
-                            Text(if (permanentlyDenied) "Open Settings" else "Grant Permission")
+                            Text(if (permanentlyDenied) s(StringKey.OTP_SCAN_OPEN_SETTINGS) else s(StringKey.OTP_SCAN_GRANT_PERMISSION))
                         }
                     }
                 }

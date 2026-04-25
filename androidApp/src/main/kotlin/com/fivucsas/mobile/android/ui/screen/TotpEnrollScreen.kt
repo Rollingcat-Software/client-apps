@@ -166,7 +166,7 @@ fun TotpEnrollScreen(
                     ) {
                         AsyncImage(
                             model = "https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${java.net.URLEncoder.encode(uri, "UTF-8")}",
-                            contentDescription = "TOTP QR Code",
+                            contentDescription = s(StringKey.TOTP_QR_CONTENT_DESC),
                             modifier = Modifier
                                 .size(250.dp)
                                 .align(Alignment.CenterHorizontally)

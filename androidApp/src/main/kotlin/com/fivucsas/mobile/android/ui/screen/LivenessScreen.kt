@@ -74,6 +74,8 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import com.fivucsas.mobile.android.ui.util.toCompressedJpegBytes
 import com.fivucsas.shared.domain.model.FacialAction
+import com.fivucsas.shared.i18n.StringKey
+import com.fivucsas.shared.i18n.s
 import com.fivucsas.shared.presentation.viewmodel.LivenessViewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
@@ -104,14 +106,14 @@ fun LivenessScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = if (uiState.isComplete) "Liveness Result" else "Face Liveness Puzzle",
+                        text = if (uiState.isComplete) s(StringKey.LIVENESS_RESULT_TITLE) else s(StringKey.LIVENESS_PUZZLE_TITLE),
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.SemiBold
                     )
                 },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = s(StringKey.BACK))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -183,11 +185,11 @@ private fun LivenessChallengeContent(
         ) {
             Icon(Icons.Default.Face, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(80.dp))
             Spacer(modifier = Modifier.height(24.dp))
-            Text("Camera Permission Required", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
+            Text(s(StringKey.COMMON_CAMERA_PERMISSION_REQUIRED), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                if (permanentlyDenied) "Camera permission was permanently denied. Enable it in settings."
-                else "Camera access is needed for face liveness detection.",
+                if (permanentlyDenied) s(StringKey.LIVENESS_PERMISSION_PERMANENTLY_DENIED)
+                else s(StringKey.LIVENESS_PERMISSION_RATIONALE),
                 style = MaterialTheme.typography.bodyMedium, textAlign = TextAlign.Center, color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Spacer(modifier = Modifier.height(24.dp))
@@ -197,11 +199,11 @@ private fun LivenessChallengeContent(
                 }, modifier = Modifier.fillMaxWidth()) {
                     Icon(Icons.Default.Settings, contentDescription = null)
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text("Open App Settings")
+                    Text(s(StringKey.COMMON_OPEN_APP_SETTINGS))
                 }
             } else {
                 Button(onClick = { permissionRequested = true; cameraPermissionState.launchPermissionRequest() }, modifier = Modifier.fillMaxWidth()) {
-                    Text("Grant Camera Permission")
+                    Text(s(StringKey.COMMON_GRANT_CAMERA_PERMISSION))
                 }
             }
         }
@@ -310,7 +312,7 @@ private fun LivenessChallengeContent(
                         viewModel.verifyWithServer(bytes)
                     }
                     override fun onError(exception: ImageCaptureException) {
-                        viewModel.onError("Failed to capture: ${exception.message}")
+                        viewModel.onError(s(StringKey.LIVENESS_CAPTURE_ERROR, exception.message ?: ""))
                     }
                 }
             )
@@ -364,7 +366,7 @@ private fun LivenessChallengeContent(
                         modifier = Modifier.size(24.dp)
                     )
                     Text(
-                        "Liveness Challenge (${uiState.completedSteps}/${uiState.totalSteps})",
+                        s(StringKey.LIVENESS_CHALLENGE_PROGRESS, uiState.completedSteps, uiState.totalSteps),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onPrimaryContainer
@@ -449,7 +451,7 @@ private fun LivenessChallengeContent(
                 ) {
                     CircularProgressIndicator(modifier = Modifier.size(32.dp))
                     Spacer(modifier = Modifier.height(8.dp))
-                    Text("Verifying with server...", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                    Text(s(StringKey.LIVENESS_VERIFYING_SERVER), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                 }
             }
         }
@@ -528,16 +530,16 @@ private fun LivenessResultContent(
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
-                    text = if (serverLive) "Liveness Verified" else "Liveness Check Failed",
+                    text = if (serverLive) s(StringKey.LIVENESS_VERIFIED) else s(StringKey.LIVENESS_FAILED),
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold
                 )
                 Spacer(modifier = Modifier.height(16.dp))
 
                 // Scores
-                ScoreRow("Client Score", clientScore)
+                ScoreRow(s(StringKey.LIVENESS_CLIENT_SCORE_LABEL), clientScore)
                 Spacer(modifier = Modifier.height(8.dp))
-                ScoreRow("Server Score", serverScore)
+                ScoreRow(s(StringKey.LIVENESS_SERVER_SCORE_LABEL), serverScore)
 
                 if (errorMessage != null) {
                     Spacer(modifier = Modifier.height(12.dp))
@@ -554,12 +556,12 @@ private fun LivenessResultContent(
                         onClick = onRetry,
                         modifier = Modifier.weight(1f).height(48.dp),
                         shape = RoundedCornerShape(12.dp)
-                    ) { Text("Retry") }
+                    ) { Text(s(StringKey.COMMON_RETRY)) }
                     Button(
                         onClick = onDone,
                         modifier = Modifier.weight(1f).height(48.dp),
                         shape = RoundedCornerShape(12.dp)
-                    ) { Text("Done") }
+                    ) { Text(s(StringKey.COMMON_DONE)) }
                 }
             }
         }

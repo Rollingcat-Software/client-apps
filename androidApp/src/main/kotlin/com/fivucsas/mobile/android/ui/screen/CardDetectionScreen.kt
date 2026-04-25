@@ -73,6 +73,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import com.fivucsas.mobile.android.ui.util.toCompressedJpegBytes
+import com.fivucsas.shared.i18n.StringKey
+import com.fivucsas.shared.i18n.s
 import com.fivucsas.shared.presentation.viewmodel.CardDetectionViewModel
 import com.fivucsas.shared.presentation.viewmodel.CardTypeLabels
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
@@ -100,7 +102,7 @@ fun CardDetectionScreen(
             TopAppBar(
                 title = {
                     Text(
-                        if (currentStep == STEP_RESULT) "Detection Result" else "Card Detection",
+                        if (currentStep == STEP_RESULT) s(StringKey.CARD_DETECTION_RESULT_TITLE) else s(StringKey.CARD_DETECTION_TITLE),
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.SemiBold
                     )
@@ -110,7 +112,7 @@ fun CardDetectionScreen(
                         if (currentStep == STEP_RESULT) { currentStep = STEP_CAPTURE; viewModel.reset() }
                         else onNavigateBack()
                     }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = s(StringKey.BACK))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.surface)
@@ -133,7 +135,7 @@ fun CardDetectionScreen(
                     ) {
                         CircularProgressIndicator(Modifier.size(48.dp))
                         Spacer(Modifier.height(16.dp))
-                        Text("Detecting card...", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                        Text(s(StringKey.CARD_DETECTION_PROCESSING), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                         Spacer(Modifier.height(8.dp))
                         LinearProgressIndicator(Modifier.fillMaxWidth(0.7f))
                     }
@@ -179,11 +181,11 @@ private fun CardDetectionCaptureContent(
         ) {
             Icon(Icons.Default.CreditCard, null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(80.dp))
             Spacer(Modifier.height(24.dp))
-            Text("Camera Permission Required", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
+            Text(s(StringKey.COMMON_CAMERA_PERMISSION_REQUIRED), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
             Spacer(Modifier.height(8.dp))
             Text(
-                if (permanentlyDenied) "Enable camera in app settings."
-                else "Camera is needed for card detection.",
+                if (permanentlyDenied) s(StringKey.CARD_DETECTION_PERMISSION_PERMANENTLY_DENIED)
+                else s(StringKey.CARD_DETECTION_PERMISSION_RATIONALE),
                 style = MaterialTheme.typography.bodyMedium, textAlign = TextAlign.Center,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -192,11 +194,11 @@ private fun CardDetectionCaptureContent(
                 Button(onClick = {
                     context.startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.fromParts("package", context.packageName, null)))
                 }, Modifier.fillMaxWidth()) {
-                    Icon(Icons.Default.Settings, null); Spacer(Modifier.width(8.dp)); Text("Open App Settings")
+                    Icon(Icons.Default.Settings, null); Spacer(Modifier.width(8.dp)); Text(s(StringKey.COMMON_OPEN_APP_SETTINGS))
                 }
             } else {
                 Button(onClick = { permissionRequested = true; cameraPermissionState.launchPermissionRequest() }, Modifier.fillMaxWidth()) {
-                    Text("Grant Camera Permission")
+                    Text(s(StringKey.COMMON_GRANT_CAMERA_PERMISSION))
                 }
             }
         }
@@ -223,8 +225,8 @@ private fun CardDetectionCaptureContent(
             Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 Icon(Icons.Default.CreditCard, null, tint = MaterialTheme.colorScheme.onPrimaryContainer, modifier = Modifier.size(32.dp))
                 Column {
-                    Text("Card Detection", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onPrimaryContainer)
-                    Text("Point camera at an ID card or document", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onPrimaryContainer)
+                    Text(s(StringKey.CARD_DETECTION_TITLE), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onPrimaryContainer)
+                    Text(s(StringKey.CARD_DETECTION_HEADER_HINT), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onPrimaryContainer)
                 }
             }
         }
@@ -270,7 +272,7 @@ private fun CardDetectionCaptureContent(
             ) {
                 Icon(Icons.Default.CameraAlt, null)
                 Spacer(Modifier.width(8.dp))
-                Text("Detect Card", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+                Text(s(StringKey.CARD_DETECTION_DETECT_BUTTON), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
             }
         }
     }
@@ -291,7 +293,7 @@ private fun CardResultContent(
             val bitmap = remember(bytes) { BitmapFactory.decodeByteArray(bytes, 0, bytes.size) }
             if (bitmap != null) {
                 Image(
-                    bitmap.asImageBitmap(), "Captured card",
+                    bitmap.asImageBitmap(), s(StringKey.CARD_DETECTION_CAPTURED_DESC),
                     Modifier.fillMaxWidth().aspectRatio(1.586f).clip(RoundedCornerShape(16.dp)),
                     contentScale = ContentScale.Crop
                 )
@@ -308,16 +310,16 @@ private fun CardResultContent(
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(Icons.Default.CheckCircle, null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(32.dp))
                     Spacer(Modifier.width(12.dp))
-                    Text("Card Detected", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onPrimaryContainer)
+                    Text(s(StringKey.CARD_DETECTED_TITLE), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onPrimaryContainer)
                 }
                 Spacer(Modifier.height(16.dp))
-                CardDetailRow("Card Type (EN)", result.cardTypeLabel)
-                CardDetailRow("Card Type (TR)", CardTypeLabels.getLabel(result.cardType, turkish = true))
-                CardDetailRow("Confidence", "${(result.confidence * 100).toInt()}%")
+                CardDetailRow(s(StringKey.CARD_TYPE_EN), result.cardTypeLabel)
+                CardDetailRow(s(StringKey.CARD_TYPE_TR), CardTypeLabels.getLabel(result.cardType, turkish = true))
+                CardDetailRow(s(StringKey.CARD_CONFIDENCE), "${(result.confidence * 100).toInt()}%")
                 if (result.boundingBox.isNotEmpty()) {
-                    CardDetailRow("Bounding Box", result.boundingBox.joinToString(", ") { "%.1f".format(it) })
+                    CardDetailRow(s(StringKey.CARD_BOUNDING_BOX), result.boundingBox.joinToString(", ") { "%.1f".format(it) })
                 }
-                if (result.message.isNotBlank()) CardDetailRow("Message", result.message)
+                if (result.message.isNotBlank()) CardDetailRow(s(StringKey.CARD_MESSAGE_LABEL), result.message)
             }
         }
 
@@ -325,10 +327,10 @@ private fun CardResultContent(
 
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             OutlinedButton(onRetry, Modifier.weight(1f).height(56.dp), shape = RoundedCornerShape(16.dp)) {
-                Icon(Icons.Default.CameraAlt, null); Spacer(Modifier.width(8.dp)); Text("Scan Another", fontWeight = FontWeight.SemiBold)
+                Icon(Icons.Default.CameraAlt, null); Spacer(Modifier.width(8.dp)); Text(s(StringKey.CARD_SCAN_ANOTHER), fontWeight = FontWeight.SemiBold)
             }
             Button(onDone, Modifier.weight(1f).height(56.dp), shape = RoundedCornerShape(16.dp)) {
-                Icon(Icons.Default.CheckCircle, null); Spacer(Modifier.width(8.dp)); Text("Done", fontWeight = FontWeight.SemiBold)
+                Icon(Icons.Default.CheckCircle, null); Spacer(Modifier.width(8.dp)); Text(s(StringKey.COMMON_DONE), fontWeight = FontWeight.SemiBold)
             }
         }
     }

@@ -340,14 +340,14 @@ private fun CardResultView(
                 if (result.boundingBox.isNotEmpty()) {
                     Spacer(modifier = Modifier.height(8.dp))
                     CardDetailRow(
-                        label = "Bounding Box",
+                        label = s(StringKey.CARD_BOUNDING_BOX),
                         value = result.boundingBox.joinToString(", ") { (kotlin.math.round(it * 10) / 10.0).toString() }
                     )
                 }
 
                 if (result.message.isNotBlank()) {
                     Spacer(modifier = Modifier.height(8.dp))
-                    CardDetailRow(label = "Message", value = result.message)
+                    CardDetailRow(label = s(StringKey.CARD_MESSAGE_LABEL), value = result.message)
                 }
             }
         }

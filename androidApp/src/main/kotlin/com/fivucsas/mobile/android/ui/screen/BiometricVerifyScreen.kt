@@ -70,6 +70,8 @@ import androidx.core.content.ContextCompat
 import com.fivucsas.mobile.android.ui.util.toCompressedJpegBytes
 import com.fivucsas.shared.domain.model.GuestFaceCheckOutcome
 import com.fivucsas.shared.domain.model.confidenceToBand
+import com.fivucsas.shared.i18n.StringKey
+import com.fivucsas.shared.i18n.s
 import com.fivucsas.shared.presentation.state.BiometricResult
 import com.fivucsas.shared.presentation.state.BiometricState
 import com.fivucsas.shared.presentation.viewmodel.auth.BiometricViewModel
@@ -133,14 +135,14 @@ fun BiometricVerifyScreen(
             TopAppBar(
                 title = {
                     Text(
-                        "Face Verification",
+                        s(StringKey.FACE_VERIFY_TITLE),
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.SemiBold
                     )
                 },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.Default.ArrowBack, contentDescription = s(StringKey.BACK))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -175,7 +177,7 @@ fun BiometricVerifyScreen(
 
                                 override fun onError(exception: ImageCaptureException) {
                                     viewModel.onCaptureError(
-                                        "Failed to capture image: ${exception.message}"
+                                        s(StringKey.FACE_VERIFY_CAPTURE_ERROR, exception.message ?: "")
                                     )
                                 }
                             }
@@ -275,7 +277,7 @@ private fun VerificationCameraContent(
             // Error state
         if (biometricState.error != null) {
             val displayMessage = if (guestMode) {
-                "Could not reach face-check service. Please check backend/DB connection and try again."
+                s(StringKey.FACE_VERIFY_GUEST_BACKEND_ERROR)
             } else {
                 biometricState.error!!
             }
@@ -289,7 +291,7 @@ private fun VerificationCameraContent(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(16.dp)
                 ) {
-                    Text("Try Again")
+                    Text(s(StringKey.COMMON_TRY_AGAIN))
                 }
             }
 
@@ -354,9 +356,9 @@ private fun VerificationResultCard(
 
             Text(
                 text = if (isVerified) {
-                    if (guestMode) "FOUND" else "Verified Successfully"
+                    if (guestMode) s(StringKey.FACE_VERIFY_GUEST_FOUND) else s(StringKey.FACE_VERIFY_VERIFIED_SUCCESS)
                 } else {
-                    if (guestMode) "NOT FOUND" else "Verification Failed"
+                    if (guestMode) s(StringKey.FACE_VERIFY_GUEST_NOT_FOUND) else s(StringKey.FACE_VERIFY_FAILED)
                 },
                 color = if (isVerified)
                     MaterialTheme.colorScheme.onPrimaryContainer
@@ -369,9 +371,9 @@ private fun VerificationResultCard(
 
             Text(
                 text = if (guestMode) {
-                    "No personal identity details are shown in guest mode."
+                    s(StringKey.FACE_VERIFY_GUEST_PRIVACY_NOTE)
                 } else {
-                    result?.result?.message ?: "Verification complete"
+                    result?.result?.message ?: s(StringKey.FACE_VERIFY_RESULT_FALLBACK)
                 },
                 color = if (isVerified)
                     MaterialTheme.colorScheme.onPrimaryContainer
@@ -394,7 +396,7 @@ private fun VerificationResultCard(
                 ) {
                     Column {
                         Text(
-                            text = "Confidence",
+                            text = s(StringKey.FACE_VERIFY_CONFIDENCE_LABEL),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
                         )
@@ -409,7 +411,7 @@ private fun VerificationResultCard(
                     if (!guestMode) {
                         Column(horizontalAlignment = Alignment.End) {
                             Text(
-                                text = "User ID",
+                                text = s(StringKey.FACE_VERIFY_USER_ID_LABEL),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
                             )
@@ -434,13 +436,13 @@ private fun VerificationResultCard(
                     onClick = onRetry,
                     modifier = Modifier.weight(1f)
                 ) {
-                    Text("Try Again")
+                    Text(s(StringKey.COMMON_TRY_AGAIN))
                 }
                 Button(
                     onClick = onDone,
                     modifier = Modifier.weight(1f)
                 ) {
-                    Text("Done")
+                    Text(s(StringKey.COMMON_DONE))
                 }
             }
         }
@@ -472,14 +474,14 @@ private fun VerificationInstructionsCard(modifier: Modifier = Modifier) {
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = "Verify Your Identity",
+                text = s(StringKey.FACE_VERIFY_HEADER),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onPrimaryContainer
             )
             Spacer(modifier = Modifier.height(4.dp))
             Text(
-                text = "• Position face in frame\n• Look directly at camera\n• Stay still during capture",
+                text = s(StringKey.FACE_VERIFY_INSTRUCTIONS),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onPrimaryContainer,
                 textAlign = TextAlign.Center
@@ -507,7 +509,7 @@ private fun VerificationLoadingCard(modifier: Modifier = Modifier) {
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = "Verifying...",
+                text = s(StringKey.FACE_VERIFY_VERIFYING),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSecondaryContainer
@@ -566,10 +568,10 @@ private fun VerificationCaptureButton(isLoading: Boolean, onClick: () -> Unit) {
                 color = MaterialTheme.colorScheme.onPrimary
             )
             Spacer(modifier = Modifier.width(8.dp))
-            Text("Verifying...", style = MaterialTheme.typography.titleMedium)
+            Text(s(StringKey.FACE_VERIFY_VERIFYING), style = MaterialTheme.typography.titleMedium)
         } else {
             Text(
-                "Verify Face",
+                s(StringKey.FACE_VERIFY_BUTTON),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold
             )
@@ -602,7 +604,7 @@ private fun VerificationPermissionContent(
         )
         Spacer(modifier = Modifier.height(24.dp))
         Text(
-            text = "Camera Permission Required",
+            text = s(StringKey.COMMON_CAMERA_PERMISSION_REQUIRED),
             style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center
@@ -610,9 +612,9 @@ private fun VerificationPermissionContent(
         Spacer(modifier = Modifier.height(8.dp))
         Text(
             text = if (permanentlyDenied) {
-                "Camera permission was permanently denied. Please enable it in app settings to continue."
+                s(StringKey.FACE_VERIFY_PERMISSION_PERMANENTLY_DENIED)
             } else {
-                "We need camera access to verify your identity using face recognition."
+                s(StringKey.FACE_VERIFY_PERMISSION_RATIONALE)
             },
             style = MaterialTheme.typography.bodyMedium,
             textAlign = TextAlign.Center,
@@ -627,14 +629,14 @@ private fun VerificationPermissionContent(
             ) {
                 Icon(Icons.Default.Settings, contentDescription = null)
                 Spacer(modifier = Modifier.width(8.dp))
-                Text("Open App Settings")
+                Text(s(StringKey.COMMON_OPEN_APP_SETTINGS))
             }
         } else {
             Button(
                 onClick = onRequestPermission,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Grant Camera Permission")
+                Text(s(StringKey.COMMON_GRANT_CAMERA_PERMISSION))
             }
         }
     }

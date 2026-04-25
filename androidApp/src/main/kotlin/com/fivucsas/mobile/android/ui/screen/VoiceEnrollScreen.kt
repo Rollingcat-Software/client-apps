@@ -267,7 +267,7 @@ fun VoiceEnrollScreen(
             ) {
                 Icon(
                     imageVector = if (uiState.isRecording) Icons.Default.Stop else Icons.Default.Mic,
-                    contentDescription = if (uiState.isRecording) "Stop" else "Record",
+                    contentDescription = if (uiState.isRecording) s(StringKey.VOICE_STOP_BUTTON_DESC) else s(StringKey.VOICE_RECORD_BUTTON_DESC),
                     modifier = Modifier.size(36.dp)
                 )
             }
@@ -341,7 +341,7 @@ fun VoiceEnrollScreen(
                         )
                         if (result.found && result.userId != null) {
                             Text(
-                                text = "User: ${result.userId}",
+                                text = s(StringKey.VOICE_USER_LABEL, result.userId!!),
                                 style = MaterialTheme.typography.bodyMedium
                             )
                             Text(
