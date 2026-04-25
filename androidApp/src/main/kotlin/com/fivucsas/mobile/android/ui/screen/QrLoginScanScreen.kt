@@ -17,9 +17,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -48,6 +49,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
+import com.fivucsas.shared.i18n.StringKey
+import com.fivucsas.shared.i18n.s
 import com.fivucsas.shared.platform.AndroidCameraService
 import com.fivucsas.shared.platform.CameraState
 import com.fivucsas.shared.platform.LensFacing
@@ -140,12 +143,12 @@ fun QRLoginScanScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Scan QR to Login") },
+                title = { Text(s(StringKey.QR_LOGIN_SCAN_TITLE)) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(
-                            imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "Back"
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = s(StringKey.BACK)
                         )
                     }
                 },
@@ -165,7 +168,7 @@ fun QRLoginScanScreen(
             verticalArrangement = Arrangement.Top
         ) {
             Text(
-                text = "Point your camera at the QR code on desktop",
+                text = s(StringKey.QR_LOGIN_POINT_CAMERA),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Medium,
                 textAlign = TextAlign.Center
@@ -174,7 +177,7 @@ fun QRLoginScanScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(
-                text = "Align the QR code inside the frame",
+                text = s(StringKey.QR_LOGIN_ALIGN_FRAME),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center
@@ -211,12 +214,12 @@ fun QRLoginScanScreen(
                     if (cameraState != CameraState.Previewing) {
                         Text(
                             text = when (cameraState) {
-                                CameraState.Initializing -> "Initializing camera..."
-                                CameraState.Ready -> "Starting preview..."
-                                is CameraState.Error -> "Camera error"
-                                CameraState.Idle -> "Camera not initialized"
-                                CameraState.Capturing -> "Camera busy"
-                                CameraState.Released -> "Camera released"
+                                CameraState.Initializing -> s(StringKey.QR_LOGIN_CAMERA_INITIALIZING)
+                                CameraState.Ready -> s(StringKey.QR_LOGIN_CAMERA_STARTING_PREVIEW)
+                                is CameraState.Error -> s(StringKey.QR_LOGIN_CAMERA_ERROR)
+                                CameraState.Idle -> s(StringKey.QR_LOGIN_CAMERA_NOT_INITIALIZED)
+                                CameraState.Capturing -> s(StringKey.QR_LOGIN_CAMERA_BUSY)
+                                CameraState.Released -> s(StringKey.QR_LOGIN_CAMERA_RELEASED)
                                 CameraState.Previewing -> ""
                             },
                             style = MaterialTheme.typography.bodyMedium,
@@ -242,16 +245,16 @@ fun QRLoginScanScreen(
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Icon(
                             imageVector = Icons.Default.CameraAlt,
-                            contentDescription = "Camera permission required",
+                            contentDescription = s(StringKey.QR_LOGIN_PERMISSION_REQUIRED_DESC),
                             tint = Color.White,
                             modifier = Modifier.size(48.dp)
                         )
                         Spacer(modifier = Modifier.height(12.dp))
                         Text(
                             text = if (permanentlyDenied) {
-                                "Camera permission was denied. Enable it in settings to scan QR."
+                                s(StringKey.QR_LOGIN_PERMISSION_DENIED_MSG)
                             } else {
-                                "Camera permission is required to scan QR."
+                                s(StringKey.QR_LOGIN_PERMISSION_NEEDED_MSG)
                             },
                             style = MaterialTheme.typography.bodyMedium,
                             color = Color.White,
@@ -273,7 +276,13 @@ fun QRLoginScanScreen(
                                 }
                             }
                         ) {
-                            Text(if (permanentlyDenied) "Open Settings" else "Grant Permission")
+                            Text(
+                                if (permanentlyDenied) {
+                                    s(StringKey.QR_LOGIN_OPEN_SETTINGS)
+                                } else {
+                                    s(StringKey.QR_LOGIN_GRANT_PERMISSION)
+                                }
+                            )
                         }
                     }
                 }
@@ -282,7 +291,7 @@ fun QRLoginScanScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(
-                text = "Align the QR code inside the frame to continue",
+                text = s(StringKey.QR_LOGIN_ALIGN_FRAME_CONTINUE),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -293,7 +302,7 @@ fun QRLoginScanScreen(
                 value = manualQrPayload,
                 onValueChange = { manualQrPayload = it },
                 modifier = Modifier.fillMaxWidth(),
-                label = { Text("Scanned QR Payload (Fallback)") },
+                label = { Text(s(StringKey.QR_LOGIN_PAYLOAD_LABEL)) },
                 placeholder = { Text("fivucsas://qr-login?session=...") },
                 singleLine = true
             )
@@ -305,17 +314,25 @@ fun QRLoginScanScreen(
                 modifier = Modifier.fillMaxWidth(),
                 enabled = !qrState.isLoading && manualQrPayload.isNotBlank()
             ) {
-                Text("Submit QR Payload")
+                if (qrState.isLoading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(20.dp),
+                        color = MaterialTheme.colorScheme.onPrimary,
+                        strokeWidth = 2.dp
+                    )
+                    Spacer(modifier = Modifier.size(8.dp))
+                }
+                Text(s(StringKey.QR_LOGIN_SUBMIT_PAYLOAD))
             }
 
             Spacer(modifier = Modifier.height(10.dp))
             Text(
                 text = when (qrState.status) {
-                    QrLoginStatus.IDLE -> "Ready to scan QR from desktop/web"
-                    QrLoginStatus.WAITING_FOR_MOBILE_SCAN -> "Waiting for camera scan..."
-                    QrLoginStatus.WAITING_FOR_DESKTOP_APPROVAL -> "QR accepted. Waiting for desktop..."
-                    QrLoginStatus.APPROVED -> "Login request approved. You can return."
-                    QrLoginStatus.ERROR -> qrState.error ?: "QR login error"
+                    QrLoginStatus.IDLE -> s(StringKey.QR_LOGIN_STATUS_IDLE)
+                    QrLoginStatus.WAITING_FOR_MOBILE_SCAN -> s(StringKey.QR_LOGIN_STATUS_WAITING_SCAN)
+                    QrLoginStatus.WAITING_FOR_DESKTOP_APPROVAL -> s(StringKey.QR_LOGIN_STATUS_WAITING_DESKTOP)
+                    QrLoginStatus.APPROVED -> s(StringKey.QR_LOGIN_STATUS_APPROVED)
+                    QrLoginStatus.ERROR -> qrState.error ?: s(StringKey.QR_LOGIN_STATUS_ERROR)
                 },
                 style = MaterialTheme.typography.bodySmall,
                 color = if (qrState.status == QrLoginStatus.ERROR) {
@@ -332,7 +349,7 @@ fun QRLoginScanScreen(
                     onClick = onNavigateBack,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text("Done")
+                    Text(s(StringKey.QR_LOGIN_DONE))
                 }
             }
         }
