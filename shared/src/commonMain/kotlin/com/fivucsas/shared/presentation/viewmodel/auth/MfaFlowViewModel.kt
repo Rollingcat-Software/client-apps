@@ -2,6 +2,7 @@ package com.fivucsas.shared.presentation.viewmodel.auth
 
 import com.fivucsas.shared.data.local.OfflineCache
 import com.fivucsas.shared.data.remote.dto.AvailableMethodDto
+import com.fivucsas.shared.data.remote.dto.MfaChallengeData
 import com.fivucsas.shared.data.remote.dto.MfaQrTokenResponse
 import com.fivucsas.shared.data.remote.dto.toModel
 import com.fivucsas.shared.domain.model.UserRole
@@ -173,6 +174,15 @@ class MfaFlowViewModel(
      */
     suspend fun sendOtp(method: String): Result<Unit> {
         return authRepository.sendMfaOtp(mfaSessionToken, method)
+    }
+
+    /**
+     * Request a WebAuthn challenge for the current FINGERPRINT or HARDWARE_KEY step.
+     * The caller is expected to drive the platform Credential Manager / authenticator
+     * with the returned challenge and then submit the assertion via [verifyStep].
+     */
+    suspend fun requestStepUpChallenge(method: String): Result<MfaChallengeData> {
+        return authRepository.requestMfaChallenge(mfaSessionToken, method)
     }
 
     /**

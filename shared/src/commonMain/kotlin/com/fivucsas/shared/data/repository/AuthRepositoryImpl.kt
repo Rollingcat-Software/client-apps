@@ -5,6 +5,7 @@ import com.fivucsas.shared.data.local.TokenManager
 import com.fivucsas.shared.data.remote.api.AuthApi
 import com.fivucsas.shared.data.remote.dto.ChangePasswordRequestDto
 import com.fivucsas.shared.data.remote.dto.LoginRequestDto
+import com.fivucsas.shared.data.remote.dto.MfaChallengeData
 import com.fivucsas.shared.data.remote.dto.MfaQrTokenResponse
 import com.fivucsas.shared.data.remote.dto.MfaSendOtpRequest
 import com.fivucsas.shared.data.remote.dto.MfaStepRequest
@@ -150,6 +151,27 @@ class AuthRepositoryImpl(
             }
 
             Result.success(response)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun requestMfaChallenge(
+        sessionToken: String,
+        method: String
+    ): Result<MfaChallengeData> {
+        return try {
+            val request = MfaStepRequest(
+                sessionToken = sessionToken,
+                method = method,
+                data = mapOf("action" to "challenge")
+            )
+            val response = authApi.requestMfaChallenge(request)
+            if (response.status == "CHALLENGE") {
+                Result.success(response.data)
+            } else {
+                Result.failure(Exception(response.message ?: "Unexpected response: ${response.status}"))
+            }
         } catch (e: Exception) {
             Result.failure(e)
         }

@@ -1,6 +1,7 @@
 package com.fivucsas.shared.test
 
 import com.fivucsas.shared.data.remote.dto.AvailableMethodDto
+import com.fivucsas.shared.data.remote.dto.MfaChallengeData
 import com.fivucsas.shared.data.remote.dto.MfaQrTokenResponse
 import com.fivucsas.shared.data.remote.dto.MfaStepResponse
 import com.fivucsas.shared.domain.repository.AuthRepository
@@ -115,6 +116,24 @@ class FakeAuthRepository : AuthRepository {
                     accessToken = mockAccessToken,
                     refreshToken = mockRefreshToken,
                     expiresIn = 3600
+                )
+            )
+        } else {
+            Result.failure(RuntimeException(errorMessage))
+        }
+    }
+
+    override suspend fun requestMfaChallenge(
+        sessionToken: String,
+        method: String
+    ): Result<MfaChallengeData> {
+        return if (shouldSucceed) {
+            Result.success(
+                MfaChallengeData(
+                    challenge = "fake-challenge",
+                    rpId = "fivucsas.local",
+                    timeout = "60000",
+                    allowCredentials = emptyList()
                 )
             )
         } else {
