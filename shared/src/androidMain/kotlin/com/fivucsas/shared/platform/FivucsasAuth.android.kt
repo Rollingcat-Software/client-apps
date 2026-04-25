@@ -182,6 +182,11 @@ class FivucsasAuthActivity : Activity() {
         }
     }
 
+    @Deprecated(
+        "Deprecated in Java",
+        replaceWith = ReplaceWith("onBackPressedDispatcher.onBackPressed()")
+    )
+    @Suppress("DEPRECATION")
     override fun onBackPressed() {
         if (!callbackFired) {
             callbackFired = true

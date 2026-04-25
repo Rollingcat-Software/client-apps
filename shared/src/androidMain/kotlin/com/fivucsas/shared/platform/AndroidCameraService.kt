@@ -95,6 +95,11 @@ class AndroidCameraService(
         }
     }
 
+    // TODO(camera-x): migrate from setTargetResolution(Size) to
+    //  ResolutionSelector + ResolutionStrategy (CameraX 1.3+). Requires
+    //  picking aspect-ratio strategy and verifying biometric capture
+    //  quality on the new path. Tracked separately from this polish sweep.
+    @Suppress("DEPRECATION")
     private fun setupUseCases() {
         // Preview use case
         preview = Preview.Builder()

@@ -36,7 +36,10 @@ class AndroidPushNotificationService(
     override suspend fun getToken(): String? {
         return try {
             val token = FirebaseMessaging.getInstance().token.await()
-            Log.d(TAG, "FCM token retrieved (${token.take(10)}...)")
+            // Don't log token contents (even truncated) — FCM tokens are
+            // bearer credentials and any prefix can correlate with the full
+            // token in other logs. Length is enough for debugging.
+            Log.d(TAG, "FCM token retrieved (length=${token.length})")
             token
         } catch (e: Exception) {
             Log.w(TAG, "FCM token unavailable (Firebase not configured?): ${e.message}")

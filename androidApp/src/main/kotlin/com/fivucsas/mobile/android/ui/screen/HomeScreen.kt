@@ -14,7 +14,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CameraAlt
-import androidx.compose.material.icons.filled.Logout
+import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.PersonAdd
 import androidx.compose.material.icons.filled.Verified
 import androidx.compose.material3.Button
@@ -65,7 +65,7 @@ fun HomeScreen(
                 actions = {
                     IconButton(onClick = onLogout) {
                         Icon(
-                            imageVector = Icons.Default.Logout,
+                            imageVector = Icons.AutoMirrored.Filled.Logout,
                             contentDescription = "Logout",
                             tint = MaterialTheme.colorScheme.onSurface
                         )

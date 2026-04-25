@@ -36,6 +36,9 @@ fun AndroidCameraPreview(
     onFaceDetected: ((List<Face>) -> Unit)? = null
 ) {
     val context = LocalContext.current
+    // TODO(lifecycle): switch to androidx.lifecycle.compose.LocalLifecycleOwner
+    //  once we add the lifecycle-runtime-compose dependency.
+    @Suppress("DEPRECATION")
     val lifecycleOwner = LocalLifecycleOwner.current
 
     // Create and remember PreviewView
