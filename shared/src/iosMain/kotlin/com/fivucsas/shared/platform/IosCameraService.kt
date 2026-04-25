@@ -1,3 +1,5 @@
+@file:OptIn(kotlinx.cinterop.ExperimentalForeignApi::class, kotlinx.cinterop.BetaInteropApi::class)
+
 package com.fivucsas.shared.platform
 
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -170,11 +172,7 @@ class IosCameraService : ICameraService {
                         val uiImage = UIImage(data = data)
                         val jpegData = UIImageJPEGRepresentation(uiImage, 0.85)
                         if (jpegData != null) {
-                            val bytes = ByteArray(jpegData.length.toInt())
-                            bytes.usePinned { pinned ->
-                                jpegData.getBytes(pinned.addressOf(0), jpegData.length)
-                            }
-                            continuation.resume(bytes)
+                            continuation.resume(jpegData.toByteArray())
                         } else {
                             continuation.resumeWithException(Exception("JPEG conversion failed"))
                         }
@@ -323,11 +321,7 @@ private class VideoSampleDelegate : NSObject(), AVCaptureVideoDataOutputSampleBu
         val uiImage = UIImage(cIImage = ciImage)
         val jpegData = UIImageJPEGRepresentation(uiImage, 0.80)
         if (jpegData != null) {
-            val bytes = ByteArray(jpegData.length.toInt())
-            bytes.usePinned { pinned ->
-                jpegData.getBytes(pinned.addressOf(0), jpegData.length)
-            }
-            latestImageData = bytes
+            latestImageData = jpegData.toByteArray()
         }
     }
 
@@ -335,4 +329,21 @@ private class VideoSampleDelegate : NSObject(), AVCaptureVideoDataOutputSampleBu
      * Returns the latest captured frame as JPEG bytes, or null if no frame yet.
      */
     fun lastFrameAsJpeg(): ByteArray? = latestImageData
+}
+
+/**
+ * Copy bytes out of an NSData into a Kotlin ByteArray.
+ *
+ * Kotlin/Native 2.1.x unifies the cinterop `CValues<T>.getBytes(): ByteArray`
+ * extension with `NSData.getBytes:length:`, which makes calling the latter
+ * ambiguous ("Too many arguments for `fun <T : CVariable> CValues<T>.getBytes(): ByteArray`").
+ * We read via the `bytes` pointer (COpaquePointer to the NSData backing buffer)
+ * instead.
+ */
+private fun NSData.toByteArray(): ByteArray {
+    val length = this.length.toInt()
+    if (length == 0) return ByteArray(0)
+    val src = this.bytes ?: return ByteArray(0)
+    val srcTyped = src.reinterpret<ByteVar>()
+    return ByteArray(length) { i -> srcTyped[i] }
 }
