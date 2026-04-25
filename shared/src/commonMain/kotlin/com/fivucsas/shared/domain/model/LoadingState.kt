@@ -40,7 +40,13 @@ val LoadingState.isIdle: Boolean
 
 /**
  * Get data or null
+ *
+ * Note: the cast is unchecked because [LoadingState.Success] erases its
+ * type parameter at runtime. Callers must request the same `T` they put
+ * in. We suppress the compiler warning rather than leak it everywhere
+ * this helper is used.
  */
+@Suppress("UNCHECKED_CAST")
 fun <T> LoadingState.getDataOrNull(): T? {
     return when (this) {
         is LoadingState.Success<*> -> data as? T

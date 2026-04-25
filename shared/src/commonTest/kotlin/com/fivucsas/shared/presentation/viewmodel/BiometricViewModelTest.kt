@@ -220,10 +220,10 @@ private class FakeUserRepository : UserRepository {
         else Result.failure(RuntimeException("Create failed"))
     }
 
-    override suspend fun updateUser(userId: String, user: User): Result<User> =
+    override suspend fun updateUser(id: String, user: User): Result<User> =
         Result.success(mockUser.copy(status = user.status, hasBiometric = user.hasBiometric))
 
-    override suspend fun deleteUser(userId: String): Result<Unit> = Result.success(Unit)
+    override suspend fun deleteUser(id: String): Result<Unit> = Result.success(Unit)
 
     override suspend fun getUserById(id: String): Result<User> = Result.success(mockUser)
     override suspend fun getUsers(): Result<List<User>> = Result.success(listOf(mockUser))
