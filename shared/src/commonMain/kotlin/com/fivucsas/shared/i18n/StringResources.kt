@@ -607,6 +607,14 @@ enum class StringKey {
     MFA_INVALID_CODE,
     MFA_TOO_MANY_ATTEMPTS,
     MFA_GENERIC_ERROR,
+    // PR #25: switch-method + NEEDS_ENROLLMENT flow
+    MFA_NEEDS_ENROLLMENT_TITLE,
+    MFA_NEEDS_ENROLLMENT_DESC,
+    MFA_ENROLL_NOW,
+    MFA_SWITCH_METHOD_BUTTON,
+    MFA_TRY_DIFFERENT_METHOD,
+    MFA_METHOD_NOT_PERMITTED,
+    MFA_METHOD_ALREADY_USED,
 
     // Authenticator (standalone TOTP app)
     AUTH_TITLE,
@@ -1373,6 +1381,13 @@ private val enStrings = mapOf(
     StringKey.MFA_INVALID_CODE to "Invalid verification code.",
     StringKey.MFA_TOO_MANY_ATTEMPTS to "Too many attempts. Please wait.",
     StringKey.MFA_GENERIC_ERROR to "Verification failed. Please try again.",
+    StringKey.MFA_NEEDS_ENROLLMENT_TITLE to "Enrollment required",
+    StringKey.MFA_NEEDS_ENROLLMENT_DESC to "You need to enroll {0} before you can use it. Tap below to set it up.",
+    StringKey.MFA_ENROLL_NOW to "Enroll now",
+    StringKey.MFA_SWITCH_METHOD_BUTTON to "Use this method instead",
+    StringKey.MFA_TRY_DIFFERENT_METHOD to "Try a different method",
+    StringKey.MFA_METHOD_NOT_PERMITTED to "This method isn't allowed for this step.",
+    StringKey.MFA_METHOD_ALREADY_USED to "You have already used this method in this session.",
 
     // Authenticator (standalone TOTP app)
     StringKey.AUTH_TITLE to "Authenticator",
@@ -2139,6 +2154,13 @@ private val trStrings = mapOf(
     StringKey.MFA_INVALID_CODE to "Geçersiz doğrulama kodu.",
     StringKey.MFA_TOO_MANY_ATTEMPTS to "Çok fazla deneme. Lütfen bekleyin.",
     StringKey.MFA_GENERIC_ERROR to "Doğrulama başarısız. Lütfen tekrar deneyin.",
+    StringKey.MFA_NEEDS_ENROLLMENT_TITLE to "Kayıt gerekli",
+    StringKey.MFA_NEEDS_ENROLLMENT_DESC to "{0} yöntemini kullanmadan önce kaydolmanız gerekiyor. Kurulum için aşağıya dokunun.",
+    StringKey.MFA_ENROLL_NOW to "Şimdi kaydol",
+    StringKey.MFA_SWITCH_METHOD_BUTTON to "Bu yöntemi kullan",
+    StringKey.MFA_TRY_DIFFERENT_METHOD to "Farklı bir yöntem dene",
+    StringKey.MFA_METHOD_NOT_PERMITTED to "Bu yöntem bu adım için kullanılamaz.",
+    StringKey.MFA_METHOD_ALREADY_USED to "Bu yöntemi bu oturumda zaten kullandınız.",
 
     // Authenticator (standalone TOTP app)
     StringKey.AUTH_TITLE to "Doğrulayici",

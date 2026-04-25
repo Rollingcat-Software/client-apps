@@ -67,6 +67,10 @@ kotlin {
                 // Turbine (for Flow testing)
                 implementation("app.cash.turbine:turbine:1.2.0")
 
+                // Ktor mock engine — used by AuthApiImpl tests to assert
+                // method / path / body without standing up a real server.
+                implementation("io.ktor:ktor-client-mock:3.1.1")
+
                 // MockK (for mocking) - Note: Common MockK doesn't exist, we'll use expect/actual pattern
                 // For now, we'll create our own test doubles
             }

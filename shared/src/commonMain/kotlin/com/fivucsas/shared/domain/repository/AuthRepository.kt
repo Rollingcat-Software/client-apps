@@ -4,6 +4,7 @@ import com.fivucsas.shared.data.remote.dto.AvailableMethodDto
 import com.fivucsas.shared.data.remote.dto.MfaChallengeData
 import com.fivucsas.shared.data.remote.dto.MfaQrTokenResponse
 import com.fivucsas.shared.data.remote.dto.MfaStepResponse
+import com.fivucsas.shared.data.remote.dto.MfaSwitchMethodResponse
 
 /**
  * Authentication repository interface
@@ -96,6 +97,30 @@ interface AuthRepository {
      * Generate QR token for MFA QR_CODE method
      */
     suspend fun generateMfaQr(sessionToken: String): Result<MfaQrTokenResponse>
+
+    /**
+     * Cancel an in-progress MFA session.
+     * Maps to DELETE /auth/mfa/session/{sessionToken}.
+     * Always returns success once the network round-trip completes (a 404
+     * for an already-expired session is intentionally swallowed by the
+     * implementation).
+     */
+    suspend fun cancelMfaSession(sessionToken: String): Result<Unit>
+
+    /**
+     * Switch the active method for the current MFA step.
+     * Maps to POST /auth/mfa/switch-method.
+     *
+     * A 409 is *not* treated as a failure here — it is returned as a
+     * `Result.success` carrying the error envelope (with `errorCode`)
+     * so the ViewModel can surface a precise UI message and an enrollment
+     * link if applicable. Network / 5xx errors are returned as
+     * `Result.failure`.
+     */
+    suspend fun switchMfaMethod(
+        sessionToken: String,
+        method: String
+    ): Result<MfaSwitchMethodResponse>
 }
 
 /**

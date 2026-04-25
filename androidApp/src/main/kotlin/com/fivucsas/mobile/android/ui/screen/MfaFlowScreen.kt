@@ -1,7 +1,10 @@
 package com.fivucsas.mobile.android.ui.screen
 
 import android.Manifest
+import android.content.Context
+import android.content.Intent
 import android.media.MediaRecorder
+import android.net.Uri
 import android.os.Build
 import android.util.Base64
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -112,17 +115,29 @@ fun MfaFlowScreen(
     onCancel: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val context = LocalContext.current
 
     // Navigate to dashboard when authenticated
     LaunchedEffect(uiState) {
         if (uiState is MfaFlowUiState.Authenticated) {
             onAuthenticated()
         }
+        // Cancelled is a terminal state — bubble it back up to the host nav.
+        if (uiState is MfaFlowUiState.Cancelled) {
+            onCancel()
+        }
     }
 
     // Overlay QR scanner when requested from QR_CODE step
     var showQrScanner by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
+
+    // PR #25: server-side cancel via DELETE /auth/mfa/session/{token}, then
+    // navigate back. Failures are absorbed inside the ViewModel — the user
+    // must always be able to leave the screen.
+    val cancelClick: () -> Unit = {
+        scope.launch { viewModel.cancelSession() }
+    }
 
     if (showQrScanner) {
         QrScannerScreen(
@@ -171,7 +186,7 @@ fun MfaFlowScreen(
                         textAlign = TextAlign.Center
                     )
                     Spacer(modifier = Modifier.height(24.dp))
-                    TextButton(onClick = onCancel) {
+                    TextButton(onClick = cancelClick) {
                         Text(s(StringKey.CANCEL))
                     }
                 }
@@ -182,7 +197,7 @@ fun MfaFlowScreen(
                         currentStep = state.currentStep,
                         totalSteps = state.totalSteps,
                         onMethodSelected = { viewModel.selectMethod(it) },
-                        onCancel = onCancel
+                        onCancel = cancelClick
                     )
                 }
 
@@ -193,7 +208,11 @@ fun MfaFlowScreen(
                         totalSteps = state.totalSteps,
                         viewModel = viewModel,
                         onBack = { viewModel.backToMethodSelection() },
-                        onOpenQrScanner = { showQrScanner = true }
+                        onOpenQrScanner = { showQrScanner = true },
+                        alternativeMethods = viewModel.currentAlternativeMethods(),
+                        onSwitchMethod = { newMethod ->
+                            scope.launch { viewModel.switchMethod(newMethod) }
+                        }
                     )
                 }
 
@@ -234,12 +253,100 @@ fun MfaFlowScreen(
                         }
                     }
                     Spacer(modifier = Modifier.height(8.dp))
-                    TextButton(onClick = onCancel) {
+                    TextButton(onClick = cancelClick) {
                         Text(s(StringKey.CANCEL))
                     }
                 }
+
+                is MfaFlowUiState.Cancelled -> {
+                    // Terminal — LaunchedEffect above will dispatch onCancel().
+                    CircularProgressIndicator(modifier = Modifier.size(32.dp))
+                }
+
+                is MfaFlowUiState.NeedsEnrollment -> {
+                    NeedsEnrollmentContent(
+                        method = state.method,
+                        description = state.description,
+                        onEnroll = { openInBrowser(context, state.enrollmentUrl) },
+                        onCancel = cancelClick
+                    )
+                }
             }
         }
+    }
+}
+
+/**
+ * Open [url] in an external browser. Tries Chrome Custom Tabs first via the
+ * `androidx.browser` library if it's on the classpath, otherwise falls back
+ * to a plain `ACTION_VIEW` intent. The fallback path keeps this screen
+ * compilable without requiring a new dependency.
+ */
+private fun openInBrowser(context: Context, url: String) {
+    if (url.isBlank()) return
+    // Server may return a relative path like "/enroll/totp". Resolve it
+    // against the auth host so the device can actually open it.
+    val absolute = if (url.startsWith("http://") || url.startsWith("https://")) {
+        url
+    } else {
+        val base = "https://auth.rollingcatsoftware.com"
+        if (url.startsWith("/")) "$base$url" else "$base/$url"
+    }
+    try {
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(absolute))
+            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        context.startActivity(intent)
+    } catch (_: Exception) {
+        // No browser available — silently swallow; the screen stays on
+        // NeedsEnrollment so the user can cancel.
+    }
+}
+
+@Composable
+private fun NeedsEnrollmentContent(
+    method: String,
+    description: String?,
+    onEnroll: () -> Unit,
+    onCancel: () -> Unit
+) {
+    Icon(
+        imageVector = Icons.Default.Security,
+        contentDescription = null,
+        tint = MaterialTheme.colorScheme.primary,
+        modifier = Modifier.size(64.dp)
+    )
+
+    Spacer(modifier = Modifier.height(16.dp))
+
+    Text(
+        text = s(StringKey.MFA_NEEDS_ENROLLMENT_TITLE),
+        style = MaterialTheme.typography.titleLarge,
+        textAlign = TextAlign.Center
+    )
+
+    Spacer(modifier = Modifier.height(8.dp))
+
+    Text(
+        text = description?.takeIf { it.isNotBlank() }
+            ?: StringResources.get(StringKey.MFA_NEEDS_ENROLLMENT_DESC, methodDisplayName(method)),
+        style = MaterialTheme.typography.bodyMedium,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        textAlign = TextAlign.Center
+    )
+
+    Spacer(modifier = Modifier.height(24.dp))
+
+    Button(
+        onClick = onEnroll,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Text(s(StringKey.MFA_ENROLL_NOW))
+    }
+
+    Spacer(modifier = Modifier.height(8.dp))
+
+    TextButton(onClick = onCancel) {
+        Text(s(StringKey.CANCEL))
     }
 }
 
@@ -301,7 +408,9 @@ private fun MfaStepInputContent(
     totalSteps: Int,
     viewModel: MfaFlowViewModel,
     onBack: () -> Unit,
-    onOpenQrScanner: () -> Unit = {}
+    onOpenQrScanner: () -> Unit = {},
+    alternativeMethods: List<AvailableMethodDto> = emptyList(),
+    onSwitchMethod: (String) -> Unit = {}
 ) {
     val scope = rememberCoroutineScope()
 
@@ -424,6 +533,35 @@ private fun MfaStepInputContent(
     }
 
     Spacer(modifier = Modifier.height(24.dp))
+
+    // PR #25: surface "Try a different method" using the latest server-supplied
+    // alternativeMethods. Each pick fires POST /auth/mfa/switch-method which
+    // re-dispatches OTP for EMAIL/SMS_OTP server-side.
+    val filteredAlternatives = alternativeMethods.filter { it.methodType != method }
+    if (filteredAlternatives.isNotEmpty()) {
+        Text(
+            text = s(StringKey.MFA_TRY_DIFFERENT_METHOD),
+            style = MaterialTheme.typography.titleSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        filteredAlternatives.forEach { alt ->
+            OutlinedButton(
+                onClick = { onSwitchMethod(alt.methodType) },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Icon(
+                    imageVector = methodIcon(alt.methodType),
+                    contentDescription = null,
+                    modifier = Modifier.size(20.dp)
+                )
+                Spacer(modifier = Modifier.size(8.dp))
+                Text(methodDisplayName(alt.methodType))
+            }
+            Spacer(modifier = Modifier.height(4.dp))
+        }
+        Spacer(modifier = Modifier.height(16.dp))
+    }
 
     TextButton(onClick = onBack) {
         Text(s(StringKey.MFA_BACK_TO_METHODS))
