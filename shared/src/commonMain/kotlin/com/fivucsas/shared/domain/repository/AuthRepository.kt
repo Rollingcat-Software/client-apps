@@ -1,6 +1,7 @@
 package com.fivucsas.shared.domain.repository
 
 import com.fivucsas.shared.data.remote.dto.AvailableMethodDto
+import com.fivucsas.shared.data.remote.dto.MfaChallengeData
 import com.fivucsas.shared.data.remote.dto.MfaQrTokenResponse
 import com.fivucsas.shared.data.remote.dto.MfaStepResponse
 
@@ -75,6 +76,16 @@ interface AuthRepository {
         method: String,
         data: Map<String, String> = emptyMap()
     ): Result<MfaStepResponse>
+
+    /**
+     * Request a WebAuthn challenge for FINGERPRINT or HARDWARE_KEY MFA step.
+     * Internally posts to /auth/mfa/step with `data: { action: "challenge" }`.
+     * @return [MfaChallengeData] with the server's challenge, rpId and allowCredentials.
+     */
+    suspend fun requestMfaChallenge(
+        sessionToken: String,
+        method: String
+    ): Result<MfaChallengeData>
 
     /**
      * Send OTP for MFA (EMAIL_OTP or SMS_OTP)

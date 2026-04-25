@@ -3,6 +3,7 @@ package com.fivucsas.shared.data.remote.api
 import com.fivucsas.shared.data.remote.dto.AuthResponseDto
 import com.fivucsas.shared.data.remote.dto.ChangePasswordRequestDto
 import com.fivucsas.shared.data.remote.dto.LoginRequestDto
+import com.fivucsas.shared.data.remote.dto.MfaChallengeResponse
 import com.fivucsas.shared.data.remote.dto.MfaQrTokenResponse
 import com.fivucsas.shared.data.remote.dto.MfaSendOtpRequest
 import com.fivucsas.shared.data.remote.dto.MfaStepRequest
@@ -63,6 +64,13 @@ interface AuthApi {
      * POST /auth/mfa/step (PUBLIC — no JWT required)
      */
     suspend fun verifyMfaStep(request: MfaStepRequest): MfaStepResponse
+
+    /**
+     * Request a WebAuthn challenge for FINGERPRINT or HARDWARE_KEY MFA step.
+     * POST /auth/mfa/step with `data: { action: "challenge" }`. The server returns
+     * a CHALLENGE-shaped response that does not match MfaStepResponse.
+     */
+    suspend fun requestMfaChallenge(request: MfaStepRequest): MfaChallengeResponse
 
     /**
      * Send OTP for MFA

@@ -120,6 +120,29 @@ data class MfaStepResponse(
 )
 
 /**
+ * Inner challenge payload returned by the server when requesting a WebAuthn challenge
+ * (FINGERPRINT or HARDWARE_KEY) via POST /auth/mfa/step with `data: { action: "challenge" }`.
+ */
+@Serializable
+data class MfaChallengeData(
+    val challenge: String = "",
+    val rpId: String = "",
+    val timeout: String? = null,
+    val allowCredentials: List<String> = emptyList()
+)
+
+/**
+ * Response wrapper for MFA WebAuthn challenge requests.
+ * Server returns: { "status": "CHALLENGE", "data": { challenge, rpId, allowCredentials, timeout } }
+ */
+@Serializable
+data class MfaChallengeResponse(
+    val status: String = "",
+    val data: MfaChallengeData = MfaChallengeData(),
+    val message: String? = null
+)
+
+/**
  * Request to send an OTP for MFA.
  * POST /auth/mfa/send-otp
  */

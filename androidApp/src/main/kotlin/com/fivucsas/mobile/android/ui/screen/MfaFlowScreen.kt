@@ -1,13 +1,29 @@
 package com.fivucsas.mobile.android.ui.screen
 
+import android.Manifest
+import android.media.MediaRecorder
+import android.os.Build
+import android.util.Base64
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.camera.core.CameraSelector
+import androidx.camera.core.ImageCapture
+import androidx.camera.core.ImageCaptureException
+import androidx.camera.core.ImageProxy
+import androidx.camera.view.CameraController
+import androidx.camera.view.LifecycleCameraController
+import androidx.camera.view.PreviewView
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -15,6 +31,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -24,11 +41,13 @@ import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Face
 import androidx.compose.material.icons.filled.Fingerprint
 import androidx.compose.material.icons.filled.Key
+import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.Nfc
 import androidx.compose.material.icons.filled.PhoneAndroid
 import androidx.compose.material.icons.filled.QrCode
 import androidx.compose.material.icons.filled.RecordVoiceOver
 import androidx.compose.material.icons.filled.Security
+import androidx.compose.material.icons.filled.Stop
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -41,6 +60,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -52,17 +72,29 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.content.ContextCompat
 import io.github.alexzhirkevich.qrose.rememberQrCodePainter
+import com.fivucsas.mobile.android.ui.util.toCompressedJpegBytes
 import com.fivucsas.shared.data.remote.dto.AvailableMethodDto
+import com.fivucsas.shared.data.remote.dto.MfaChallengeData
 import com.fivucsas.shared.i18n.StringKey
 import com.fivucsas.shared.i18n.StringResources
 import com.fivucsas.shared.i18n.s
+import com.fivucsas.shared.platform.WebAuthnAuthenticator
+import com.fivucsas.shared.platform.provideWebAuthnAuthenticator
 import com.fivucsas.shared.presentation.viewmodel.auth.MfaFlowUiState
 import com.fivucsas.shared.presentation.viewmodel.auth.MfaFlowViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.buildJsonObject
+import java.io.File
 
 /**
  * MFA Flow Screen
@@ -321,12 +353,52 @@ private fun MfaStepInputContent(
             )
         }
 
-        "FINGERPRINT" -> {
-            // Fingerprint uses biometric prompt — auto-verify
-            FingerprintStepInput(
-                onVerify = { attestation ->
+        "FACE" -> {
+            FaceMfaStepInput(
+                onCapture = { jpegBytes ->
+                    val base64 = Base64.encodeToString(jpegBytes, Base64.NO_WRAP)
                     scope.launch {
-                        viewModel.verifyStep(method, mapOf("attestation" to attestation))
+                        // Backend FaceAuthHandler reads `data.get("image")`.
+                        viewModel.verifyStep(method, mapOf("image" to base64))
+                    }
+                }
+            )
+        }
+
+        "VOICE" -> {
+            VoiceMfaStepInput(
+                onRecorded = { audioBase64 ->
+                    scope.launch {
+                        // Backend VoiceAuthHandler reads `data.get("voiceData")`.
+                        viewModel.verifyStep(method, mapOf("voiceData" to audioBase64))
+                    }
+                }
+            )
+        }
+
+        "FINGERPRINT" -> {
+            FingerprintMfaStepInput(
+                viewModel = viewModel,
+                method = method,
+                authenticatorAttachment = "platform",
+                onVerify = { assertionPayload ->
+                    scope.launch {
+                        // Backend FingerprintAuthHandler accepts `fingerprintData` (or `assertion`).
+                        viewModel.verifyStep(method, mapOf("fingerprintData" to assertionPayload))
+                    }
+                }
+            )
+        }
+
+        "HARDWARE_KEY" -> {
+            FingerprintMfaStepInput(
+                viewModel = viewModel,
+                method = method,
+                authenticatorAttachment = "cross-platform",
+                onVerify = { assertionPayload ->
+                    scope.launch {
+                        // Backend HardwareKeyAuthHandler reads `assertion` (base64 JSON blob).
+                        viewModel.verifyStep(method, mapOf("assertion" to assertionPayload))
                     }
                 }
             )
@@ -335,19 +407,6 @@ private fun MfaStepInputContent(
         "NFC_DOCUMENT" -> {
             // Passport / eID BAC read → payload sent to NfcDocumentAuthHandler.
             NfcStepScreen(
-                onVerify = { data ->
-                    scope.launch {
-                        viewModel.verifyStep(method, data)
-                    }
-                }
-            )
-        }
-
-        "FACE", "VOICE", "HARDWARE_KEY" -> {
-            // Generic placeholder for methods that require platform-specific flows.
-            // These will be wired to existing screens later.
-            GenericMethodStepInput(
-                method = method,
                 onVerify = { data ->
                     scope.launch {
                         viewModel.verifyStep(method, data)
@@ -529,63 +588,472 @@ private fun QrCodeStepInput(
     }
 }
 
+/**
+ * FACE MFA step — captures a single front-camera frame and returns compressed JPEG bytes.
+ * The bytes are then base64-encoded and submitted as `{"image": "<base64>"}` (matching
+ * the FaceAuthHandler contract on the backend).
+ */
 @Composable
-private fun FingerprintStepInput(onVerify: (String) -> Unit) {
-    // Placeholder for biometric prompt integration.
-    // The actual BiometricPrompt call will be wired via the platform.
-    Icon(
-        imageVector = Icons.Default.Fingerprint,
-        contentDescription = null,
-        modifier = Modifier.size(64.dp),
-        tint = MaterialTheme.colorScheme.primary
-    )
+private fun FaceMfaStepInput(onCapture: (ByteArray) -> Unit) {
+    val context = LocalContext.current
+    val lifecycleOwner = LocalLifecycleOwner.current
 
-    Spacer(modifier = Modifier.height(16.dp))
+    var hasPermission by remember { mutableStateOf(false) }
+    var capturing by remember { mutableStateOf(false) }
+    var captureError by remember { mutableStateOf<String?>(null) }
 
-    Text(
-        text = s(StringKey.MFA_METHOD_FINGERPRINT),
-        style = MaterialTheme.typography.bodyLarge,
-        textAlign = TextAlign.Center
-    )
+    val permissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { granted -> hasPermission = granted }
 
-    Spacer(modifier = Modifier.height(16.dp))
+    LaunchedEffect(Unit) {
+        permissionLauncher.launch(Manifest.permission.CAMERA)
+    }
 
-    Button(
-        onClick = { onVerify("biometric_prompt") },
-        modifier = Modifier.fillMaxWidth()
+    val cameraController = remember {
+        LifecycleCameraController(context).apply {
+            setEnabledUseCases(CameraController.IMAGE_CAPTURE or CameraController.IMAGE_ANALYSIS)
+            cameraSelector = CameraSelector.DEFAULT_FRONT_CAMERA
+        }
+    }
+
+    DisposableEffect(Unit) {
+        onDispose { cameraController.unbind() }
+    }
+
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(s(StringKey.MFA_VERIFY))
+        Text(
+            text = s(StringKey.FACE_VERIFY_INSTRUCTIONS),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            textAlign = TextAlign.Center
+        )
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        if (hasPermission) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .aspectRatio(3f / 4f),
+                contentAlignment = Alignment.Center
+            ) {
+                AndroidView(
+                    factory = { ctx ->
+                        PreviewView(ctx).apply {
+                            controller = cameraController
+                            cameraController.bindToLifecycle(lifecycleOwner)
+                        }
+                    },
+                    modifier = Modifier.fillMaxSize()
+                )
+                Box(
+                    modifier = Modifier
+                        .size(240.dp)
+                        .border(
+                            BorderStroke(3.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.8f)),
+                            shape = CircleShape
+                        )
+                )
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            captureError?.let { msg ->
+                Text(
+                    text = msg,
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodySmall
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+
+            Button(
+                onClick = {
+                    if (capturing) return@Button
+                    capturing = true
+                    captureError = null
+                    cameraController.takePicture(
+                        ContextCompat.getMainExecutor(context),
+                        object : ImageCapture.OnImageCapturedCallback() {
+                            override fun onCaptureSuccess(image: ImageProxy) {
+                                val bytes = image.toCompressedJpegBytes()
+                                image.close()
+                                capturing = false
+                                onCapture(bytes)
+                            }
+
+                            override fun onError(exception: ImageCaptureException) {
+                                capturing = false
+                                captureError = exception.message
+                                    ?: StringResources.get(StringKey.FACE_VERIFY_CAPTURE_ERROR, "")
+                            }
+                        }
+                    )
+                },
+                enabled = !capturing,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Icon(Icons.Default.CameraAlt, contentDescription = null)
+                Spacer(modifier = Modifier.size(8.dp))
+                Text(s(StringKey.FACE_VERIFY_BUTTON))
+            }
+        } else {
+            Icon(
+                imageVector = Icons.Default.Face,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(64.dp)
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = s(StringKey.FACE_VERIFY_PERMISSION_RATIONALE),
+                style = MaterialTheme.typography.bodyMedium,
+                textAlign = TextAlign.Center
+            )
+            Spacer(modifier = Modifier.height(12.dp))
+            Button(
+                onClick = { permissionLauncher.launch(Manifest.permission.CAMERA) },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(s(StringKey.COMMON_GRANT_CAMERA_PERMISSION))
+            }
+        }
     }
 }
 
+/**
+ * VOICE MFA step — records up to ~5 s of mono 16 kHz AAC-in-MP4 audio and returns it
+ * as a base64 string. Submitted as `{"voiceData": "<base64>"}` (matching the
+ * VoiceAuthHandler contract on the backend).
+ */
 @Composable
-private fun GenericMethodStepInput(
-    method: String,
-    onVerify: (Map<String, String>) -> Unit
-) {
-    Icon(
-        imageVector = methodIcon(method),
-        contentDescription = null,
-        modifier = Modifier.size(64.dp),
-        tint = MaterialTheme.colorScheme.primary
-    )
+private fun VoiceMfaStepInput(onRecorded: (String) -> Unit) {
+    val context = LocalContext.current
 
-    Spacer(modifier = Modifier.height(16.dp))
+    var hasPermission by remember { mutableStateOf(false) }
+    var recording by remember { mutableStateOf(false) }
+    var recorder by remember { mutableStateOf<MediaRecorder?>(null) }
+    var audioFile by remember { mutableStateOf<File?>(null) }
+    var seconds by remember { mutableStateOf(0) }
+    var error by remember { mutableStateOf<String?>(null) }
 
-    Text(
-        text = methodDisplayName(method),
-        style = MaterialTheme.typography.bodyLarge,
-        textAlign = TextAlign.Center
-    )
+    val permissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { granted -> hasPermission = granted }
 
-    Spacer(modifier = Modifier.height(16.dp))
-
-    Button(
-        onClick = { onVerify(emptyMap()) },
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        Text(s(StringKey.MFA_VERIFY))
+    LaunchedEffect(Unit) {
+        permissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
     }
+
+    LaunchedEffect(recording) {
+        if (recording) {
+            seconds = 0
+            while (recording) {
+                delay(1000)
+                seconds += 1
+            }
+        }
+    }
+
+    DisposableEffect(Unit) {
+        onDispose {
+            try { recorder?.stop() } catch (_: Exception) {}
+            try { recorder?.release() } catch (_: Exception) {}
+        }
+    }
+
+    fun startRecording() {
+        try {
+            val file = File(context.cacheDir, "mfa_voice_${System.currentTimeMillis()}.m4a")
+            audioFile = file
+            val mr = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                MediaRecorder(context)
+            } else {
+                @Suppress("DEPRECATION")
+                MediaRecorder()
+            }
+            mr.setAudioSource(MediaRecorder.AudioSource.MIC)
+            mr.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
+            mr.setAudioEncoder(MediaRecorder.AudioEncoder.AAC)
+            mr.setAudioSamplingRate(16000)
+            mr.setAudioChannels(1)
+            mr.setOutputFile(file.absolutePath)
+            mr.prepare()
+            mr.start()
+            recorder = mr
+            recording = true
+            error = null
+        } catch (e: Exception) {
+            error = e.message
+            recording = false
+        }
+    }
+
+    fun stopRecordingAndSubmit() {
+        try {
+            recorder?.stop()
+            recorder?.release()
+        } catch (_: Exception) {}
+        recorder = null
+        recording = false
+
+        val file = audioFile
+        if (file == null || !file.exists()) {
+            error = StringResources.get(StringKey.MFA_GENERIC_ERROR)
+            return
+        }
+        val bytes = file.readBytes()
+        val base64 = Base64.encodeToString(bytes, Base64.NO_WRAP)
+        file.delete()
+        onRecorded(base64)
+    }
+
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Icon(
+            imageVector = Icons.Default.RecordVoiceOver,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.size(64.dp)
+        )
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        Text(
+            text = s(StringKey.VOICE_VERIFY_INSTRUCTION),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            textAlign = TextAlign.Center
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        if (recording) {
+            Text(
+                text = "${s(StringKey.VOICE_RECORDING)}... ${seconds}s",
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.error
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+        }
+
+        error?.let { msg ->
+            Text(
+                text = msg,
+                color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.bodySmall
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+        }
+
+        if (hasPermission) {
+            Button(
+                onClick = {
+                    if (recording) {
+                        stopRecordingAndSubmit()
+                    } else {
+                        startRecording()
+                    }
+                },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Icon(
+                    imageVector = if (recording) Icons.Default.Stop else Icons.Default.Mic,
+                    contentDescription = null
+                )
+                Spacer(modifier = Modifier.size(8.dp))
+                Text(
+                    text = if (recording) s(StringKey.MFA_VERIFY) else s(StringKey.VOICE_TAP_TO_RECORD)
+                )
+            }
+        } else {
+            Text(
+                text = s(StringKey.VOICE_PERMISSION_REQUIRED),
+                style = MaterialTheme.typography.bodyMedium,
+                textAlign = TextAlign.Center
+            )
+            Spacer(modifier = Modifier.height(12.dp))
+            Button(
+                onClick = { permissionLauncher.launch(Manifest.permission.RECORD_AUDIO) },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(s(StringKey.MFA_VERIFY))
+            }
+        }
+    }
+}
+
+/**
+ * Shared UI for FINGERPRINT and HARDWARE_KEY MFA steps. Drives a full WebAuthn
+ * round trip:
+ *   1) POST /auth/mfa/step with `data: { action: "challenge" }` to fetch the challenge.
+ *   2) Hand the challenge to the platform [WebAuthnAuthenticator] (Credential Manager)
+ *      with the requested authenticator attachment ("platform" for fingerprint /
+ *      device biometric, "cross-platform" for USB/NFC/BLE security keys).
+ *   3) Pack `{credentialId, authenticatorData, clientDataJSON, signature}` into a
+ *      base64-encoded JSON blob and forward it via [onVerify].
+ */
+@Composable
+private fun FingerprintMfaStepInput(
+    viewModel: MfaFlowViewModel,
+    method: String,
+    authenticatorAttachment: String,
+    onVerify: (String) -> Unit
+) {
+    val scope = rememberCoroutineScope()
+    val authenticator = remember { provideWebAuthnAuthenticator() }
+
+    var processing by remember { mutableStateOf(false) }
+    var error by remember { mutableStateOf<String?>(null) }
+
+    val isFingerprint = method == "FINGERPRINT"
+    val icon = if (isFingerprint) Icons.Default.Fingerprint else Icons.Default.Key
+    val instruction = if (isFingerprint) {
+        s(StringKey.MFA_METHOD_FINGERPRINT)
+    } else {
+        s(StringKey.HW_TOKEN_VERIFY_DESC)
+    }
+
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.size(64.dp)
+        )
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        Text(
+            text = instruction,
+            style = MaterialTheme.typography.bodyMedium,
+            textAlign = TextAlign.Center
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        error?.let { msg ->
+            Text(
+                text = msg,
+                color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.bodySmall,
+                textAlign = TextAlign.Center
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+        }
+
+        if (processing) {
+            CircularProgressIndicator(modifier = Modifier.size(32.dp))
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = s(StringKey.MFA_VERIFYING),
+                style = MaterialTheme.typography.bodySmall
+            )
+        } else {
+            Button(
+                onClick = {
+                    processing = true
+                    error = null
+                    scope.launch {
+                        runWebAuthnAssertion(
+                            viewModel = viewModel,
+                            method = method,
+                            authenticator = authenticator,
+                            authenticatorAttachment = authenticatorAttachment,
+                            onSuccess = { payload ->
+                                processing = false
+                                onVerify(payload)
+                            },
+                            onError = { msg ->
+                                processing = false
+                                error = msg
+                            }
+                        )
+                    }
+                },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    text = if (isFingerprint) {
+                        s(StringKey.MFA_METHOD_FINGERPRINT)
+                    } else {
+                        s(StringKey.HW_TOKEN_VERIFY_BUTTON)
+                    }
+                )
+            }
+        }
+    }
+}
+
+/**
+ * Drive one challenge → assertion round-trip and call [onSuccess] with the base64
+ * JSON blob the backend WebAuthn handlers expect.
+ */
+/**
+ * NOTE: [authenticatorAttachment] is currently advisory — the server-side challenge
+ * already filters `allowCredentials` by transport type (internal vs. external) so the
+ * Credential Manager can only return a credential of the right kind. We still accept
+ * it as a parameter for symmetry with the registration flow and for future tightening.
+ */
+@Suppress("UNUSED_PARAMETER")
+private suspend fun runWebAuthnAssertion(
+    viewModel: MfaFlowViewModel,
+    method: String,
+    authenticator: WebAuthnAuthenticator,
+    authenticatorAttachment: String,
+    onSuccess: (String) -> Unit,
+    onError: (String) -> Unit
+) {
+    val challengeResult = viewModel.requestStepUpChallenge(method)
+    val challengeData: MfaChallengeData = challengeResult.fold(
+        onSuccess = { it },
+        onFailure = { err ->
+            onError(err.message ?: StringResources.get(StringKey.MFA_GENERIC_ERROR))
+            return
+        }
+    )
+
+    if (challengeData.challenge.isBlank()) {
+        onError(StringResources.get(StringKey.MFA_GENERIC_ERROR))
+        return
+    }
+
+    val assertion = try {
+        authenticator.getAssertion(
+            rpId = challengeData.rpId,
+            challenge = challengeData.challenge,
+            allowCredentialIds = challengeData.allowCredentials,
+            userVerification = "required"
+        )
+    } catch (e: Exception) {
+        onError(e.message ?: StringResources.get(StringKey.MFA_GENERIC_ERROR))
+        return
+    }
+
+    // Backend expects a base64-encoded JSON object exactly matching what the web
+    // FingerprintStep/HardwareKeyStep ship: { credentialId, authenticatorData,
+    // clientDataJSON, signature }.
+    val payloadJson = buildJsonObject {
+        put("credentialId", JsonPrimitive(assertion.credentialId))
+        put("authenticatorData", JsonPrimitive(assertion.authenticatorData))
+        put("clientDataJSON", JsonPrimitive(assertion.clientDataJson))
+        put("signature", JsonPrimitive(assertion.signature))
+    }.toString()
+
+    val base64Payload = Base64.encodeToString(
+        payloadJson.toByteArray(Charsets.UTF_8),
+        Base64.NO_WRAP
+    )
+    onSuccess(base64Payload)
 }
 
 // ── Shared UI Components ──────────────────────────────────────────

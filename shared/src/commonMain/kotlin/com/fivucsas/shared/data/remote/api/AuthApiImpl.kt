@@ -3,6 +3,7 @@ package com.fivucsas.shared.data.remote.api
 import com.fivucsas.shared.data.remote.dto.AuthResponseDto
 import com.fivucsas.shared.data.remote.dto.ChangePasswordRequestDto
 import com.fivucsas.shared.data.remote.dto.LoginRequestDto
+import com.fivucsas.shared.data.remote.dto.MfaChallengeResponse
 import com.fivucsas.shared.data.remote.dto.MfaQrGenerateRequest
 import com.fivucsas.shared.data.remote.dto.MfaQrTokenResponse
 import com.fivucsas.shared.data.remote.dto.MfaSendOtpRequest
@@ -72,6 +73,17 @@ class AuthApiImpl(
     }
 
     override suspend fun verifyMfaStep(request: MfaStepRequest): MfaStepResponse {
+        val response = client.post("$BASE_PATH/mfa/step") {
+            contentType(ContentType.Application.Json)
+            setBody(request)
+        }
+        if (!response.status.isSuccess()) {
+            throw Exception("${response.status.value} ${response.bodyAsText()}")
+        }
+        return response.body()
+    }
+
+    override suspend fun requestMfaChallenge(request: MfaStepRequest): MfaChallengeResponse {
         val response = client.post("$BASE_PATH/mfa/step") {
             contentType(ContentType.Application.Json)
             setBody(request)
