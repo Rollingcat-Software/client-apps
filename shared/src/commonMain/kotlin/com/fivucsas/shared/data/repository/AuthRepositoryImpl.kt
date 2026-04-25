@@ -14,6 +14,8 @@ import com.fivucsas.shared.data.remote.dto.MfaSwitchMethodRequest
 import com.fivucsas.shared.data.remote.dto.MfaSwitchMethodResponse
 import com.fivucsas.shared.data.remote.dto.RegisterRequestDto
 import com.fivucsas.shared.data.remote.dto.toModel
+import com.fivucsas.shared.domain.model.AuthFlowStep
+import com.fivucsas.shared.domain.repository.AuthFlowRepository
 import com.fivucsas.shared.domain.repository.AuthRepository
 import com.fivucsas.shared.domain.repository.AuthTokens
 import com.fivucsas.shared.domain.repository.LoginResult
@@ -27,7 +29,8 @@ import com.fivucsas.shared.domain.repository.LoginResult
 class AuthRepositoryImpl(
     private val authApi: AuthApi,
     private val tokenManager: TokenManager,
-    private val stepUpTokenManager: StepUpTokenManager? = null
+    private val stepUpTokenManager: StepUpTokenManager? = null,
+    private val authFlowRepository: AuthFlowRepository? = null
 ) : AuthRepository {
 
     override suspend fun login(email: String, password: String): Result<LoginResult> {
@@ -220,5 +223,20 @@ class AuthRepositoryImpl(
         } catch (e: Exception) {
             Result.failure(e)
         }
+    }
+
+    override suspend fun discoverPrimaryStep(
+        operationType: String,
+        tenantId: String?
+    ): AuthFlowStep? {
+        // Without an injected AuthFlowRepository we cannot discover — fall
+        // back to "no flow" so the LoginScreen renders the legacy PASSWORD
+        // form. This keeps the legacy DI graph (which does not yet wire
+        // AuthFlowRepository into AuthRepositoryImpl) working unchanged.
+        val flowRepo = authFlowRepository ?: return null
+        return flowRepo.getActiveFlow(operationType, tenantId)
+            .getOrNull()
+            ?.steps
+            ?.minByOrNull { it.stepOrder }
     }
 }

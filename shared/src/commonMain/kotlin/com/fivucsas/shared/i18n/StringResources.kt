@@ -810,6 +810,20 @@ enum class StringKey {
 
     // NFC step (NfcStepScreen — Identifyscanning extras)
     NFC_STEP_DETECTED_PREFIX,
+
+    // LoginScreen — primary-step discovery (PR #18 client side)
+    LOGIN_PRIMARY_LOADING,
+    LOGIN_PRIMARY_NO_FLOW,
+    LOGIN_PRIMARY_EMAIL_OTP_TITLE,
+    LOGIN_PRIMARY_EMAIL_OTP_INSTRUCTION,
+    LOGIN_PRIMARY_FACE_TITLE,
+    LOGIN_PRIMARY_FACE_INSTRUCTION,
+    LOGIN_PRIMARY_TOTP_TITLE,
+    LOGIN_PRIMARY_TOTP_INSTRUCTION,
+    LOGIN_PRIMARY_CONTINUE,
+    LOGIN_PRIMARY_UNSUPPORTED_TITLE,
+    LOGIN_PRIMARY_UNSUPPORTED_BODY,
+    LOGIN_PRIMARY_OPEN_WEB,
 }
 
 private val enStrings = mapOf(
@@ -1583,6 +1597,20 @@ private val enStrings = mapOf(
 
     // NFC step
     StringKey.NFC_STEP_DETECTED_PREFIX to "Detected: {0}",
+
+    // LoginScreen — primary-step discovery (PR #18 client side)
+    StringKey.LOGIN_PRIMARY_LOADING to "Loading sign-in options...",
+    StringKey.LOGIN_PRIMARY_NO_FLOW to "Sign in with your account",
+    StringKey.LOGIN_PRIMARY_EMAIL_OTP_TITLE to "Sign in with email code",
+    StringKey.LOGIN_PRIMARY_EMAIL_OTP_INSTRUCTION to "Enter your email — we'll send you a one-time code.",
+    StringKey.LOGIN_PRIMARY_FACE_TITLE to "Sign in with your face",
+    StringKey.LOGIN_PRIMARY_FACE_INSTRUCTION to "Enter your email — your face will be used to verify your identity on the next step.",
+    StringKey.LOGIN_PRIMARY_TOTP_TITLE to "Sign in with authenticator",
+    StringKey.LOGIN_PRIMARY_TOTP_INSTRUCTION to "Enter your email — your authenticator app will be used on the next step.",
+    StringKey.LOGIN_PRIMARY_CONTINUE to "Continue",
+    StringKey.LOGIN_PRIMARY_UNSUPPORTED_TITLE to "Sign-in method not supported",
+    StringKey.LOGIN_PRIMARY_UNSUPPORTED_BODY to "Your tenant has configured a sign-in method that is not yet available in this app. Please continue from the web sign-in page.",
+    StringKey.LOGIN_PRIMARY_OPEN_WEB to "Open web sign-in",
 )
 
 private val trStrings = mapOf(
@@ -2356,6 +2384,20 @@ private val trStrings = mapOf(
 
     // NFC step
     StringKey.NFC_STEP_DETECTED_PREFIX to "Algılandı: {0}",
+
+    // LoginScreen — primary-step discovery (PR #18 client side)
+    StringKey.LOGIN_PRIMARY_LOADING to "Giriş seçenekleri yükleniyor...",
+    StringKey.LOGIN_PRIMARY_NO_FLOW to "Hesabınızla giriş yapın",
+    StringKey.LOGIN_PRIMARY_EMAIL_OTP_TITLE to "E-posta kodu ile giriş",
+    StringKey.LOGIN_PRIMARY_EMAIL_OTP_INSTRUCTION to "E-postanızı girin — size tek seferlik bir kod göndereceğiz.",
+    StringKey.LOGIN_PRIMARY_FACE_TITLE to "Yüzünüzle giriş",
+    StringKey.LOGIN_PRIMARY_FACE_INSTRUCTION to "E-postanızı girin — kimliğiniz bir sonraki adımda yüzünüzle doğrulanacak.",
+    StringKey.LOGIN_PRIMARY_TOTP_TITLE to "Kimlik doğrulayıcı ile giriş",
+    StringKey.LOGIN_PRIMARY_TOTP_INSTRUCTION to "E-postanızı girin — kimlik doğrulayıcı uygulamanız bir sonraki adımda kullanılacak.",
+    StringKey.LOGIN_PRIMARY_CONTINUE to "Devam et",
+    StringKey.LOGIN_PRIMARY_UNSUPPORTED_TITLE to "Desteklenmeyen giriş yöntemi",
+    StringKey.LOGIN_PRIMARY_UNSUPPORTED_BODY to "Kiracınız bu uygulamada henüz desteklenmeyen bir giriş yöntemi yapılandırmış. Lütfen web giriş sayfasından devam edin.",
+    StringKey.LOGIN_PRIMARY_OPEN_WEB to "Web girişini aç",
 )
 
 /**

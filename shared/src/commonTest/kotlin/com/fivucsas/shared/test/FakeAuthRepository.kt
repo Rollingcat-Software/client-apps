@@ -5,6 +5,8 @@ import com.fivucsas.shared.data.remote.dto.MfaChallengeData
 import com.fivucsas.shared.data.remote.dto.MfaQrTokenResponse
 import com.fivucsas.shared.data.remote.dto.MfaStepResponse
 import com.fivucsas.shared.data.remote.dto.MfaSwitchMethodResponse
+import com.fivucsas.shared.domain.model.AuthFlowStep
+import com.fivucsas.shared.domain.model.AuthMethodInfo
 import com.fivucsas.shared.domain.repository.AuthRepository
 import com.fivucsas.shared.domain.repository.AuthTokens
 import com.fivucsas.shared.domain.repository.LoginResult
@@ -183,5 +185,37 @@ class FakeAuthRepository : AuthRepository {
         switchMfaMethodCalled = true
         lastSwitchedMethod = method
         return if (shouldSucceed) Result.success(mockSwitchMfaResponse) else Result.failure(RuntimeException(errorMessage))
+    }
+
+    // ---- PR #18 client side: primary-step discovery ----
+    var discoverPrimaryStepCalled = false
+    var lastDiscoverOperationType: String? = null
+    var lastDiscoverTenantId: String? = null
+    /**
+     * The auth method TYPE this fake should claim is the primary step,
+     * or `null` to simulate "no flow configured" (the LoginScreen's
+     * legacy PASSWORD fallback).
+     */
+    var mockPrimaryStepMethodType: String? = null
+
+    override suspend fun discoverPrimaryStep(
+        operationType: String,
+        tenantId: String?
+    ): AuthFlowStep? {
+        discoverPrimaryStepCalled = true
+        lastDiscoverOperationType = operationType
+        lastDiscoverTenantId = tenantId
+        val type = mockPrimaryStepMethodType ?: return null
+        return AuthFlowStep(
+            id = "fake-step",
+            stepOrder = 1,
+            authMethod = AuthMethodInfo(
+                id = "fake-method",
+                type = type,
+                name = type,
+                category = "FAKE",
+                isActive = true
+            )
+        )
     }
 }

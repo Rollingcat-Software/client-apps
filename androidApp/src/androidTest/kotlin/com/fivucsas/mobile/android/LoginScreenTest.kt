@@ -7,9 +7,16 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import com.fivucsas.shared.data.local.OfflineCache
+import com.fivucsas.shared.data.remote.dto.MfaChallengeData
+import com.fivucsas.shared.data.remote.dto.MfaQrTokenResponse
+import com.fivucsas.shared.data.remote.dto.MfaStepResponse
+import com.fivucsas.shared.data.remote.dto.MfaSwitchMethodResponse
+import com.fivucsas.shared.domain.model.AuthFlowStep
 import com.fivucsas.shared.domain.repository.AuthRepository
 import com.fivucsas.shared.domain.repository.AuthTokens
+import com.fivucsas.shared.domain.repository.LoginResult
 import com.fivucsas.shared.domain.usecase.auth.LoginUseCase
+import com.fivucsas.shared.platform.IPushNotificationService
 import com.fivucsas.shared.platform.ISecureStorage
 import com.fivucsas.shared.presentation.viewmodel.auth.LoginViewModel
 import com.fivucsas.shared.ui.screen.LoginScreen
@@ -54,7 +61,7 @@ class LoginScreenTest {
 
     /** AuthRepository that always fails with a controlled error. */
     private class FailingAuthRepository : AuthRepository {
-        override suspend fun login(email: String, password: String): Result<AuthTokens> =
+        override suspend fun login(email: String, password: String): Result<LoginResult> =
             Result.failure(RuntimeException("stub: no backend"))
         override suspend fun register(email: String, password: String, firstName: String, lastName: String): Result<AuthTokens> =
             Result.failure(RuntimeException("stub"))
@@ -65,12 +72,32 @@ class LoginScreenTest {
             Result.failure(RuntimeException("stub"))
         override suspend fun isAuthenticated(): Boolean = false
         override suspend fun getAccessToken(): String? = null
+        override suspend fun verifyMfaStep(sessionToken: String, method: String, data: Map<String, String>): Result<MfaStepResponse> =
+            Result.failure(RuntimeException("stub"))
+        override suspend fun requestMfaChallenge(sessionToken: String, method: String): Result<MfaChallengeData> =
+            Result.failure(RuntimeException("stub"))
+        override suspend fun sendMfaOtp(sessionToken: String, method: String): Result<Unit> =
+            Result.failure(RuntimeException("stub"))
+        override suspend fun generateMfaQr(sessionToken: String): Result<MfaQrTokenResponse> =
+            Result.failure(RuntimeException("stub"))
+        override suspend fun cancelMfaSession(sessionToken: String): Result<Unit> =
+            Result.success(Unit)
+        override suspend fun switchMfaMethod(sessionToken: String, method: String): Result<MfaSwitchMethodResponse> =
+            Result.failure(RuntimeException("stub"))
+        override suspend fun discoverPrimaryStep(operationType: String, tenantId: String?): AuthFlowStep? = null
+    }
+
+    private class NoopPushService : IPushNotificationService {
+        override suspend fun registerToken(userId: String, token: String) {}
+        override suspend fun getToken(): String? = null
+        override fun isSupported(): Boolean = false
     }
 
     private fun viewModel(): LoginViewModel {
-        val loginUseCase = LoginUseCase(FailingAuthRepository())
+        val repo = FailingAuthRepository()
+        val loginUseCase = LoginUseCase(repo)
         val offlineCache = OfflineCache(InMemorySecureStorage())
-        return LoginViewModel(loginUseCase, offlineCache)
+        return LoginViewModel(loginUseCase, offlineCache, NoopPushService(), repo)
     }
 
     private fun setLoginScreen(vm: LoginViewModel = viewModel()) {

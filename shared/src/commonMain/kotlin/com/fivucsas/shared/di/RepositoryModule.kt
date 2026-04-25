@@ -55,12 +55,14 @@ import org.koin.dsl.module
  * for real backend communication.
  */
 val repositoryModule = module {
-    // Auth Repository - with AuthApi and TokenManager
+    // Auth Repository - with AuthApi, TokenManager and AuthFlowRepository
+    // (the latter is used for primary-step discovery on the LoginScreen).
     single<AuthRepository> {
         AuthRepositoryImpl(
             authApi = get<AuthApi>(),
             tokenManager = get<TokenManager>(),
-            stepUpTokenManager = get<StepUpTokenManager>()
+            stepUpTokenManager = get<StepUpTokenManager>(),
+            authFlowRepository = get<AuthFlowRepository>()
         )
     }
 

@@ -40,7 +40,7 @@ class LoginViewModelTest {
         fakeRepository = FakeAuthRepository()
         loginUseCase = LoginUseCase(fakeRepository)
         offlineCache = OfflineCache(InMemorySecureStorage())
-        viewModel = LoginViewModel(loginUseCase, offlineCache, FakePushService())
+        viewModel = LoginViewModel(loginUseCase, offlineCache, FakePushService(), fakeRepository)
     }
 
     @AfterTest
@@ -231,6 +231,86 @@ class LoginViewModelTest {
         viewModel.login("test@fivucsas.com", "Password123!")
 
         assertFalse(viewModel.state.value.isLoading)
+    }
+
+    // ============== ACTIVE FLOW DISCOVERY TESTS (PR #18 client side) ==============
+
+    @Test
+    fun `loadActiveFlow with no flow configured falls back to PASSWORD`() = runTest {
+        fakeRepository.mockPrimaryStepMethodType = null
+
+        viewModel.loadActiveFlow(tenantId = "tenant-a")
+
+        val state = viewModel.state.value
+        assertFalse(state.flowDiscoveryLoading)
+        assertEquals("PASSWORD", state.primaryStepMethod)
+        assertTrue(fakeRepository.discoverPrimaryStepCalled)
+        assertEquals("APP_LOGIN", fakeRepository.lastDiscoverOperationType)
+        assertEquals("tenant-a", fakeRepository.lastDiscoverTenantId)
+    }
+
+    @Test
+    fun `loadActiveFlow with FACE primary sets primaryStepMethod to FACE`() = runTest {
+        fakeRepository.mockPrimaryStepMethodType = "FACE"
+
+        viewModel.loadActiveFlow(tenantId = "tenant-face")
+
+        assertEquals("FACE", viewModel.state.value.primaryStepMethod)
+    }
+
+    @Test
+    fun `discoverActiveFlow_WhenFlowIsFaceFirst_StateShouldRenderFacePrimary`() = runTest {
+        fakeRepository.mockPrimaryStepMethodType = "FACE"
+
+        viewModel.loadActiveFlow(tenantId = "tenant-face")
+
+        assertEquals("FACE", viewModel.state.value.primaryStepMethod)
+        assertFalse(viewModel.state.value.flowDiscoveryLoading)
+    }
+
+    @Test
+    fun `loadActiveFlow with EMAIL_OTP primary sets primaryStepMethod to EMAIL_OTP`() = runTest {
+        fakeRepository.mockPrimaryStepMethodType = "EMAIL_OTP"
+
+        viewModel.loadActiveFlow(tenantId = "tenant-otp")
+
+        assertEquals("EMAIL_OTP", viewModel.state.value.primaryStepMethod)
+    }
+
+    @Test
+    fun `loadActiveFlow with TOTP primary sets primaryStepMethod to TOTP`() = runTest {
+        fakeRepository.mockPrimaryStepMethodType = "TOTP"
+
+        viewModel.loadActiveFlow(tenantId = "tenant-totp")
+
+        assertEquals("TOTP", viewModel.state.value.primaryStepMethod)
+    }
+
+    @Test
+    fun `loadActiveFlow is idempotent — second call does not re-fetch`() = runTest {
+        fakeRepository.mockPrimaryStepMethodType = "FACE"
+        viewModel.loadActiveFlow(tenantId = "tenant-1")
+        assertEquals("FACE", viewModel.state.value.primaryStepMethod)
+
+        // Flip the fake's response — a real second call would observe it.
+        fakeRepository.mockPrimaryStepMethodType = "EMAIL_OTP"
+        fakeRepository.discoverPrimaryStepCalled = false
+
+        viewModel.loadActiveFlow(tenantId = "tenant-1")
+
+        assertEquals("FACE", viewModel.state.value.primaryStepMethod)
+        assertFalse(fakeRepository.discoverPrimaryStepCalled)
+    }
+
+    @Test
+    fun `loadActiveFlow with null tenantId still calls discover with null`() = runTest {
+        fakeRepository.mockPrimaryStepMethodType = null
+
+        viewModel.loadActiveFlow(tenantId = null)
+
+        assertTrue(fakeRepository.discoverPrimaryStepCalled)
+        assertEquals(null, fakeRepository.lastDiscoverTenantId)
+        assertEquals("PASSWORD", viewModel.state.value.primaryStepMethod)
     }
 }
 
