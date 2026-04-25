@@ -44,6 +44,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.fivucsas.shared.i18n.StringKey
+import com.fivucsas.shared.i18n.s
 import com.fivucsas.shared.presentation.viewmodel.HardwareTokenViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -61,14 +63,14 @@ fun HardwareTokenScreen(
             TopAppBar(
                 title = {
                     Text(
-                        "Hardware Security Key",
+                        s(StringKey.HW_TOKEN_TITLE),
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.SemiBold
                     )
                 },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = s(StringKey.BACK))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -107,15 +109,14 @@ fun HardwareTokenScreen(
                     )
                     Spacer(modifier = Modifier.height(12.dp))
                     Text(
-                        "WebAuthn / FIDO2",
+                        s(StringKey.HW_TOKEN_BANNER_TITLE),
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onPrimaryContainer
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        "Register and verify with a hardware security key (YubiKey, Titan, etc.) " +
-                            "via USB, NFC, or Bluetooth, or use your device biometric as a platform authenticator.",
+                        s(StringKey.HW_TOKEN_BANNER_DESC),
                         style = MaterialTheme.typography.bodyMedium,
                         textAlign = TextAlign.Center,
                         color = MaterialTheme.colorScheme.onPrimaryContainer
@@ -141,15 +142,14 @@ fun HardwareTokenScreen(
                         )
                         Spacer(modifier = Modifier.width(12.dp))
                         Text(
-                            "Register Security Key",
+                            s(StringKey.HW_TOKEN_REGISTER_KEY_HEADER),
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold
                         )
                     }
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        "Connect your hardware security key and tap Register to create a " +
-                            "WebAuthn credential with cross-platform attachment (USB, NFC, BLE).",
+                        s(StringKey.HW_TOKEN_REGISTER_KEY_DESC),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -167,11 +167,11 @@ fun HardwareTokenScreen(
                                 color = MaterialTheme.colorScheme.onPrimary
                             )
                             Spacer(Modifier.width(8.dp))
-                            Text(uiState.stepDescription ?: "Registering...")
+                            Text(uiState.stepDescription ?: s(StringKey.HW_TOKEN_REGISTERING))
                         } else {
                             Icon(Icons.Default.Key, null)
                             Spacer(Modifier.width(8.dp))
-                            Text("Register Key", fontWeight = FontWeight.SemiBold)
+                            Text(s(StringKey.HW_TOKEN_REGISTER_KEY_BUTTON), fontWeight = FontWeight.SemiBold)
                         }
                     }
                 }
@@ -195,15 +195,14 @@ fun HardwareTokenScreen(
                         )
                         Spacer(modifier = Modifier.width(12.dp))
                         Text(
-                            "Register Platform Biometric",
+                            s(StringKey.HW_TOKEN_REGISTER_PLATFORM_HEADER),
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold
                         )
                     }
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        "Use your device fingerprint or face unlock as a WebAuthn " +
-                            "platform authenticator for passwordless login.",
+                        s(StringKey.HW_TOKEN_REGISTER_PLATFORM_DESC),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -217,7 +216,7 @@ fun HardwareTokenScreen(
                     ) {
                         Icon(Icons.Default.Fingerprint, null)
                         Spacer(Modifier.width(8.dp))
-                        Text("Register Biometric", fontWeight = FontWeight.SemiBold)
+                        Text(s(StringKey.HW_TOKEN_REGISTER_PLATFORM_BUTTON), fontWeight = FontWeight.SemiBold)
                     }
                 }
             }
@@ -240,14 +239,14 @@ fun HardwareTokenScreen(
                         )
                         Spacer(modifier = Modifier.width(12.dp))
                         Text(
-                            "Verify Credential",
+                            s(StringKey.HW_TOKEN_VERIFY_HEADER),
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold
                         )
                     }
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        "Use any of your registered WebAuthn credentials to authenticate.",
+                        s(StringKey.HW_TOKEN_VERIFY_DESC),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -262,11 +261,11 @@ fun HardwareTokenScreen(
                         if (uiState.isVerifying) {
                             CircularProgressIndicator(Modifier.size(20.dp))
                             Spacer(Modifier.width(8.dp))
-                            Text(uiState.stepDescription ?: "Verifying...")
+                            Text(uiState.stepDescription ?: s(StringKey.HW_TOKEN_VERIFYING))
                         } else {
                             Icon(Icons.Default.Security, null)
                             Spacer(Modifier.width(8.dp))
-                            Text("Verify", fontWeight = FontWeight.SemiBold)
+                            Text(s(StringKey.HW_TOKEN_VERIFY_BUTTON), fontWeight = FontWeight.SemiBold)
                         }
                     }
                 }
@@ -316,18 +315,18 @@ fun HardwareTokenScreen(
                             )
                             Spacer(modifier = Modifier.width(12.dp))
                             Text(
-                                "Credential Info",
+                                s(StringKey.HW_TOKEN_CREDENTIAL_INFO),
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Bold,
                                 color = MaterialTheme.colorScheme.onTertiaryContainer
                             )
                         }
                         Spacer(modifier = Modifier.height(12.dp))
-                        CredentialRow("Credential ID", uiState.credential!!.credentialId)
-                        CredentialRow("Algorithm", uiState.credential!!.publicKeyAlgorithm)
-                        CredentialRow("Attestation", uiState.credential!!.attestationFormat)
-                        CredentialRow("Transports", uiState.credential!!.transports.joinToString(", "))
-                        CredentialRow("Registered", uiState.credential!!.registeredAt)
+                        CredentialRow(s(StringKey.HW_TOKEN_CRED_ID_LABEL), uiState.credential!!.credentialId)
+                        CredentialRow(s(StringKey.HW_TOKEN_ALGO_LABEL), uiState.credential!!.publicKeyAlgorithm)
+                        CredentialRow(s(StringKey.HW_TOKEN_ATTESTATION_LABEL), uiState.credential!!.attestationFormat)
+                        CredentialRow(s(StringKey.HW_TOKEN_TRANSPORTS_LABEL), uiState.credential!!.transports.joinToString(", "))
+                        CredentialRow(s(StringKey.HW_TOKEN_REGISTERED_AT_LABEL), uiState.credential!!.registeredAt)
                     }
                 }
             }
@@ -399,7 +398,7 @@ fun HardwareTokenScreen(
                             modifier = Modifier.weight(1f)
                         ) {
                             Text(
-                                "Registered",
+                                s(StringKey.HW_TOKEN_BADGE_REGISTERED),
                                 Modifier.padding(12.dp),
                                 style = MaterialTheme.typography.labelLarge,
                                 fontWeight = FontWeight.Bold,
@@ -417,7 +416,7 @@ fun HardwareTokenScreen(
                             modifier = Modifier.weight(1f)
                         ) {
                             Text(
-                                "Verified",
+                                s(StringKey.HW_TOKEN_BADGE_VERIFIED),
                                 Modifier.padding(12.dp),
                                 style = MaterialTheme.typography.labelLarge,
                                 fontWeight = FontWeight.Bold,

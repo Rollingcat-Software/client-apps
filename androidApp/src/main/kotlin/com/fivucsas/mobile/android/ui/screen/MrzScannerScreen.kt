@@ -107,6 +107,8 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.LifecycleOwner
+import com.fivucsas.shared.i18n.StringKey
+import com.fivucsas.shared.i18n.s
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
@@ -262,11 +264,11 @@ private fun CameraPreviewContent(
                         contentColor = Color.White
                     )
                 ) {
-                    Icon(Icons.Default.Close, contentDescription = "Close")
+                    Icon(Icons.Default.Close, contentDescription = s(StringKey.MRZ_CLOSE_DESC))
                 }
 
                 Text(
-                    text = "Scan ID Card",
+                    text = s(StringKey.MRZ_TITLE),
                     color = Color.White,
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.SemiBold
@@ -284,7 +286,7 @@ private fun CameraPreviewContent(
                 ) {
                     Icon(
                         if (isFlashOn) Icons.Default.FlashOn else Icons.Default.FlashOff,
-                        contentDescription = if (isFlashOn) "Turn off flash" else "Turn on flash"
+                        contentDescription = if (isFlashOn) s(StringKey.MRZ_FLASH_ON_DESC) else s(StringKey.MRZ_FLASH_OFF_DESC)
                     )
                 }
             }
@@ -359,7 +361,7 @@ private fun CameraPreviewContent(
                         Spacer(modifier = Modifier.height(8.dp))
 
                         Text(
-                            text = "Rotate card to the left & place in frame",
+                            text = s(StringKey.MRZ_ROTATE_HINT),
                             color = Color.White,
                             style = MaterialTheme.typography.bodyMedium,
                             textAlign = TextAlign.Center,
@@ -367,7 +369,7 @@ private fun CameraPreviewContent(
                         )
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
-                            text = "Back side with MRZ lines (<<<) facing camera",
+                            text = s(StringKey.MRZ_BACK_SIDE_HINT),
                             color = Color.White.copy(alpha = 0.7f),
                             style = MaterialTheme.typography.bodySmall,
                             textAlign = TextAlign.Center
@@ -462,7 +464,7 @@ private fun CameraPreview(
                     onCameraReady(camera)
                 } catch (e: Exception) {
                     Log.e(TAG, "Camera binding failed", e)
-                    onError("Failed to start camera: ${e.message}")
+                    onError(s(StringKey.MRZ_CAMERA_START_FAILED, e.message ?: ""))
                 }
             }, ContextCompat.getMainExecutor(ctx))
 
@@ -661,7 +663,7 @@ private fun IdCardScanningOverlay(
                     fontSize = 11.sp,
                     fontWeight = FontWeight.Bold
                 )
-                val backLayout = textMeasurer.measure("BACK OF ID", backStyle)
+                val backLayout = textMeasurer.measure(s(StringKey.MRZ_BACK_OF_ID_OVERLAY), backStyle)
                 drawText(
                     textLayoutResult = backLayout,
                     topLeft = Offset(
@@ -702,7 +704,7 @@ private fun IdCardScanningOverlay(
             ) {
                 Icon(
                     imageVector = Icons.Default.CheckCircle,
-                    contentDescription = "Detected",
+                    contentDescription = s(StringKey.MRZ_DETECTED_DESC),
                     tint = successColor,
                     modifier = Modifier.size(56.dp)
                 )
@@ -722,7 +724,7 @@ private fun LiveOcrDisplay(text: String) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "Detecting...",
+            text = s(StringKey.MRZ_DETECTING),
             color = Color(0xFF4CAF50),
             fontSize = 10.sp,
             fontWeight = FontWeight.Medium
@@ -811,7 +813,7 @@ private fun RotationGuideAnimation() {
 
         Icon(
             imageVector = Icons.AutoMirrored.Filled.RotateLeft,
-            contentDescription = "Rotate left",
+            contentDescription = s(StringKey.MRZ_ROTATE_LEFT_DESC),
             tint = Color(0xFF4CAF50).copy(alpha = arrowAlpha),
             modifier = Modifier.size(28.dp)
         )
@@ -877,7 +879,7 @@ private fun ScannedDataCard(
                 Spacer(modifier = Modifier.width(12.dp))
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        "MRZ Data Detected",
+                        s(StringKey.MRZ_DATA_DETECTED),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.SemiBold
                     )
@@ -894,7 +896,7 @@ private fun ScannedDataCard(
                                 .padding(horizontal = 6.dp, vertical = 2.dp)
                         ) {
                             Text(
-                                text = if (data.checksumValid) "Checksum Verified" else "Checksum Failed",
+                                text = if (data.checksumValid) s(StringKey.MRZ_CHECKSUM_VERIFIED) else s(StringKey.MRZ_CHECKSUM_FAILED),
                                 style = MaterialTheme.typography.labelSmall,
                                 color = statusColor,
                                 fontWeight = FontWeight.Medium
@@ -907,7 +909,7 @@ private fun ScannedDataCard(
             if (!data.checksumValid) {
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = "Data may contain OCR errors. Please verify before using.",
+                    text = s(StringKey.MRZ_OCR_WARNING),
                     style = MaterialTheme.typography.bodySmall,
                     color = warningColor,
                     modifier = Modifier
@@ -922,14 +924,14 @@ private fun ScannedDataCard(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            DetectedDataRow("Document Number", data.documentNumber, data.checksumValid)
+            DetectedDataRow(s(StringKey.MRZ_DOC_NUMBER_LABEL), data.documentNumber, data.checksumValid)
             DetectedDataRow(
-                "Date of Birth",
+                s(StringKey.MRZ_DOB_LABEL),
                 formatDateDisplay(data.dateOfBirth),
                 data.checksumValid
             )
             DetectedDataRow(
-                "Date of Expiry",
+                s(StringKey.MRZ_DOE_LABEL),
                 formatDateDisplay(data.dateOfExpiry),
                 data.checksumValid
             )
@@ -950,14 +952,14 @@ private fun ScannedDataCard(
                         modifier = Modifier.size(18.dp)
                     )
                     Spacer(modifier = Modifier.width(4.dp))
-                    Text("Rescan")
+                    Text(s(StringKey.MRZ_RESCAN))
                 }
                 Button(
                     onClick = onConfirm,
                     modifier = Modifier.weight(1f),
                     colors = ButtonDefaults.buttonColors(containerColor = statusColor)
                 ) {
-                    Text(if (data.checksumValid) "Use This" else "Use Anyway")
+                    Text(if (data.checksumValid) s(StringKey.MRZ_USE_THIS) else s(StringKey.MRZ_USE_ANYWAY))
                 }
             }
         }
@@ -1022,22 +1024,22 @@ private fun PermissionRationaleContent(
         )
         Spacer(modifier = Modifier.height(24.dp))
         Text(
-            "Camera Permission Required",
+            s(StringKey.COMMON_CAMERA_PERMISSION_REQUIRED),
             style = MaterialTheme.typography.titleLarge,
             textAlign = TextAlign.Center,
             color = Color.White
         )
         Spacer(modifier = Modifier.height(8.dp))
         Text(
-            "To scan the MRZ from your ID card, we need access to your camera.",
+            s(StringKey.MRZ_PERMISSION_RATIONALE),
             style = MaterialTheme.typography.bodyMedium,
             textAlign = TextAlign.Center,
             color = Color.White.copy(alpha = 0.7f)
         )
         Spacer(modifier = Modifier.height(24.dp))
-        Button(onClick = onRequestPermission) { Text("Grant Permission") }
+        Button(onClick = onRequestPermission) { Text(s(StringKey.COMMON_GRANT_PERMISSION)) }
         Spacer(modifier = Modifier.height(8.dp))
-        TextButton(onClick = onDismiss) { Text("Cancel", color = Color.White) }
+        TextButton(onClick = onDismiss) { Text(s(StringKey.CANCEL), color = Color.White) }
     }
 }
 
@@ -1053,11 +1055,11 @@ private fun PermissionRequestContent(onDismiss: () -> Unit) {
         CircularProgressIndicator(color = Color.White)
         Spacer(modifier = Modifier.height(16.dp))
         Text(
-            "Requesting camera permission...",
+            s(StringKey.MRZ_PERMISSION_REQUESTING),
             style = MaterialTheme.typography.bodyMedium,
             color = Color.White
         )
         Spacer(modifier = Modifier.height(24.dp))
-        TextButton(onClick = onDismiss) { Text("Cancel", color = Color.White) }
+        TextButton(onClick = onDismiss) { Text(s(StringKey.CANCEL), color = Color.White) }
     }
 }

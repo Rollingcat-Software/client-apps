@@ -31,6 +31,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.fivucsas.mobile.android.ui.component.MrzInputDialog
 import com.fivucsas.mobile.android.ui.viewmodel.NfcStepViewModel
+import com.fivucsas.shared.i18n.StringKey
+import com.fivucsas.shared.i18n.s
 import com.fivucsas.shared.platform.INfcService
 import org.koin.compose.koinInject
 
@@ -129,9 +131,8 @@ private fun IdleContent(onStart: () -> Unit) {
         tint = MaterialTheme.colorScheme.primary
     )
     Spacer(modifier = Modifier.height(12.dp))
-    // TODO(i18n): NFC_STEP_IDLE_PROMPT
     Text(
-        text = "Place your passport or eID near the back of your phone when prompted.",
+        text = s(StringKey.NFC_STEP_IDLE_PROMPT),
         style = MaterialTheme.typography.bodyLarge,
         textAlign = TextAlign.Center
     )
@@ -142,8 +143,7 @@ private fun IdleContent(onStart: () -> Unit) {
     ) {
         Icon(Icons.Default.CameraAlt, contentDescription = null, modifier = Modifier.size(18.dp))
         Spacer(modifier = Modifier.size(8.dp))
-        // TODO(i18n): NFC_STEP_START_BUTTON
-        Text("Enter or scan MRZ")
+        Text(s(StringKey.NFC_STEP_START_BUTTON))
     }
 }
 
@@ -152,9 +152,8 @@ private fun MrzCaptureContent(
     onOpenDialog: () -> Unit,
     onCancel: () -> Unit
 ) {
-    // TODO(i18n): NFC_STEP_MRZ_CAPTURE_HINT
     Text(
-        text = "Provide the MRZ from the back of your document.",
+        text = s(StringKey.NFC_STEP_MRZ_CAPTURE_HINT),
         style = MaterialTheme.typography.bodyMedium,
         textAlign = TextAlign.Center
     )
@@ -165,12 +164,11 @@ private fun MrzCaptureContent(
     ) {
         Icon(Icons.Default.Edit, contentDescription = null, modifier = Modifier.size(18.dp))
         Spacer(modifier = Modifier.size(8.dp))
-        // TODO(i18n): NFC_STEP_REOPEN_DIALOG
-        Text("Open MRZ entry")
+        Text(s(StringKey.NFC_STEP_REOPEN_DIALOG))
     }
     Spacer(modifier = Modifier.height(8.dp))
     OutlinedButton(onClick = onCancel, modifier = Modifier.fillMaxWidth()) {
-        Text("Cancel")
+        Text(s(StringKey.CANCEL))
     }
 }
 
@@ -178,16 +176,15 @@ private fun MrzCaptureContent(
 private fun ScanningContent(cardTypeName: String) {
     CircularProgressIndicator(modifier = Modifier.size(48.dp))
     Spacer(modifier = Modifier.height(16.dp))
-    // TODO(i18n): NFC_STEP_SCANNING
     Text(
-        text = "Hold the document against the back of your phone. Do not move it.",
+        text = s(StringKey.NFC_STEP_SCANNING),
         style = MaterialTheme.typography.bodyLarge,
         textAlign = TextAlign.Center
     )
     if (cardTypeName.isNotBlank() && cardTypeName != "Unknown") {
         Spacer(modifier = Modifier.height(8.dp))
         Text(
-            text = "Detected: $cardTypeName",
+            text = s(StringKey.NFC_STEP_DETECTED_PREFIX, cardTypeName),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.primary
         )
@@ -203,9 +200,8 @@ private fun SuccessContent(displayName: String, onVerify: () -> Unit) {
         tint = MaterialTheme.colorScheme.primary
     )
     Spacer(modifier = Modifier.height(12.dp))
-    // TODO(i18n): NFC_STEP_SUCCESS
     Text(
-        text = "Document read successfully.",
+        text = s(StringKey.NFC_STEP_SUCCESS),
         style = MaterialTheme.typography.titleMedium
     )
     if (displayName.isNotBlank()) {
@@ -221,8 +217,7 @@ private fun SuccessContent(displayName: String, onVerify: () -> Unit) {
         onClick = onVerify,
         modifier = Modifier.fillMaxWidth()
     ) {
-        // TODO(i18n): NFC_STEP_SUBMIT_BUTTON
-        Text("Continue")
+        Text(s(StringKey.NFC_STEP_SUBMIT_BUTTON))
     }
 }
 
@@ -249,13 +244,12 @@ private fun ErrorContent(
     Spacer(modifier = Modifier.height(16.dp))
     if (canRetry) {
         Button(onClick = onRetry, modifier = Modifier.fillMaxWidth()) {
-            // TODO(i18n): NFC_STEP_RETRY_BUTTON
-            Text("Try again")
+            Text(s(StringKey.NFC_STEP_RETRY_BUTTON))
         }
         Spacer(modifier = Modifier.height(8.dp))
     }
     OutlinedButton(onClick = onCancel, modifier = Modifier.fillMaxWidth()) {
-        Text("Cancel")
+        Text(s(StringKey.CANCEL))
     }
 }
 
