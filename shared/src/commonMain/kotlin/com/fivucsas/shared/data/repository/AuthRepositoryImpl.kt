@@ -10,6 +10,8 @@ import com.fivucsas.shared.data.remote.dto.MfaQrTokenResponse
 import com.fivucsas.shared.data.remote.dto.MfaSendOtpRequest
 import com.fivucsas.shared.data.remote.dto.MfaStepRequest
 import com.fivucsas.shared.data.remote.dto.MfaStepResponse
+import com.fivucsas.shared.data.remote.dto.MfaSwitchMethodRequest
+import com.fivucsas.shared.data.remote.dto.MfaSwitchMethodResponse
 import com.fivucsas.shared.data.remote.dto.RegisterRequestDto
 import com.fivucsas.shared.data.remote.dto.toModel
 import com.fivucsas.shared.domain.repository.AuthRepository
@@ -189,6 +191,31 @@ class AuthRepositoryImpl(
     override suspend fun generateMfaQr(sessionToken: String): Result<MfaQrTokenResponse> {
         return try {
             val response = authApi.generateMfaQr(sessionToken)
+            Result.success(response)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun cancelMfaSession(sessionToken: String): Result<Unit> {
+        return try {
+            authApi.cancelMfaSession(sessionToken)
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun switchMfaMethod(
+        sessionToken: String,
+        method: String
+    ): Result<MfaSwitchMethodResponse> {
+        return try {
+            val response = authApi.switchMfaMethod(
+                MfaSwitchMethodRequest(sessionToken = sessionToken, method = method)
+            )
+            // 409 envelopes still come back as Result.success — they carry an
+            // errorCode the ViewModel maps to a precise UI message.
             Result.success(response)
         } catch (e: Exception) {
             Result.failure(e)

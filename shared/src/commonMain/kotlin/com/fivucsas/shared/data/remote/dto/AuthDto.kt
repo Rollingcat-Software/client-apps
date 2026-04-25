@@ -102,6 +102,21 @@ data class MfaStepRequest(
 
 /**
  * Response from MFA step verification.
+ *
+ * Server-side PR #25 added the following fields:
+ *  - `alternativeMethods` — methods the user can pick instead of the
+ *    `expectedMethod` for the current step (subset of `availableMethods`,
+ *    filtered to ones the step config still permits and the user is
+ *    enrolled in / not yet completed).
+ *  - `completedMethods` — list of method types the user has already
+ *    cleared in this MFA session.
+ *  - `expectedMethod` — the method the server currently expects for this
+ *    step (informational; user can override via switch-method).
+ *  - `errorCode` / `enrollmentUrl` — populated on 4xx error envelopes
+ *    (e.g. `NEEDS_ENROLLMENT`) so the client can surface a dedicated UI.
+ *
+ * All new fields are nullable to keep backwards compatibility with old
+ * server builds.
  */
 @Serializable
 data class MfaStepResponse(
@@ -116,6 +131,50 @@ data class MfaStepResponse(
     val currentStep: Int? = null,
     val totalSteps: Int? = null,
     val availableMethods: List<AvailableMethodDto>? = null,
+    val alternativeMethods: List<AvailableMethodDto>? = null,
+    val completedMethods: List<String>? = null,
+    val expectedMethod: String? = null,
+    val errorCode: String? = null,
+    val enrollmentUrl: String? = null,
+    val message: String? = null
+)
+
+/**
+ * Request body for POST /auth/mfa/switch-method.
+ *
+ * Lets the user swap the active method for the current MFA step
+ * (e.g. from TOTP to EMAIL_OTP). Server validates that:
+ *  - the requested method is permitted by the step config,
+ *  - the user is enrolled in it,
+ *  - the method has not already been completed in this session.
+ */
+@Serializable
+data class MfaSwitchMethodRequest(
+    val sessionToken: String,
+    val method: String
+)
+
+/**
+ * Response body for POST /auth/mfa/switch-method.
+ *
+ * On success (200) `status = "METHOD_SWITCHED"` and the server has
+ * pre-dispatched any required side-channel (OTP for EMAIL_OTP / SMS_OTP).
+ *
+ * On a 409 the server returns this same shape with `errorCode` populated
+ * (`METHOD_NOT_PERMITTED`, `METHOD_ALREADY_USED`, `NEEDS_ENROLLMENT`)
+ * and an optional `enrollmentUrl` for the NEEDS_ENROLLMENT case.
+ */
+@Serializable
+data class MfaSwitchMethodResponse(
+    val status: String = "",
+    val currentStep: Int? = null,
+    val totalSteps: Int? = null,
+    val expectedMethod: String? = null,
+    val availableMethods: List<AvailableMethodDto>? = null,
+    val alternativeMethods: List<AvailableMethodDto>? = null,
+    val completedMethods: List<String>? = null,
+    val errorCode: String? = null,
+    val enrollmentUrl: String? = null,
     val message: String? = null
 )
 

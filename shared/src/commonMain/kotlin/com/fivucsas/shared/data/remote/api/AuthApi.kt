@@ -8,6 +8,8 @@ import com.fivucsas.shared.data.remote.dto.MfaQrTokenResponse
 import com.fivucsas.shared.data.remote.dto.MfaSendOtpRequest
 import com.fivucsas.shared.data.remote.dto.MfaStepRequest
 import com.fivucsas.shared.data.remote.dto.MfaStepResponse
+import com.fivucsas.shared.data.remote.dto.MfaSwitchMethodRequest
+import com.fivucsas.shared.data.remote.dto.MfaSwitchMethodResponse
 import com.fivucsas.shared.data.remote.dto.RegisterRequestDto
 
 /**
@@ -83,4 +85,24 @@ interface AuthApi {
      * POST /auth/mfa/qr-generate (PUBLIC — no JWT required)
      */
     suspend fun generateMfaQr(sessionToken: String): MfaQrTokenResponse
+
+    /**
+     * Cancel an in-progress MFA session.
+     * DELETE /auth/mfa/session/{sessionToken} (PUBLIC — rate limited via login bucket)
+     *
+     * Returns Unit on 204. Throws on any non-2xx (including 404 for an
+     * already-expired session — caller should treat that as a soft success).
+     */
+    suspend fun cancelMfaSession(sessionToken: String)
+
+    /**
+     * Switch the active method for the current MFA step.
+     * POST /auth/mfa/switch-method (PUBLIC — no JWT required)
+     *
+     * On 200 returns `status = "METHOD_SWITCHED"` plus the updated step
+     * snapshot. On 409 the response carries an `errorCode` describing why
+     * the switch was rejected (METHOD_NOT_PERMITTED / METHOD_ALREADY_USED /
+     * NEEDS_ENROLLMENT). Other non-2xx responses are surfaced as exceptions.
+     */
+    suspend fun switchMfaMethod(request: MfaSwitchMethodRequest): MfaSwitchMethodResponse
 }

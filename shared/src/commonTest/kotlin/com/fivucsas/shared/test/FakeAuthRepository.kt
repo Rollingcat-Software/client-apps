@@ -4,6 +4,7 @@ import com.fivucsas.shared.data.remote.dto.AvailableMethodDto
 import com.fivucsas.shared.data.remote.dto.MfaChallengeData
 import com.fivucsas.shared.data.remote.dto.MfaQrTokenResponse
 import com.fivucsas.shared.data.remote.dto.MfaStepResponse
+import com.fivucsas.shared.data.remote.dto.MfaSwitchMethodResponse
 import com.fivucsas.shared.domain.repository.AuthRepository
 import com.fivucsas.shared.domain.repository.AuthTokens
 import com.fivucsas.shared.domain.repository.LoginResult
@@ -151,5 +152,36 @@ class FakeAuthRepository : AuthRepository {
         } else {
             Result.failure(RuntimeException(errorMessage))
         }
+    }
+
+    // ---- PR #25 endpoints ----
+    var cancelMfaSessionCalled = false
+    var lastCancelledSessionToken: String? = null
+
+    var switchMfaMethodCalled = false
+    var lastSwitchedMethod: String? = null
+    var mockSwitchMfaResponse: MfaSwitchMethodResponse = MfaSwitchMethodResponse(
+        status = "METHOD_SWITCHED",
+        currentStep = 1,
+        totalSteps = 2,
+        expectedMethod = "EMAIL_OTP",
+        availableMethods = emptyList(),
+        alternativeMethods = emptyList(),
+        completedMethods = emptyList()
+    )
+
+    override suspend fun cancelMfaSession(sessionToken: String): Result<Unit> {
+        cancelMfaSessionCalled = true
+        lastCancelledSessionToken = sessionToken
+        return if (shouldSucceed) Result.success(Unit) else Result.failure(RuntimeException(errorMessage))
+    }
+
+    override suspend fun switchMfaMethod(
+        sessionToken: String,
+        method: String
+    ): Result<MfaSwitchMethodResponse> {
+        switchMfaMethodCalled = true
+        lastSwitchedMethod = method
+        return if (shouldSucceed) Result.success(mockSwitchMfaResponse) else Result.failure(RuntimeException(errorMessage))
     }
 }
