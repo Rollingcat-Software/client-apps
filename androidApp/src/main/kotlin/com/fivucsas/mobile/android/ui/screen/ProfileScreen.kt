@@ -39,6 +39,8 @@ import com.fivucsas.shared.config.UIDimens
 import com.fivucsas.shared.domain.model.Permission
 import com.fivucsas.shared.domain.model.UserRole
 import com.fivucsas.shared.domain.model.hasPermission
+import com.fivucsas.shared.i18n.StringKey
+import com.fivucsas.shared.i18n.s
 import com.fivucsas.shared.ui.components.molecules.ConfirmationDialog
 import com.fivucsas.shared.ui.components.molecules.ErrorMessage
 import com.fivucsas.shared.ui.components.molecules.SuccessMessage
@@ -76,11 +78,11 @@ fun ProfileScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("My Profile") },
+                title = { Text(s(StringKey.PROFILE_MY_PROFILE_TITLE)) },
                 actions = {
                     if (userRole.hasPermission(Permission.PROFILE_UPDATE_SELF)) {
                         IconButton(onClick = onEditProfile) {
-                            Icon(imageVector = Icons.Default.Edit, contentDescription = "Edit profile")
+                            Icon(imageVector = Icons.Default.Edit, contentDescription = s(StringKey.A11Y_EDIT_PROFILE))
                         }
                     }
                 },
@@ -137,7 +139,7 @@ fun ProfileScreen(
                     )
                     if (enrollmentDate.isNotBlank()) {
                         Text(
-                            text = "Member since $enrollmentDate",
+                            text = s(StringKey.PROFILE_MEMBER_SINCE, enrollmentDate),
                             style = MaterialTheme.typography.bodySmall,
                             color = AppColors.OnSurfaceVariant
                         )
@@ -150,45 +152,45 @@ fun ProfileScreen(
                 }
             }
 
-            SectionHeader(title = "Personal Information")
+            SectionHeader(title = s(StringKey.PROFILE_PERSONAL_INFO))
             Card(
                 colors = CardDefaults.cardColors(containerColor = AppColors.Surface)
             ) {
                 Column(modifier = Modifier.padding(UIDimens.SpacingMedium)) {
                     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                        Text("Name", style = MaterialTheme.typography.bodySmall, color = AppColors.OnSurfaceVariant)
+                        Text(s(StringKey.PROFILE_FIELD_NAME), style = MaterialTheme.typography.bodySmall, color = AppColors.OnSurfaceVariant)
                         Text(userName, style = MaterialTheme.typography.bodyMedium)
                     }
                     Spacer(modifier = Modifier.size(8.dp))
                     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                        Text("Email", style = MaterialTheme.typography.bodySmall, color = AppColors.OnSurfaceVariant)
+                        Text(s(StringKey.PROFILE_FIELD_EMAIL), style = MaterialTheme.typography.bodySmall, color = AppColors.OnSurfaceVariant)
                         Text(userEmail, style = MaterialTheme.typography.bodyMedium)
                     }
                     Spacer(modifier = Modifier.size(8.dp))
                     if (userPhone.isNotBlank()) {
                         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                            Text("Phone", style = MaterialTheme.typography.bodySmall, color = AppColors.OnSurfaceVariant)
+                            Text(s(StringKey.PROFILE_FIELD_PHONE), style = MaterialTheme.typography.bodySmall, color = AppColors.OnSurfaceVariant)
                             Text(userPhone, style = MaterialTheme.typography.bodyMedium)
                         }
                     }
                 }
             }
 
-            SectionHeader(title = "Account Actions")
+            SectionHeader(title = s(StringKey.PROFILE_ACCOUNT_ACTIONS))
             Column(verticalArrangement = Arrangement.spacedBy(UIDimens.SpacingSmall)) {
                 Button(onClick = onChangePassword, modifier = Modifier.fillMaxWidth()) {
-                    Text("Change Password")
+                    Text(s(StringKey.CHANGE_PASSWORD_TITLE))
                 }
                 if (isSelfBiometricRole && userRole.hasPermission(Permission.ENROLL_SELF_UPDATE)) {
                     Button(onClick = onReEnroll, modifier = Modifier.fillMaxWidth()) {
-                        Text("Re-Enroll Face")
+                        Text(s(StringKey.PROFILE_RE_ENROLL_FACE))
                     }
                 }
                 Button(
                     onClick = onOpenSettings,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text("Settings")
+                    Text(s(StringKey.PROFILE_OPEN_SETTINGS))
                 }
                 if (isSelfBiometricRole && userRole.hasPermission(Permission.ENROLL_SELF_DELETE)) {
                     OutlinedButton(
@@ -198,7 +200,7 @@ fun ProfileScreen(
                             contentColor = AppColors.Error
                         )
                     ) {
-                        Text("Delete My Enrollment")
+                        Text(s(StringKey.PROFILE_DELETE_ENROLLMENT))
                     }
                 }
             }

@@ -29,8 +29,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -56,6 +58,25 @@ fun EmailOtpScreen(
     val uiState by viewModel.uiState.collectAsState()
     var email by remember { mutableStateOf("") }
     var otpCode by remember { mutableStateOf("") }
+
+    // UX polish — Resend cooldown timer (30s), restarts each time otpSent flips to true
+    var resendSeconds by remember { mutableIntStateOf(0) }
+    LaunchedEffect(uiState.otpSent) {
+        if (uiState.otpSent) {
+            resendSeconds = 30
+            while (resendSeconds > 0) {
+                kotlinx.coroutines.delay(1000)
+                resendSeconds -= 1
+            }
+        }
+    }
+
+    // UX polish — auto-submit on 6 digits
+    LaunchedEffect(otpCode, uiState.isLoading) {
+        if (otpCode.length == 6 && !uiState.isLoading && !uiState.otpVerified && uiState.otpSent) {
+            viewModel.verifyEmailOtp(userId, otpCode)
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -166,10 +187,16 @@ fun EmailOtpScreen(
 
                 OutlinedButton(
                     onClick = { viewModel.sendEmailOtp(userId, email) },
-                    enabled = !uiState.isLoading,
+                    enabled = !uiState.isLoading && resendSeconds == 0,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text(s(StringKey.OTP_RESEND))
+                    Text(
+                        if (resendSeconds > 0) {
+                            s(StringKey.OTP_RESEND_COUNTDOWN, formatSeconds(resendSeconds))
+                        } else {
+                            s(StringKey.OTP_RESEND)
+                        }
+                    )
                 }
             }
 
@@ -223,4 +250,12 @@ fun EmailOtpScreen(
             }
         }
     }
+}
+
+/** Formats seconds as M:SS (e.g. 30 → "0:30"). */
+private fun formatSeconds(totalSeconds: Int): String {
+    val minutes = totalSeconds / 60
+    val seconds = totalSeconds % 60
+    val secondsPadded = if (seconds < 10) "0$seconds" else "$seconds"
+    return "$minutes:$secondsPadded"
 }
