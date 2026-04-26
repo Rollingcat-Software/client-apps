@@ -116,4 +116,16 @@ private class FakeAuthFlowRepository : AuthFlowRepository {
         return if (shouldSucceed) Result.success(mockFlows)
         else Result.failure(RuntimeException(errorMessage))
     }
+
+    override suspend fun getActiveFlow(
+        operationType: String,
+        tenantId: String?
+    ): Result<AuthFlow?> {
+        if (!shouldSucceed) return Result.failure(RuntimeException(errorMessage))
+        if (tenantId.isNullOrBlank()) return Result.success(null)
+        val match = mockFlows.firstOrNull {
+            it.tenantId == tenantId && it.operationType.equals(operationType, ignoreCase = true)
+        }
+        return Result.success(match)
+    }
 }

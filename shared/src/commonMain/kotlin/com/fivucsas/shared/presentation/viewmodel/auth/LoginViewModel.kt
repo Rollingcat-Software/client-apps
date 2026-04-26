@@ -2,6 +2,7 @@ package com.fivucsas.shared.presentation.viewmodel.auth
 
 import com.fivucsas.shared.data.local.OfflineCache
 import com.fivucsas.shared.domain.model.UserRole
+import com.fivucsas.shared.domain.repository.AuthRepository
 import com.fivucsas.shared.domain.repository.LoginResult
 import com.fivucsas.shared.domain.usecase.auth.LoginUseCase
 import com.fivucsas.shared.platform.IPushNotificationService
@@ -13,10 +14,45 @@ import kotlinx.coroutines.flow.asStateFlow
 class LoginViewModel(
     private val loginUseCase: LoginUseCase,
     private val offlineCache: OfflineCache,
-    private val pushService: IPushNotificationService
+    private val pushService: IPushNotificationService,
+    private val authRepository: AuthRepository
 ) {
     private val _state = MutableStateFlow(LoginState())
     val state: StateFlow<LoginState> = _state.asStateFlow()
+
+    /**
+     * Discover the active auth flow's primary step for APP_LOGIN.
+     *
+     * Called from `LoginScreen` on mount. While the call is in flight,
+     * `flowDiscoveryLoading=true` and the screen shows a shimmer instead
+     * of the credential form. On any failure (no flow, auth required, network)
+     * `primaryStepMethod` stays `null` and the screen renders the legacy
+     * PASSWORD form — the existing happy-path is therefore preserved.
+     *
+     * @param tenantId optional tenant scope. May be `null` when the app
+     *                 has no remembered tenant (e.g. fresh install) — in
+     *                 that case discovery is skipped.
+     */
+    suspend fun loadActiveFlow(tenantId: String?) {
+        // Don't trigger discovery twice; once we know the answer, hold it.
+        if (_state.value.primaryStepMethod != null) return
+        _state.value = _state.value.copy(flowDiscoveryLoading = true)
+        val step = try {
+            authRepository.discoverPrimaryStep(
+                operationType = "APP_LOGIN",
+                tenantId = tenantId
+            )
+        } catch (_: Exception) {
+            null
+        }
+        _state.value = _state.value.copy(
+            flowDiscoveryLoading = false,
+            // Default to "PASSWORD" so the UI branches deterministically.
+            // Any unrecognised method type still flows through the
+            // PASSWORD branch's fallback "method-not-supported" message.
+            primaryStepMethod = step?.authMethod?.type?.takeIf { it.isNotBlank() } ?: "PASSWORD"
+        )
+    }
 
     suspend fun login(email: String, password: String) {
         _state.value = LoginState(isLoading = true)
@@ -32,6 +68,8 @@ class LoginViewModel(
                             userEmail = tokens.userEmail,
                             role = tokens.role
                         )
+                        // Remember the tenant for next launch's flow discovery.
+                        offlineCache.cacheTenantId(tokens.tenantId)
                         _state.value = LoginState(
                             isLoading = false,
                             tokens = tokens,
@@ -112,5 +150,13 @@ class LoginViewModel(
         _state.value = _state.value.copy(error = null)
     }
 
-    fun resetState(){_state.value=LoginState()}
+    fun resetState() {
+        // Preserve discovered primary-step so the user doesn't see a
+        // re-shimmer when navigating back from the MFA flow.
+        val keep = _state.value
+        _state.value = LoginState(
+            primaryStepMethod = keep.primaryStepMethod,
+            flowDiscoveryLoading = false
+        )
+    }
 }

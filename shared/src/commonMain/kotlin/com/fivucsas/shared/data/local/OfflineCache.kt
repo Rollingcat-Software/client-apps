@@ -26,7 +26,23 @@ class OfflineCache(
         private const val KEY_CACHED_VOICE_ENROLLED = "offline_voice_enrolled"
         private const val KEY_CACHED_FINGERPRINT_ENROLLED = "offline_fingerprint_enrolled"
         private const val KEY_CACHED_LAST_SYNC = "offline_last_sync"
+        private const val KEY_CACHED_TENANT_ID = "offline_tenant_id"
     }
+
+    /**
+     * Persist the tenant id seen at last successful authentication.
+     *
+     * Used by the LoginScreen on subsequent launches to discover the
+     * tenant's active auth flow before showing the credential form.
+     * No-ops on a blank value to avoid overwriting a known tenant with "".
+     */
+    fun cacheTenantId(tenantId: String) {
+        if (tenantId.isBlank()) return
+        storage.saveString(KEY_CACHED_TENANT_ID, tenantId)
+    }
+
+    /** Returns the cached tenant id, or null when none has been recorded. */
+    fun getCachedTenantId(): String? = storage.getString(KEY_CACHED_TENANT_ID)
 
     /**
      * Cache user profile data after a successful API call.

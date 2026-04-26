@@ -287,6 +287,7 @@ fun AppNavigation() {
 
         composable(Screen.Login.route) {
             val viewModel = koinInject<LoginViewModel>()
+            val context = androidx.compose.ui.platform.LocalContext.current
             LoginScreen(
                 viewModel = viewModel,
                 onNavigateToRegister = { navController.navigate(Screen.Register.route) },
@@ -302,6 +303,16 @@ fun AppNavigation() {
                 },
                 onMfaRequired = {
                     navController.navigate(Screen.MfaFlow.route)
+                },
+                onOpenWebSignIn = {
+                    // PR #18 fallback for primary methods this app cannot
+                    // render natively (SMS_OTP, QR_CODE, NFC_DOCUMENT,
+                    // HARDWARE_KEY, FINGERPRINT, VOICE as PRIMARY).
+                    val intent = android.content.Intent(
+                        android.content.Intent.ACTION_VIEW,
+                        android.net.Uri.parse("https://app.fivucsas.com/login")
+                    ).apply { addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK) }
+                    runCatching { context.startActivity(intent) }
                 }
             )
         }

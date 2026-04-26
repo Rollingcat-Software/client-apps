@@ -5,6 +5,7 @@ import com.fivucsas.shared.data.remote.dto.MfaChallengeData
 import com.fivucsas.shared.data.remote.dto.MfaQrTokenResponse
 import com.fivucsas.shared.data.remote.dto.MfaStepResponse
 import com.fivucsas.shared.data.remote.dto.MfaSwitchMethodResponse
+import com.fivucsas.shared.domain.model.AuthFlowStep
 
 /**
  * Authentication repository interface
@@ -121,6 +122,24 @@ interface AuthRepository {
         sessionToken: String,
         method: String
     ): Result<MfaSwitchMethodResponse>
+
+    /**
+     * Discover the *primary* (first) step of the active auth flow for the
+     * given operation type and tenant.
+     *
+     * This is a thin wrapper over [AuthFlowRepository.getActiveFlow] that
+     * extracts step #1 from the active flow. It is used by the LoginScreen
+     * to decide which primary-step UI to render (PASSWORD, EMAIL_OTP, FACE,
+     * TOTP, ...).
+     *
+     * Returns `null` when no flow is configured or when discovery fails for
+     * any reason (auth required, network, parse). Callers MUST treat `null`
+     * as "render the legacy PASSWORD form" — never as a hard error.
+     */
+    suspend fun discoverPrimaryStep(
+        operationType: String,
+        tenantId: String?
+    ): AuthFlowStep?
 }
 
 /**
