@@ -824,6 +824,34 @@ enum class StringKey {
     LOGIN_PRIMARY_UNSUPPORTED_TITLE,
     LOGIN_PRIMARY_UNSUPPORTED_BODY,
     LOGIN_PRIMARY_OPEN_WEB,
+
+    // UX polish — OTP resend countdown + auto-submit (PR polish/i18n-and-ux-sweep-20260426)
+    OTP_RESEND_COUNTDOWN,
+    OTP_AUTO_VERIFYING,
+
+    // a11y — icon-only contentDescription labels
+    A11Y_NAVIGATE_BACK,
+    A11Y_REFRESH,
+    A11Y_RETRY,
+    A11Y_OPEN_SETTINGS,
+    A11Y_EDIT_PROFILE,
+
+    // ProfileScreen / EditProfileScreen — i18n sweep (PR polish/i18n-and-ux-sweep-20260426)
+    PROFILE_MY_PROFILE_TITLE,
+    PROFILE_PERSONAL_INFO,
+    PROFILE_ACCOUNT_ACTIONS,
+    PROFILE_FIELD_NAME,
+    PROFILE_FIELD_EMAIL,
+    PROFILE_FIELD_PHONE,
+    PROFILE_MEMBER_SINCE,
+    PROFILE_RE_ENROLL_FACE,
+    PROFILE_DELETE_ENROLLMENT,
+    PROFILE_OPEN_SETTINGS,
+    EDIT_PROFILE_TITLE,
+    EDIT_PROFILE_SAVE,
+    EDIT_PROFILE_EMAIL_READONLY,
+    EDIT_PROFILE_ID_NUMBER,
+    EDIT_PROFILE_PHONE_NUMBER,
 }
 
 private val enStrings = mapOf(
@@ -1611,6 +1639,34 @@ private val enStrings = mapOf(
     StringKey.LOGIN_PRIMARY_UNSUPPORTED_TITLE to "Sign-in method not supported",
     StringKey.LOGIN_PRIMARY_UNSUPPORTED_BODY to "Your tenant has configured a sign-in method that is not yet available in this app. Please continue from the web sign-in page.",
     StringKey.LOGIN_PRIMARY_OPEN_WEB to "Open web sign-in",
+
+    // UX polish — OTP resend countdown + auto-submit (PR polish/i18n-and-ux-sweep-20260426)
+    StringKey.OTP_RESEND_COUNTDOWN to "Resend in {0}",
+    StringKey.OTP_AUTO_VERIFYING to "Verifying…",
+
+    // a11y — icon-only contentDescription labels
+    StringKey.A11Y_NAVIGATE_BACK to "Navigate back",
+    StringKey.A11Y_REFRESH to "Refresh",
+    StringKey.A11Y_RETRY to "Retry",
+    StringKey.A11Y_OPEN_SETTINGS to "Open settings",
+    StringKey.A11Y_EDIT_PROFILE to "Edit profile",
+
+    // ProfileScreen / EditProfileScreen — i18n sweep
+    StringKey.PROFILE_MY_PROFILE_TITLE to "My Profile",
+    StringKey.PROFILE_PERSONAL_INFO to "Personal Information",
+    StringKey.PROFILE_ACCOUNT_ACTIONS to "Account Actions",
+    StringKey.PROFILE_FIELD_NAME to "Name",
+    StringKey.PROFILE_FIELD_EMAIL to "Email",
+    StringKey.PROFILE_FIELD_PHONE to "Phone",
+    StringKey.PROFILE_MEMBER_SINCE to "Member since {0}",
+    StringKey.PROFILE_RE_ENROLL_FACE to "Re-Enroll Face",
+    StringKey.PROFILE_DELETE_ENROLLMENT to "Delete My Enrollment",
+    StringKey.PROFILE_OPEN_SETTINGS to "Settings",
+    StringKey.EDIT_PROFILE_TITLE to "Edit Profile",
+    StringKey.EDIT_PROFILE_SAVE to "Save",
+    StringKey.EDIT_PROFILE_EMAIL_READONLY to "Email (read-only)",
+    StringKey.EDIT_PROFILE_ID_NUMBER to "ID Number",
+    StringKey.EDIT_PROFILE_PHONE_NUMBER to "Phone Number",
 )
 
 private val trStrings = mapOf(
@@ -2321,23 +2377,23 @@ private val trStrings = mapOf(
     // Hardware Token
     StringKey.HW_TOKEN_TITLE to "Donanım Güvenlik Anahtarı",
     StringKey.HW_TOKEN_BANNER_TITLE to "WebAuthn / FIDO2",
-    StringKey.HW_TOKEN_BANNER_DESC to "Bir donanım güvenlik anahtarı (YubiKey, Titan, vb.) ile USB, NFC veya Bluetooth üzerinden kayıt olun ve doğrulayın; ya da cihazınızın biyometrisini platform doğrulayıcı olarak kullanın.",
-    StringKey.HW_TOKEN_REGISTER_KEY_HEADER to "Güvenlik Anahtarı Kaydet",
-    StringKey.HW_TOKEN_REGISTER_KEY_DESC to "Donanım güvenlik anahtarınızı bağlayın ve platformlar arası bağlantı (USB, NFC, BLE) ile bir WebAuthn kimlik bilgisi oluşturmak için Kaydet'e dokunun.",
-    StringKey.HW_TOKEN_REGISTERING to "Kaydediliyor...",
+    StringKey.HW_TOKEN_BANNER_DESC to "USB, NFC veya Bluetooth üzerinden bir donanım güvenlik anahtarı (YubiKey, Titan vb.) ile kayıt olun ve doğrulayın ya da cihazınızın biyometrik özelliğini platform doğrulayıcı olarak kullanın.",
+    StringKey.HW_TOKEN_REGISTER_KEY_HEADER to "Güvenlik Anahtarını Kaydet",
+    StringKey.HW_TOKEN_REGISTER_KEY_DESC to "Donanım güvenlik anahtarınızı bağlayın ve platformlar arası bağlantı (USB, NFC, BLE) üzerinden WebAuthn kimlik bilgisi oluşturmak için Kaydet'e dokunun.",
+    StringKey.HW_TOKEN_REGISTERING to "Kayıt yapılıyor…",
     StringKey.HW_TOKEN_REGISTER_KEY_BUTTON to "Anahtarı Kaydet",
-    StringKey.HW_TOKEN_REGISTER_PLATFORM_HEADER to "Platform Biyometriği Kaydet",
-    StringKey.HW_TOKEN_REGISTER_PLATFORM_DESC to "Şifresiz giriş için cihazınızın parmak izini veya yüz kilidini WebAuthn platform doğrulayıcısı olarak kullanın.",
-    StringKey.HW_TOKEN_REGISTER_PLATFORM_BUTTON to "Biyometriyi Kaydet",
+    StringKey.HW_TOKEN_REGISTER_PLATFORM_HEADER to "Platform Biyometriğini Kaydet",
+    StringKey.HW_TOKEN_REGISTER_PLATFORM_DESC to "Şifresiz giriş için cihazınızın parmak izini veya yüz tanımayı WebAuthn platform doğrulayıcısı olarak kullanın.",
+    StringKey.HW_TOKEN_REGISTER_PLATFORM_BUTTON to "Biyometriği Kaydet",
     StringKey.HW_TOKEN_VERIFY_HEADER to "Kimlik Bilgisini Doğrula",
-    StringKey.HW_TOKEN_VERIFY_DESC to "Kimlik doğrulamak için kayıtlı WebAuthn kimlik bilgilerinizden herhangi birini kullanın.",
-    StringKey.HW_TOKEN_VERIFYING to "Doğrulanıyor...",
+    StringKey.HW_TOKEN_VERIFY_DESC to "Kimliğinizi doğrulamak için kayıtlı WebAuthn kimlik bilgilerinizden herhangi birini kullanın.",
+    StringKey.HW_TOKEN_VERIFYING to "Doğrulama yapılıyor…",
     StringKey.HW_TOKEN_VERIFY_BUTTON to "Doğrula",
     StringKey.HW_TOKEN_CREDENTIAL_INFO to "Kimlik Bilgisi Detayları",
-    StringKey.HW_TOKEN_CRED_ID_LABEL to "Kimlik Bilgisi ID",
+    StringKey.HW_TOKEN_CRED_ID_LABEL to "Kimlik Bilgisi Kimliği",
     StringKey.HW_TOKEN_ALGO_LABEL to "Algoritma",
-    StringKey.HW_TOKEN_ATTESTATION_LABEL to "Doğrulama Belgesi",
-    StringKey.HW_TOKEN_TRANSPORTS_LABEL to "Aktarımlar",
+    StringKey.HW_TOKEN_ATTESTATION_LABEL to "Tasdik Belgesi",
+    StringKey.HW_TOKEN_TRANSPORTS_LABEL to "Aktarım Yöntemleri",
     StringKey.HW_TOKEN_REGISTERED_AT_LABEL to "Kayıt Tarihi",
     StringKey.HW_TOKEN_BADGE_REGISTERED to "Kayıtlı",
     StringKey.HW_TOKEN_BADGE_VERIFIED to "Doğrulandı",
@@ -2363,9 +2419,9 @@ private val trStrings = mapOf(
     StringKey.MRZ_FLASH_OFF_DESC to "Flaşı aç",
     StringKey.MRZ_FLASH_ON_DESC to "Flaşı kapat",
     StringKey.MRZ_ROTATE_HINT to "Kartı sola çevirin ve çerçeveye yerleştirin",
-    StringKey.MRZ_BACK_SIDE_HINT to "MRZ satırları (<<<) olan arka yüz kameraya bakacak şekilde",
+    StringKey.MRZ_BACK_SIDE_HINT to "MRZ satırlarını (<<<) içeren arka yüzü kameraya doğru çevirin",
     StringKey.MRZ_CAMERA_START_FAILED to "Kamera başlatılamadı: {0}",
-    StringKey.MRZ_BACK_OF_ID_OVERLAY to "KİMLİK ARKA YÜZ",
+    StringKey.MRZ_BACK_OF_ID_OVERLAY to "KİMLİĞİN ARKA YÜZÜ",
     StringKey.MRZ_DETECTED_DESC to "Algılandı",
     StringKey.MRZ_DETECTING to "Algılanıyor...",
     StringKey.MRZ_ROTATE_LEFT_DESC to "Sola döndür",
@@ -2398,6 +2454,34 @@ private val trStrings = mapOf(
     StringKey.LOGIN_PRIMARY_UNSUPPORTED_TITLE to "Desteklenmeyen giriş yöntemi",
     StringKey.LOGIN_PRIMARY_UNSUPPORTED_BODY to "Kiracınız bu uygulamada henüz desteklenmeyen bir giriş yöntemi yapılandırmış. Lütfen web giriş sayfasından devam edin.",
     StringKey.LOGIN_PRIMARY_OPEN_WEB to "Web girişini aç",
+
+    // UX polish — OTP resend countdown + auto-submit (PR polish/i18n-and-ux-sweep-20260426)
+    StringKey.OTP_RESEND_COUNTDOWN to "{0} sonra tekrar gönder",
+    StringKey.OTP_AUTO_VERIFYING to "Doğrulanıyor…",
+
+    // a11y — icon-only contentDescription labels
+    StringKey.A11Y_NAVIGATE_BACK to "Geri dön",
+    StringKey.A11Y_REFRESH to "Yenile",
+    StringKey.A11Y_RETRY to "Tekrar dene",
+    StringKey.A11Y_OPEN_SETTINGS to "Ayarları aç",
+    StringKey.A11Y_EDIT_PROFILE to "Profili düzenle",
+
+    // ProfileScreen / EditProfileScreen — i18n sweep
+    StringKey.PROFILE_MY_PROFILE_TITLE to "Profilim",
+    StringKey.PROFILE_PERSONAL_INFO to "Kişisel Bilgiler",
+    StringKey.PROFILE_ACCOUNT_ACTIONS to "Hesap İşlemleri",
+    StringKey.PROFILE_FIELD_NAME to "Ad",
+    StringKey.PROFILE_FIELD_EMAIL to "E-posta",
+    StringKey.PROFILE_FIELD_PHONE to "Telefon",
+    StringKey.PROFILE_MEMBER_SINCE to "Üyelik tarihi: {0}",
+    StringKey.PROFILE_RE_ENROLL_FACE to "Yüzü Yeniden Kaydet",
+    StringKey.PROFILE_DELETE_ENROLLMENT to "Kaydımı Sil",
+    StringKey.PROFILE_OPEN_SETTINGS to "Ayarlar",
+    StringKey.EDIT_PROFILE_TITLE to "Profili Düzenle",
+    StringKey.EDIT_PROFILE_SAVE to "Kaydet",
+    StringKey.EDIT_PROFILE_EMAIL_READONLY to "E-posta (salt okunur)",
+    StringKey.EDIT_PROFILE_ID_NUMBER to "Kimlik Numarası",
+    StringKey.EDIT_PROFILE_PHONE_NUMBER to "Telefon Numarası",
 )
 
 /**

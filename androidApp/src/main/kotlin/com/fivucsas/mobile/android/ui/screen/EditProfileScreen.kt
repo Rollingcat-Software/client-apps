@@ -30,6 +30,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.fivucsas.shared.config.UIDimens
+import com.fivucsas.shared.i18n.StringKey
+import com.fivucsas.shared.i18n.s
 import com.fivucsas.shared.ui.components.atoms.AppTextField
 import com.fivucsas.shared.ui.theme.AppColors
 
@@ -51,18 +53,18 @@ fun EditProfileScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Edit Profile") },
+                title = { Text(s(StringKey.EDIT_PROFILE_TITLE)) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back"
+                            contentDescription = s(StringKey.BACK)
                         )
                     }
                 },
                 actions = {
                     IconButton(onClick = { onSave(firstNameState.value, lastNameState.value, phoneState.value) }) {
-                        Text("Save", style = MaterialTheme.typography.labelLarge, color = AppColors.Primary)
+                        Text(s(StringKey.EDIT_PROFILE_SAVE), style = MaterialTheme.typography.labelLarge, color = AppColors.Primary)
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -84,32 +86,32 @@ fun EditProfileScreen(
             AppTextField(
                 value = firstNameState.value,
                 onValueChange = { firstNameState.value = it },
-                label = "First Name",
+                label = s(StringKey.FIRST_NAME),
                 leadingIcon = Icons.Default.Person
             )
             AppTextField(
                 value = lastNameState.value,
                 onValueChange = { lastNameState.value = it },
-                label = "Last Name",
+                label = s(StringKey.LAST_NAME),
                 leadingIcon = Icons.Default.Person
             )
             AppTextField(
                 value = email,
                 onValueChange = {},
-                label = "Email (read-only)",
+                label = s(StringKey.EDIT_PROFILE_EMAIL_READONLY),
                 leadingIcon = Icons.Default.Email,
                 enabled = false
             )
             AppTextField(
                 value = phoneState.value,
                 onValueChange = { phoneState.value = it },
-                label = "Phone Number",
+                label = s(StringKey.EDIT_PROFILE_PHONE_NUMBER),
                 leadingIcon = Icons.Default.Phone
             )
             AppTextField(
                 value = idNumber,
                 onValueChange = {},
-                label = "ID Number",
+                label = s(StringKey.EDIT_PROFILE_ID_NUMBER),
                 leadingIcon = Icons.Default.Badge,
                 enabled = false
             )

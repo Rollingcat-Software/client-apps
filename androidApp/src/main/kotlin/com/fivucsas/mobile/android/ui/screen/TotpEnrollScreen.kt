@@ -63,6 +63,13 @@ fun TotpEnrollScreen(
         viewModel.checkStatus(userId)
     }
 
+    // UX polish — auto-submit when the user enters a 6-digit code
+    LaunchedEffect(verifyCode, uiState.isLoading) {
+        if (verifyCode.length == 6 && !uiState.isLoading && !uiState.setupComplete) {
+            viewModel.verifySetup(userId, verifyCode)
+        }
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
