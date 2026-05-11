@@ -1,4 +1,6 @@
-# FIVUCSAS Client Apps
+# FIVUCSAS — Face and Identity Verification Using Cloud-based SaaS
+
+## Client Apps
 
 **Cross-Platform Applications for Face and Identity Verification Using Cloud-based SaaS**
 
