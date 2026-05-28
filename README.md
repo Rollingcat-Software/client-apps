@@ -200,7 +200,7 @@ The project includes comprehensive ViewModel tests with mock implementations:
 
 ### Test Coverage
 
-- **Total Kotlin tests:** 424 (v5.1.0 added ~23 covering the TOTP engine + `otpauth://` parser)
+- **Total Kotlin tests:** 505 (static count: 447 commonTest + 33 androidTest + 25 desktopTest `@Test` annotations; as of 2026-05-28)
 - **AdminViewModel**: 25+ tests (navigation, CRUD, search, dialogs)
 - **KioskViewModel**: 25+ tests (navigation, enrollment, verification)
 
