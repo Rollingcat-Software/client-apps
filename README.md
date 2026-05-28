@@ -56,10 +56,10 @@ and [`../web-app/docs/plans/HOSTED_LOGIN_INTEGRATION.md`](../web-app/docs/plans/
 
 ## Project Status
 
-**Version:** 1.1.0
-**Status:** PRODUCTION READY (Phase 1 complete -- build fixes, FIDO2/WebAuthn, permissions)
+**Version:** 5.2.0
+**Status:** PRODUCTION READY (Phases 1–3 complete)
 **Architecture:** Clean Architecture + MVVM + Kotlin Multiplatform
-**Platforms:** Android (APK releases), Desktop (JVM), iOS (CI ready)
+**Platforms:** Android (APK releases), Desktop (JVM), iOS (planned; no module yet)
 **CI/CD:** Android Build + iOS Build workflows GREEN (GitHub Actions, self-hosted runner)
 
 ---
@@ -200,7 +200,7 @@ The project includes comprehensive ViewModel tests with mock implementations:
 
 ### Test Coverage
 
-- **Total Kotlin tests:** 424 (v5.1.0 added ~23 covering the TOTP engine + `otpauth://` parser)
+- **Total Kotlin tests:** 517 (commonTest: 447, androidTest: 33, android unit: 12, desktopTest: 25; verified 2026-05-28)
 - **AdminViewModel**: 25+ tests (navigation, CRUD, search, dialogs)
 - **KioskViewModel**: 25+ tests (navigation, enrollment, verification)
 
@@ -258,7 +258,7 @@ Desktop implementations are in `desktopApp/.../platform/`.
 - JDK 17+
 - Kotlin 2.0+
 - Gradle 8.0+ (wrapper included)
-- Android SDK (API 34+)
+- Android SDK (API 35+)
 
 ### Build & Run
 

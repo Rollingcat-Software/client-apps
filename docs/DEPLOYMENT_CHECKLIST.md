@@ -22,7 +22,7 @@
 
 ### Testing
 
-- [x] Unit tests created (22 tests)
+- [x] Unit tests created (517 tests across all test source sets; verified 2026-05-28)
 - [x] Test data factory ready
 - [ ] Integration tests (optional)
 - [ ] Manual testing completed
@@ -51,8 +51,7 @@
 
 ```bash
 # Build production desktop app
-cd mobile-app
-.\gradlew.bat :desktopApp:packageDistributionForCurrentOS
+./gradlew :desktopApp:packageDistributionForCurrentOS
 
 # Output: desktopApp/build/compose/binaries/main/
 ```
@@ -61,10 +60,10 @@ cd mobile-app
 
 ```bash
 # Build production Android APK
-.\gradlew.bat :androidApp:assembleRelease
+./gradlew :androidApp:assembleRelease
 
 # Build Android App Bundle (for Play Store)
-.\gradlew.bat :androidApp:bundleRelease
+./gradlew :androidApp:bundleRelease
 
 # Output: androidApp/build/outputs/
 ```
