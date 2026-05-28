@@ -1,5 +1,8 @@
 # FIVUCSAS Client-Apps & Web-App Completion Roadmap
 
+> **SUPERSEDED** — The hosted-first pivot (2026-04-16) replaced the 14-feature parity matrix below.
+> Native clients are now thin OAuth wrappers. See [docs/TODO.md](docs/TODO.md) for current priorities.
+
 **Created:** 2026-04-04
 **Last Updated:** 2026-04-05
 **Current Completion:** 100% (Phase 1-3 complete)
