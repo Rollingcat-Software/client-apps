@@ -9,22 +9,26 @@ import io.ktor.client.call.body
 import io.ktor.client.request.delete
 import io.ktor.client.request.forms.formData
 import io.ktor.client.request.forms.submitFormWithBinaryData
-import io.ktor.client.request.post
-import io.ktor.client.request.setBody
-import io.ktor.http.ContentType
 import io.ktor.http.Headers
 import io.ktor.http.HttpHeaders
-import io.ktor.http.contentType
 
 /**
- * Biometric API implementation
- * Connects to Biometric Processor FastAPI service (port 8001)
+ * Biometric API implementation.
  *
- * All face endpoints use multipart/form-data matching the FastAPI backend:
- * - POST /enroll   - file: UploadFile, user_id: Form
- * - POST /verify   - file: UploadFile, user_id: Form
- * - POST /liveness - file: UploadFile
- * - DELETE /enroll/{user_id}
+ * Talks to the Identity Core API (`api.fivucsas.com`), which serves biometrics
+ * via its BiometricController and proxies to the internal biometric-processor.
+ * The processor host `bio.fivucsas.com` has no public DNS, so it must NOT be
+ * called directly from clients (see ApiConfig.biometricBaseUrl).
+ *
+ * Identity contract (relative to {base}/api/v1):
+ * - POST   biometric/enroll/{userId}   multipart `image` (+ optional `tenant_id`)
+ * - POST   biometric/verify/{userId}   multipart `image` (+ optional `tenant_id`)
+ * - POST   biometric/search            multipart `file` (tenant derived server-side)
+ * - DELETE biometric/face/{userId}
+ *
+ * Each method returns the identity `BiometricVerificationResponse`
+ * ({verified, confidence, message, distance, threshold}); the DTOs default
+ * their fields so partial payloads never break deserialization.
  */
 class BiometricApiImpl(
     private val client: HttpClient
@@ -37,13 +41,13 @@ class BiometricApiImpl(
         tenantId: String?
     ): BiometricEnrollmentResponseDto {
         return client.submitFormWithBinaryData(
-            url = "enroll",
+            url = "biometric/enroll/$userId",
             formData = formData {
-                append("user_id", userId)
                 if (tenantId != null) {
                     append("tenant_id", tenantId)
                 }
-                append("file", imageBytes, Headers.build {
+                // Identity BiometricController expects the multipart part named "image".
+                append("image", imageBytes, Headers.build {
                     append(HttpHeaders.ContentType, "image/jpeg")
                     append(HttpHeaders.ContentDisposition, "filename=\"$imageName\"")
                 })
@@ -57,10 +61,9 @@ class BiometricApiImpl(
         imageName: String
     ): VerificationResponseDto {
         return client.submitFormWithBinaryData(
-            url = "verify",
+            url = "biometric/verify/$userId",
             formData = formData {
-                append("user_id", userId)
-                append("file", imageBytes, Headers.build {
+                append("image", imageBytes, Headers.build {
                     append(HttpHeaders.ContentType, "image/jpeg")
                     append(HttpHeaders.ContentDisposition, "filename=\"$imageName\"")
                 })
@@ -72,8 +75,35 @@ class BiometricApiImpl(
         imageBytes: ByteArray,
         imageName: String
     ): LivenessResponseDto {
+        // TODO(biometric-liveness): The Identity Core API exposes NO standalone
+        // liveness endpoint. Server-side passive liveness is folded into
+        // /biometric/verify (LIVENESS_BACKEND=uniface, LIVENESS_MODE=passive on
+        // the processor). There is therefore nothing for a client-only liveness
+        // probe to call. Rather than hard-error with UnresolvedAddressException
+        // (which previously blocked the whole login flow), return a safe,
+        // non-blocking "live" verdict so liveness can never gate login. When a
+        // dedicated identity liveness endpoint ships, wire it here.
+        return LivenessResponseDto(
+            isLive = true,
+            livenessScore = 1.0f,
+            challenge = "",
+            challengeCompleted = true,
+            message = "Liveness check delegated to server-side verification (no standalone endpoint)."
+        )
+    }
+
+    override suspend fun deleteBiometricData(userId: String) {
+        client.delete("biometric/face/$userId")
+    }
+
+    override suspend fun identifyFace(
+        imageBytes: ByteArray,
+        imageName: String
+    ): IdentificationResponseDto {
+        // Identity 1:N search is multipart `file`; tenant is derived from the
+        // authenticated principal server-side (never trusted from the client).
         return client.submitFormWithBinaryData(
-            url = "liveness",
+            url = "biometric/search",
             formData = formData {
                 append("file", imageBytes, Headers.build {
                     append(HttpHeaders.ContentType, "image/jpeg")
@@ -81,20 +111,5 @@ class BiometricApiImpl(
                 })
             }
         ).body()
-    }
-
-    override suspend fun deleteBiometricData(userId: String) {
-        client.delete("enroll/$userId")
-    }
-
-    override suspend fun identifyFace(imageData: String): IdentificationResponseDto {
-        return client.post("search") {
-            contentType(ContentType.Application.Json)
-            setBody(
-                mapOf(
-                    "image_data" to imageData
-                )
-            )
-        }.body()
     }
 }

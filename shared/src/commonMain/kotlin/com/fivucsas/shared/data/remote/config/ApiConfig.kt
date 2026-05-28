@@ -16,9 +16,17 @@ object ApiConfig {
     }
 
     /**
-     * Current environment (can be changed at runtime)
+     * Current environment (can be changed at runtime).
+     *
+     * Defaults to PRODUCTION so RELEASE builds never emit request/response
+     * logging (see [isLoggingEnabled]) — previously this defaulted to
+     * DEVELOPMENT, which leaked full prod traffic into the Ktor logger on
+     * shipped APKs. All three environments currently resolve to the same prod
+     * hosts (there is no separate staging/dev backend), so PRODUCTION is the
+     * correct safe default. A debug entry point may still flip this to
+     * DEVELOPMENT at runtime when verbose logging is wanted locally.
      */
-    var currentEnvironment: Environment = Environment.DEVELOPMENT
+    var currentEnvironment: Environment = Environment.PRODUCTION
 
     /**
      * Identity Core API URLs per environment (Auth, Users, RBAC)
@@ -28,11 +36,18 @@ object ApiConfig {
     private const val PROD_IDENTITY_URL = "https://api.fivucsas.com/api/v1"
 
     /**
-     * Biometric Processor API URLs per environment (Face detection, Verification)
+     * Biometric API URLs per environment (Face/Voice enroll, verify, search).
+     *
+     * IMPORTANT: biometrics are served by the Identity Core API at
+     * `api.fivucsas.com`, which proxies to the internal biometric-processor.
+     * The processor host `bio.fivucsas.com` has NO public DNS (Docker-internal
+     * only), so pointing clients at it caused every biometric call to fail with
+     * UnresolvedAddressException and broke any login flow using a FACE/VOICE
+     * step. These URLs therefore match the Identity base URL above.
      */
-    private const val DEV_BIOMETRIC_URL = "https://bio.fivucsas.com/api/v1"
-    private const val STAGING_BIOMETRIC_URL = "https://bio.fivucsas.com/api/v1"
-    private const val PROD_BIOMETRIC_URL = "https://bio.fivucsas.com/api/v1"
+    private const val DEV_BIOMETRIC_URL = "https://api.fivucsas.com/api/v1"
+    private const val STAGING_BIOMETRIC_URL = "https://api.fivucsas.com/api/v1"
+    private const val PROD_BIOMETRIC_URL = "https://api.fivucsas.com/api/v1"
 
     /**
      * Get Identity Core API base URL for current environment
