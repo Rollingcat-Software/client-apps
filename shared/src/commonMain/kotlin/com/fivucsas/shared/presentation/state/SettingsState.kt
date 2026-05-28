@@ -9,7 +9,9 @@ package com.fivucsas.shared.presentation.state
 data class SettingsState(
     // System Settings
     val apiEndpoint: String = "https://api.fivucsas.com/api/v1",
-    val biometricProcessorUrl: String = "https://bio.fivucsas.com/api/v1",
+    // Biometrics are served by the Identity API (which proxies to the
+    // internal processor); bio.fivucsas.com has no public DNS.
+    val biometricProcessorUrl: String = "https://api.fivucsas.com/api/v1",
     val connectionStatus: ConnectionStatus = ConnectionStatus.DISCONNECTED,
 
     // Security Settings

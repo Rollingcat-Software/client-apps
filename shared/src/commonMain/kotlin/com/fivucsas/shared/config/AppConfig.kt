@@ -8,7 +8,8 @@ package com.fivucsas.shared.config
  */
 object AppConfig {
     const val APP_NAME = "FIVUCSAS"
-    const val APP_VERSION = "1.0.0"
+    // Keep in sync with androidApp/build.gradle.kts `versionName` and README.
+    const val APP_VERSION = "5.2.0"
     const val APP_ID = "com.fivucsas.mobile"
 
     /**

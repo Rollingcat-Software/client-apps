@@ -8,8 +8,6 @@ import com.fivucsas.shared.domain.model.IdentifyResult
 import com.fivucsas.shared.domain.model.LivenessResult
 import com.fivucsas.shared.domain.model.VerificationResult
 import com.fivucsas.shared.domain.repository.BiometricRepository
-import kotlin.io.encoding.Base64
-import kotlin.io.encoding.ExperimentalEncodingApi
 
 /**
  * Real implementation of BiometricRepository
@@ -57,11 +55,10 @@ class BiometricRepositoryImpl(
         }
     }
 
-    @OptIn(ExperimentalEncodingApi::class)
     override suspend fun identifyFace(imageData: ByteArray): Result<IdentifyResult> {
         return try {
-            val base64Image = Base64.encode(imageData)
-            val response = biometricApi.identifyFace(base64Image)
+            // Identity 1:N search takes the raw image as a multipart `file`.
+            val response = biometricApi.identifyFace(imageData)
             Result.success(response.toModel())
         } catch (e: Exception) {
             Result.failure(e)

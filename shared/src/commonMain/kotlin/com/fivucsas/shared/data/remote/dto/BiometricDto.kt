@@ -7,31 +7,39 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /**
- * Enrollment Response DTO — matches biometric-processor EnrollmentResponse schema:
- * {success, user_id, quality_score, message, embedding_dimension, liveness_score}
+ * Enrollment Response DTO — matches the Identity Core API
+ * `BiometricVerificationResponse` schema returned by
+ * `POST /api/v1/biometric/enroll/{userId}`:
+ * {verified, confidence, message, distance, threshold}
+ *
+ * NOTE: the legacy biometric-processor enroll schema
+ * ({success, user_id, quality_score, embedding_dimension, liveness_score})
+ * is NOT what the identity API surfaces. Every field below has a default so a
+ * partial/legacy payload still deserializes without throwing. `quality_score`
+ * is kept as an optional alias in case a future identity response echoes it.
  */
 @Serializable
 data class BiometricEnrollmentResponseDto(
-    val success: Boolean,
-    @SerialName("user_id")
-    val userId: String,
+    val verified: Boolean = false,
+    val confidence: Float = 0f,
+    val message: String = "",
+    val distance: Float? = null,
+    val threshold: Float? = null,
     @SerialName("quality_score")
-    val qualityScore: Float,
-    val message: String,
-    @SerialName("embedding_dimension")
-    val embeddingDimension: Int = 0,
-    @SerialName("liveness_score")
-    val livenessScore: Float = 1.0f
+    val qualityScore: Float? = null
 )
 
 fun BiometricEnrollmentResponseDto.toModel(): EnrollmentResult {
     return EnrollmentResult(
-        success = success,
-        userId = userId,
-        qualityScore = qualityScore,
+        success = verified,
+        // Identity enroll does not echo the user id; the caller already knows it.
+        userId = "",
+        // Use the processor-reported quality score when present, else fall back
+        // to the verification confidence as a coarse proxy.
+        qualityScore = qualityScore ?: confidence,
         message = message,
-        embeddingDimension = embeddingDimension,
-        livenessScore = livenessScore
+        embeddingDimension = 0,
+        livenessScore = 1.0f
     )
 }
 
