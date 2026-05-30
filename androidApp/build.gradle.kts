@@ -42,8 +42,8 @@ android {
         applicationId = "com.fivucsas.mobile"
         minSdk = 24
         targetSdk = 35
-        versionCode = 7
-        versionName = "5.2.0"
+        versionCode = 8
+        versionName = "5.2.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 

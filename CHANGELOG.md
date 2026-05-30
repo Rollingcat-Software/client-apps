@@ -2,6 +2,33 @@
 
 All notable changes to the FIVUCSAS client apps (Android, iOS, Desktop).
 
+## [5.2.1] — 2026-05-30 — First production-signed Android release
+
+First Android release built and signed with the **rotated production upload
+keystore** (delivered via the `ANDROID_KEYSTORE_BASE64` / `ANDROID_KEYSTORE_PASSWORD`
+/ `ANDROID_KEY_ALIAS` / `ANDROID_KEY_PASSWORD` GitHub Actions secrets). Every
+prior release APK was debug-signed.
+
+### Changed
+
+- `androidApp/build.gradle.kts`: `versionCode` 7 → 8, `versionName` 5.2.0 → 5.2.1.
+
+### Includes (already on `main` since the v5.2.0 tag)
+
+- **Biometric login repointed to a reachable host (#41).** `bio.fivucsas.com`
+  has no public DNS; all FACE enroll/verify/liveness/search now go through
+  `api.fivucsas.com/api/v1` (Identity Core API → internal processor). Passive
+  liveness folded into `/verify`; `checkLiveness` returns a non-blocking result
+  so it can never gate login. `ApiConfig` defaults to PRODUCTION.
+- i18n + UX sweep, dynamic primary-step login screen, MFA cancel/switch-method
+  wiring, SECURITY.md + LICENSE, doc-freshness fixes (#27–#42).
+
+### Signing
+
+- Release variant is now signed with the production keystore (not the Android
+  debug key). Uploadable to Google Play; updates over a debug-signed v5.2.0
+  install require uninstall-first (signing-key mismatch — expected).
+
 ## [2026-04-19] Audit remediation (MO-H1/H3/H4/H6/C3)
 
 Addresses the four mobile findings from
