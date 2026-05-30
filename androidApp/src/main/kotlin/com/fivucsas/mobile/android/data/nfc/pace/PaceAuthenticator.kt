@@ -60,16 +60,41 @@ class PaceAuthenticator {
             ?: infos.firstOrNull()
 
     /**
-     * Attempt PACE. Currently a guarded no-op: it parses EF.CardAccess and
-     * selects a protocol, but returns [PaceResult.NotImplemented] (or
-     * [PaceResult.NoPaceAdvertised]) rather than running un-vetted crypto.
+     * Derive the nonce-decryption key `K_π` from the MRZ-derived seed.
+     *
+     * `π = SHA-1(mrzSeed)`, then `K_π = KDF(π, 3)`. This step is implemented
+     * and vector-tested via [PaceKeyDerivation] (ICAO 9303 worked-example
+     * vectors). It is the first cryptographic step of the PACE-GM handshake.
+     */
+    fun derivePasswordKey(mrzSeed: ByteArray): ByteArray {
+        val pi = java.security.MessageDigest.getInstance("SHA-1").digest(mrzSeed)
+        return PaceKeyDerivation.derivePasswordKey(pi)
+    }
+
+    /**
+     * Attempt PACE.
+     *
+     * Implemented + vector-tested today: EF.CardAccess parsing
+     * ([CardAccessParser]), protocol selection ([selectProtocol]), and the
+     * TR-03110 key derivation ([PaceKeyDerivation] / [derivePasswordKey]).
+     *
+     * NOT yet implemented (returns [PaceResult.NotImplemented] → BAC fallback):
+     * the on-card APDU exchange — MSE:Set AT + the chained GENERAL AUTHENTICATE
+     * (encrypted-nonce fetch, GM point mapping, token verify) and the AES
+     * secure-messaging channel. That last leg needs a physical PACE document to
+     * validate the full handshake (operator-blocked). The integration point is
+     * here: derive `K_π`, then drive the GA chain over [isoDep].
      *
      * @param cardAccess raw EF.CardAccess bytes (publicly readable).
+     * @param mrzSeed the MRZ-derived seed (or CAN) used to derive `K_π`.
      */
     @Suppress("UNUSED_PARAMETER")
     fun run(isoDep: IsoDep, cardAccess: ByteArray, mrzSeed: ByteArray): PaceResult {
         val infos = CardAccessParser.parse(cardAccess)
         val selected = selectProtocol(infos) ?: return PaceResult.NoPaceAdvertised
+        // Key derivation is ready (vector-tested); the on-card GA exchange is the
+        // remaining TODO — fall back to BAC until a PACE test card validates it.
+        // val kPassword = derivePasswordKey(mrzSeed)  // <- integration point
         return PaceResult.NotImplemented(selected)
     }
 }
