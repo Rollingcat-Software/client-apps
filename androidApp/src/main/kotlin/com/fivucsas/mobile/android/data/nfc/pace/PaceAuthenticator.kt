@@ -22,14 +22,15 @@ import com.fivucsas.mobile.android.data.nfc.pace.CardAccessParser.PaceInfo
  *  1. Read EF.CardAccess (public), pick a [PaceInfo] (prefer GM + AES-128).
  *  2. MSE:Set AT — select the PACE protocol OID + key reference (MRZ/CAN).
  *  3. GENERAL AUTHENTICATE (chained):
- *     a. Get the encrypted nonce `z`; derive `s = AES-Dec(K_π, z)` where
- *        the key `K_π` is `KDF(π, 3)`, where the PACE secret `π` is SHA-1 over
- *        the MRZ-derived seed (CAN may be used instead of the MRZ).
- *     b. Generic Mapping: exchange ephemeral PK; map the base point
- *        `G' = s·G + H` where `H` is the shared ECDH secret of the mapping keys.
- *     c. Exchange the mapped ephemeral PKs; compute shared secret `K`.
- *     d. Derive `K_enc = KDF(K,1)`, `K_mac = KDF(K,2)`; exchange + verify the
- *        authentication tokens `T_PCD`/`T_PICC` (AES-CMAC).
+ *     a. Get the encrypted nonce, then AES-decrypt it under the derived nonce
+ *        key (the third KDF output of the PACE secret, which is SHA-1 over the
+ *        MRZ-derived seed; a CAN may be used instead of the MRZ).
+ *     b. Generic Mapping: exchange the ephemeral public keys and map the base
+ *        point using the decrypted nonce and the ECDH secret of the mapping keys.
+ *     c. Exchange the mapped ephemeral public keys; compute the shared secret.
+ *     d. Derive the encryption and MAC session keys (first and second KDF
+ *        outputs) and exchange + verify the PCD/PICC authentication tokens
+ *        (AES-CMAC).
  *  4. Open AES secure messaging (SSC starts at 0) and return it as a
  *     [SecureMessaging] so the existing DG-read path is unchanged.
  *
