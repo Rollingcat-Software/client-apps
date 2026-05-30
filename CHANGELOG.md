@@ -31,6 +31,34 @@ All notable changes to the FIVUCSAS client apps (Android, iOS, Desktop).
   wiring as done and the passive-auth / CSCA / PACE work as deferred
   (operator-blocked: needs CSCA roots + test cards).
 
+## [5.2.3] — 2026-05-30 — MFA completion false-failure fix (P0)
+
+v5.2.2 fixed the login flicker so password login reaches the MFA step — but
+MFA *completion* then failed on the client: the server returned a clean
+`200 AUTHENTICATED` (tokens minted, no 500) yet the app showed
+"Verification failed" and stranded the user.
+
+### Fixed
+
+- **MFA completion no longer flips a server 200 into a false failure.** In
+  `MfaFlowViewModel.verifyStep`, the `AUTHENTICATED` branch ran
+  `offlineCache.cacheLoginData(...)` (an encrypted-prefs write) INSIDE the
+  verify `try` BEFORE `_authResult` was published. A throw there — e.g. a
+  keystore / `EncryptedSharedPreferences` write failure — was swallowed by
+  the outer `catch` and overwrote the committed success with
+  `MFA_GENERIC_ERROR`. Now the auth result + `Authenticated` state are
+  published FIRST; the offline-cache write and FCM push registration are
+  best-effort (`runCatching`); and the outer `catch` returns early if an
+  auth result already exists, so a late throw can never strand an
+  authenticated user. Regression test: `MfaFlowAuthenticatedRegressionTest`
+  (AUTHENTICATED survives a throwing secure-storage + throwing push
+  service).
+
+### Changed
+
+- `androidApp/build.gradle.kts`: `versionCode` 9 → 10, `versionName`
+  5.2.2 → 5.2.3.
+
 ## [5.2.2] — 2026-05-30 — Login fix (P0)
 
 A user who freshly installed v5.2.1 could not log in. Three login-screen
