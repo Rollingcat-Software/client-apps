@@ -207,6 +207,13 @@ val repositoryModule = module {
         )
     }
 
+    // Approve-login Repository (number-matching approver side)
+    single<com.fivucsas.shared.domain.repository.ApproveLoginRepository> {
+        com.fivucsas.shared.data.repository.ApproveLoginRepositoryImpl(
+            api = get<com.fivucsas.shared.data.remote.api.ApproveLoginApi>()
+        )
+    }
+
     // NFC document enrollment / verification Repository
     single<com.fivucsas.shared.domain.repository.NfcEnrollmentRepository> {
         com.fivucsas.shared.data.repository.NfcEnrollmentRepositoryImpl(

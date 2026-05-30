@@ -2,6 +2,7 @@ package com.fivucsas.shared.di
 
 import com.fivucsas.shared.presentation.viewmodel.AccountLinkingViewModel
 import com.fivucsas.shared.presentation.viewmodel.AdminViewModel
+import com.fivucsas.shared.presentation.viewmodel.ApproveLoginViewModel
 import com.fivucsas.shared.presentation.viewmodel.AuthFlowViewModel
 import com.fivucsas.shared.presentation.viewmodel.BiometricBackupViewModel
 import com.fivucsas.shared.presentation.viewmodel.DeviceViewModel
@@ -74,4 +75,8 @@ val viewModelModule = module {
     // the ApprovalActionReceiver (notification action buttons) need to observe
     // and drive the same state instance. See NFC_PUSH_APPROVAL_PROTOCOL.md.
     single { NfcApprovalViewModel(repository = get()) }
+
+    // Approve-login "Login requests" screen — singleton so the polling job
+    // and the screen observe the same state instance across recompositions.
+    single { ApproveLoginViewModel(repository = get()) }
 }
