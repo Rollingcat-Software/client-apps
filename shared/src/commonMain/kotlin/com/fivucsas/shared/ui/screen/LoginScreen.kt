@@ -12,8 +12,13 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -29,10 +34,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.fivucsas.shared.i18n.StringKey
 import com.fivucsas.shared.i18n.s
+import com.fivucsas.shared.presentation.state.MfaHandoff
 import com.fivucsas.shared.presentation.viewmodel.auth.LoginViewModel
 import kotlinx.coroutines.launch
 
@@ -63,9 +70,8 @@ fun LoginScreen(
     viewModel: LoginViewModel,
     onNavigateToRegister: () -> Unit,
     onNavigateToForgotPassword: () -> Unit,
-    onNavigateToGuestFaceCheck: () -> Unit,
     onLoginSuccess: () -> Unit,
-    onMfaRequired: () -> Unit = {},
+    onMfaRequired: (MfaHandoff) -> Unit = {},
     onOpenWebSignIn: () -> Unit = {}
 ) {
     val state by viewModel.state.collectAsState()
@@ -87,9 +93,22 @@ fun LoginScreen(
     // Navigate to MFA flow when MFA is required (this fires both for the
     // PASSWORD path's downstream MFA step AND for passwordless primary
     // steps that hand off to the MFA pipeline immediately).
+    //
+    // The session token + available methods + step counters are carried
+    // forward as an explicit [MfaHandoff] payload (encoded into the nav
+    // route), NOT read back off a fresh LoginViewModel factory instance on
+    // the MfaFlow screen — that was the v5.2.1 login-bounce bug.
     LaunchedEffect(state.mfaRequired) {
-        if (state.mfaRequired && state.mfaSessionToken != null) {
-            onMfaRequired()
+        val token = state.mfaSessionToken
+        if (state.mfaRequired && token != null) {
+            onMfaRequired(
+                MfaHandoff(
+                    sessionToken = token,
+                    methods = state.mfaAvailableMethods ?: emptyList(),
+                    step = state.mfaCurrentStep,
+                    total = state.mfaTotalSteps
+                )
+            )
         }
     }
 
@@ -133,8 +152,7 @@ fun LoginScreen(
                         viewModel = viewModel,
                         scope = scope,
                         onNavigateToForgotPassword = onNavigateToForgotPassword,
-                        onNavigateToRegister = onNavigateToRegister,
-                        onNavigateToGuestFaceCheck = onNavigateToGuestFaceCheck
+                        onNavigateToRegister = onNavigateToRegister
                     )
                     "FACE" -> PasswordlessPrimaryStep(
                         title = s(StringKey.LOGIN_PRIMARY_FACE_TITLE),
@@ -142,8 +160,7 @@ fun LoginScreen(
                         viewModel = viewModel,
                         scope = scope,
                         onNavigateToForgotPassword = onNavigateToForgotPassword,
-                        onNavigateToRegister = onNavigateToRegister,
-                        onNavigateToGuestFaceCheck = onNavigateToGuestFaceCheck
+                        onNavigateToRegister = onNavigateToRegister
                     )
                     "TOTP" -> PasswordlessPrimaryStep(
                         title = s(StringKey.LOGIN_PRIMARY_TOTP_TITLE),
@@ -151,8 +168,7 @@ fun LoginScreen(
                         viewModel = viewModel,
                         scope = scope,
                         onNavigateToForgotPassword = onNavigateToForgotPassword,
-                        onNavigateToRegister = onNavigateToRegister,
-                        onNavigateToGuestFaceCheck = onNavigateToGuestFaceCheck
+                        onNavigateToRegister = onNavigateToRegister
                     )
                     // Methods we don't yet render dynamically as PRIMARY.
                     // SMS_OTP / QR_CODE / NFC_DOCUMENT / HARDWARE_KEY /
@@ -161,8 +177,7 @@ fun LoginScreen(
                     "FINGERPRINT", "VOICE" -> UnsupportedPrimaryStep(
                         method = state.primaryStepMethod ?: "",
                         onOpenWebSignIn = onOpenWebSignIn,
-                        onNavigateToRegister = onNavigateToRegister,
-                        onNavigateToGuestFaceCheck = onNavigateToGuestFaceCheck
+                        onNavigateToRegister = onNavigateToRegister
                     )
                     // PASSWORD, null, or any unrecognised type — render the
                     // legacy email + password form. This is the safe default
@@ -171,8 +186,7 @@ fun LoginScreen(
                         viewModel = viewModel,
                         scope = scope,
                         onNavigateToForgotPassword = onNavigateToForgotPassword,
-                        onNavigateToRegister = onNavigateToRegister,
-                        onNavigateToGuestFaceCheck = onNavigateToGuestFaceCheck
+                        onNavigateToRegister = onNavigateToRegister
                     )
                 }
             }
@@ -201,11 +215,11 @@ private fun LegacyPasswordPrimaryStep(
     viewModel: LoginViewModel,
     scope: kotlinx.coroutines.CoroutineScope,
     onNavigateToForgotPassword: () -> Unit,
-    onNavigateToRegister: () -> Unit,
-    onNavigateToGuestFaceCheck: () -> Unit
+    onNavigateToRegister: () -> Unit
 ) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var passwordVisible by remember { mutableStateOf(false) }
     val state by viewModel.state.collectAsState()
 
     OutlinedTextField(
@@ -222,7 +236,30 @@ private fun LegacyPasswordPrimaryStep(
         value = password,
         onValueChange = { password = it },
         label = { Text(s(StringKey.PASSWORD)) },
-        visualTransformation = PasswordVisualTransformation(),
+        visualTransformation = if (passwordVisible) {
+            VisualTransformation.None
+        } else {
+            PasswordVisualTransformation()
+        },
+        trailingIcon = {
+            IconButton(
+                onClick = { passwordVisible = !passwordVisible },
+                enabled = !state.isLoading
+            ) {
+                Icon(
+                    imageVector = if (passwordVisible) {
+                        Icons.Filled.VisibilityOff
+                    } else {
+                        Icons.Filled.Visibility
+                    },
+                    contentDescription = if (passwordVisible) {
+                        s(StringKey.HIDE_PASSWORD)
+                    } else {
+                        s(StringKey.SHOW_PASSWORD)
+                    }
+                )
+            }
+        },
         modifier = Modifier.fillMaxWidth(),
         enabled = !state.isLoading
     )
@@ -276,13 +313,6 @@ private fun LegacyPasswordPrimaryStep(
     ) {
         Text(s(StringKey.DONT_HAVE_ACCOUNT))
     }
-
-    TextButton(
-        onClick = onNavigateToGuestFaceCheck,
-        enabled = !state.isLoading
-    ) {
-        Text(s(StringKey.GUEST_FACE_CHECK))
-    }
 }
 
 /**
@@ -307,8 +337,7 @@ private fun PasswordlessPrimaryStep(
     viewModel: LoginViewModel,
     scope: kotlinx.coroutines.CoroutineScope,
     onNavigateToForgotPassword: () -> Unit,
-    onNavigateToRegister: () -> Unit,
-    onNavigateToGuestFaceCheck: () -> Unit
+    onNavigateToRegister: () -> Unit
 ) {
     var email by remember { mutableStateOf("") }
     val state by viewModel.state.collectAsState()
@@ -379,9 +408,6 @@ private fun PasswordlessPrimaryStep(
     TextButton(onClick = onNavigateToRegister, enabled = !state.isLoading) {
         Text(s(StringKey.DONT_HAVE_ACCOUNT))
     }
-    TextButton(onClick = onNavigateToGuestFaceCheck, enabled = !state.isLoading) {
-        Text(s(StringKey.GUEST_FACE_CHECK))
-    }
 }
 
 /**
@@ -394,8 +420,7 @@ private fun PasswordlessPrimaryStep(
 private fun UnsupportedPrimaryStep(
     method: String,
     onOpenWebSignIn: () -> Unit,
-    onNavigateToRegister: () -> Unit,
-    onNavigateToGuestFaceCheck: () -> Unit
+    onNavigateToRegister: () -> Unit
 ) {
     Text(
         text = s(StringKey.LOGIN_PRIMARY_UNSUPPORTED_TITLE),
@@ -433,8 +458,5 @@ private fun UnsupportedPrimaryStep(
 
     TextButton(onClick = onNavigateToRegister) {
         Text(s(StringKey.DONT_HAVE_ACCOUNT))
-    }
-    TextButton(onClick = onNavigateToGuestFaceCheck) {
-        Text(s(StringKey.GUEST_FACE_CHECK))
     }
 }

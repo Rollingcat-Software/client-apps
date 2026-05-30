@@ -59,6 +59,7 @@ import com.fivucsas.shared.presentation.viewmodel.auth.BiometricViewModel
 import com.fivucsas.shared.presentation.viewmodel.auth.ChangePasswordViewModel
 import com.fivucsas.shared.presentation.viewmodel.auth.FingerprintViewModel
 import com.fivucsas.shared.presentation.state.FingerprintUiState
+import com.fivucsas.shared.presentation.state.MfaHandoff
 import com.fivucsas.shared.presentation.viewmodel.auth.LoginViewModel
 import com.fivucsas.shared.presentation.viewmodel.auth.RegisterViewModel
 import com.fivucsas.shared.presentation.viewmodel.UserProfileViewModel
@@ -162,7 +163,15 @@ sealed class Screen(val route: String) {
     object LivenessPuzzle : Screen(RouteIds.LIVENESS_PUZZLE)
     object CardDetection : Screen(RouteIds.CARD_DETECTION)
     object HardwareToken : Screen(RouteIds.HARDWARE_TOKEN)
-    object MfaFlow : Screen(RouteIds.MFA_FLOW)
+    object MfaFlow : Screen("${RouteIds.MFA_FLOW}/{payload}") {
+        /**
+         * Carry the MFA hand-off (session token + available methods + step
+         * counters) into the MfaFlow destination as a single URL-encoded
+         * route argument, instead of reading it back off a fresh
+         * LoginViewModel factory instance (the v5.2.1 login-bounce bug).
+         */
+        fun createRoute(payload: String) = "${RouteIds.MFA_FLOW}/${Uri.encode(payload)}"
+    }
     object Authenticator : Screen(RouteIds.AUTHENTICATOR)
 
     object AuthFlows : Screen("${RouteIds.AUTH_FLOWS}/{tenantId}") {
@@ -292,7 +301,6 @@ fun AppNavigation() {
                 viewModel = viewModel,
                 onNavigateToRegister = { navController.navigate(Screen.Register.route) },
                 onNavigateToForgotPassword = { navController.navigate(Screen.ForgotPassword.route) },
-                onNavigateToGuestFaceCheck = { navController.navigate(Screen.GuestFaceCheckCapture.route) },
                 onLoginSuccess = {
                     viewModel.state.value.tokens?.let { tokenManager?.saveTokens(it) }
                     val loginRole = viewModel.state.value.role
@@ -301,8 +309,11 @@ fun AppNavigation() {
                         popUpTo(Screen.Login.route) { inclusive = true }
                     }
                 },
-                onMfaRequired = {
-                    navController.navigate(Screen.MfaFlow.route)
+                onMfaRequired = { handoff ->
+                    // Carry the MFA session state forward in the route so the
+                    // MfaFlow destination initializes from explicit args, not
+                    // a fresh (null-token) LoginViewModel factory instance.
+                    navController.navigate(Screen.MfaFlow.createRoute(handoff.encode()))
                 },
                 onOpenWebSignIn = {
                     // PR #18 fallback for primary methods this app cannot
@@ -1563,30 +1574,35 @@ fun AppNavigation() {
         }
 
         // N-step MFA flow (public — shown after login when mfaRequired=true)
-        composable(Screen.MfaFlow.route) {
+        composable(
+            route = Screen.MfaFlow.route,
+            arguments = listOf(navArgument("payload") { type = NavType.StringType })
+        ) { backStackEntry ->
             val mfaViewModel = koinInject<com.fivucsas.shared.presentation.viewmodel.auth.MfaFlowViewModel>()
-            // Retrieve MFA session data from the LoginViewModel that triggered the flow
-            val loginViewModel = koinInject<LoginViewModel>()
-            val loginState = loginViewModel.state.collectAsState().value
             val mfaUiState by mfaViewModel.uiState.collectAsState()
 
-            // Initialize MFA flow with data from login response.
-            // If the session token is lost (process death / reload), bail back to
-            // Login instead of stranding the user on a silent spinner.
-            LaunchedEffect(loginState.mfaSessionToken) {
-                val token = loginState.mfaSessionToken
-                if (token != null) {
+            // The MFA session state is carried in the route, not read back off
+            // a LoginViewModel (which is a Koin factory — a fresh instance with
+            // a null token would bounce the user straight back to Login; that
+            // was the v5.2.1 "can't pass MFA" bug). Decode it here.
+            val handoff = remember(backStackEntry) {
+                MfaHandoff.decode(backStackEntry.arguments?.getString("payload")?.let(Uri::decode))
+            }
+
+            // Initialize the MFA flow from the decoded hand-off. If the payload
+            // is missing/corrupt (e.g. process death dropped the back stack),
+            // bail back to Login rather than stranding the user on a spinner.
+            LaunchedEffect(handoff) {
+                if (handoff != null) {
                     if (mfaUiState is com.fivucsas.shared.presentation.viewmodel.auth.MfaFlowUiState.Idle) {
                         mfaViewModel.initialize(
-                            sessionToken = token,
-                            methods = loginState.mfaAvailableMethods ?: emptyList(),
-                            step = loginState.mfaCurrentStep,
-                            total = loginState.mfaTotalSteps
+                            sessionToken = handoff.sessionToken,
+                            methods = handoff.methods,
+                            step = handoff.step,
+                            total = handoff.total
                         )
                     }
                 } else if (mfaUiState is com.fivucsas.shared.presentation.viewmodel.auth.MfaFlowUiState.Idle) {
-                    // No session token and nothing in flight — the flow can't continue.
-                    loginViewModel.resetState()
                     navController.navigate(Screen.Login.route) {
                         popUpTo(Screen.Login.route) { inclusive = true }
                     }
@@ -1611,7 +1627,6 @@ fun AppNavigation() {
                     // Handled by LaunchedEffect above via authResult
                 },
                 onCancel = {
-                    loginViewModel.resetState()
                     navController.popBackStack(Screen.Login.route, inclusive = false)
                 }
             )

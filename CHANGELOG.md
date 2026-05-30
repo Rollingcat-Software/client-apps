@@ -2,6 +2,47 @@
 
 All notable changes to the FIVUCSAS client apps (Android, iOS, Desktop).
 
+## [5.2.2] — 2026-05-30 — Login fix (P0)
+
+A user who freshly installed v5.2.1 could not log in. Three login-screen
+defects fixed.
+
+### Fixed
+
+- **Could not pass MFA / instant bounce back to Login.** The MfaFlow
+  destination read its session token off `koinInject<LoginViewModel>()`, but
+  `LoginViewModel` is a Koin **factory** — that injection returned a
+  brand-new instance with a `null` token, so the flow immediately reset and
+  navigated back to Login. A password login that escalated to MFA could never
+  reach the MFA step. The MFA session state (session token + available
+  methods + step counters) is now carried forward as an explicit
+  `MfaHandoff` payload encoded into the navigation route; `LoginViewModel`
+  stays a factory (no global-singleton auto-bounce footgun). A malformed /
+  missing payload (process death) bails cleanly back to Login.
+
+### Added
+
+- **Show/hide password toggle** on the login form — a trailing
+  Visibility / VisibilityOff `IconButton` flips
+  `PasswordVisualTransformation` ↔ `VisualTransformation.None`. Accessibility
+  `contentDescription` is localized (EN: "Show password" / "Hide password",
+  TR: "Şifreyi göster" / "Şifreyi gizle") via new `SHOW_PASSWORD` /
+  `HIDE_PASSWORD` string keys.
+
+### Removed
+
+- **"Continue as Guest (Face Check)" button** from all three login variants
+  (legacy password, passwordless primary, unsupported primary). The web app
+  has no guest-login button (web "guests" are tenant invitations, a different
+  concept), and the mobile route was a dead end. The `GuestFaceCheck`
+  composables/routes remain in the tree but are no longer reachable from
+  login.
+
+### Changed
+
+- `androidApp/build.gradle.kts`: `versionCode` 8 → 9, `versionName`
+  5.2.1 → 5.2.2.
+
 ## [5.2.1] — 2026-05-30 — First production-signed Android release
 
 First Android release built and signed with the **rotated production upload

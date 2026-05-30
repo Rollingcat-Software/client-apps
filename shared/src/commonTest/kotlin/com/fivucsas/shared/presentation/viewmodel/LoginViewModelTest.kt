@@ -233,6 +233,31 @@ class LoginViewModelTest {
         assertFalse(viewModel.state.value.isLoading)
     }
 
+    @Test
+    fun `MFA state carries everything needed to build the MfaFlow handoff`() = runTest {
+        // Regression guard for the v5.2.1 login-bounce bug: the MfaFlow screen
+        // is initialized from a route payload (MfaHandoff) built from this
+        // state — NOT from a fresh LoginViewModel factory instance. If any of
+        // these fields go missing, the MFA step can't initialize.
+        fakeRepository.mfaRequired = true
+
+        viewModel.login("test@fivucsas.com", "Password123!")
+
+        val state = viewModel.state.value
+        val handoff = com.fivucsas.shared.presentation.state.MfaHandoff(
+            sessionToken = state.mfaSessionToken!!,
+            methods = state.mfaAvailableMethods ?: emptyList(),
+            step = state.mfaCurrentStep,
+            total = state.mfaTotalSteps
+        )
+
+        val decoded = com.fivucsas.shared.presentation.state.MfaHandoff.decode(handoff.encode())
+        assertEquals("fake-mfa-session-token", decoded?.sessionToken)
+        assertEquals(1, decoded?.step)
+        assertEquals(2, decoded?.total)
+        assertTrue(decoded?.methods?.isNotEmpty() == true)
+    }
+
     // ============== ACTIVE FLOW DISCOVERY TESTS (PR #18 client side) ==============
 
     @Test
