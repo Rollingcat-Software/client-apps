@@ -31,8 +31,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -155,7 +159,13 @@ fun MfaFlowScreen(
     }
 
     Box(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .fillMaxSize()
+            // Keep all content (incl. the bottom Cancel / action buttons) clear
+            // of the status bar and the system navigation bar so nothing is
+            // occluded on gesture-nav or 3-button-nav devices. This screen has
+            // no Scaffold, so the insets must be consumed here explicitly.
+            .windowInsetsPadding(WindowInsets.systemBars),
         contentAlignment = Alignment.Center
     ) {
         Column(
