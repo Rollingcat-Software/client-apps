@@ -361,6 +361,12 @@ enum class StringKey {
     NFC_REGISTER_CARD_SUCCESS,
     NFC_REGISTER_CARD_ERROR,
 
+    // NFC passive authentication (server-authoritative verdict)
+    NFC_AUTHENTICITY_VERIFY_BUTTON,
+    NFC_AUTHENTICITY_IN_PROGRESS,
+    NFC_AUTHENTICITY_AUTHENTIC,
+    NFC_AUTHENTICITY_NOT_AUTHENTIC,
+
     // Linked accounts + workspace switcher (account-linking parity)
     LINKED_ACCOUNTS_TITLE,
     LINKED_ACCOUNTS_DESCRIPTION,
@@ -1204,6 +1210,10 @@ private val enStrings = mapOf(
     StringKey.NFC_REGISTER_CARD_IN_PROGRESS to "Registering card…",
     StringKey.NFC_REGISTER_CARD_SUCCESS to "Card registered successfully",
     StringKey.NFC_REGISTER_CARD_ERROR to "Could not register card. Please try again.",
+    StringKey.NFC_AUTHENTICITY_VERIFY_BUTTON to "Verify authenticity",
+    StringKey.NFC_AUTHENTICITY_IN_PROGRESS to "Verifying authenticity…",
+    StringKey.NFC_AUTHENTICITY_AUTHENTIC to "Document is authentic",
+    StringKey.NFC_AUTHENTICITY_NOT_AUTHENTIC to "Authenticity could not be confirmed",
     StringKey.LINKED_ACCOUNTS_TITLE to "Linked Accounts",
     StringKey.LINKED_ACCOUNTS_DESCRIPTION to "Verified emails and tenant memberships linked to your identity.",
     StringKey.LINKED_ACCOUNTS_EMAILS to "Emails",
@@ -2045,6 +2055,10 @@ private val trStrings = mapOf(
     StringKey.NFC_REGISTER_CARD_IN_PROGRESS to "Kart kaydediliyor…",
     StringKey.NFC_REGISTER_CARD_SUCCESS to "Kart başarıyla kaydedildi",
     StringKey.NFC_REGISTER_CARD_ERROR to "Kart kaydedilemedi. Lütfen tekrar deneyin.",
+    StringKey.NFC_AUTHENTICITY_VERIFY_BUTTON to "Orijinalliği doğrula",
+    StringKey.NFC_AUTHENTICITY_IN_PROGRESS to "Orijinallik doğrulanıyor…",
+    StringKey.NFC_AUTHENTICITY_AUTHENTIC to "Belge orijinal",
+    StringKey.NFC_AUTHENTICITY_NOT_AUTHENTIC to "Orijinallik doğrulanamadı",
     StringKey.LINKED_ACCOUNTS_TITLE to "Bağlı Hesaplar",
     StringKey.LINKED_ACCOUNTS_DESCRIPTION to "Kimliğinize bağlı doğrulanmış e-postalar ve kiracı üyelikleri.",
     StringKey.LINKED_ACCOUNTS_EMAILS to "E-postalar",

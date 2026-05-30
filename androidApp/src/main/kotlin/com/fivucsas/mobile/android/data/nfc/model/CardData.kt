@@ -82,7 +82,13 @@ data class PassportData(
     val dg1HashValid: Boolean? = null,
     val dg2HashValid: Boolean? = null,
     val activeAuthenticationSupported: Boolean = false,
-    val chipAuthenticationSupported: Boolean = false
+    val chipAuthenticationSupported: Boolean = false,
+
+    // Raw passive-authentication material for the authoritative server verdict
+    // (POST /nfc/verify-authenticity). Null when not captured.
+    val sodBytes: ByteArray? = null,
+    val dg1Bytes: ByteArray? = null,
+    val dg2Bytes: ByteArray? = null
 ) : CardData() {
     /**
      * Full name combining surname and given names.
@@ -129,7 +135,13 @@ data class TurkishEidData(
 
     // Authentication info
     val bacSuccessful: Boolean = false,
-    val sodValid: Boolean? = null
+    val sodValid: Boolean? = null,
+
+    // Raw passive-authentication material for the authoritative server verdict
+    // (POST /nfc/verify-authenticity). Null when not captured.
+    val sodBytes: ByteArray? = null,
+    val dg1Bytes: ByteArray? = null,
+    val dg2Bytes: ByteArray? = null
 ) : CardData() {
     override fun clearSensitiveData() {
         // In Kotlin data classes, we can't mutate.

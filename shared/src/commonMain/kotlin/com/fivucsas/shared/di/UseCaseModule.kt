@@ -11,6 +11,7 @@ import com.fivucsas.shared.domain.usecase.admin.UpdateUserUseCase
 import com.fivucsas.shared.domain.usecase.auth.ChangePasswordUseCase
 import com.fivucsas.shared.domain.usecase.auth.LoginUseCase
 import com.fivucsas.shared.domain.usecase.nfc.EnrollNfcCardUseCase
+import com.fivucsas.shared.domain.usecase.nfc.VerifyNfcAuthenticityUseCase
 import com.fivucsas.shared.domain.usecase.auth.RegisterUseCase
 import com.fivucsas.shared.domain.usecase.auth.qr.ApproveQrLoginSessionUseCase
 import com.fivucsas.shared.domain.usecase.auth.qr.GetQrLoginSessionUseCase
@@ -72,4 +73,5 @@ val useCaseModule = module {
 
     // NFC Use Cases
     factoryOf(::EnrollNfcCardUseCase)
+    factoryOf(::VerifyNfcAuthenticityUseCase)
 }

@@ -6,6 +6,21 @@ All notable changes to the FIVUCSAS client apps (Android, iOS, Desktop).
 
 ### Added
 
+- **NFC passive authentication (server-authoritative).** The NFC readers now
+  surface the RAW `EF.SOD` + `DG1` + `DG2` bytes through the domain model
+  (`NfcIdentityDocumentData.sodBytes/dg1Bytes/dg2Bytes`). A new "Verify
+  authenticity" action on the reader result base64-encodes them and submits to
+  `POST /api/v1/nfc/verify-authenticity` for the authoritative, fail-closed
+  verdict (200 authentic / 422 not-authentic with `reasonCode` / 400 missing
+  SOD). New shared `NfcAuthenticityApi(Impl)` +
+  `NfcAuthenticityRepository(Impl)` + `VerifyNfcAuthenticityUseCase`; i18n
+  EN + TR; unit tests. The client-side DS→CSCA chain check stays advisory.
+  `CscaCertificateStore.loadBundledRoots(context)` (called at startup)
+  auto-loads bundled ICAO-PKD CSCA roots from `assets/csca/<COUNTRY>/`.
+  **Operator action to activate validation:** drop CSCA roots (esp. Turkey)
+  into `assets/csca/TUR/` AND into the bio container's trust dir — until then
+  the server returns `reasonCode=NO_TRUST_STORE`. The code path is complete.
+
 - **Linked accounts + workspace (account) switcher** — mobile parity with
   the web `linkedAccounts` / `accountSwitcher` features. A new
   `LinkedAccountsScreen` (reached from Profile) lists the person's verified

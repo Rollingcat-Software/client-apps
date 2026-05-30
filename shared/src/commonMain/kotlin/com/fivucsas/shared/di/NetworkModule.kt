@@ -249,4 +249,9 @@ val networkModule = module {
     single<com.fivucsas.shared.data.remote.api.AccountLinkingApi> {
         com.fivucsas.shared.data.remote.api.AccountLinkingApiImpl(get(named("identityClient")))
     }
+
+    // NFC passive-authentication API (verify-authenticity)
+    single<com.fivucsas.shared.data.remote.api.NfcAuthenticityApi> {
+        com.fivucsas.shared.data.remote.api.NfcAuthenticityApiImpl(get(named("identityClient")))
+    }
 }

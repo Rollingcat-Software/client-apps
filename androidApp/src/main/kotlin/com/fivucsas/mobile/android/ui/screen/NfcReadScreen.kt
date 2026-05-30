@@ -62,6 +62,7 @@ import com.fivucsas.shared.domain.model.NfcGenericCardData
 import com.fivucsas.shared.domain.model.NfcIdentityDocumentData
 import com.fivucsas.shared.domain.model.NfcReadResult
 import com.fivucsas.shared.domain.usecase.nfc.EnrollNfcCardUseCase
+import com.fivucsas.shared.domain.usecase.nfc.VerifyNfcAuthenticityUseCase
 import com.fivucsas.shared.i18n.StringKey
 import com.fivucsas.shared.i18n.s
 import com.fivucsas.shared.platform.INfcService
@@ -77,6 +78,7 @@ fun NfcReadScreen(
 ) {
     val nfcService = koinInject<INfcService>()
     val enrollUseCase = koinInject<EnrollNfcCardUseCase>()
+    val authenticityUseCase = koinInject<VerifyNfcAuthenticityUseCase>()
     val scanState by nfcService.scanState.collectAsState()
     val scope = rememberCoroutineScope()
 
@@ -88,12 +90,31 @@ fun NfcReadScreen(
     // "Register this card" state for the result screen. Reset on each new scan.
     var enrollState by remember { mutableStateOf<EnrollUiState>(EnrollUiState.Idle) }
 
+    // Passive-authentication (server-authoritative) verdict state. Reset per scan.
+    var authState by remember { mutableStateOf<AuthenticityUiState>(AuthenticityUiState.Idle) }
+
     val onRegisterCard: (uid: String, cardType: String?) -> Unit = { uid, cardType ->
         enrollState = EnrollUiState.InProgress
         scope.launch {
             enrollUseCase(cardSerial = uid, cardType = cardType).fold(
                 onSuccess = { enrollState = EnrollUiState.Success },
                 onFailure = { enrollState = EnrollUiState.Error }
+            )
+        }
+    }
+
+    val onVerifyAuthenticity: (doc: NfcIdentityDocumentData) -> Unit = { doc ->
+        authState = AuthenticityUiState.InProgress
+        scope.launch {
+            authenticityUseCase(sod = doc.sodBytes, dg1 = doc.dg1Bytes, dg2 = doc.dg2Bytes).fold(
+                onSuccess = { verdict ->
+                    authState = if (verdict.authentic) {
+                        AuthenticityUiState.Authentic
+                    } else {
+                        AuthenticityUiState.NotAuthentic(verdict.reasonCode)
+                    }
+                },
+                onFailure = { authState = AuthenticityUiState.NotAuthentic(reasonCode = null) }
             )
         }
     }
@@ -180,9 +201,12 @@ fun NfcReadScreen(
                         result = state.result,
                         enrollState = enrollState,
                         onRegisterCard = onRegisterCard,
+                        authState = authState,
+                        onVerifyAuthenticity = onVerifyAuthenticity,
                         onScanAgain = {
                             nfcService.stopNfcScan()
                             enrollState = EnrollUiState.Idle
+                            authState = AuthenticityUiState.Idle
                             showMrzInput = true
                         }
                     )
@@ -390,6 +414,8 @@ private fun ResultSection(
     result: NfcReadResult,
     enrollState: EnrollUiState,
     onRegisterCard: (uid: String, cardType: String?) -> Unit,
+    authState: AuthenticityUiState,
+    onVerifyAuthenticity: (doc: NfcIdentityDocumentData) -> Unit,
     onScanAgain: () -> Unit
 ) {
     when (result) {
@@ -399,6 +425,8 @@ private fun ResultSection(
                     data = data,
                     enrollState = enrollState,
                     onRegisterCard = onRegisterCard,
+                    authState = authState,
+                    onVerifyAuthenticity = onVerifyAuthenticity,
                     onScanAgain = onScanAgain
                 )
                 is NfcGenericCardData -> GenericCardResult(
@@ -449,6 +477,8 @@ private fun IdentityDocumentResult(
     data: NfcIdentityDocumentData,
     enrollState: EnrollUiState,
     onRegisterCard: (uid: String, cardType: String?) -> Unit,
+    authState: AuthenticityUiState,
+    onVerifyAuthenticity: (doc: NfcIdentityDocumentData) -> Unit,
     onScanAgain: () -> Unit
 ) {
     Card(
@@ -546,6 +576,16 @@ private fun IdentityDocumentResult(
     DataRow("UID", data.uid)
     DataRow("Technologies", data.technologies.joinToString(", "))
 
+    // Passive authentication (server-authoritative) — only offered when the
+    // chip yielded an EF.SOD to verify.
+    if (data.sodBytes != null) {
+        Spacer(modifier = Modifier.height(24.dp))
+        VerifyAuthenticitySection(
+            authState = authState,
+            onVerify = { onVerifyAuthenticity(data) }
+        )
+    }
+
     Spacer(modifier = Modifier.height(24.dp))
     RegisterCardSection(
         enrollState = enrollState,
@@ -634,6 +674,87 @@ private sealed interface EnrollUiState {
     data object InProgress : EnrollUiState
     data object Success : EnrollUiState
     data object Error : EnrollUiState
+}
+
+/** Local UI state for the passive-authentication (server) verdict. */
+private sealed interface AuthenticityUiState {
+    data object Idle : AuthenticityUiState
+    data object InProgress : AuthenticityUiState
+    data object Authentic : AuthenticityUiState
+    data class NotAuthentic(val reasonCode: String?) : AuthenticityUiState
+}
+
+/**
+ * "Verify authenticity" affordance — submits the chip's EF.SOD + DGs to the
+ * server for the authoritative, fail-closed passive-auth verdict
+ * (POST /nfc/verify-authenticity). The client-side check is advisory; this is
+ * the trustworthy result. NOTE: the server returns reasonCode=NO_TRUST_STORE
+ * until the operator loads ICAO-PKD CSCA roots into the bio container.
+ */
+@Composable
+private fun VerifyAuthenticitySection(
+    authState: AuthenticityUiState,
+    onVerify: () -> Unit
+) {
+    when (authState) {
+        is AuthenticityUiState.Authentic -> {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(
+                    Icons.Default.CheckCircle,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    s(StringKey.NFC_AUTHENTICITY_AUTHENTIC),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
+        }
+        is AuthenticityUiState.NotAuthentic -> {
+            Column {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        Icons.Default.Error,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.error
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        s(StringKey.NFC_AUTHENTICITY_NOT_AUTHENTIC),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
+                authState.reasonCode?.let {
+                    Text(
+                        it,
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+        }
+        else -> {
+            OutlinedButton(
+                onClick = onVerify,
+                enabled = authState != AuthenticityUiState.InProgress,
+                modifier = Modifier.fillMaxWidth().height(48.dp),
+                shape = RoundedCornerShape(16.dp)
+            ) {
+                if (authState == AuthenticityUiState.InProgress) {
+                    CircularProgressIndicator(modifier = Modifier.size(20.dp))
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(s(StringKey.NFC_AUTHENTICITY_IN_PROGRESS))
+                } else {
+                    Icon(Icons.Default.CheckCircle, contentDescription = null)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(s(StringKey.NFC_AUTHENTICITY_VERIFY_BUTTON))
+                }
+            }
+        }
+    }
 }
 
 /**

@@ -276,7 +276,10 @@ class PassportNfcReader : BaseCardReader() {
                     dg1HashValid = dg1HashValid,
                     dg2HashValid = dg2HashValid,
                     activeAuthenticationSupported = availableDataGroups.contains(15),
-                    chipAuthenticationSupported = availableDataGroups.contains(14)
+                    chipAuthenticationSupported = availableDataGroups.contains(14),
+                    sodBytes = sodData,
+                    dg1Bytes = dg1Data,
+                    dg2Bytes = dg2Data
                 )
             } else {
                 // TD1 format from Dg1Parser (fallback)
@@ -305,7 +308,10 @@ class PassportNfcReader : BaseCardReader() {
                     dg1HashValid = dg1HashValid,
                     dg2HashValid = dg2HashValid,
                     activeAuthenticationSupported = availableDataGroups.contains(15),
-                    chipAuthenticationSupported = availableDataGroups.contains(14)
+                    chipAuthenticationSupported = availableDataGroups.contains(14),
+                    sodBytes = sodData,
+                    dg1Bytes = dg1Data,
+                    dg2Bytes = dg2Data
                 )
             }
 

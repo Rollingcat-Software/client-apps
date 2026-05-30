@@ -216,7 +216,10 @@ class AndroidNfcService(
                 bacSuccessful = cardData.bacSuccessful,
                 sodValid = cardData.sodValid,
                 dg1HashValid = cardData.dg1HashValid,
-                dg2HashValid = cardData.dg2HashValid
+                dg2HashValid = cardData.dg2HashValid,
+                sodBytes = cardData.sodBytes,
+                dg1Bytes = cardData.dg1Bytes,
+                dg2Bytes = cardData.dg2Bytes
             )
             is TurkishEidData -> NfcIdentityDocumentData(
                 uid = cardData.uid,
@@ -233,7 +236,10 @@ class AndroidNfcService(
                 personalNumber = cardData.personalNumber,
                 photoBytes = cardData.photo?.toJpegBytes(),
                 bacSuccessful = cardData.bacSuccessful,
-                sodValid = cardData.sodValid
+                sodValid = cardData.sodValid,
+                sodBytes = cardData.sodBytes,
+                dg1Bytes = cardData.dg1Bytes,
+                dg2Bytes = cardData.dg2Bytes
             )
             is IstanbulkartData -> NfcGenericCardData(
                 uid = cardData.uid,
