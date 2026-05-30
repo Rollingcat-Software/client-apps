@@ -58,9 +58,15 @@ The gap is **integration only**: `MfaFlowScreen.kt:324` still routes
       `assets/csca/<COUNTRY>/` (called at startup) + a drop-in README. Client
       DS→CSCA check stays *advisory* (server verdict authoritative). OPERATOR:
       drop Turkey CSCA root into `assets/csca/TUR/`.
-- [ ] **PACE** (read `EF.CardAccess`, GM mapping, AES secure messaging) to
-      broaden beyond BAC for PACE-only documents. Needs PACE-capable test
-      docs + a reference-vector doc.
+- [~] **PACE** (read `EF.CardAccess`, GM mapping, AES secure messaging) —
+      2026-05-30: `CardAccessParser` (parses PACEInfo, unit-tested) +
+      `PaceKeyDerivation` (TR-03110/9303 KDF, **vector-tested byte-exact**
+      against the published ICAO 9303 worked example) + `PaceAuthenticator`
+      (protocol selection + `K_π` derivation + BAC-fallback seam). Remaining:
+      the on-card GM handshake (MSE:Set AT + GENERAL AUTHENTICATE) + AES secure
+      messaging — needs a physical PACE card. Plan in `docs/NFC_PACE_PLAN.md`.
+      OPERATOR: PACE-capable test card(s) + BSI TR-03110 / 9303-11 Appendix G
+      GM worked-example vectors.
 
 ### A2 — GDPR/KVKK export mobile UI (~2 days)
 

@@ -6,6 +6,19 @@ All notable changes to the FIVUCSAS client apps (Android, iOS, Desktop).
 
 ### Added
 
+- **NFC PACE: EF.CardAccess parse + vector-tested key derivation.** New
+  `CardAccessParser` parses the chip's advertised `PACEInfo` entries (protocol
+  OID + version + domain-parameter id; BouncyCastle ASN.1, no card needed). New
+  `PaceKeyDerivation` implements the TR-03110 / ICAO 9303 KDF
+  (`KDF(K,c)=H(K‖c)`, counters 1=enc/2=mac/3=password) and is **vector-tested
+  byte-exact** against the published ICAO 9303 key-derivation worked example
+  (Kseed `561754EE…` → Kenc `EB0F20E3…` / Kmac `6DC37B57…`). `PaceAuthenticator`
+  selects a protocol (prefers Generic Mapping + AES), derives `K_π` from the
+  MRZ seed, and provides the BAC-fallback seam (`run()` returns
+  `NotImplemented`). Deferred (needs a physical PACE card): the on-card GM
+  handshake (MSE:Set AT + GENERAL AUTHENTICATE) + AES secure messaging. See
+  `docs/NFC_PACE_PLAN.md`.
+
 - **NFC passive authentication (server-authoritative).** The NFC readers now
   surface the RAW `EF.SOD` + `DG1` + `DG2` bytes through the domain model
   (`NfcIdentityDocumentData.sodBytes/dg1Bytes/dg2Bytes`). A new "Verify
