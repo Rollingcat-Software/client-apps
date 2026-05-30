@@ -21,7 +21,7 @@ for the `fivucsas/client-apps` repository:
 | Secret name                 | Value                                                                            | Used by                                  |
 |-----------------------------|----------------------------------------------------------------------------------|------------------------------------------|
 | `ANDROID_KEYSTORE_BASE64`   | Base64 encoding of `keystore/release.jks`                                        | `.github/workflows/android-build.yml`    |
-| `ANDROID_KEYSTORE_PASSWORD` | Keystore store password (the current password, **never** `fivucsas2026`)        | `.github/workflows/android-build.yml`    |
+| `ANDROID_KEYSTORE_PASSWORD` | Keystore store password (the current rotated password — never the old leaked one) | `.github/workflows/android-build.yml`    |
 | `ANDROID_KEY_ALIAS`         | Key alias inside the keystore (currently `fivucsas`)                             | `.github/workflows/android-build.yml`    |
 | `ANDROID_KEY_PASSWORD`      | Private-key password (often same as store password, but can differ)              | `.github/workflows/android-build.yml`    |
 
@@ -175,7 +175,7 @@ app-signing key as long as Play accepts our new upload certificate.
 
 ## What changed on 2026-04-18
 
-- Removed hardcoded `fivucsas2026` password from `build.gradle.kts`.
+- Removed the hardcoded (now-revoked, leaked) signing password from `build.gradle.kts`.
 - Switched signing config to env-var / Gradle-property resolution.
 - Release builds now fall back to debug signing when no password is set
   (keeps PR + fork CI green).
