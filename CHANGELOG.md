@@ -90,11 +90,18 @@ MFA *completion* then failed on the client: the server returned a clean
   authenticated user. Regression test: `MfaFlowAuthenticatedRegressionTest`
   (AUTHENTICATED survives a throwing secure-storage + throwing push
   service).
+- **System navigation bar no longer occludes the MFA bottom buttons.** The
+  `MfaFlowScreen` has no `Scaffold`, so it drew under the system bars — the
+  bottom "Cancel" (and Retry / Back / Enroll) actions were ~half-covered by
+  the Android navigation bar on both gesture-nav and 3-button-nav devices.
+  Added `windowInsetsPadding(WindowInsets.systemBars)` to the screen's root
+  container so all content stays clear of the status and navigation bars.
 
 ### Changed
 
-- `androidApp/build.gradle.kts`: `versionCode` 9 → 10, `versionName`
-  5.2.2 → 5.2.3.
+- `androidApp/build.gradle.kts`: `versionCode` 9 → 11, `versionName`
+  5.2.2 → 5.2.3. (versionCode 11 re-issues the v5.2.3 build with the MFA fix
+  + the navigation-bar inset fix; the original v5.2.3 APK asset is replaced.)
 
 ## [5.2.2] — 2026-05-30 — Login fix (P0)
 
