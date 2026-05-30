@@ -58,9 +58,12 @@ The gap is **integration only**: `MfaFlowScreen.kt:324` still routes
       `assets/csca/<COUNTRY>/` (called at startup) + a drop-in README. Client
       DS→CSCA check stays *advisory* (server verdict authoritative). OPERATOR:
       drop Turkey CSCA root into `assets/csca/TUR/`.
-- [ ] **PACE** (read `EF.CardAccess`, GM mapping, AES secure messaging) to
-      broaden beyond BAC for PACE-only documents. Needs PACE-capable test
-      docs + a reference-vector doc.
+- [~] **PACE** (read `EF.CardAccess`, GM mapping, AES secure messaging) —
+      SCAFFOLD landed 2026-05-30: `CardAccessParser` (parses PACEInfo,
+      unit-tested) + `PaceAuthenticator` (protocol selection + integration
+      seam, returns `NotImplemented` → BAC fallback). The crypto core is
+      deferred; plan + operator needs in `docs/NFC_PACE_PLAN.md`. OPERATOR:
+      PACE-capable test card(s) + BSI TR-03110 reference vectors.
 
 ### A2 — GDPR/KVKK export mobile UI (~2 days)
 

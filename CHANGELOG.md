@@ -6,6 +6,15 @@ All notable changes to the FIVUCSAS client apps (Android, iOS, Desktop).
 
 ### Added
 
+- **NFC PACE scaffold** (`EF.CardAccess` parsing + protocol selection). New
+  `CardAccessParser` parses the chip's advertised `PACEInfo` entries (protocol
+  OID + version + domain-parameter id; unit-tested with BouncyCastle ASN.1, no
+  card needed). New `PaceAuthenticator` selects a protocol (prefers Generic
+  Mapping + AES) and provides the BAC-fallback integration seam, returning
+  `NotImplemented` until the cryptographic core lands. The GM + AES secure-
+  messaging core is deferred (operator-blocked): see `docs/NFC_PACE_PLAN.md` —
+  needs a PACE-capable test card + BSI TR-03110 reference vectors.
+
 - **NFC passive authentication (server-authoritative).** The NFC readers now
   surface the RAW `EF.SOD` + `DG1` + `DG2` bytes through the domain model
   (`NfcIdentityDocumentData.sodBytes/dg1Bytes/dg2Bytes`). A new "Verify
