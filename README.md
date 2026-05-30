@@ -52,7 +52,7 @@ artifact, public distribution.
 **Platform status (2026-04-18e):**
 
 - **Android: 13 / 13** — v5.2.0-rc1 shipped 2026-04-18e.
-- **Desktop (Windows + Linux): scaffolding in flight** — Agents B/C/D on OAuth loopback + secure storage + installers (e.g. `desktopApp/.../security/SecureTokenStorage.kt`).
+- **Desktop (Windows + Linux): shipped** — hosted-first OAuth loopback (RFC 8252 + PKCE, `OAuthLoopbackClient`) wired as the default entry, real secure token storage (DPAPI on Windows / libsecret on Linux / AES-GCM file fallback via `TokenStorageFactory`), and `.deb` + `.msi` installers produced by `.github/workflows/desktop-installers.yml` (Linux + Windows runners). macOS/iOS out of scope (no signer).
 - **iOS: 0 / 13** — Phase 2 (July 2026), blocked on Apple Developer enrollment; no `iosApp/` module yet.
 - **macOS: out of scope** — no Mac available for `codesign` / `notarytool`.
 
