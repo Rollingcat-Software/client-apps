@@ -23,7 +23,8 @@ import com.fivucsas.mobile.android.data.nfc.pace.CardAccessParser.PaceInfo
  *  2. MSE:Set AT — select the PACE protocol OID + key reference (MRZ/CAN).
  *  3. GENERAL AUTHENTICATE (chained):
  *     a. Get the encrypted nonce `z`; derive `s = AES-Dec(K_π, z)` where
- *        `K_π = KDF(password, 3)` (password = SHA-1 over the MRZ-derived seed).
+ *        the key `K_π` is `KDF(π, 3)`, where the PACE secret `π` is SHA-1 over
+ *        the MRZ-derived seed (CAN may be used instead of the MRZ).
  *     b. Generic Mapping: exchange ephemeral PK; map the base point
  *        `G' = s·G + H` where `H` is the shared ECDH secret of the mapping keys.
  *     c. Exchange the mapped ephemeral PKs; compute shared secret `K`.
