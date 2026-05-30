@@ -178,6 +178,7 @@ sealed class Screen(val route: String) {
         fun createRoute(tenantId: String) = "${RouteIds.AUTH_FLOWS}/$tenantId"
     }
     object Sessions : Screen(RouteIds.SESSIONS)
+    object LinkedAccounts : Screen(RouteIds.LINKED_ACCOUNTS)
     object Devices : Screen("${RouteIds.DEVICES}/{userId}") {
         fun createRoute(userId: String) = "${RouteIds.DEVICES}/$userId"
     }
@@ -772,6 +773,7 @@ fun AppNavigation() {
                 },
                 onEditProfile = { navController.navigate(Screen.EditProfile.route) },
                 onChangePassword = { navController.navigate(Screen.ChangePassword.route) },
+                onOpenLinkedAccounts = { navController.navigate(Screen.LinkedAccounts.route) },
                 onReEnroll = { navController.navigate(Screen.BiometricEnroll.createRoute(tokenManager?.getUserId() ?: "me")) },
                 onDeleteEnrollment = { /* Enrollment deletion not yet available */ },
                 onOpenSettings = { navController.navigate(Screen.Settings.route) },
@@ -1348,6 +1350,28 @@ fun AppNavigation() {
             com.fivucsas.shared.ui.screen.SessionsScreen(
                 viewModel = viewModel,
                 onBack = { navController.popBackStack() }
+            )
+        }
+
+        // Linked accounts + workspace switcher
+        composable(Screen.LinkedAccounts.route) {
+            if (!isAuthenticated()) {
+                LaunchedEffect(Unit) {
+                    navController.navigate(Screen.Login.route) { popUpTo(0) { inclusive = true } }
+                }
+                return@composable
+            }
+            val viewModel = koinInject<com.fivucsas.shared.presentation.viewmodel.AccountLinkingViewModel>()
+            com.fivucsas.shared.ui.screen.LinkedAccountsScreen(
+                viewModel = viewModel,
+                onSwitched = {
+                    // Membership switch persisted new (login-shaped) tokens — reset
+                    // app context by routing to the post-login home for the new role.
+                    val destination = NavigationPolicy.loginSuccessRoute(currentUserRole())
+                    navController.navigate(destination) {
+                        popUpTo(0) { inclusive = true }
+                    }
+                }
             )
         }
 

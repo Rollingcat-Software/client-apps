@@ -214,6 +214,14 @@ val repositoryModule = module {
         )
     }
 
+    // Account-linking + workspace-switcher Repository
+    single<com.fivucsas.shared.domain.repository.AccountLinkingRepository> {
+        com.fivucsas.shared.data.repository.AccountLinkingRepositoryImpl(
+            api = get<com.fivucsas.shared.data.remote.api.AccountLinkingApi>(),
+            tokenManager = get()
+        )
+    }
+
     // Offline Cache
     single { OfflineCache(storage = get()) }
 }

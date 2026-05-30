@@ -82,6 +82,7 @@ object RouteIds {
     const val ANALYTICS = "analytics"
 
     const val AUTH_FLOWS = "auth-flows"
+    const val LINKED_ACCOUNTS = "linked-accounts"
     const val SESSIONS = "sessions"
     const val DEVICES = "devices"
     const val ENROLLMENTS_LIST = "enrollments-list"
