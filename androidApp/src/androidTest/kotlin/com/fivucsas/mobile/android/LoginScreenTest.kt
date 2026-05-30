@@ -3,6 +3,7 @@ package com.fivucsas.mobile.android
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
@@ -106,7 +107,6 @@ class LoginScreenTest {
                 viewModel = vm,
                 onNavigateToRegister = {},
                 onNavigateToForgotPassword = {},
-                onNavigateToGuestFaceCheck = {},
                 onLoginSuccess = {}
             )
         }
@@ -151,7 +151,6 @@ class LoginScreenTest {
                 viewModel = viewModel(),
                 onNavigateToRegister = {},
                 onNavigateToForgotPassword = { clicked = true },
-                onNavigateToGuestFaceCheck = {},
                 onLoginSuccess = {}
             )
         }
@@ -168,7 +167,6 @@ class LoginScreenTest {
                 viewModel = viewModel(),
                 onNavigateToRegister = { navigated = true },
                 onNavigateToForgotPassword = {},
-                onNavigateToGuestFaceCheck = {},
                 onLoginSuccess = {}
             )
         }
@@ -178,20 +176,26 @@ class LoginScreenTest {
     }
 
     @Test
-    fun loginScreen_guestFaceCheckNavigationWorks() {
-        var navigated = false
-        composeTestRule.setContent {
-            LoginScreen(
-                viewModel = viewModel(),
-                onNavigateToRegister = {},
-                onNavigateToForgotPassword = {},
-                onNavigateToGuestFaceCheck = { navigated = true },
-                onLoginSuccess = {}
-            )
-        }
+    fun loginScreen_doesNotShowGuestFaceCheckButton() {
+        // The "Continue as Guest (Face Check)" entry was removed in v5.2.2 —
+        // web has no guest-login button and the route was a dead end on mobile.
+        setLoginScreen()
 
-        composeTestRule.onNodeWithText("Continue as Guest (Face Check)").performClick()
-        assert(navigated) { "Guest face check navigation callback was not invoked" }
+        composeTestRule.onNodeWithText("Continue as Guest (Face Check)").assertDoesNotExist()
+    }
+
+    @Test
+    fun loginScreen_showPasswordToggleRevealsAndHidesPassword() {
+        setLoginScreen()
+
+        // The reveal affordance is present and labelled for accessibility.
+        composeTestRule.onNodeWithContentDescription("Show password").assertIsDisplayed()
+
+        composeTestRule.onNodeWithText("Password").performTextInput("secret123")
+        // While masked, the trailing icon offers to SHOW the password.
+        composeTestRule.onNodeWithContentDescription("Show password").performClick()
+        // After revealing, the toggle flips to offer HIDING it again.
+        composeTestRule.onNodeWithContentDescription("Hide password").assertIsDisplayed()
     }
 
     @Test

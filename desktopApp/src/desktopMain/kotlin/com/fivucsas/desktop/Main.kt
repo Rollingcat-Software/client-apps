@@ -292,7 +292,6 @@ private fun AppContent(
             viewModel = loginViewModel,
             onNavigateToRegister = { onNavigate(AppMode.REGISTER) },
             onNavigateToForgotPassword = { onNavigate(AppMode.FORGOT_PASSWORD) },
-            onNavigateToGuestFaceCheck = { onNavigate(AppMode.GUEST_FACE_CHECK) },
             onLoginSuccess = {
                 loginViewModel.state.value.tokens?.let { tokenManager.saveTokens(it) }
                 val role = loginViewModel.state.value.role ?: UserRole.USER
