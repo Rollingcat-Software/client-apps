@@ -117,13 +117,12 @@ class MfaFlowViewModel(
                     when (response.status) {
                         "AUTHENTICATED" -> {
                             val tokens = response.toModel()
-                            // Cache login data for offline mode
-                            offlineCache.cacheLoginData(
-                                userId = tokens.userId,
-                                userName = tokens.userName,
-                                userEmail = tokens.userEmail,
-                                role = tokens.role
-                            )
+                            // The server has AUTHENTICATED us and minted tokens —
+                            // this is a committed success. Publish the auth result
+                            // and Authenticated state FIRST, before any side effect,
+                            // so a throw in offline-cache / push-token can NEVER flip
+                            // a real 200 success into MFA_GENERIC_ERROR (the v5.2.2
+                            // false-failure regression).
                             _authResult.value = MfaAuthResult(
                                 tokens = tokens,
                                 role = UserRole.fromString(tokens.role)
@@ -131,8 +130,17 @@ class MfaFlowViewModel(
                             _uiState.value = MfaFlowUiState.Authenticated(
                                 userId = tokens.userId
                             )
-                            // Register FCM push token (fire-and-forget)
-                            registerPushToken(tokens.userId)
+                            // Best-effort side effects — must not affect the verdict.
+                            runCatching {
+                                offlineCache.cacheLoginData(
+                                    userId = tokens.userId,
+                                    userName = tokens.userName,
+                                    userEmail = tokens.userEmail,
+                                    role = tokens.role
+                                )
+                            }
+                            // Register FCM push token (fire-and-forget).
+                            runCatching { registerPushToken(tokens.userId) }
                         }
 
                         "STEP_COMPLETED" -> {
@@ -188,6 +196,10 @@ class MfaFlowViewModel(
                 }
             )
         } catch (e: Exception) {
+            // Never override a committed authentication. If we've already
+            // produced an auth result (server said AUTHENTICATED), a late
+            // throw must not strand the user on a false "Verification failed".
+            if (_authResult.value != null) return
             _uiState.value = MfaFlowUiState.Error(
                 message = s(StringKey.MFA_GENERIC_ERROR),
                 canRetry = true
