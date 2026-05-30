@@ -34,6 +34,13 @@ All notable changes to the FIVUCSAS client apps (Android, iOS, Desktop).
 
 ### Changed
 
+- **Desktop installers track the release line.** `desktopApp` version 1.0.0 →
+  5.2.3, so the produced `.deb` / `.msi` match the published app version
+  instead of a stale `1.0.0`. README desktop status corrected from
+  "scaffolding in flight" to shipped (OAuth loopback RFC 8252 + PKCE wired as
+  the default entry; real DPAPI/libsecret/AES-GCM token storage via
+  `TokenStorageFactory`; `.deb` + `.msi` via `desktop-installers.yml`). Fixed
+  a stale "stub storage" comment in desktop `Main.kt`.
 - **CI now runs unit tests.** `android-build.yml` runs
   `./gradlew :shared:test :androidApp:testDebugUnitTest` before assembling —
   previously CI only assembled and the Kotlin unit tests never ran. (The

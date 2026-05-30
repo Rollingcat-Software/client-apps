@@ -249,7 +249,9 @@ private fun AppContent(
     val qrState by qrLoginViewModel.state.collectAsState()
     val currentRole = tokenManager.getRole()?.let { UserRole.fromString(it) }
     var rootSelectedTenantId by remember { mutableStateOf<String?>(null) }
-    // Hosted-first OAuth state — stub storage until Agent C wires DPAPI/libsecret.
+    // Hosted-first OAuth state. AuthStateManager() defaults to
+    // TokenStorageFactory.create() — real secure storage (DPAPI on Windows /
+    // libsecret on Linux / AES-GCM file fallback), not a stub.
     val authStateManager = remember { AuthStateManager() }
     LaunchedEffect(Unit) { authStateManager.restore() }
     val onLogoutToLauncher = {
