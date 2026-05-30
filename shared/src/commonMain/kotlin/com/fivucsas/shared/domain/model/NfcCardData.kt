@@ -72,7 +72,16 @@ data class NfcIdentityDocumentData(
     val bacSuccessful: Boolean = false,
     val sodValid: Boolean? = null,
     val dg1HashValid: Boolean? = null,
-    val dg2HashValid: Boolean? = null
+    val dg2HashValid: Boolean? = null,
+
+    // Raw passive-authentication material, for the authoritative server-side
+    // verdict (POST /nfc/verify-authenticity). The boolean *Valid flags above
+    // are an advisory client-side check; the server re-runs the SOD signature
+    // + DG-hash + DS→CSCA chain against its trust store and fail-closes.
+    // Null when read without these groups (e.g. an MRZ-less generic scan).
+    val sodBytes: ByteArray? = null,
+    val dg1Bytes: ByteArray? = null,
+    val dg2Bytes: ByteArray? = null
 ) : NfcCardData() {
     val fullName: String
         get() = if (givenNames.isNotEmpty()) "$givenNames $surname" else surname

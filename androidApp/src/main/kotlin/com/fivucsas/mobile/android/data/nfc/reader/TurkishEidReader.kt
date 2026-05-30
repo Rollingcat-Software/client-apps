@@ -167,11 +167,18 @@ class TurkishEidReader : BaseCardReader() {
 
             SecureLogger.d(TAG, "BAC authentication successful, reading data with secure messaging...")
 
-            // Read DG1 (personal data) with secure messaging
-            val personalData = readDg1Secure(isoDep, secureMessaging)
+            // Read the RAW DG1 / DG2 / EF.SOD bytes once, under secure
+            // messaging. We keep the raw bytes (for the authoritative
+            // server-side passive-auth verdict via /nfc/verify-authenticity)
+            // AND parse them locally for display. EF.SOD is best-effort — a
+            // card that omits it simply yields a null SOD (passive auth then
+            // short-circuits to not-authentic server-side).
+            val dg1Bytes = readFileSecureSafe(isoDep, secureMessaging, EidApduHelper.FileIds.DG1, "DG1")
+            val dg2Bytes = readFileSecureSafe(isoDep, secureMessaging, EidApduHelper.FileIds.DG2, "DG2")
+            val sodBytes = readFileSecureSafe(isoDep, secureMessaging, EidApduHelper.FileIds.EF_SOD, "EF.SOD")
 
-            // Read DG2 (photo) with secure messaging
-            val photo = readDg2Secure(isoDep, secureMessaging)
+            val personalData = dg1Bytes?.let { runCatching { Dg1Parser.parse(it) }.getOrNull() }
+            val photo = dg2Bytes?.let { runCatching { Dg2Parser.parse(it) }.getOrNull() }
 
             // Construct TurkishEidData
             val cardData = TurkishEidData(
@@ -189,7 +196,10 @@ class TurkishEidReader : BaseCardReader() {
                 dateOfExpiry = personalData?.expiryDate ?: "",
                 personalNumber = personalData?.tckn ?: "",
                 photo = photo,
-                bacSuccessful = true
+                bacSuccessful = true,
+                sodBytes = sodBytes,
+                dg1Bytes = dg1Bytes,
+                dg2Bytes = dg2Bytes
             )
 
             SecureLogger.d(TAG, "Card reading completed successfully")
@@ -398,47 +408,26 @@ class TurkishEidReader : BaseCardReader() {
     }
 
     /**
-     * Reads DG1 (personal data) with secure messaging and parses it.
+     * Reads a file's RAW bytes under secure messaging, returning null (and
+     * logging) on any failure. Used to capture DG1 / DG2 / EF.SOD for both
+     * local parsing and the server-side passive-auth verdict.
      */
-    private suspend fun readDg1Secure(
+    private suspend fun readFileSecureSafe(
         isoDep: IsoDep,
-        secureMessaging: SecureMessaging
-    ): Dg1Parser.PersonalData? {
+        secureMessaging: SecureMessaging,
+        fileId: Byte,
+        label: String
+    ): ByteArray? {
         return try {
-            SecureLogger.d(TAG, "Reading DG1 (personal data) with secure messaging...")
-            val dg1Data = readFileSecure(isoDep, secureMessaging, EidApduHelper.FileIds.DG1)
-
-            if (dg1Data != null) {
-                SecureLogger.d(TAG, "DG1 data size: ${dg1Data.size} bytes")
-                Dg1Parser.parse(dg1Data)
+            val data = readFileSecure(isoDep, secureMessaging, fileId)
+            if (data != null) {
+                SecureLogger.d(TAG, "$label data size: ${data.size} bytes")
             } else {
-                null
+                SecureLogger.w(TAG, "$label not present / unreadable")
             }
+            data
         } catch (e: Exception) {
-            SecureLogger.e(TAG, "Failed to read DG1", e)
-            null
-        }
-    }
-
-    /**
-     * Reads DG2 (photo) with secure messaging and decodes it.
-     */
-    private suspend fun readDg2Secure(
-        isoDep: IsoDep,
-        secureMessaging: SecureMessaging
-    ): Bitmap? {
-        return try {
-            SecureLogger.d(TAG, "Reading DG2 (photo) with secure messaging...")
-            val dg2Data = readFileSecure(isoDep, secureMessaging, EidApduHelper.FileIds.DG2)
-
-            if (dg2Data != null) {
-                SecureLogger.d(TAG, "DG2 data size: ${dg2Data.size} bytes")
-                Dg2Parser.parse(dg2Data)
-            } else {
-                null
-            }
-        } catch (e: Exception) {
-            SecureLogger.e(TAG, "Failed to read DG2", e)
+            SecureLogger.e(TAG, "Failed to read $label", e)
             null
         }
     }

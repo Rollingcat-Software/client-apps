@@ -222,6 +222,13 @@ val repositoryModule = module {
         )
     }
 
+    // NFC passive-authentication Repository
+    single<com.fivucsas.shared.domain.repository.NfcAuthenticityRepository> {
+        com.fivucsas.shared.data.repository.NfcAuthenticityRepositoryImpl(
+            api = get<com.fivucsas.shared.data.remote.api.NfcAuthenticityApi>()
+        )
+    }
+
     // Offline Cache
     single { OfflineCache(storage = get()) }
 }

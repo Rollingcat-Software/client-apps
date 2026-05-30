@@ -147,6 +147,46 @@ class CscaCertificateStore {
     }
 
     /**
+     * Auto-discovers and loads bundled CSCA roots from app assets.
+     *
+     * Layout: `assets/<rootDir>/<COUNTRY>/<anything>.{cer,crt,der,pem,p7c}`
+     * where `<COUNTRY>` is an ISO 3166-1 alpha-3 code (e.g. `TUR/`). Each file
+     * may contain one or more certificates (PKCS#7 chains are expanded).
+     *
+     * This is the populate hook for passive authentication: the *code* is
+     * complete; the operator drops ICAO-PKD CSCA roots (at least Turkey, under
+     * `assets/csca/TUR/`) into the build and they load on startup. With no
+     * bundle present this is a no-op — the client-side advisory chain check
+     * then simply finds no anchors (the AUTHORITATIVE check is server-side,
+     * which returns `NO_TRUST_STORE` until its own trust dir is populated).
+     *
+     * @return number of certificates loaded across all countries.
+     */
+    fun loadBundledRoots(context: Context, rootDir: String = "csca"): Int {
+        var total = 0
+        try {
+            val countries = context.assets.list(rootDir) ?: emptyArray()
+            for (country in countries) {
+                val files = context.assets.list("$rootDir/$country") ?: continue
+                for (file in files) {
+                    if (!file.matches(Regex(""".*\.(cer|crt|der|pem|p7c|p7b)$""", RegexOption.IGNORE_CASE))) continue
+                    try {
+                        context.assets.open("$rootDir/$country/$file").use { stream ->
+                            total += loadCertificateChain(stream, country)
+                        }
+                    } catch (e: Exception) {
+                        SecureLogger.e(TAG, "Failed to load bundled CSCA $rootDir/$country/$file", e)
+                    }
+                }
+            }
+            SecureLogger.d(TAG, "Loaded $total bundled CSCA certificate(s) from assets/$rootDir")
+        } catch (e: Exception) {
+            SecureLogger.e(TAG, "Failed to enumerate bundled CSCA roots under assets/$rootDir", e)
+        }
+        return total
+    }
+
+    /**
      * Loads multiple CSCA certificates from a PKCS#7 or certificate chain file.
      *
      * @param inputStream Input stream containing certificates

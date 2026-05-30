@@ -4,6 +4,7 @@ import android.app.Application
 import android.util.Log
 import com.fivucsas.mobile.android.data.AndroidNetworkMonitor
 import com.fivucsas.mobile.android.data.nfc.AndroidNfcService
+import com.fivucsas.mobile.android.data.nfc.security.sod.CscaCertificateStore
 import com.fivucsas.mobile.android.data.preferences.ThemePreferences
 import com.fivucsas.mobile.android.data.push.AndroidPushNotificationService
 import com.fivucsas.shared.di.getAppModules
@@ -47,6 +48,13 @@ class FIVUCSASApplication : Application() {
             androidContext(this@FIVUCSASApplication)
             modules(getAppModules() + androidAppModule)
         }
+
+        // Load any bundled ICAO-PKD CSCA roots for the (advisory) client-side
+        // passive-auth chain check. No-op when no certs are bundled — the
+        // AUTHORITATIVE verdict is server-side (/nfc/verify-authenticity).
+        runCatching {
+            CscaCertificateStore.getInstance().loadBundledRoots(this)
+        }.onFailure { Log.w("FIVUCSASApplication", "CSCA root load skipped: ${it.message}") }
     }
 
     /**
