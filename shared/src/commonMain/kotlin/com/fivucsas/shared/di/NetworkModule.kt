@@ -239,4 +239,9 @@ val networkModule = module {
     single<com.fivucsas.shared.data.remote.api.NfcApprovalApi> {
         com.fivucsas.shared.data.remote.api.NfcApprovalApiImpl(get(named("identityClient")))
     }
+
+    // NFC document enrollment / verification API
+    single<com.fivucsas.shared.data.remote.api.NfcEnrollmentApi> {
+        com.fivucsas.shared.data.remote.api.NfcEnrollmentApiImpl(get(named("identityClient")))
+    }
 }

@@ -355,6 +355,12 @@ enum class StringKey {
     NFC_STEP_PRIVACY_NOTE,
     NFC_STEP_AUTHENTICATE_BUTTON,
 
+    // NFC card enrollment ("Register this card" on the reader result)
+    NFC_REGISTER_CARD_BUTTON,
+    NFC_REGISTER_CARD_IN_PROGRESS,
+    NFC_REGISTER_CARD_SUCCESS,
+    NFC_REGISTER_CARD_ERROR,
+
     // GDPR/KVKK "My Data" export UI (Android 20B — v5.2.0)
     MY_DATA,
     DATA_EXPORT_TITLE,
@@ -1172,6 +1178,10 @@ private val enStrings = mapOf(
     StringKey.NFC_STEP_OR_MANUAL to "Or enter the MRZ data manually:",
     StringKey.NFC_STEP_PRIVACY_NOTE to "Your MRZ data is used only for card authentication and is not stored.",
     StringKey.NFC_STEP_AUTHENTICATE_BUTTON to "Authenticate",
+    StringKey.NFC_REGISTER_CARD_BUTTON to "Register this card",
+    StringKey.NFC_REGISTER_CARD_IN_PROGRESS to "Registering card…",
+    StringKey.NFC_REGISTER_CARD_SUCCESS to "Card registered successfully",
+    StringKey.NFC_REGISTER_CARD_ERROR to "Could not register card. Please try again.",
 
     // GDPR/KVKK "My Data" export UI (Android 20B — v5.2.0)
     StringKey.MY_DATA to "My Data",
@@ -1989,6 +1999,10 @@ private val trStrings = mapOf(
     StringKey.NFC_STEP_OR_MANUAL to "Veya MRZ verisini elle girin:",
     StringKey.NFC_STEP_PRIVACY_NOTE to "MRZ veriniz yalnızca kart doğrulama için kullanılır ve saklanmaz.",
     StringKey.NFC_STEP_AUTHENTICATE_BUTTON to "Doğrula",
+    StringKey.NFC_REGISTER_CARD_BUTTON to "Bu kartı kaydet",
+    StringKey.NFC_REGISTER_CARD_IN_PROGRESS to "Kart kaydediliyor…",
+    StringKey.NFC_REGISTER_CARD_SUCCESS to "Kart başarıyla kaydedildi",
+    StringKey.NFC_REGISTER_CARD_ERROR to "Kart kaydedilemedi. Lütfen tekrar deneyin.",
 
     // GDPR/KVKK "My Data" export UI (Android 20B — v5.2.0)
     StringKey.MY_DATA to "Verilerim",

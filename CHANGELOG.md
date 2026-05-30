@@ -2,6 +2,35 @@
 
 All notable changes to the FIVUCSAS client apps (Android, iOS, Desktop).
 
+## [Unreleased]
+
+### Added
+
+- **NFC card enrollment.** `NfcReadScreen` now offers a "Register this card"
+  action on a successful read → `EnrollNfcCardUseCase` →
+  `POST /api/v1/nfc/enroll`. The card serial is normalized to the
+  API-canonical form (upper-case hex, no separators — e.g. `04A2245B6F7180`)
+  via `normalizeCardSerial`, aligned with identity-core-api so a
+  mobile-enrolled card matches a web verify and vice-versa. New shared
+  client: `NfcEnrollmentApi(Impl)`, `NfcEnrollmentRepository(Impl)`,
+  `NfcEnrollRequest/Response` DTOs. i18n EN + TR. (Android `Tag.getId()`
+  already yields canonical UPPERHEX; the normalizer guards opaque UIDs and
+  guarantees we never emit separators.)
+
+### Changed
+
+- **CI now runs unit tests.** `android-build.yml` runs
+  `./gradlew :shared:test :androidApp:testDebugUnitTest` before assembling —
+  previously CI only assembled and the Kotlin unit tests never ran. (The
+  instrumented `androidTest` set still needs an emulator and is not run in
+  CI.)
+- **Docs reconciled.** README "thin OAuth client" framing corrected — the
+  FIVUCSAS Android app is a full native client (native login + adaptive MFA,
+  NFC read + enroll, on-device biometric), with hosted-first OAuth as the
+  primary *third-party* integration mode. `docs/TODO.md` records the enroll
+  wiring as done and the passive-auth / CSCA / PACE work as deferred
+  (operator-blocked: needs CSCA roots + test cards).
+
 ## [5.2.2] — 2026-05-30 — Login fix (P0)
 
 A user who freshly installed v5.2.1 could not log in. Three login-screen
