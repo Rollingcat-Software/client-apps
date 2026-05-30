@@ -6,6 +6,21 @@ All notable changes to the FIVUCSAS client apps (Android, iOS, Desktop).
 
 ### Added
 
+- **Linked accounts + workspace (account) switcher** — mobile parity with
+  the web `linkedAccounts` / `accountSwitcher` features. A new
+  `LinkedAccountsScreen` (reached from Profile) lists the person's verified
+  emails and tenant memberships, links another account
+  (`/identity/link/initiate` → OTP + step-up password →
+  `/identity/link/confirm`), unlinks a membership (`/identity/unlink`), and
+  switches the active membership in-session
+  (`/auth/switch-membership` → login-shaped tokens persisted via the
+  canonical `TokenManager` path, then re-navigates to the post-login home).
+  The switcher shows only when the person has >1 membership and is distinct
+  from any SUPER_ADMIN data-scoping switch (it changes WHO you are). New
+  shared client `AccountLinkingApi(Impl)` + `AccountLinkingRepository(Impl)`
+  + `AccountLinkingViewModel`; `IdentityMe` domain model; i18n EN + TR; unit
+  tests.
+
 - **NFC card enrollment.** `NfcReadScreen` now offers a "Register this card"
   action on a successful read → `EnrollNfcCardUseCase` →
   `POST /api/v1/nfc/enroll`. The card serial is normalized to the

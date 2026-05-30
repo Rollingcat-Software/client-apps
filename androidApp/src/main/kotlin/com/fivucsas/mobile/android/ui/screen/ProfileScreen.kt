@@ -68,6 +68,7 @@ fun ProfileScreen(
     onReEnroll: () -> Unit,
     onDeleteEnrollment: () -> Unit,
     onOpenSettings: () -> Unit,
+    onOpenLinkedAccounts: () -> Unit = {},
     navItems: List<com.fivucsas.shared.ui.components.organisms.BottomNavItem> = com.fivucsas.mobile.android.ui.navigation.BottomNavDestinations.items,
     userId: String = "",
     dataExportViewModel: DataExportViewModel? = null,
@@ -180,6 +181,9 @@ fun ProfileScreen(
             Column(verticalArrangement = Arrangement.spacedBy(UIDimens.SpacingSmall)) {
                 Button(onClick = onChangePassword, modifier = Modifier.fillMaxWidth()) {
                     Text(s(StringKey.CHANGE_PASSWORD_TITLE))
+                }
+                Button(onClick = onOpenLinkedAccounts, modifier = Modifier.fillMaxWidth()) {
+                    Text(s(StringKey.LINKED_ACCOUNTS_TITLE))
                 }
                 if (isSelfBiometricRole && userRole.hasPermission(Permission.ENROLL_SELF_UPDATE)) {
                     Button(onClick = onReEnroll, modifier = Modifier.fillMaxWidth()) {

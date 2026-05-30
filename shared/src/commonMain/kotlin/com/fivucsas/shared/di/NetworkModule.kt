@@ -244,4 +244,9 @@ val networkModule = module {
     single<com.fivucsas.shared.data.remote.api.NfcEnrollmentApi> {
         com.fivucsas.shared.data.remote.api.NfcEnrollmentApiImpl(get(named("identityClient")))
     }
+
+    // Account-linking + workspace-switcher API
+    single<com.fivucsas.shared.data.remote.api.AccountLinkingApi> {
+        com.fivucsas.shared.data.remote.api.AccountLinkingApiImpl(get(named("identityClient")))
+    }
 }

@@ -1,5 +1,6 @@
 package com.fivucsas.shared.di
 
+import com.fivucsas.shared.presentation.viewmodel.AccountLinkingViewModel
 import com.fivucsas.shared.presentation.viewmodel.AdminViewModel
 import com.fivucsas.shared.presentation.viewmodel.AuthFlowViewModel
 import com.fivucsas.shared.presentation.viewmodel.BiometricBackupViewModel
@@ -67,6 +68,7 @@ val viewModelModule = module {
     factoryOf(::DeveloperPortalViewModel)
     factoryOf(::AuditLogDashboardViewModel)
     factoryOf(::DataExportViewModel)
+    factoryOf(::AccountLinkingViewModel)
 
     // NfcApprovalViewModel is a singleton because the deep-link activity and
     // the ApprovalActionReceiver (notification action buttons) need to observe
