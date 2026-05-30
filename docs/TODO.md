@@ -34,6 +34,29 @@ The gap is **integration only**: `MfaFlowScreen.kt:324` still routes
 - [ ] Replace the `GenericMethodStepInput` dispatch at `MfaFlowScreen.kt:324`.
 - [ ] MRZ capture copy in EN + TR `strings.xml`.
 
+#### NFC card enrollment (done) + passive auth (deferred)
+
+- [x] **Enroll wiring (2026-05-30).** `NfcReadScreen` now offers "Register
+      this card" → `EnrollNfcCardUseCase` → `POST /api/v1/nfc/enroll`. The
+      serial is normalized to the API-canonical UPPERHEX-no-separators form
+      (`normalizeCardSerial`), aligned with identity-core-api so a
+      mobile-enrolled card matches a web verify. Shared client:
+      `NfcEnrollmentApi(Impl)` + `NfcEnrollmentRepository(Impl)`.
+- [ ] **Passive authentication → server (deferred, operator-blocked).** Send
+      raw `EF.SOD` + DGs (base64) to `POST /api/v1/nfc/verify-authenticity`
+      for the authoritative, fail-closed verdict. Today the domain model
+      (`NfcIdentityDocumentData`) exposes only boolean SOD/DG *validity*, not
+      the raw bytes — threading raw SOD/DG up from the reader is required
+      first. OPERATOR: load ICAO-PKD CSCA roots (esp. Turkey) into the bio
+      container, else every verify returns `NO_TRUST_STORE` (422). Needs
+      physical eID/passport test cards.
+- [ ] **Populate `CscaCertificateStore`** (currently empty → client-side
+      passive auth always fails). Bundle CSCA roots as a resource; client
+      DS→CSCA check stays *advisory* (server verdict authoritative).
+- [ ] **PACE** (read `EF.CardAccess`, GM mapping, AES secure messaging) to
+      broaden beyond BAC for PACE-only documents. Needs PACE-capable test
+      docs + a reference-vector doc.
+
 ### A2 — GDPR/KVKK export mobile UI (~2 days)
 
 Backend `GET /users/{id}/export` shipped 2026-04-16b. Web-app wired

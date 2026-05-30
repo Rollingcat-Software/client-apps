@@ -24,18 +24,30 @@ actuals land (tracked in `docs/TODO.md`). QR code scanning is deferred; manual
 entry is the supported flow in 5.1.0.
 
 
-## Feature coverage matrix (hosted-first, since 2026-04-16)
+## Feature coverage matrix
 
-On 2026-04-16 FIVUCSAS pivoted to **hosted-first authentication**: native
-clients are thin OAuth 2.0 / OIDC clients that hand off to
-`verify.fivucsas.com/login` and receive an `?code=…&state=…` callback. Face,
-Voice, Fingerprint, and NFC live on the hosted login page — native apps no
-longer reimplement them. The parity matrix collapsed from 20 reference
-columns to **13 thin-OAuth-client columns**: OAuth login, secure token
-storage, token refresh, deep-link handler, account dashboard, cross-device
-sessions, GDPR/KVKK export, offline display, push/WebSocket approval
-handler, TOTP authenticator (companion), QR display + scanner, signed
-release artifact, public distribution.
+On 2026-04-16 FIVUCSAS adopted **hosted-first authentication** as the
+*primary* third-party integration mode: tenants can hand off to
+`verify.fivucsas.com/login` over OAuth 2.0 / OIDC and receive an
+`?code=…&state=…` callback (redirective OIDC; the Android app uses Custom
+Tabs + AppAuth). Hosted-first remains the recommended path for embedding
+FIVUCSAS into a *third-party* app.
+
+The FIVUCSAS-branded Android app itself, however, is a **full native
+client**, not a thin OAuth shell. It implements native login (PASSWORD +
+adaptive MFA across all 10 methods — see `MfaFlowScreen`), native NFC
+document reading + card enrollment (`POST /api/v1/nfc/enroll`), on-device
+biometric capture, the account dashboard, cross-device sessions,
+GDPR/KVKK export, the standalone TOTP authenticator, and push/WebSocket
+approval handling. The earlier "thin OAuth client" framing described the
+intended third-party SDK shape, not this app — it was inaccurate for the
+shipped native app and has been corrected here.
+
+Capability columns: native login + adaptive MFA, NFC read + enroll, secure
+token storage, token refresh, deep-link handler, account dashboard,
+cross-device sessions, GDPR/KVKK export, offline display, push/WebSocket
+approval handler, TOTP authenticator, QR display + scanner, signed release
+artifact, public distribution.
 
 **Platform status (2026-04-18e):**
 

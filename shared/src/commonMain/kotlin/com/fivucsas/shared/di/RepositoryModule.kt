@@ -207,6 +207,13 @@ val repositoryModule = module {
         )
     }
 
+    // NFC document enrollment / verification Repository
+    single<com.fivucsas.shared.domain.repository.NfcEnrollmentRepository> {
+        com.fivucsas.shared.data.repository.NfcEnrollmentRepositoryImpl(
+            api = get<com.fivucsas.shared.data.remote.api.NfcEnrollmentApi>()
+        )
+    }
+
     // Offline Cache
     single { OfflineCache(storage = get()) }
 }

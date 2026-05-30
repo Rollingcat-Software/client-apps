@@ -61,8 +61,13 @@ import com.fivucsas.shared.domain.model.MrzInputData
 import com.fivucsas.shared.domain.model.NfcGenericCardData
 import com.fivucsas.shared.domain.model.NfcIdentityDocumentData
 import com.fivucsas.shared.domain.model.NfcReadResult
+import com.fivucsas.shared.domain.usecase.nfc.EnrollNfcCardUseCase
+import com.fivucsas.shared.i18n.StringKey
+import com.fivucsas.shared.i18n.s
 import com.fivucsas.shared.platform.INfcService
 import com.fivucsas.shared.platform.NfcScanState
+import kotlinx.coroutines.launch
+import androidx.compose.runtime.rememberCoroutineScope
 import org.koin.compose.koinInject
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -71,12 +76,27 @@ fun NfcReadScreen(
     onNavigateBack: () -> Unit
 ) {
     val nfcService = koinInject<INfcService>()
+    val enrollUseCase = koinInject<EnrollNfcCardUseCase>()
     val scanState by nfcService.scanState.collectAsState()
+    val scope = rememberCoroutineScope()
 
     var documentNumber by rememberSaveable { mutableStateOf("") }
     var dateOfBirth by rememberSaveable { mutableStateOf("") }
     var dateOfExpiry by rememberSaveable { mutableStateOf("") }
     var showMrzInput by rememberSaveable { mutableStateOf(true) }
+
+    // "Register this card" state for the result screen. Reset on each new scan.
+    var enrollState by remember { mutableStateOf<EnrollUiState>(EnrollUiState.Idle) }
+
+    val onRegisterCard: (uid: String, cardType: String?) -> Unit = { uid, cardType ->
+        enrollState = EnrollUiState.InProgress
+        scope.launch {
+            enrollUseCase(cardSerial = uid, cardType = cardType).fold(
+                onSuccess = { enrollState = EnrollUiState.Success },
+                onFailure = { enrollState = EnrollUiState.Error }
+            )
+        }
+    }
 
     DisposableEffect(Unit) {
         onDispose { nfcService.stopNfcScan() }
@@ -158,8 +178,11 @@ fun NfcReadScreen(
                 is NfcScanState.Completed -> {
                     ResultSection(
                         result = state.result,
+                        enrollState = enrollState,
+                        onRegisterCard = onRegisterCard,
                         onScanAgain = {
                             nfcService.stopNfcScan()
+                            enrollState = EnrollUiState.Idle
                             showMrzInput = true
                         }
                     )
@@ -365,13 +388,25 @@ private fun ReadingSection(cardTypeName: String) {
 @Composable
 private fun ResultSection(
     result: NfcReadResult,
+    enrollState: EnrollUiState,
+    onRegisterCard: (uid: String, cardType: String?) -> Unit,
     onScanAgain: () -> Unit
 ) {
     when (result) {
         is NfcReadResult.Success -> {
             when (val data = result.cardData) {
-                is NfcIdentityDocumentData -> IdentityDocumentResult(data, onScanAgain)
-                is NfcGenericCardData -> GenericCardResult(data, onScanAgain)
+                is NfcIdentityDocumentData -> IdentityDocumentResult(
+                    data = data,
+                    enrollState = enrollState,
+                    onRegisterCard = onRegisterCard,
+                    onScanAgain = onScanAgain
+                )
+                is NfcGenericCardData -> GenericCardResult(
+                    data = data,
+                    enrollState = enrollState,
+                    onRegisterCard = onRegisterCard,
+                    onScanAgain = onScanAgain
+                )
             }
         }
         is NfcReadResult.AuthenticationRequired -> {
@@ -412,6 +447,8 @@ private fun ResultSection(
 @Composable
 private fun IdentityDocumentResult(
     data: NfcIdentityDocumentData,
+    enrollState: EnrollUiState,
+    onRegisterCard: (uid: String, cardType: String?) -> Unit,
     onScanAgain: () -> Unit
 ) {
     Card(
@@ -510,6 +547,12 @@ private fun IdentityDocumentResult(
     DataRow("Technologies", data.technologies.joinToString(", "))
 
     Spacer(modifier = Modifier.height(24.dp))
+    RegisterCardSection(
+        enrollState = enrollState,
+        onRegisterCard = { onRegisterCard(data.uid, data.cardTypeName) }
+    )
+
+    Spacer(modifier = Modifier.height(12.dp))
     Button(
         onClick = onScanAgain,
         modifier = Modifier.fillMaxWidth().height(48.dp),
@@ -524,6 +567,8 @@ private fun IdentityDocumentResult(
 @Composable
 private fun GenericCardResult(
     data: NfcGenericCardData,
+    enrollState: EnrollUiState,
+    onRegisterCard: (uid: String, cardType: String?) -> Unit,
     onScanAgain: () -> Unit
 ) {
     Card(
@@ -566,6 +611,12 @@ private fun GenericCardResult(
     }
 
     Spacer(modifier = Modifier.height(24.dp))
+    RegisterCardSection(
+        enrollState = enrollState,
+        onRegisterCard = { onRegisterCard(data.uid, data.cardTypeName) }
+    )
+
+    Spacer(modifier = Modifier.height(12.dp))
     Button(
         onClick = onScanAgain,
         modifier = Modifier.fillMaxWidth().height(48.dp),
@@ -574,6 +625,72 @@ private fun GenericCardResult(
         Icon(Icons.Default.Refresh, contentDescription = null)
         Spacer(modifier = Modifier.width(8.dp))
         Text("Scan Another Card")
+    }
+}
+
+/** Local UI state for the "Register this card" enrollment action. */
+private sealed interface EnrollUiState {
+    data object Idle : EnrollUiState
+    data object InProgress : EnrollUiState
+    data object Success : EnrollUiState
+    data object Error : EnrollUiState
+}
+
+/**
+ * "Register this card" affordance shown under a successful NFC read. POSTs
+ * the (canonical UPPERHEX) serial to /api/v1/nfc/enroll via the use case.
+ * Once registered, the button is replaced by a success line.
+ */
+@Composable
+private fun RegisterCardSection(
+    enrollState: EnrollUiState,
+    onRegisterCard: () -> Unit
+) {
+    when (enrollState) {
+        EnrollUiState.Success -> {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(
+                    Icons.Default.CheckCircle,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    s(StringKey.NFC_REGISTER_CARD_SUCCESS),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
+        }
+        else -> {
+            Button(
+                onClick = onRegisterCard,
+                enabled = enrollState != EnrollUiState.InProgress,
+                modifier = Modifier.fillMaxWidth().height(48.dp),
+                shape = RoundedCornerShape(16.dp)
+            ) {
+                if (enrollState == EnrollUiState.InProgress) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(20.dp),
+                        color = MaterialTheme.colorScheme.onPrimary
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(s(StringKey.NFC_REGISTER_CARD_IN_PROGRESS))
+                } else {
+                    Icon(Icons.Default.CreditCard, contentDescription = null)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(s(StringKey.NFC_REGISTER_CARD_BUTTON))
+                }
+            }
+            if (enrollState == EnrollUiState.Error) {
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    s(StringKey.NFC_REGISTER_CARD_ERROR),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.error
+                )
+            }
+        }
     }
 }
 

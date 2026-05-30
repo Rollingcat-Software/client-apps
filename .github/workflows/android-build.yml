@@ -84,6 +84,23 @@ jobs:
           }
           GSEOF
 
+      - name: Run unit tests
+        # JVM unit tests for the shared KMP module + the Android app. The
+        # instrumented androidTest set (connectedAndroidTest) needs an emulator
+        # and is NOT run here. ~517 Kotlin tests previously never ran in CI.
+        run: ./gradlew :shared:test :androidApp:testDebugUnitTest --no-daemon
+
+      - name: Upload test reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: unit-test-reports
+          path: |
+            shared/build/reports/tests/
+            androidApp/build/reports/tests/
+          retention-days: 14
+          if-no-files-found: ignore
+
       - name: Determine build task
         id: build-task
         env:
