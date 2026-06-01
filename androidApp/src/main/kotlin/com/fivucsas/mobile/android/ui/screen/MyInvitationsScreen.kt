@@ -51,6 +51,8 @@ import com.fivucsas.shared.domain.model.ReceivedInviteStatus
 import com.fivucsas.shared.domain.usecase.invite.GetReceivedInvitesUseCase
 import com.fivucsas.shared.domain.usecase.invite.InviteResponse
 import com.fivucsas.shared.domain.usecase.invite.RespondToInviteUseCase
+import com.fivucsas.shared.i18n.StringKey
+import com.fivucsas.shared.i18n.s
 import com.fivucsas.shared.ui.components.atoms.StatusBadge
 import com.fivucsas.shared.ui.components.atoms.StatusBadgeType
 import com.fivucsas.shared.ui.components.molecules.ErrorMessage
@@ -81,7 +83,7 @@ fun MyInvitationsScreen(
                 isLoading = false
             },
             onFailure = { error ->
-                errorMessage = error.message ?: "Failed to load invitations."
+                errorMessage = error.message ?: s(StringKey.MYINV_LOAD_FAILED)
                 isLoading = false
             }
         )
@@ -94,14 +96,14 @@ fun MyInvitationsScreen(
             TopAppBar(
                 title = {
                     Text(
-                        "My Invitations",
+                        s(StringKey.MYINV_TITLE),
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.SemiBold
                     )
                 },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = s(StringKey.A11Y_NAVIGATE_BACK))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -167,7 +169,7 @@ fun MyInvitationsScreen(
                     if (pending.isNotEmpty()) {
                         item {
                             Text(
-                                text = "Pending",
+                                text = s(StringKey.MYINV_PENDING_SECTION),
                                 style = MaterialTheme.typography.titleSmall,
                                 fontWeight = FontWeight.Bold,
                                 color = AppColors.OnSurfaceVariant,
@@ -186,13 +188,13 @@ fun MyInvitationsScreen(
                                     scope.launch {
                                         respondToInviteUseCase(invite.id, InviteResponse.ACCEPT).fold(
                                             onSuccess = {
-                                                successMessage = "Joined ${invite.tenantName}"
+                                                successMessage = s(StringKey.MYINV_JOINED, invite.tenantName)
                                                 actionInProgressId = null
                                                 reload()
                                             },
                                             onFailure = { error ->
                                                 actionInProgressId = null
-                                                errorMessage = error.message ?: "Failed to accept invitation."
+                                                errorMessage = error.message ?: s(StringKey.MYINV_ACCEPT_FAILED)
                                             }
                                         )
                                     }
@@ -205,13 +207,13 @@ fun MyInvitationsScreen(
                                     scope.launch {
                                         respondToInviteUseCase(invite.id, InviteResponse.DECLINE).fold(
                                             onSuccess = {
-                                                successMessage = "Invitation declined"
+                                                successMessage = s(StringKey.MYINV_DECLINED)
                                                 actionInProgressId = null
                                                 reload()
                                             },
                                             onFailure = { error ->
                                                 actionInProgressId = null
-                                                errorMessage = error.message ?: "Failed to decline invitation."
+                                                errorMessage = error.message ?: s(StringKey.MYINV_DECLINE_FAILED)
                                             }
                                         )
                                     }
@@ -223,7 +225,7 @@ fun MyInvitationsScreen(
                     if (past.isNotEmpty()) {
                         item {
                             Text(
-                                text = "Past",
+                                text = s(StringKey.MYINV_PAST_SECTION),
                                 style = MaterialTheme.typography.titleSmall,
                                 fontWeight = FontWeight.Bold,
                                 color = AppColors.OnSurfaceVariant,
@@ -277,13 +279,18 @@ private fun ReceivedInviteCard(
                         fontWeight = FontWeight.SemiBold
                     )
                     Text(
-                        text = "From: ${invite.invitedBy}",
+                        text = s(StringKey.MYINV_FROM_LABEL, invite.invitedBy),
                         style = MaterialTheme.typography.bodySmall,
                         color = AppColors.OnSurfaceVariant
                     )
                 }
                 StatusBadge(
-                    text = invite.status.name,
+                    text = when (invite.status) {
+                        ReceivedInviteStatus.PENDING -> s(StringKey.MYINV_STATUS_PENDING)
+                        ReceivedInviteStatus.ACCEPTED -> s(StringKey.MYINV_STATUS_ACCEPTED)
+                        ReceivedInviteStatus.DECLINED -> s(StringKey.MYINV_STATUS_DECLINED)
+                        ReceivedInviteStatus.EXPIRED -> s(StringKey.MYINV_STATUS_EXPIRED)
+                    },
                     type = when (invite.status) {
                         ReceivedInviteStatus.PENDING -> StatusBadgeType.Warning
                         ReceivedInviteStatus.ACCEPTED -> StatusBadgeType.Success
@@ -308,13 +315,13 @@ private fun ReceivedInviteCard(
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
-                        text = "Expires: ${invite.expiresAt}",
+                        text = s(StringKey.MYINV_EXPIRES_LABEL, invite.expiresAt),
                         style = MaterialTheme.typography.bodySmall,
                         color = AppColors.OnSurfaceVariant
                     )
                 }
                 Text(
-                    text = "Role: ${invite.role.replace("TENANT_", "")}",
+                    text = s(StringKey.MYINV_ROLE_LABEL, invite.role.replace("TENANT_", "")),
                     style = MaterialTheme.typography.bodySmall,
                     color = AppColors.OnSurfaceVariant
                 )
@@ -333,7 +340,7 @@ private fun ReceivedInviteCard(
                     ) {
                         Icon(Icons.Default.Close, contentDescription = null, modifier = Modifier.size(18.dp))
                         Spacer(modifier = Modifier.width(4.dp))
-                        Text("Decline")
+                        Text(s(StringKey.MYINV_DECLINE))
                     }
                     Button(
                         onClick = onAccept,
@@ -342,7 +349,7 @@ private fun ReceivedInviteCard(
                     ) {
                         Icon(Icons.Default.Check, contentDescription = null, modifier = Modifier.size(18.dp))
                         Spacer(modifier = Modifier.width(4.dp))
-                        Text("Accept")
+                        Text(s(StringKey.MYINV_ACCEPT))
                     }
                 }
             }
@@ -367,14 +374,14 @@ private fun EmptyInvitationsContent() {
         )
         Spacer(modifier = Modifier.height(16.dp))
         Text(
-            text = "No Invitations",
+            text = s(StringKey.MYINV_EMPTY_TITLE),
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Bold,
             color = AppColors.OnSurfaceVariant
         )
         Spacer(modifier = Modifier.height(4.dp))
         Text(
-            text = "You have no pending or past invitations.",
+            text = s(StringKey.MYINV_EMPTY_BODY),
             style = MaterialTheme.typography.bodyMedium,
             color = AppColors.OnSurfaceVariant,
             textAlign = TextAlign.Center

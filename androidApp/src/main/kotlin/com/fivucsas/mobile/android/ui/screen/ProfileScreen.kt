@@ -233,7 +233,7 @@ fun ProfileScreen(
             }
 
             if (showDeleteSuccess) {
-                SuccessMessage(message = "Enrollment deleted successfully.")
+                SuccessMessage(message = s(StringKey.PROFILE2_DELETE_SUCCESS))
             }
             deleteError?.let { ErrorMessage(message = it) }
 
@@ -242,8 +242,7 @@ fun ProfileScreen(
             // the navigation layer. Positioned below privacy/settings per the
             // ProfileScreen spec (Agent 20B; Agent 20D owns Settings).
             if (dataExportViewModel != null && userId.isNotBlank()) {
-                // TODO(i18n): DATA_EXPORT_* keys in /tmp/i18n_agent_20B.txt
-                SectionHeader(title = "My Data")
+                SectionHeader(title = s(StringKey.MY_DATA))
                 ExportDataRow(
                     userId = userId,
                     viewModel = dataExportViewModel,
@@ -254,10 +253,10 @@ fun ProfileScreen(
 
     if (showDeleteDialog && onDeleteEnrollment != null) {
         ConfirmationDialog(
-            title = "Delete My Enrollment",
-            message = "This will permanently delete your biometric data. You will need to re-enroll to use face verification.",
-            confirmText = "Delete",
-            dismissText = "Cancel",
+            title = s(StringKey.PROFILE2_DELETE_DIALOG_TITLE),
+            message = s(StringKey.PROFILE2_DELETE_DIALOG_MESSAGE),
+            confirmText = s(StringKey.DELETE),
+            dismissText = s(StringKey.CANCEL),
             onConfirm = {
                 showDeleteDialog = false
                 deleteError = null
@@ -272,7 +271,7 @@ fun ProfileScreen(
                         },
                         onFailure = { error ->
                             deleteInProgress = false
-                            deleteError = error.message ?: "Failed to delete enrollment. Please try again."
+                            deleteError = error.message ?: s(StringKey.PROFILE2_DELETE_FAILED)
                         }
                     )
                 }
