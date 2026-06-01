@@ -23,6 +23,7 @@ object RouteIds {
     const val ABOUT = "about"
     const val QR_LOGIN_SCAN = "qr-login-scan"
     const val QR_LOGIN_DISPLAY = "qr-login-display"
+    const val APPROVE_LOGIN = "approve-login"
 
     const val UNAUTHORIZED = "unauthorized"
     const val GUEST_FACE_CHECK_CAPTURE = "guest-face-check"

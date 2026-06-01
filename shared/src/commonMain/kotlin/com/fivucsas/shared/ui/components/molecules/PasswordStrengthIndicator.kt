@@ -72,6 +72,7 @@ private fun calculateStrength(password: String): Strength {
     return Strength(score, hint)
 }
 
+@Composable
 private fun strengthLabel(score: Int): Pair<String, Color> {
     return when (score) {
         0, 1 -> "Weak" to AppColors.Error

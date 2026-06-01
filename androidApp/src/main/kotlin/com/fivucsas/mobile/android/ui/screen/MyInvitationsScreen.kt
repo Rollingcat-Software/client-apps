@@ -31,13 +31,15 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -46,19 +48,46 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.fivucsas.shared.domain.model.ReceivedInvite
 import com.fivucsas.shared.domain.model.ReceivedInviteStatus
+import com.fivucsas.shared.domain.usecase.invite.GetReceivedInvitesUseCase
+import com.fivucsas.shared.domain.usecase.invite.InviteResponse
+import com.fivucsas.shared.domain.usecase.invite.RespondToInviteUseCase
 import com.fivucsas.shared.ui.components.atoms.StatusBadge
 import com.fivucsas.shared.ui.components.atoms.StatusBadgeType
+import com.fivucsas.shared.ui.components.molecules.ErrorMessage
 import com.fivucsas.shared.ui.theme.AppColors
+import kotlinx.coroutines.launch
+import org.koin.compose.koinInject
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MyInvitationsScreen(
-    onNavigateBack: () -> Unit
+    onNavigateBack: () -> Unit,
+    getReceivedInvitesUseCase: GetReceivedInvitesUseCase = koinInject(),
+    respondToInviteUseCase: RespondToInviteUseCase = koinInject()
 ) {
-    // Invitations will be loaded from API when endpoint is available
-    val invites = remember { mutableStateListOf<ReceivedInvite>() }
-
+    // Received invitations are loaded from GET /invites/received on entry.
+    var invites by remember { mutableStateOf<List<ReceivedInvite>>(emptyList()) }
+    var isLoading by remember { mutableStateOf(true) }
+    var errorMessage by remember { mutableStateOf<String?>(null) }
+    var actionInProgressId by remember { mutableStateOf<String?>(null) }
     var successMessage by remember { mutableStateOf<String?>(null) }
+    val scope = rememberCoroutineScope()
+
+    suspend fun reload() {
+        getReceivedInvitesUseCase().fold(
+            onSuccess = {
+                invites = it
+                errorMessage = null
+                isLoading = false
+            },
+            onFailure = { error ->
+                errorMessage = error.message ?: "Failed to load invitations."
+                isLoading = false
+            }
+        )
+    }
+
+    LaunchedEffect(Unit) { reload() }
 
     Scaffold(
         topBar = {
@@ -107,10 +136,27 @@ fun MyInvitationsScreen(
                 }
             }
 
+            errorMessage?.let { msg ->
+                ErrorMessage(
+                    message = msg,
+                    modifier = Modifier.padding(vertical = 8.dp)
+                )
+            }
+
             val pending = invites.filter { it.status == ReceivedInviteStatus.PENDING }
             val past = invites.filter { it.status != ReceivedInviteStatus.PENDING }
 
-            if (invites.isEmpty()) {
+            if (isLoading) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(32.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    CircularProgressIndicator()
+                }
+            } else if (invites.isEmpty()) {
                 EmptyInvitationsContent()
             } else {
                 LazyColumn(
@@ -131,18 +177,43 @@ fun MyInvitationsScreen(
                         items(pending, key = { it.id }) { invite ->
                             ReceivedInviteCard(
                                 invite = invite,
+                                actionInProgress = actionInProgressId == invite.id,
                                 onAccept = {
-                                    val idx = invites.indexOfFirst { it.id == invite.id }
-                                    if (idx >= 0) {
-                                        invites[idx] = invite.copy(status = ReceivedInviteStatus.ACCEPTED)
-                                        successMessage = "Joined ${invite.tenantName}"
+                                    // Real accept: PUT /invites/received/{id}/accept.
+                                    errorMessage = null
+                                    successMessage = null
+                                    actionInProgressId = invite.id
+                                    scope.launch {
+                                        respondToInviteUseCase(invite.id, InviteResponse.ACCEPT).fold(
+                                            onSuccess = {
+                                                successMessage = "Joined ${invite.tenantName}"
+                                                actionInProgressId = null
+                                                reload()
+                                            },
+                                            onFailure = { error ->
+                                                actionInProgressId = null
+                                                errorMessage = error.message ?: "Failed to accept invitation."
+                                            }
+                                        )
                                     }
                                 },
                                 onDecline = {
-                                    val idx = invites.indexOfFirst { it.id == invite.id }
-                                    if (idx >= 0) {
-                                        invites[idx] = invite.copy(status = ReceivedInviteStatus.DECLINED)
-                                        successMessage = "Invitation declined"
+                                    // Real decline: PUT /invites/received/{id}/decline.
+                                    errorMessage = null
+                                    successMessage = null
+                                    actionInProgressId = invite.id
+                                    scope.launch {
+                                        respondToInviteUseCase(invite.id, InviteResponse.DECLINE).fold(
+                                            onSuccess = {
+                                                successMessage = "Invitation declined"
+                                                actionInProgressId = null
+                                                reload()
+                                            },
+                                            onFailure = { error ->
+                                                actionInProgressId = null
+                                                errorMessage = error.message ?: "Failed to decline invitation."
+                                            }
+                                        )
                                     }
                                 }
                             )
@@ -162,6 +233,7 @@ fun MyInvitationsScreen(
                         items(past, key = { it.id }) { invite ->
                             ReceivedInviteCard(
                                 invite = invite,
+                                actionInProgress = false,
                                 onAccept = null,
                                 onDecline = null
                             )
@@ -176,6 +248,7 @@ fun MyInvitationsScreen(
 @Composable
 private fun ReceivedInviteCard(
     invite: ReceivedInvite,
+    actionInProgress: Boolean,
     onAccept: (() -> Unit)?,
     onDecline: (() -> Unit)?
 ) {
@@ -255,6 +328,7 @@ private fun ReceivedInviteCard(
                 ) {
                     OutlinedButton(
                         onClick = onDecline,
+                        enabled = !actionInProgress,
                         modifier = Modifier.weight(1f)
                     ) {
                         Icon(Icons.Default.Close, contentDescription = null, modifier = Modifier.size(18.dp))
@@ -263,6 +337,7 @@ private fun ReceivedInviteCard(
                     }
                     Button(
                         onClick = onAccept,
+                        enabled = !actionInProgress,
                         modifier = Modifier.weight(1f)
                     ) {
                         Icon(Icons.Default.Check, contentDescription = null, modifier = Modifier.size(18.dp))

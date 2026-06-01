@@ -32,7 +32,7 @@ data class NotificationItemData(
     val isUnread: Boolean = false,
     val status: StatusBadgeType = StatusBadgeType.Info,
     val icon: ImageVector? = null,
-    val iconTint: Color = AppColors.Info
+    val iconTint: Color? = null
 )
 
 @Composable
@@ -63,7 +63,7 @@ fun NotificationItem(
                 Icon(
                     imageVector = data.icon,
                     contentDescription = null,
-                    tint = data.iconTint,
+                    tint = data.iconTint ?: AppColors.Info,
                     modifier = Modifier.size(UIDimens.IconMedium)
                 )
             }

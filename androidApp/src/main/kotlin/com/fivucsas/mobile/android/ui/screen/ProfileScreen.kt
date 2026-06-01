@@ -30,6 +30,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -50,6 +51,7 @@ import com.fivucsas.mobile.android.ui.component.ExportDataRow
 import com.fivucsas.mobile.android.ui.viewmodel.DataExportViewModel
 import com.fivucsas.shared.ui.components.organisms.BottomNavBar
 import com.fivucsas.shared.ui.theme.AppColors
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -66,16 +68,30 @@ fun ProfileScreen(
     onEditProfile: () -> Unit,
     onChangePassword: () -> Unit,
     onReEnroll: () -> Unit,
-    onDeleteEnrollment: () -> Unit,
+    /**
+     * Performs the real biometric-enrollment deletion (DELETE biometric/face/{userId})
+     * and returns its [Result]. The success dialog is shown only when this resolves
+     * to [Result.success]; a failure surfaces an inline error instead. Wired in
+     * AppNavigation to [BiometricRepository.deleteBiometricData]. When `null`, no
+     * real delete capability is available and the delete control is hidden.
+     */
+    onDeleteEnrollment: (suspend () -> Result<Unit>)? = null,
     onOpenSettings: () -> Unit,
     onOpenLinkedAccounts: () -> Unit = {},
+    onOpenLoginRequests: () -> Unit = {},
     navItems: List<com.fivucsas.shared.ui.components.organisms.BottomNavItem> = com.fivucsas.mobile.android.ui.navigation.BottomNavDestinations.items,
     userId: String = "",
     dataExportViewModel: DataExportViewModel? = null,
 ) {
     val isSelfBiometricRole = userRole == UserRole.USER || userRole == UserRole.TENANT_MEMBER
+    val canDeleteEnrollment = onDeleteEnrollment != null &&
+        isSelfBiometricRole &&
+        userRole.hasPermission(Permission.ENROLL_SELF_DELETE)
     var showDeleteDialog by remember { mutableStateOf(false) }
     var showDeleteSuccess by remember { mutableStateOf(false) }
+    var deleteInProgress by remember { mutableStateOf(false) }
+    var deleteError by remember { mutableStateOf<String?>(null) }
+    val deleteScope = rememberCoroutineScope()
     Scaffold(
         topBar = {
             TopAppBar(
@@ -185,6 +201,9 @@ fun ProfileScreen(
                 Button(onClick = onOpenLinkedAccounts, modifier = Modifier.fillMaxWidth()) {
                     Text(s(StringKey.LINKED_ACCOUNTS_TITLE))
                 }
+                Button(onClick = onOpenLoginRequests, modifier = Modifier.fillMaxWidth()) {
+                    Text(s(StringKey.APPROVE_LOGIN_TITLE))
+                }
                 if (isSelfBiometricRole && userRole.hasPermission(Permission.ENROLL_SELF_UPDATE)) {
                     Button(onClick = onReEnroll, modifier = Modifier.fillMaxWidth()) {
                         Text(s(StringKey.PROFILE_RE_ENROLL_FACE))
@@ -196,9 +215,13 @@ fun ProfileScreen(
                 ) {
                     Text(s(StringKey.PROFILE_OPEN_SETTINGS))
                 }
-                if (isSelfBiometricRole && userRole.hasPermission(Permission.ENROLL_SELF_DELETE)) {
+                // Only shown when a real delete capability is wired in
+                // (onDeleteEnrollment != null). If no delete API is available the
+                // control is hidden entirely — we never offer an action we cannot honour.
+                if (canDeleteEnrollment) {
                     OutlinedButton(
                         onClick = { showDeleteDialog = true },
+                        enabled = !deleteInProgress,
                         modifier = Modifier.fillMaxWidth(),
                         colors = ButtonDefaults.outlinedButtonColors(
                             contentColor = AppColors.Error
@@ -212,6 +235,7 @@ fun ProfileScreen(
             if (showDeleteSuccess) {
                 SuccessMessage(message = "Enrollment deleted successfully.")
             }
+            deleteError?.let { ErrorMessage(message = it) }
 
             // ── "My Data" (GDPR Art. 20 / KVKK data portability) ──
             // Only rendered when we have both a user id + a VM wired in by
@@ -228,7 +252,7 @@ fun ProfileScreen(
         }
     }
 
-    if (showDeleteDialog) {
+    if (showDeleteDialog && onDeleteEnrollment != null) {
         ConfirmationDialog(
             title = "Delete My Enrollment",
             message = "This will permanently delete your biometric data. You will need to re-enroll to use face verification.",
@@ -236,8 +260,22 @@ fun ProfileScreen(
             dismissText = "Cancel",
             onConfirm = {
                 showDeleteDialog = false
-                showDeleteSuccess = true
-                onDeleteEnrollment()
+                deleteError = null
+                deleteInProgress = true
+                deleteScope.launch {
+                    // Success is shown ONLY when the server confirms the delete.
+                    // A failure surfaces an inline error — never a fake success.
+                    onDeleteEnrollment().fold(
+                        onSuccess = {
+                            deleteInProgress = false
+                            showDeleteSuccess = true
+                        },
+                        onFailure = { error ->
+                            deleteInProgress = false
+                            deleteError = error.message ?: "Failed to delete enrollment. Please try again."
+                        }
+                    )
+                }
             },
             onDismiss = { showDeleteDialog = false }
         )

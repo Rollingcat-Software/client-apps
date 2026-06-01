@@ -469,12 +469,7 @@ private fun MfaStepInputContent(
         "QR_CODE" -> {
             QrCodeStepInput(
                 viewModel = viewModel,
-                onOpenQrScanner = onOpenQrScanner,
-                onVerify = {
-                    scope.launch {
-                        viewModel.verifyStep(method)
-                    }
-                }
+                onOpenQrScanner = onOpenQrScanner
             )
         }
 
@@ -508,8 +503,17 @@ private fun MfaStepInputContent(
                 authenticatorAttachment = "platform",
                 onVerify = { assertionPayload ->
                     scope.launch {
-                        // Backend FingerprintAuthHandler accepts `fingerprintData` (or `assertion`).
-                        viewModel.verifyStep(method, mapOf("fingerprintData" to assertionPayload))
+                        // Backend FingerprintVerifyMfaStepHandler reads data.get("assertion")
+                        // ONLY (same as HARDWARE_KEY) — the previous "fingerprintData" key
+                        // was never read, so FINGERPRINT always failed. Send `assertion`
+                        // (and `fingerprintData` too, harmlessly, for safety).
+                        viewModel.verifyStep(
+                            method,
+                            mapOf(
+                                "assertion" to assertionPayload,
+                                "fingerprintData" to assertionPayload
+                            )
+                        )
                     }
                 }
             )
@@ -715,8 +719,7 @@ private fun OtpStepInput(
 @Composable
 private fun QrCodeStepInput(
     viewModel: MfaFlowViewModel,
-    onOpenQrScanner: () -> Unit,
-    onVerify: () -> Unit
+    onOpenQrScanner: () -> Unit
 ) {
     var qrToken by remember { mutableStateOf<String?>(null) }
     var loading by remember { mutableStateOf(true) }
@@ -760,7 +763,11 @@ private fun QrCodeStepInput(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Primary action: scan the QR code shown on the web/desktop with the camera
+        // Primary action: scan the QR code shown on the web/desktop with the camera.
+        // The server completes the QR step once the OTHER device submits the token —
+        // there is intentionally no "confirm" button here. A button that called
+        // verifyStep("QR_CODE") with an empty data map always failed server-side
+        // ("QR token is required"), so it was removed.
         Button(
             onClick = onOpenQrScanner,
             modifier = Modifier.fillMaxWidth()
@@ -772,13 +779,6 @@ private fun QrCodeStepInput(
             )
             Spacer(modifier = Modifier.size(8.dp))
             Text(s(StringKey.MFA_SCAN_QR_CAMERA))
-        }
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        // Secondary action: confirm that another device already scanned this app's QR
-        OutlinedButton(onClick = onVerify, modifier = Modifier.fillMaxWidth()) {
-            Text(s(StringKey.MFA_VERIFY))
         }
     } else {
         Text(

@@ -104,7 +104,24 @@ class MfaFlowViewModel(
             }
 
             if (result == null) {
-                // Timeout occurred
+                // Timeout occurred — but the server may have actually
+                // AUTHENTICATED us before the response made it back over a
+                // slow link. Before surfacing a timeout error, check whether
+                // authentication has in fact succeeded; if so, treat it as a
+                // success instead of stranding the user on a false failure.
+                if (_authResult.value != null) {
+                    // We already committed a success on an earlier turn.
+                    _uiState.value = MfaFlowUiState.Authenticated(
+                        userId = _authResult.value?.tokens?.userId ?: ""
+                    )
+                    return
+                }
+                val authenticated = runCatching { authRepository.isAuthenticated() }
+                    .getOrDefault(false)
+                if (authenticated) {
+                    _uiState.value = MfaFlowUiState.Authenticated(userId = "")
+                    return
+                }
                 _uiState.value = MfaFlowUiState.Error(
                     message = s(StringKey.MFA_TIMEOUT),
                     canRetry = true

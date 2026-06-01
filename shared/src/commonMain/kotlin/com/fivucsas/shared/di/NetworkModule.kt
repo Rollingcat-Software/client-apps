@@ -96,6 +96,9 @@ val networkModule = module {
             isLenient = true
             ignoreUnknownKeys = true
             encodeDefaults = true
+            // Coerce an explicit null on a field that has a default to its
+            // default (e.g. `content: List = emptyList()`), instead of throwing.
+            coerceInputValues = true
         }
     }
 
@@ -274,11 +277,6 @@ val networkModule = module {
     // OAuth2 Client API (Developer Portal)
     single<com.fivucsas.shared.data.remote.api.OAuth2ClientApi> {
         com.fivucsas.shared.data.remote.api.OAuth2ClientApiImpl(get(named("identityClient")))
-    }
-
-    // NFC Approval API (push-approval decide endpoint)
-    single<com.fivucsas.shared.data.remote.api.NfcApprovalApi> {
-        com.fivucsas.shared.data.remote.api.NfcApprovalApiImpl(get(named("identityClient")))
     }
 
     // Approve-login API (number-matching approver side: list pending + decide)

@@ -14,6 +14,7 @@ import androidx.navigation.navArgument
 import com.fivucsas.mobile.android.ui.screen.AboutScreen
 import com.fivucsas.mobile.android.ui.screen.ActivityHistoryScreen
 import com.fivucsas.mobile.android.ui.screen.AdminDashboardScreen
+import com.fivucsas.mobile.android.ui.screen.ApproveLoginScreen
 import com.fivucsas.mobile.android.ui.screen.BiometricEnrollScreen
 import com.fivucsas.mobile.android.ui.screen.BiometricVerifyScreen
 import com.fivucsas.mobile.android.ui.screen.CardScanScreen
@@ -49,6 +50,7 @@ import com.fivucsas.mobile.android.ui.screen.MfaFlowScreen
 import com.fivucsas.mobile.android.ui.viewmodel.DataExportViewModel as AndroidDataExportViewModel
 import com.fivucsas.authenticator.ui.AuthenticatorScreen
 import com.fivucsas.shared.data.local.TokenManager
+import com.fivucsas.shared.domain.repository.BiometricRepository
 import com.fivucsas.shared.domain.repository.DataExportRepository
 import com.fivucsas.shared.domain.model.ConfidenceBand
 import com.fivucsas.shared.domain.model.GuestFaceCheckOutcome
@@ -106,6 +108,7 @@ sealed class Screen(val route: String) {
     object Help : Screen(RouteIds.HELP)
     object About : Screen(RouteIds.ABOUT)
     object QrLoginScan : Screen(RouteIds.QR_LOGIN_SCAN)
+    object ApproveLogin : Screen(RouteIds.APPROVE_LOGIN)
     object TenantHistory : Screen(RouteIds.TENANT_HISTORY)
     object TenantSettings : Screen(RouteIds.TENANT_SETTINGS)
     object Unauthorized : Screen("${RouteIds.UNAUTHORIZED}/{message}") {
@@ -640,6 +643,13 @@ fun AppNavigation() {
                 }
                 return@composable
             }
+            val operatorRole = currentUserRole()
+            if (!NavigationPolicy.canAccessRoute(operatorRole, RouteIds.OPERATOR_DASHBOARD)) {
+                LaunchedEffect(Unit) {
+                    navigateUnauthorized("No permission for the operator console.")
+                }
+                return@composable
+            }
             OperatorDashboardScreen(
                 currentRoute = Screen.OperatorDashboard.route,
                 onNavigateToNotifications = { navController.navigate(Screen.Notifications.route) },
@@ -743,6 +753,7 @@ fun AppNavigation() {
             }
             val profileUserName = profileState.user?.name ?: tokenManager?.getUserName() ?: "User"
             val profileUserEmail = profileState.user?.email ?: tokenManager?.getUserEmail() ?: ""
+            val profileBiometricRepository = koinInject<BiometricRepository>()
             val dataExportRepository = koinInject<DataExportRepository>()
             val profileContext = LocalContext.current.applicationContext
             val dataExportVm = remember(dataExportRepository) {
@@ -774,8 +785,17 @@ fun AppNavigation() {
                 onEditProfile = { navController.navigate(Screen.EditProfile.route) },
                 onChangePassword = { navController.navigate(Screen.ChangePassword.route) },
                 onOpenLinkedAccounts = { navController.navigate(Screen.LinkedAccounts.route) },
+                onOpenLoginRequests = { navController.navigate(Screen.ApproveLogin.route) },
                 onReEnroll = { navController.navigate(Screen.BiometricEnroll.createRoute(tokenManager?.getUserId() ?: "me")) },
-                onDeleteEnrollment = { /* Enrollment deletion not yet available */ },
+                onDeleteEnrollment = {
+                    // Real delete: DELETE biometric/face/{userId} via BiometricRepository.
+                    val deleteUserId = profileState.user?.id ?: tokenManager?.getUserId()
+                    if (deleteUserId.isNullOrBlank()) {
+                        Result.failure(IllegalStateException("No signed-in user to delete enrollment for."))
+                    } else {
+                        profileBiometricRepository.deleteBiometricData(deleteUserId)
+                    }
+                },
                 onOpenSettings = { navController.navigate(Screen.Settings.route) },
                 navItems = profileNavItems,
                 userId = profileState.user?.id ?: tokenManager?.getUserId() ?: "",
@@ -864,6 +884,7 @@ fun AppNavigation() {
                 onNavigateToHardwareToken = { navController.navigate(Screen.HardwareToken.route) },
                 onNavigateToBiometricBackup = { navController.navigate(Screen.BiometricBackup.createRoute(tokenManager?.getUserId() ?: "me")) },
                 onNavigateToAuthenticator = { navController.navigate(Screen.Authenticator.route) },
+                onNavigateToSystemSettings = { navController.navigate(Screen.RootSystemSettings.route) },
                 onLogout = {
                     tokenManager?.clearTokens()
                     navController.navigate(Screen.Login.route) {
@@ -947,6 +968,18 @@ fun AppNavigation() {
                 return@composable
             }
             QRLoginScanScreen(onNavigateBack = { navController.popBackStack() })
+        }
+
+        composable(Screen.ApproveLogin.route) {
+            if (!isAuthenticated()) {
+                LaunchedEffect(Unit) {
+                    navController.navigate(Screen.Login.route) {
+                        popUpTo(0) { inclusive = true }
+                    }
+                }
+                return@composable
+            }
+            ApproveLoginScreen(onNavigateBack = { navController.popBackStack() })
         }
 
         composable(Screen.GuestFaceCheckCapture.route) {
@@ -1103,6 +1136,14 @@ fun AppNavigation() {
         }
 
         composable(Screen.NfcRead.route) {
+            if (!isAuthenticated()) {
+                LaunchedEffect(Unit) {
+                    navController.navigate(Screen.Login.route) {
+                        popUpTo(0) { inclusive = true }
+                    }
+                }
+                return@composable
+            }
             NfcReadScreen(
                 onNavigateBack = { navController.popBackStack() }
             )
@@ -1525,6 +1566,12 @@ fun AppNavigation() {
                 }
                 return@composable
             }
+            if (!NavigationPolicy.canAccessRoute(currentUserRole(), RouteIds.ANALYTICS)) {
+                LaunchedEffect(Unit) {
+                    navigateUnauthorized("No permission to view analytics.")
+                }
+                return@composable
+            }
             val viewModel = koinInject<com.fivucsas.shared.presentation.viewmodel.AnalyticsViewModel>()
             AnalyticsScreen(
                 viewModel = viewModel,
@@ -1567,6 +1614,12 @@ fun AppNavigation() {
             if (!isAuthenticated()) {
                 LaunchedEffect(Unit) {
                     navController.navigate(Screen.Login.route) { popUpTo(0) { inclusive = true } }
+                }
+                return@composable
+            }
+            if (!NavigationPolicy.canAccessRoute(currentUserRole(), RouteIds.HARDWARE_TOKEN)) {
+                LaunchedEffect(Unit) {
+                    navigateUnauthorized("No permission to register a hardware security key.")
                 }
                 return@composable
             }

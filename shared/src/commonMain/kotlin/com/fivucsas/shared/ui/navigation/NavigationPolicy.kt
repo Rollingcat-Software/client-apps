@@ -62,6 +62,19 @@ object NavigationPolicy {
             routeId == RouteIds.ROOT_AUDIT_EXPLORER -> canAccess(role, Permission.PLATFORM_AUDIT_READ)
             routeId == RouteIds.ROOT_SECURITY_EVENTS -> canAccess(role, Permission.PLATFORM_HEALTH_READ)
             routeId == RouteIds.ROOT_SYSTEM_SETTINGS -> canAccess(role, Permission.PLATFORM_SETTINGS_UPDATE)
+            // Explicit gating for sensitive routes that previously fell through to
+            // the fail-open `else -> true` default. Mirrors the DESKTOP_ANALYTICS
+            // case (tenant analytics require tenant-history read).
+            routeId == RouteIds.ANALYTICS -> canAccess(role, Permission.HISTORY_READ_TENANT)
+            // Hardware security-key (FIDO2/WebAuthn) registration is a self-service
+            // enrollment action — same gate as biometric self-enrollment.
+            routeId == RouteIds.HARDWARE_TOKEN -> canAccess(role, Permission.ENROLL_SELF_CREATE)
+            // Operator console is an elevated surface — restrict to ROOT / TENANT_ADMIN
+            // (same set as ADMIN_DASHBOARD).
+            routeId == RouteIds.OPERATOR_DASHBOARD -> role == UserRole.ROOT || role == UserRole.TENANT_ADMIN
+            // NOTE: this default stays fail-open to avoid breaking the many reachable
+            // routes not yet enumerated above; a full fail-closed pass (flip to
+            // `else -> false` with an exhaustive route inventory) is a follow-up.
             else -> true
         }
     }

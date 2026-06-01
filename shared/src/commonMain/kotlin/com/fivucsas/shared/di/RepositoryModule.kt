@@ -200,13 +200,6 @@ val repositoryModule = module {
         )
     }
 
-    // NFC Approval Repository (push-approval protocol)
-    single<com.fivucsas.shared.domain.repository.NfcApprovalRepository> {
-        com.fivucsas.shared.data.repository.NfcApprovalRepositoryImpl(
-            api = get<com.fivucsas.shared.data.remote.api.NfcApprovalApi>()
-        )
-    }
-
     // Approve-login Repository (number-matching approver side)
     single<com.fivucsas.shared.domain.repository.ApproveLoginRepository> {
         com.fivucsas.shared.data.repository.ApproveLoginRepositoryImpl(
