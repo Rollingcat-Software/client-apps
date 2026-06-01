@@ -10,7 +10,7 @@ plugins {
 group = "com.fivucsas.desktop"
 // Tracks the client-apps release line (Android versionName) so the produced
 // .deb / .msi installer version matches the published release, not a stale 1.0.0.
-version = "5.2.3"
+version = "5.3.0"
 
 kotlin {
     jvmToolchain(21)
