@@ -11,8 +11,11 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+import com.fivucsas.mobile.android.R
 import com.fivucsas.mobile.android.data.preferences.ThemePreferences
 import com.fivucsas.shared.ui.theme.DarkAppColors
 import com.fivucsas.shared.ui.theme.LightAppColors
@@ -93,70 +96,91 @@ private val DarkColors = darkColorScheme(
     onErrorContainer = ErrorLight
 )
 
-// Typography aligned with web-app: Inter body, Poppins headings
-// Using system sans-serif as a fallback (Inter/Poppins require bundled fonts)
+// Typography aligned with web-app theme.ts: Poppins headings + Inter body.
+// Inter is the variable font (weights synthesized below 400-master on API<26);
+// Poppins ships as static per-weight files.
+private val Inter = FontFamily(Font(R.font.inter))
+private val Poppins = FontFamily(
+    Font(R.font.poppins_regular, FontWeight.Normal),
+    Font(R.font.poppins_medium, FontWeight.Medium),
+    Font(R.font.poppins_semibold, FontWeight.SemiBold),
+    Font(R.font.poppins_bold, FontWeight.Bold),
+)
+
 private val AppTypography = Typography(
     headlineLarge = TextStyle(
+        fontFamily = Poppins,
         fontWeight = FontWeight.Bold,
         fontSize = 28.sp,
         lineHeight = 34.sp,
         letterSpacing = (-0.02).sp
     ),
     headlineMedium = TextStyle(
+        fontFamily = Poppins,
         fontWeight = FontWeight.SemiBold,
         fontSize = 24.sp,
         lineHeight = 30.sp,
         letterSpacing = (-0.01).sp
     ),
     headlineSmall = TextStyle(
+        fontFamily = Poppins,
         fontWeight = FontWeight.SemiBold,
         fontSize = 20.sp,
         lineHeight = 26.sp,
         letterSpacing = (-0.01).sp
     ),
     titleLarge = TextStyle(
+        fontFamily = Poppins,
         fontWeight = FontWeight.SemiBold,
         fontSize = 18.sp,
         lineHeight = 24.sp
     ),
     titleMedium = TextStyle(
+        fontFamily = Inter,
         fontWeight = FontWeight.SemiBold,
         fontSize = 16.sp,
         lineHeight = 22.sp
     ),
     titleSmall = TextStyle(
+        fontFamily = Inter,
         fontWeight = FontWeight.Medium,
         fontSize = 14.sp,
         lineHeight = 20.sp
     ),
     bodyLarge = TextStyle(
+        fontFamily = Inter,
         fontWeight = FontWeight.Normal,
         fontSize = 16.sp,
         lineHeight = 24.sp
     ),
     bodyMedium = TextStyle(
+        fontFamily = Inter,
         fontWeight = FontWeight.Normal,
         fontSize = 14.sp,
         lineHeight = 20.sp
     ),
     bodySmall = TextStyle(
+        fontFamily = Inter,
         fontWeight = FontWeight.Normal,
         fontSize = 12.sp,
         lineHeight = 16.sp
     ),
     labelLarge = TextStyle(
+        fontFamily = Inter,
         fontWeight = FontWeight.SemiBold,
         fontSize = 14.sp,
         lineHeight = 20.sp,
         letterSpacing = 0.02.sp
     ),
     labelMedium = TextStyle(
+        fontFamily = Inter,
         fontWeight = FontWeight.Medium,
         fontSize = 12.sp,
         lineHeight = 16.sp,
         letterSpacing = 0.05.sp
     ),
     labelSmall = TextStyle(
+        fontFamily = Inter,
         fontWeight = FontWeight.Medium,
         fontSize = 11.sp,
         lineHeight = 16.sp,
