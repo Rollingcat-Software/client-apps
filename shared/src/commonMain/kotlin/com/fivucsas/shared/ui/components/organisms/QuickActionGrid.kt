@@ -24,7 +24,9 @@ data class QuickActionItem(
     val title: String,
     val icon: ImageVector,
     val onClick: () -> Unit,
-    val iconTint: Color = AppColors.Primary
+    // Null → default to AppColors.Primary at render (a data-class default can't
+    // call the @Composable AppColors getter).
+    val iconTint: Color? = null
 )
 
 @Composable
@@ -56,7 +58,7 @@ fun QuickActionGrid(
                             Icon(
                                 imageVector = action.icon,
                                 contentDescription = null,
-                                tint = action.iconTint,
+                                tint = action.iconTint ?: AppColors.Primary,
                                 modifier = Modifier.size(UIDimens.IconMedium)
                             )
                             Spacer(modifier = Modifier.size(8.dp))

@@ -12,15 +12,16 @@ import androidx.compose.ui.unit.dp
 import com.fivucsas.shared.ui.theme.AppColors
 import com.fivucsas.shared.ui.theme.AppShapes
 
-enum class StatusBadgeType(
-    val backgroundColor: Color,
-    val textColor: Color
-) {
-    Success(AppColors.Success.copy(alpha = 0.15f), AppColors.Success),
-    Failure(AppColors.Error.copy(alpha = 0.15f), AppColors.Error),
-    Warning(AppColors.Warning.copy(alpha = 0.15f), AppColors.WarningDark),
-    Info(AppColors.Info.copy(alpha = 0.15f), AppColors.InfoDark),
-    Neutral(AppColors.Gray200, AppColors.Gray700)
+enum class StatusBadgeType { Success, Failure, Warning, Info, Neutral }
+
+/** Background + text color for a badge type, resolved against the active (light/dark) theme. */
+@Composable
+private fun StatusBadgeType.colors(): Pair<Color, Color> = when (this) {
+    StatusBadgeType.Success -> AppColors.Success.copy(alpha = 0.15f) to AppColors.Success
+    StatusBadgeType.Failure -> AppColors.Error.copy(alpha = 0.15f) to AppColors.Error
+    StatusBadgeType.Warning -> AppColors.Warning.copy(alpha = 0.15f) to AppColors.WarningDark
+    StatusBadgeType.Info -> AppColors.Info.copy(alpha = 0.15f) to AppColors.InfoDark
+    StatusBadgeType.Neutral -> AppColors.Gray200 to AppColors.Gray700
 }
 
 @Composable
@@ -30,15 +31,16 @@ fun StatusBadge(
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(horizontal = 10.dp, vertical = 4.dp)
 ) {
+    val (badgeBackground, badgeText) = type.colors()
     Surface(
         modifier = modifier,
         shape = AppShapes.Chip,
-        color = type.backgroundColor,
-        contentColor = type.textColor
+        color = badgeBackground,
+        contentColor = badgeText
     ) {
         Text(
             text = text,
-            color = type.textColor,
+            color = badgeText,
             style = com.fivucsas.shared.ui.theme.AppTypography.LabelMedium.copy(
                 fontWeight = FontWeight.Medium
             ),

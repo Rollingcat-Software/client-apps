@@ -32,7 +32,7 @@ data class ActivityItemData(
     val score: String? = null,
     val status: StatusBadgeType = StatusBadgeType.Info,
     val icon: ImageVector? = null,
-    val iconTint: Color = AppColors.Primary
+    val iconTint: Color? = null
 )
 
 @Composable
@@ -57,7 +57,7 @@ fun ActivityItem(
                 Icon(
                     imageVector = data.icon,
                     contentDescription = null,
-                    tint = data.iconTint,
+                    tint = data.iconTint ?: AppColors.Primary,
                     modifier = Modifier.size(UIDimens.IconMedium)
                 )
             }

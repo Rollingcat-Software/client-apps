@@ -14,6 +14,9 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import com.fivucsas.mobile.android.data.preferences.ThemePreferences
+import com.fivucsas.shared.ui.theme.DarkAppColors
+import com.fivucsas.shared.ui.theme.LightAppColors
+import com.fivucsas.shared.ui.theme.LocalAppColors
 import com.fivucsas.shared.ui.theme.LocalThemeMode
 import com.fivucsas.shared.ui.theme.ThemeMode
 import org.koin.compose.koinInject
@@ -186,22 +189,21 @@ fun FIVUCSASTheme(
     val prefs: ThemePreferences = koinInject()
     val mode by prefs.themeMode.collectAsState()
 
-    CompositionLocalProvider(LocalThemeMode provides mode) {
-        // The legacy shared `AppColors` palette is LIGHT-only, and many screens
-        // read it directly alongside `MaterialTheme.colorScheme`. Rendering the
-        // dark scheme while those screens stay light yields broken, low-contrast
-        // UI (e.g. light text on a white card). Until `AppColors` is made
-        // theme-aware, render LIGHT consistently so the whole app matches the
-        // web app's (light-first) look. Proper dark mode is a tracked follow-up.
-        // An explicit [darkTheme] (e.g. screenshot tests) is still honoured.
-        @Suppress("UNUSED_VARIABLE")
-        val resolvedMode = when (mode) {
-            ThemeMode.LIGHT -> false
-            ThemeMode.DARK -> true
-            ThemeMode.SYSTEM -> isSystemInDarkTheme()
-        }
-        val useDark = darkTheme ?: false
-        val colors = if (useDark) DarkColors else LightColors
+    // AppColors is now theme-aware (LocalAppColors), so the whole app — both the
+    // MaterialTheme colorScheme AND the shared AppColors.* call sites — follows
+    // light/dark together. (This replaces the earlier force-light workaround.)
+    val useDark = darkTheme ?: when (mode) {
+        ThemeMode.LIGHT -> false
+        ThemeMode.DARK -> true
+        ThemeMode.SYSTEM -> isSystemInDarkTheme()
+    }
+    val colors = if (useDark) DarkColors else LightColors
+    val appColors = if (useDark) DarkAppColors else LightAppColors
+
+    CompositionLocalProvider(
+        LocalThemeMode provides mode,
+        LocalAppColors provides appColors,
+    ) {
 
         MaterialTheme(
             colorScheme = colors,
