@@ -48,6 +48,8 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.fivucsas.mobile.android.ui.screen.MrzScannerScreen
 import com.fivucsas.shared.domain.model.MrzInputData
+import com.fivucsas.shared.i18n.StringKey
+import com.fivucsas.shared.i18n.s
 
 /**
  * Dialog for entering MRZ (Machine Readable Zone) data for BAC authentication.
@@ -59,8 +61,6 @@ import com.fivucsas.shared.domain.model.MrzInputData
  * Offers a camera-based MRZ scanner as the primary capture path and falls back
  * to manual entry. Validation is light — the existing NFC crypto layer will
  * reject bad MRZ data during BAC derivation.
- *
- * TODO(i18n): NFC_STEP_* keys in /tmp/i18n_agent_20A.txt
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -104,36 +104,36 @@ fun MrzInputDialog(
         var isValid = true
 
         if (documentNumber.isBlank()) {
-            documentNumberError = "Document number is required"
+            documentNumberError = s(StringKey.MRZ_DIALOG_ERR_DOC_REQUIRED)
             isValid = false
         } else if (documentNumber.length > 9) {
-            documentNumberError = "Document number must be up to 9 characters"
+            documentNumberError = s(StringKey.MRZ_DIALOG_ERR_DOC_TOO_LONG)
             isValid = false
         } else {
             documentNumberError = null
         }
 
         if (dateOfBirth.isBlank()) {
-            dateOfBirthError = "Date of birth is required"
+            dateOfBirthError = s(StringKey.MRZ_DIALOG_ERR_DOB_REQUIRED)
             isValid = false
         } else if (!dateOfBirth.matches(Regex("\\d{6}"))) {
-            dateOfBirthError = "Must be YYMMDD format (e.g., 901231)"
+            dateOfBirthError = s(StringKey.MRZ_DIALOG_ERR_DOB_FORMAT)
             isValid = false
         } else if (!isValidMrzDate(dateOfBirth)) {
-            dateOfBirthError = "Invalid date"
+            dateOfBirthError = s(StringKey.MRZ_DIALOG_ERR_INVALID_DATE)
             isValid = false
         } else {
             dateOfBirthError = null
         }
 
         if (dateOfExpiry.isBlank()) {
-            dateOfExpiryError = "Date of expiry is required"
+            dateOfExpiryError = s(StringKey.MRZ_DIALOG_ERR_DOE_REQUIRED)
             isValid = false
         } else if (!dateOfExpiry.matches(Regex("\\d{6}"))) {
-            dateOfExpiryError = "Must be YYMMDD format (e.g., 301231)"
+            dateOfExpiryError = s(StringKey.MRZ_DIALOG_ERR_DOE_FORMAT)
             isValid = false
         } else if (!isValidMrzDate(dateOfExpiry)) {
-            dateOfExpiryError = "Invalid date"
+            dateOfExpiryError = s(StringKey.MRZ_DIALOG_ERR_INVALID_DATE)
             isValid = false
         } else {
             dateOfExpiryError = null
@@ -148,7 +148,7 @@ fun MrzInputDialog(
             if (mrz.isValid()) {
                 onAuthenticate(mrz)
             } else {
-                documentNumberError = "Invalid MRZ data"
+                documentNumberError = s(StringKey.MRZ_DIALOG_ERR_INVALID_MRZ)
             }
         }
     }
@@ -190,16 +190,15 @@ fun MrzInputDialog(
                             tint = MaterialTheme.colorScheme.primary
                         )
                         Spacer(modifier = Modifier.width(8.dp))
-                        // TODO(i18n): NFC_STEP_MRZ_DIALOG_TITLE
                         Text(
-                            text = "Identity Document Authentication",
+                            text = s(StringKey.MRZ_DIALOG_TITLE),
                             style = MaterialTheme.typography.titleLarge
                         )
                     }
                     IconButton(onClick = onDismiss) {
                         Icon(
                             imageVector = Icons.Default.Close,
-                            contentDescription = "Close"
+                            contentDescription = s(StringKey.MRZ_DIALOG_CLOSE_DESC)
                         )
                     }
                 }
@@ -216,15 +215,13 @@ fun MrzInputDialog(
                         modifier = Modifier.size(18.dp)
                     )
                     Spacer(modifier = Modifier.width(8.dp))
-                    // TODO(i18n): NFC_STEP_SCAN_MRZ_CAMERA
-                    Text("Scan MRZ with Camera")
+                    Text(s(StringKey.MRZ_DIALOG_SCAN_WITH_CAMERA))
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // TODO(i18n): NFC_STEP_OR_MANUAL
                 Text(
-                    text = "Or enter the MRZ data manually:",
+                    text = s(StringKey.MRZ_DIALOG_OR_MANUAL),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -237,8 +234,8 @@ fun MrzInputDialog(
                         documentNumber = it.take(9).uppercase()
                         documentNumberError = null
                     },
-                    label = { Text("Document Number") },
-                    placeholder = { Text("e.g., A12345678") },
+                    label = { Text(s(StringKey.MRZ_DIALOG_FIELD_DOCUMENT_NUMBER)) },
+                    placeholder = { Text(s(StringKey.MRZ_DIALOG_FIELD_DOCUMENT_NUMBER_HINT)) },
                     leadingIcon = {
                         Icon(Icons.Default.Numbers, contentDescription = null)
                     },
@@ -266,8 +263,8 @@ fun MrzInputDialog(
                         dateOfBirth = it.filter { c -> c.isDigit() }.take(6)
                         dateOfBirthError = null
                     },
-                    label = { Text("Date of Birth") },
-                    placeholder = { Text("YYMMDD (e.g., 901231)") },
+                    label = { Text(s(StringKey.MRZ_DIALOG_FIELD_DATE_OF_BIRTH)) },
+                    placeholder = { Text(s(StringKey.MRZ_DIALOG_FIELD_DATE_OF_BIRTH_HINT)) },
                     leadingIcon = {
                         Icon(Icons.Default.CalendarMonth, contentDescription = null)
                     },
@@ -276,7 +273,7 @@ fun MrzInputDialog(
                         if (dateOfBirthError != null) {
                             Text(dateOfBirthError!!)
                         } else {
-                            Text("Format: YYMMDD (Year-Month-Day)")
+                            Text(s(StringKey.MRZ_DIALOG_DATE_FORMAT_HELPER))
                         }
                     },
                     singleLine = true,
@@ -298,8 +295,8 @@ fun MrzInputDialog(
                         dateOfExpiry = it.filter { c -> c.isDigit() }.take(6)
                         dateOfExpiryError = null
                     },
-                    label = { Text("Date of Expiry") },
-                    placeholder = { Text("YYMMDD (e.g., 301231)") },
+                    label = { Text(s(StringKey.MRZ_DIALOG_FIELD_DATE_OF_EXPIRY)) },
+                    placeholder = { Text(s(StringKey.MRZ_DIALOG_FIELD_DATE_OF_EXPIRY_HINT)) },
                     leadingIcon = {
                         Icon(Icons.Default.CalendarMonth, contentDescription = null)
                     },
@@ -308,7 +305,7 @@ fun MrzInputDialog(
                         if (dateOfExpiryError != null) {
                             Text(dateOfExpiryError!!)
                         } else {
-                            Text("Format: YYMMDD (Year-Month-Day)")
+                            Text(s(StringKey.MRZ_DIALOG_DATE_FORMAT_HELPER))
                         }
                     },
                     singleLine = true,
@@ -329,9 +326,8 @@ fun MrzInputDialog(
                         containerColor = MaterialTheme.colorScheme.surfaceVariant
                     )
                 ) {
-                    // TODO(i18n): NFC_STEP_PRIVACY_NOTE
                     Text(
-                        text = "Your MRZ data is used only for card authentication and is not stored.",
+                        text = s(StringKey.MRZ_DIALOG_PRIVACY_NOTE),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         textAlign = TextAlign.Center,
@@ -346,7 +342,7 @@ fun MrzInputDialog(
                     horizontalArrangement = Arrangement.End
                 ) {
                     TextButton(onClick = onDismiss) {
-                        Text("Cancel")
+                        Text(s(StringKey.CANCEL))
                     }
                     Spacer(modifier = Modifier.width(8.dp))
                     Button(
@@ -355,8 +351,7 @@ fun MrzInputDialog(
                                 dateOfBirth.length == 6 &&
                                 dateOfExpiry.length == 6
                     ) {
-                        // TODO(i18n): NFC_STEP_AUTHENTICATE_BUTTON
-                        Text("Authenticate")
+                        Text(s(StringKey.MRZ_DIALOG_AUTHENTICATE))
                     }
                 }
             }

@@ -88,6 +88,8 @@ import com.fivucsas.mobile.android.ui.util.toCompressedJpegBytes
 import com.fivucsas.shared.domain.model.EnrollmentData
 import com.fivucsas.shared.domain.validation.ValidationResult
 import com.fivucsas.shared.domain.validation.ValidationRules
+import com.fivucsas.shared.i18n.StringKey
+import com.fivucsas.shared.i18n.s
 import com.fivucsas.shared.presentation.state.BiometricResult
 import com.fivucsas.shared.presentation.state.BiometricState
 import com.fivucsas.shared.presentation.viewmodel.auth.BiometricViewModel
@@ -241,10 +243,10 @@ private fun EnrollmentTopBar(
     onBack: () -> Unit
 ) {
     val title = when {
-        isSuccess -> "Enrollment Complete"
-        currentStep == STEP_PREVIEW -> "Review Photo"
-        currentStep == STEP_CAPTURE -> "Capture Face"
-        else -> "Face Enrollment"
+        isSuccess -> s(StringKey.BIOENROLL_TITLE_COMPLETE)
+        currentStep == STEP_PREVIEW -> s(StringKey.BIOENROLL_TITLE_PREVIEW)
+        currentStep == STEP_CAPTURE -> s(StringKey.BIOENROLL_TITLE_CAPTURE)
+        else -> s(StringKey.BIOENROLL_TITLE)
     }
 
     TopAppBar(
@@ -257,7 +259,7 @@ private fun EnrollmentTopBar(
         },
         navigationIcon = {
             IconButton(onClick = onBack) {
-                Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                Icon(Icons.Default.ArrowBack, contentDescription = s(StringKey.A11Y_NAVIGATE_BACK))
             }
         },
         colors = TopAppBarDefaults.topAppBarColors(
@@ -291,8 +293,8 @@ private fun EnrollmentFormContent(
             onValueChange = {
                 onFormStateChange(formState.copy(fullName = it, fullNameError = null))
             },
-            label = { Text("Full Name") },
-            placeholder = { Text("e.g. Ahmet Yilmaz") },
+            label = { Text(s(StringKey.BIOENROLL_FIELD_FULL_NAME)) },
+            placeholder = { Text(s(StringKey.BIOENROLL_FIELD_FULL_NAME_HINT)) },
             leadingIcon = { Icon(Icons.Default.Person, contentDescription = null) },
             isError = formState.fullNameError != null,
             supportingText = formState.fullNameError?.let { msg ->
@@ -312,8 +314,8 @@ private fun EnrollmentFormContent(
             onValueChange = {
                 onFormStateChange(formState.copy(email = it, emailError = null))
             },
-            label = { Text("Email") },
-            placeholder = { Text("e.g. ahmet@example.com") },
+            label = { Text(s(StringKey.BIOENROLL_FIELD_EMAIL)) },
+            placeholder = { Text(s(StringKey.BIOENROLL_FIELD_EMAIL_HINT)) },
             leadingIcon = { Icon(Icons.Default.Email, contentDescription = null) },
             isError = formState.emailError != null,
             supportingText = formState.emailError?.let { msg ->
@@ -331,8 +333,8 @@ private fun EnrollmentFormContent(
                 val filtered = input.filter { it.isDigit() }.take(11)
                 onFormStateChange(formState.copy(idNumber = filtered, idNumberError = null))
             },
-            label = { Text("National ID (TC)") },
-            placeholder = { Text("11 digit TC number (optional)") },
+            label = { Text(s(StringKey.BIOENROLL_FIELD_NATIONAL_ID)) },
+            placeholder = { Text(s(StringKey.BIOENROLL_FIELD_NATIONAL_ID_HINT)) },
             leadingIcon = { Icon(Icons.Default.AccountBox, contentDescription = null) },
             isError = formState.idNumberError != null,
             supportingText = formState.idNumberError?.let { msg ->
@@ -349,8 +351,8 @@ private fun EnrollmentFormContent(
             onValueChange = {
                 onFormStateChange(formState.copy(phoneNumber = it, phoneNumberError = null))
             },
-            label = { Text("Phone Number") },
-            placeholder = { Text("e.g. +905551234567 (optional)") },
+            label = { Text(s(StringKey.BIOENROLL_FIELD_PHONE)) },
+            placeholder = { Text(s(StringKey.BIOENROLL_FIELD_PHONE_HINT)) },
             leadingIcon = { Icon(Icons.Default.Phone, contentDescription = null) },
             isError = formState.phoneNumberError != null,
             supportingText = formState.phoneNumberError?.let { msg ->
@@ -367,8 +369,8 @@ private fun EnrollmentFormContent(
             onValueChange = {
                 onFormStateChange(formState.copy(address = it, addressError = null))
             },
-            label = { Text("Address") },
-            placeholder = { Text("Home address (optional)") },
+            label = { Text(s(StringKey.BIOENROLL_FIELD_ADDRESS)) },
+            placeholder = { Text(s(StringKey.BIOENROLL_FIELD_ADDRESS_HINT)) },
             leadingIcon = { Icon(Icons.Default.Home, contentDescription = null) },
             isError = formState.addressError != null,
             supportingText = formState.addressError?.let { msg ->
@@ -398,7 +400,7 @@ private fun EnrollmentFormContent(
             Icon(Icons.Default.CameraAlt, contentDescription = null)
             Spacer(modifier = Modifier.width(8.dp))
             Text(
-                "Continue to Face Capture",
+                s(StringKey.BIOENROLL_CONTINUE_TO_CAPTURE),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold
             )
@@ -427,13 +429,13 @@ private fun FormHeaderCard() {
             )
             Column {
                 Text(
-                    "Step 1: Personal Information",
+                    s(StringKey.BIOENROLL_STEP1_HEADER),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onPrimaryContainer
                 )
                 Text(
-                    "Fill in your details below, then continue to face capture",
+                    s(StringKey.BIOENROLL_STEP1_SUBTITLE),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onPrimaryContainer
                 )
@@ -554,7 +556,7 @@ private fun FaceCaptureContent(
 
                         override fun onError(exception: ImageCaptureException) {
                             onCaptureError(
-                                "Failed to capture image: ${exception.message}"
+                                s(StringKey.BIOENROLL_CAPTURE_FAILED, exception.message ?: "")
                             )
                         }
                     }
@@ -656,7 +658,7 @@ private fun CameraPreviewWithControls(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(16.dp)
                 ) {
-                    Text("Try Again")
+                    Text(s(StringKey.COMMON_TRY_AGAIN))
                 }
             } else {
                 CaptureButton(
@@ -693,14 +695,14 @@ private fun InstructionsCard(modifier: Modifier = Modifier) {
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                "Position Your Face",
+                s(StringKey.BIOENROLL_POSITION_FACE),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onPrimaryContainer
             )
             Spacer(modifier = Modifier.height(4.dp))
             Text(
-                text = "â€¢ Ensure good lighting\nâ€¢ Look directly at camera\nâ€¢ Remove glasses if wearing",
+                text = s(StringKey.BIOENROLL_POSITION_FACE_TIPS),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onPrimaryContainer,
                 textAlign = TextAlign.Center
@@ -728,7 +730,7 @@ private fun ProcessingOverlay(modifier: Modifier = Modifier) {
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                "Processing Enrollment...",
+                s(StringKey.BIOENROLL_PROCESSING),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSecondaryContainer
@@ -787,12 +789,12 @@ private fun CaptureButton(isLoading: Boolean, onClick: () -> Unit) {
                 color = MaterialTheme.colorScheme.onPrimary
             )
             Spacer(modifier = Modifier.width(8.dp))
-            Text("Processing...", style = MaterialTheme.typography.titleMedium)
+            Text(s(StringKey.BIOENROLL_PROCESSING_SHORT), style = MaterialTheme.typography.titleMedium)
         } else {
             Icon(Icons.Default.CameraAlt, contentDescription = null)
             Spacer(modifier = Modifier.width(8.dp))
             Text(
-                "Capture Face",
+                s(StringKey.BIOENROLL_CAPTURE_FACE),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold
             )
@@ -846,13 +848,13 @@ private fun PhotoPreviewContent(
                 )
                 Column {
                     Text(
-                        "Review Your Photo",
+                        s(StringKey.BIOENROLL_REVIEW_PHOTO_TITLE),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onSecondaryContainer
                     )
                     Text(
-                        "Make sure your face is clearly visible and well-lit",
+                        s(StringKey.BIOENROLL_REVIEW_PHOTO_SUBTITLE),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSecondaryContainer
                     )
@@ -868,7 +870,7 @@ private fun PhotoPreviewContent(
         if (previewBitmap != null) {
             Image(
                 bitmap = previewBitmap.asImageBitmap(),
-                contentDescription = "Captured face photo",
+                contentDescription = s(StringKey.BIOENROLL_CAPTURED_PHOTO_DESC),
                 modifier = Modifier
                     .fillMaxWidth()
                     .aspectRatio(3f / 4f)
@@ -904,7 +906,7 @@ private fun PhotoPreviewContent(
             ) {
                 Icon(Icons.Default.CameraAlt, contentDescription = null)
                 Spacer(modifier = Modifier.width(8.dp))
-                Text("Retake", fontWeight = FontWeight.SemiBold)
+                Text(s(StringKey.BIOENROLL_RETAKE), fontWeight = FontWeight.SemiBold)
             }
 
             Button(
@@ -925,11 +927,11 @@ private fun PhotoPreviewContent(
                         color = MaterialTheme.colorScheme.onPrimary
                     )
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text("Sending...")
+                    Text(s(StringKey.BIOENROLL_SENDING))
                 } else {
                     Icon(Icons.Default.Send, contentDescription = null)
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text("Submit", fontWeight = FontWeight.SemiBold)
+                    Text(s(StringKey.BIOENROLL_SUBMIT), fontWeight = FontWeight.SemiBold)
                 }
             }
         }
@@ -971,14 +973,17 @@ private fun EnrollmentSuccessContent(
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
-                    "Enrollment Successful",
+                    s(StringKey.BIOENROLL_SUCCESS_TITLE),
                     color = MaterialTheme.colorScheme.onPrimaryContainer,
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = "User: ${result?.user?.name ?: "Unknown"}",
+                    text = s(
+                        StringKey.BIOENROLL_SUCCESS_USER,
+                        result?.user?.name ?: s(StringKey.BIOENROLL_SUCCESS_USER_UNKNOWN)
+                    ),
                     color = MaterialTheme.colorScheme.onPrimaryContainer,
                     style = MaterialTheme.typography.bodyLarge
                 )
@@ -987,7 +992,7 @@ private fun EnrollmentSuccessContent(
                     onClick = onDone,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text("Done", style = MaterialTheme.typography.titleMedium)
+                    Text(s(StringKey.COMMON_DONE), style = MaterialTheme.typography.titleMedium)
                 }
             }
         }
@@ -1019,7 +1024,7 @@ private fun CameraPermissionContent(
         )
         Spacer(modifier = Modifier.height(24.dp))
         Text(
-            "Camera Permission Required",
+            s(StringKey.COMMON_CAMERA_PERMISSION_REQUIRED),
             style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center
@@ -1027,9 +1032,9 @@ private fun CameraPermissionContent(
         Spacer(modifier = Modifier.height(8.dp))
         Text(
             text = if (permanentlyDenied) {
-                "Camera permission was permanently denied. Please enable it in app settings to continue."
+                s(StringKey.BIOENROLL_PERMISSION_PERMANENTLY_DENIED)
             } else {
-                "We need camera access to capture your face for biometric enrollment."
+                s(StringKey.BIOENROLL_PERMISSION_RATIONALE)
             },
             style = MaterialTheme.typography.bodyMedium,
             textAlign = TextAlign.Center,
@@ -1044,14 +1049,14 @@ private fun CameraPermissionContent(
             ) {
                 Icon(Icons.Default.Settings, contentDescription = null)
                 Spacer(modifier = Modifier.width(8.dp))
-                Text("Open App Settings")
+                Text(s(StringKey.COMMON_OPEN_APP_SETTINGS))
             }
         } else {
             Button(
                 onClick = onRequestPermission,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Grant Camera Permission")
+                Text(s(StringKey.COMMON_GRANT_CAMERA_PERMISSION))
             }
         }
     }
