@@ -109,6 +109,7 @@ import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.LifecycleOwner
 import com.fivucsas.shared.i18n.StringKey
 import com.fivucsas.shared.i18n.s
+import com.fivucsas.shared.ui.theme.AppColors
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
@@ -281,7 +282,7 @@ private fun CameraPreviewContent(
                     },
                     colors = IconButtonDefaults.iconButtonColors(
                         containerColor = Color.Black.copy(alpha = 0.5f),
-                        contentColor = if (isFlashOn) Color(0xFFFFC107) else Color.White
+                        contentColor = if (isFlashOn) AppColors.Warning else Color.White
                     )
                 ) {
                     Icon(
@@ -481,8 +482,8 @@ private fun IdCardScanningOverlay(
     hasResult: Boolean
 ) {
     val primaryColor = MaterialTheme.colorScheme.primary
-    val successColor = Color(0xFF4CAF50)
-    val warningColor = Color(0xFFFFC107)
+    val successColor = AppColors.Success
+    val warningColor = AppColors.Warning
     val textMeasurer = rememberTextMeasurer()
 
     val infiniteTransition = rememberInfiniteTransition(label = "scan")
@@ -725,7 +726,7 @@ private fun LiveOcrDisplay(text: String) {
     ) {
         Text(
             text = s(StringKey.MRZ_DETECTING),
-            color = Color(0xFF4CAF50),
+            color = AppColors.Success,
             fontSize = 10.sp,
             fontWeight = FontWeight.Medium
         )
@@ -736,7 +737,7 @@ private fun LiveOcrDisplay(text: String) {
                     val isValid = char.isLetterOrDigit() || char == '<'
                     Text(
                         text = char.toString(),
-                        color = if (isValid) Color(0xFF4CAF50) else Color(0xFFFF5722),
+                        color = if (isValid) AppColors.Success else AppColors.Error,
                         fontSize = 11.sp,
                         fontFamily = FontFamily.Monospace,
                         fontWeight = FontWeight.Bold
@@ -814,7 +815,7 @@ private fun RotationGuideAnimation() {
         Icon(
             imageVector = Icons.AutoMirrored.Filled.RotateLeft,
             contentDescription = s(StringKey.MRZ_ROTATE_LEFT_DESC),
-            tint = Color(0xFF4CAF50).copy(alpha = arrowAlpha),
+            tint = AppColors.Success.copy(alpha = arrowAlpha),
             modifier = Modifier.size(28.dp)
         )
 
@@ -824,12 +825,12 @@ private fun RotationGuideAnimation() {
             modifier = Modifier
                 .size(width = 30.dp, height = 48.dp)
                 .background(
-                    color = Color(0xFF4CAF50).copy(alpha = 0.2f),
+                    color = AppColors.Success.copy(alpha = 0.2f),
                     shape = RoundedCornerShape(4.dp)
                 )
                 .border(
                     width = 2.dp,
-                    color = Color(0xFF4CAF50),
+                    color = AppColors.Success,
                     shape = RoundedCornerShape(4.dp)
                 ),
             contentAlignment = Alignment.CenterEnd
@@ -840,7 +841,7 @@ private fun RotationGuideAnimation() {
                     .fillMaxHeight()
                     .padding(2.dp)
                     .background(
-                        color = Color(0xFF4CAF50).copy(alpha = 0.5f),
+                        color = AppColors.Success.copy(alpha = 0.5f),
                         shape = RoundedCornerShape(2.dp)
                     )
             )
@@ -854,8 +855,8 @@ private fun ScannedDataCard(
     onConfirm: () -> Unit,
     onRetry: () -> Unit
 ) {
-    val verifiedColor = Color(0xFF4CAF50)
-    val warningColor = Color(0xFFFF9800)
+    val verifiedColor = AppColors.Success
+    val warningColor = AppColors.Warning
     val statusColor = if (data.checksumValid) verifiedColor else warningColor
 
     Card(
@@ -968,7 +969,7 @@ private fun ScannedDataCard(
 
 @Composable
 private fun DetectedDataRow(label: String, value: String, isVerified: Boolean = true) {
-    val valueColor = if (isVerified) Color(0xFF4CAF50) else Color(0xFFFF9800)
+    val valueColor = if (isVerified) AppColors.Success else AppColors.Warning
     Row(
         modifier = Modifier
             .fillMaxWidth()

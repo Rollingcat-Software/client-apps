@@ -38,7 +38,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -119,7 +118,7 @@ fun SmsOtpScreen(
             // Twilio info banner
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = Color(0xFFFFF3E0))
+                colors = CardDefaults.cardColors(containerColor = AppColors.Warning.copy(alpha = 0.12f))
             ) {
                 Column(
                     modifier = Modifier.padding(16.dp),
@@ -128,13 +127,13 @@ fun SmsOtpScreen(
                     Icon(
                         imageVector = Icons.Default.Warning,
                         contentDescription = null,
-                        tint = Color(0xFFE65100)
+                        tint = AppColors.Warning
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
                         text = s(StringKey.SMS_TWILIO_INFO),
                         style = MaterialTheme.typography.bodySmall,
-                        color = Color(0xFFE65100),
+                        color = AppColors.Warning,
                         textAlign = TextAlign.Center
                     )
                 }
@@ -229,12 +228,12 @@ fun SmsOtpScreen(
             uiState.successMessage?.let { message ->
                 Card(
                     modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(containerColor = Color(0xFF1B5E20).copy(alpha = 0.1f))
+                    colors = CardDefaults.cardColors(containerColor = AppColors.Success.copy(alpha = 0.1f))
                 ) {
                     Text(
                         text = message,
                         modifier = Modifier.padding(16.dp),
-                        color = Color(0xFF1B5E20),
+                        color = AppColors.Success,
                         fontWeight = FontWeight.SemiBold
                     )
                 }
@@ -258,7 +257,7 @@ fun SmsOtpScreen(
             if (uiState.otpVerified) {
                 Card(
                     modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(containerColor = Color(0xFF1B5E20).copy(alpha = 0.1f))
+                    colors = CardDefaults.cardColors(containerColor = AppColors.Success.copy(alpha = 0.1f))
                 ) {
                     Column(
                         modifier = Modifier.padding(16.dp),
@@ -268,7 +267,7 @@ fun SmsOtpScreen(
                             text = s(StringKey.OTP_VERIFIED_SUCCESS),
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
-                            color = Color(0xFF1B5E20)
+                            color = AppColors.Success
                         )
                     }
                 }

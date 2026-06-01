@@ -49,7 +49,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -285,12 +284,12 @@ fun VoiceEnrollScreen(
             uiState.successMessage?.let { message ->
                 Card(
                     modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(containerColor = Color(0xFF1B5E20).copy(alpha = 0.1f))
+                    colors = CardDefaults.cardColors(containerColor = AppColors.Success.copy(alpha = 0.1f))
                 ) {
                     Text(
                         text = message,
                         modifier = Modifier.padding(16.dp),
-                        color = Color(0xFF1B5E20),
+                        color = AppColors.Success,
                         style = MaterialTheme.typography.bodyMedium,
                         fontWeight = FontWeight.SemiBold
                     )
@@ -319,7 +318,7 @@ fun VoiceEnrollScreen(
                             text = if (result.verified) s(StringKey.VOICE_VERIFIED) else s(StringKey.VOICE_NOT_VERIFIED),
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
-                            color = if (result.verified) Color(0xFF1B5E20) else MaterialTheme.colorScheme.error
+                            color = if (result.verified) AppColors.Success else MaterialTheme.colorScheme.error
                         )
                         Text(
                             text = "${s(StringKey.VOICE_CONFIDENCE)}: ${(result.confidence * 100).toInt()}%",
@@ -337,7 +336,7 @@ fun VoiceEnrollScreen(
                             text = if (result.found) s(StringKey.VOICE_USER_FOUND) else s(StringKey.VOICE_USER_NOT_FOUND),
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
-                            color = if (result.found) Color(0xFF1B5E20) else MaterialTheme.colorScheme.onSurfaceVariant
+                            color = if (result.found) AppColors.Success else MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         if (result.found && result.userId != null) {
                             Text(

@@ -59,6 +59,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.fivucsas.shared.i18n.StringKey
 import com.fivucsas.shared.i18n.s
+import com.fivucsas.shared.ui.theme.AppColors
 
 // ── Code Examples ──────────────────────────────────────────────────
 
@@ -223,7 +224,7 @@ fun WidgetDemoScreen(
                     "Promise-based API",
                     "Event Callbacks"
                 ),
-                color = Color(0xFF6366F1)
+                color = AppColors.Primary
             ),
             ArchitectureLayer(
                 title = "Orchestration Layer",
@@ -235,7 +236,7 @@ fun WidgetDemoScreen(
                     "Theme Engine",
                     "i18n (EN/TR)"
                 ),
-                color = Color(0xFF8B5CF6)
+                color = AppColors.Secondary
             ),
             ArchitectureLayer(
                 title = "Biometric Capture Layer",
@@ -247,7 +248,7 @@ fun WidgetDemoScreen(
                     "NFC Reader",
                     "TOTP / OTP Input"
                 ),
-                color = Color(0xFF10B981)
+                color = AppColors.Success
             )
         )
     }

@@ -58,7 +58,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -66,6 +65,7 @@ import com.fivucsas.shared.i18n.StringKey
 import com.fivucsas.shared.i18n.s
 import com.fivucsas.shared.presentation.state.VoiceSearchUiMatch
 import com.fivucsas.shared.presentation.viewmodel.VoiceViewModel
+import com.fivucsas.shared.ui.theme.AppColors
 
 private const val MAX_RECORDING_SECONDS = 10
 
@@ -188,7 +188,7 @@ fun VoiceSearchScreen(
             colors = CardDefaults.cardColors(
                 containerColor = when {
                     uiState.isRecording -> MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.3f)
-                    hasRecording -> Color(0xFF1B5E20).copy(alpha = 0.08f)
+                    hasRecording -> AppColors.Success.copy(alpha = 0.08f)
                     else -> MaterialTheme.colorScheme.surfaceVariant
                 }
             )
@@ -209,13 +209,13 @@ fun VoiceSearchScreen(
                             Icons.Default.Mic,
                             contentDescription = null,
                             modifier = Modifier.size(36.dp),
-                            tint = Color(0xFF1B5E20)
+                            tint = AppColors.Success
                         )
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
                             text = "${s(StringKey.VOICE_SEARCH_RECORDING_READY)} (${uiState.recordingSeconds}s)",
                             style = MaterialTheme.typography.bodyMedium,
-                            color = Color(0xFF1B5E20),
+                            color = AppColors.Success,
                             fontWeight = FontWeight.SemiBold
                         )
                     }
@@ -443,7 +443,7 @@ fun VoiceSearchScreen(
                             },
                             colors = SuggestionChipDefaults.suggestionChipColors(
                                 containerColor = if (result.found)
-                                    Color(0xFF1B5E20).copy(alpha = 0.1f)
+                                    AppColors.Success.copy(alpha = 0.1f)
                                 else
                                     MaterialTheme.colorScheme.surfaceVariant
                             )
@@ -594,7 +594,7 @@ private fun VoiceSearchMatchItem(
                     .fillMaxWidth()
                     .height(4.dp),
                 color = when {
-                    match.similarity >= 0.8f -> Color(0xFF1B5E20)
+                    match.similarity >= 0.8f -> AppColors.Success
                     match.similarity >= 0.6f -> MaterialTheme.colorScheme.primary
                     else -> MaterialTheme.colorScheme.error
                 },
