@@ -43,6 +43,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.fivucsas.shared.i18n.StringKey
+import com.fivucsas.shared.i18n.s
 import com.fivucsas.shared.ui.theme.AppColors
 
 private enum class ExamEntryPhase { IDLE, SCANNING, RESULT }
@@ -60,14 +62,14 @@ fun ExamEntryScreen(
             TopAppBar(
                 title = {
                     Text(
-                        "Exam Entry",
+                        s(StringKey.EXAM_TITLE),
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.SemiBold
                     )
                 },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.Default.ArrowBack, contentDescription = s(StringKey.A11Y_NAVIGATE_BACK))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -120,13 +122,13 @@ private fun ExamEntryIdleContent(onStartScan: () -> Unit) {
     )
     Spacer(modifier = Modifier.height(24.dp))
     Text(
-        text = "NFC Exam Entry",
+        text = s(StringKey.EXAM_IDLE_HEADER),
         style = MaterialTheme.typography.headlineSmall,
         fontWeight = FontWeight.Bold
     )
     Spacer(modifier = Modifier.height(8.dp))
     Text(
-        text = "Tap your student card on the device to verify exam entry eligibility.",
+        text = s(StringKey.EXAM_IDLE_SUBTITLE),
         style = MaterialTheme.typography.bodyMedium,
         textAlign = TextAlign.Center,
         color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -140,7 +142,7 @@ private fun ExamEntryIdleContent(onStartScan: () -> Unit) {
         modifier = Modifier.fillMaxWidth()
     ) {
         Text(
-            text = "NFC hardware not available on this device. NFC features require compatible hardware.",
+            text = s(StringKey.EXAM_NFC_UNAVAILABLE_NOTE),
             style = MaterialTheme.typography.bodySmall,
             color = AppColors.OnSurface,
             modifier = Modifier.padding(12.dp),
@@ -157,7 +159,7 @@ private fun ExamEntryIdleContent(onStartScan: () -> Unit) {
     ) {
         Icon(Icons.Default.Nfc, contentDescription = null)
         Spacer(modifier = Modifier.width(8.dp))
-        Text("Start NFC Scan", style = MaterialTheme.typography.titleMedium)
+        Text(s(StringKey.EXAM_START_SCAN), style = MaterialTheme.typography.titleMedium)
     }
 }
 
@@ -172,13 +174,13 @@ private fun ExamEntryScanningContent(
     )
     Spacer(modifier = Modifier.height(24.dp))
     Text(
-        text = "Scanning...",
+        text = s(StringKey.EXAM_SCANNING_TITLE),
         style = MaterialTheme.typography.headlineSmall,
         fontWeight = FontWeight.Bold
     )
     Spacer(modifier = Modifier.height(8.dp))
     Text(
-        text = "Hold your card near the NFC reader.",
+        text = s(StringKey.EXAM_SCANNING_SUBTITLE),
         style = MaterialTheme.typography.bodyMedium,
         color = MaterialTheme.colorScheme.onSurfaceVariant
     )
@@ -187,7 +189,7 @@ private fun ExamEntryScanningContent(
     Spacer(modifier = Modifier.height(24.dp))
 
     Text(
-        text = "Simulation Controls",
+        text = s(StringKey.EXAM_SIMULATION_CONTROLS),
         style = MaterialTheme.typography.labelMedium,
         color = MaterialTheme.colorScheme.onSurfaceVariant
     )
@@ -201,14 +203,14 @@ private fun ExamEntryScanningContent(
             modifier = Modifier.weight(1f),
             shape = RoundedCornerShape(12.dp)
         ) {
-            Text("Simulate OK")
+            Text(s(StringKey.EXAM_SIMULATE_OK))
         }
         OutlinedButton(
             onClick = onSimulateFailure,
             modifier = Modifier.weight(1f),
             shape = RoundedCornerShape(12.dp)
         ) {
-            Text("Simulate Fail")
+            Text(s(StringKey.EXAM_SIMULATE_FAIL))
         }
     }
 }
@@ -244,7 +246,7 @@ private fun ExamEntryResultContent(
             )
             Spacer(modifier = Modifier.height(16.dp))
             Text(
-                text = if (success) "Entry Approved" else "Entry Denied",
+                text = if (success) s(StringKey.EXAM_ENTRY_APPROVED) else s(StringKey.EXAM_ENTRY_DENIED),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
                 color = if (success)
@@ -255,9 +257,9 @@ private fun ExamEntryResultContent(
             Spacer(modifier = Modifier.height(8.dp))
             Text(
                 text = if (success)
-                    "Student verified. You may enter the examination hall."
+                    s(StringKey.EXAM_APPROVED_SUBTITLE)
                 else
-                    "Card not recognized or exam not scheduled. Contact administration.",
+                    s(StringKey.EXAM_DENIED_SUBTITLE),
                 style = MaterialTheme.typography.bodyMedium,
                 textAlign = TextAlign.Center,
                 color = if (success)
@@ -276,13 +278,13 @@ private fun ExamEntryResultContent(
                 ) {
                     Icon(Icons.Default.Refresh, contentDescription = null, modifier = Modifier.size(18.dp))
                     Spacer(modifier = Modifier.width(4.dp))
-                    Text("Retry")
+                    Text(s(StringKey.EXAM_RETRY))
                 }
                 Button(
                     onClick = onDone,
                     modifier = Modifier.weight(1f)
                 ) {
-                    Text("Done")
+                    Text(s(StringKey.COMMON_DONE))
                 }
             }
         }
