@@ -25,6 +25,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.fivucsas.shared.config.UIDimens
+import com.fivucsas.shared.i18n.StringKey
+import com.fivucsas.shared.i18n.s
 import com.fivucsas.shared.ui.components.molecules.NotificationItem
 import com.fivucsas.shared.ui.components.molecules.NotificationItemData
 import com.fivucsas.shared.ui.components.atoms.StatusBadgeType
@@ -41,10 +43,10 @@ fun NotificationsScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Notifications") },
+                title = { Text(s(StringKey.NAV_NOTIFICATIONS)) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = s(StringKey.A11Y_NAVIGATE_BACK))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -71,7 +73,7 @@ fun NotificationsScreen(
                 )
                 Spacer(modifier = Modifier.size(16.dp))
                 Text(
-                    text = "No notifications yet",
+                    text = s(StringKey.NOTIF_EMPTY),
                     style = androidx.compose.material3.MaterialTheme.typography.bodyLarge,
                     color = AppColors.OnSurfaceVariant
                 )
