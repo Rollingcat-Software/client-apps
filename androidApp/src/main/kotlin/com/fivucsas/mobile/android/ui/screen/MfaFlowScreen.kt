@@ -48,6 +48,7 @@ import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Face
 import androidx.compose.material.icons.filled.Fingerprint
 import androidx.compose.material.icons.filled.Key
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.Nfc
 import androidx.compose.material.icons.filled.PhoneAndroid
@@ -55,11 +56,14 @@ import androidx.compose.material.icons.filled.QrCode
 import androidx.compose.material.icons.filled.RecordVoiceOver
 import androidx.compose.material.icons.filled.Security
 import androidx.compose.material.icons.filled.Stop
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -82,6 +86,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -534,6 +540,18 @@ private fun MfaStepInputContent(
             )
         }
 
+        "PASSWORD" -> {
+            // Config-driven flows can require PASSWORD as a step-2+ factor.
+            // Backend PasswordVerifyMfaStepHandler reads data.get("password").
+            PasswordStepInput(
+                onVerify = { password ->
+                    scope.launch {
+                        viewModel.verifyStep(method, mapOf("password" to password))
+                    }
+                }
+            )
+        }
+
         else -> {
             Text(
                 text = "Unsupported method: $method",
@@ -599,6 +617,40 @@ private fun TotpStepInput(onVerify: (String) -> Unit) {
         onClick = { onVerify(code) },
         modifier = Modifier.fillMaxWidth(),
         enabled = code.length == 6
+    ) {
+        Text(s(StringKey.MFA_VERIFY))
+    }
+}
+
+@Composable
+private fun PasswordStepInput(onVerify: (String) -> Unit) {
+    var password by remember { mutableStateOf("") }
+    var visible by remember { mutableStateOf(false) }
+
+    OutlinedTextField(
+        value = password,
+        onValueChange = { password = it },
+        label = { Text(s(StringKey.MFA_METHOD_PASSWORD)) },
+        singleLine = true,
+        visualTransformation = if (visible) VisualTransformation.None else PasswordVisualTransformation(),
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+        trailingIcon = {
+            IconButton(onClick = { visible = !visible }) {
+                Icon(
+                    imageVector = if (visible) Icons.Default.VisibilityOff else Icons.Default.Visibility,
+                    contentDescription = if (visible) "Hide password" else "Show password"
+                )
+            }
+        },
+        modifier = Modifier.fillMaxWidth()
+    )
+
+    Spacer(modifier = Modifier.height(16.dp))
+
+    Button(
+        onClick = { onVerify(password) },
+        modifier = Modifier.fillMaxWidth(),
+        enabled = password.isNotEmpty()
     ) {
         Text(s(StringKey.MFA_VERIFY))
     }
@@ -1293,6 +1345,7 @@ private fun methodIcon(methodType: String): ImageVector = when (methodType) {
     "QR_CODE" -> Icons.Default.QrCode
     "HARDWARE_KEY" -> Icons.Default.Key
     "NFC_DOCUMENT" -> Icons.Default.Nfc
+    "PASSWORD" -> Icons.Default.Lock
     else -> Icons.Default.Security
 }
 
@@ -1306,5 +1359,6 @@ private fun methodDisplayName(methodType: String): String = when (methodType) {
     "QR_CODE" -> s(StringKey.MFA_METHOD_QR_CODE)
     "HARDWARE_KEY" -> s(StringKey.MFA_METHOD_HARDWARE_KEY)
     "NFC_DOCUMENT" -> s(StringKey.MFA_METHOD_NFC)
+    "PASSWORD" -> s(StringKey.MFA_METHOD_PASSWORD)
     else -> methodType
 }
