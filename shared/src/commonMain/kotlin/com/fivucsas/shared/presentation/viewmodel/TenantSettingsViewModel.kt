@@ -18,15 +18,14 @@ import kotlinx.coroutines.launch
 class TenantSettingsViewModel(
     private val getTenantSettingsUseCase: GetTenantSettingsUseCase,
     private val updateTenantSettingsUseCase: UpdateTenantSettingsUseCase
-) {
-    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
+) : BaseViewModel() {
     private val _state = MutableStateFlow(TenantSettingsUiState())
     val state: StateFlow<TenantSettingsUiState> = _state.asStateFlow()
 
     fun loadSettings() {
         _state.update { it.copy(isLoading = true, errorMessage = null) }
 
-        scope.launch {
+        viewModelScope.launch {
             getTenantSettingsUseCase().fold(
                 onSuccess = { settings ->
                     _state.update {
@@ -98,7 +97,7 @@ class TenantSettingsViewModel(
             inviteExpiryDays = current.inviteExpiryDays
         )
 
-        scope.launch {
+        viewModelScope.launch {
             updateTenantSettingsUseCase(settings).fold(
                 onSuccess = {
                     _state.update {
@@ -125,7 +124,5 @@ class TenantSettingsViewModel(
         _state.update { it.copy(successMessage = null, errorMessage = null) }
     }
 
-    fun dispose() {
-        scope.coroutineContext[Job]?.cancel()
-    }
+
 }

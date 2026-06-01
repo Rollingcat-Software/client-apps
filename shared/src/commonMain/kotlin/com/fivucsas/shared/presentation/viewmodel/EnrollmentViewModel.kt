@@ -13,8 +13,7 @@ import kotlinx.coroutines.launch
 
 class EnrollmentViewModel(
     private val enrollmentRepository: EnrollmentRepository
-) {
-    private val viewModelScope = CoroutineScope(Dispatchers.Main)
+) : BaseViewModel() {
 
     private val _uiState = MutableStateFlow(EnrollmentUiState())
     val uiState: StateFlow<EnrollmentUiState> = _uiState.asStateFlow()

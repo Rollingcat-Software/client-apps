@@ -20,15 +20,14 @@ class InviteViewModel(
     private val getInvitesUseCase: GetInvitesUseCase,
     private val createInviteUseCase: CreateInviteUseCase,
     private val revokeInviteUseCase: RevokeInviteUseCase
-) {
-    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
+) : BaseViewModel() {
     private val _state = MutableStateFlow(InviteUiState())
     val state: StateFlow<InviteUiState> = _state.asStateFlow()
 
     fun loadInvites() {
         _state.update { it.copy(isLoading = true, errorMessage = null) }
 
-        scope.launch {
+        viewModelScope.launch {
             getInvitesUseCase().fold(
                 onSuccess = { invites ->
                     _state.update {
@@ -96,7 +95,7 @@ class InviteViewModel(
     ) {
         _state.update { it.copy(isLoading = true, errorMessage = null) }
 
-        scope.launch {
+        viewModelScope.launch {
             createInviteUseCase(
                 email = email,
                 role = role,
@@ -127,7 +126,7 @@ class InviteViewModel(
     fun revokeInvite(inviteId: String) {
         _state.update { it.copy(isLoading = true, errorMessage = null) }
 
-        scope.launch {
+        viewModelScope.launch {
             revokeInviteUseCase(inviteId).fold(
                 onSuccess = {
                     _state.update {
@@ -154,7 +153,4 @@ class InviteViewModel(
         _state.update { it.copy(errorMessage = null, successMessage = null) }
     }
 
-    fun dispose() {
-        scope.coroutineContext[Job]?.cancel()
-    }
 }

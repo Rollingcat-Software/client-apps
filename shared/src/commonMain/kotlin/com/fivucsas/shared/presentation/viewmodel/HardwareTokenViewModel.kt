@@ -52,8 +52,7 @@ data class HardwareTokenUiState(
 class HardwareTokenViewModel(
     private val webAuthnRepository: WebAuthnRepository,
     private val tokenManager: TokenManager
-) {
-    private val viewModelScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
+) : BaseViewModel() {
 
     private val _uiState = MutableStateFlow(HardwareTokenUiState())
     val uiState: StateFlow<HardwareTokenUiState> = _uiState.asStateFlow()

@@ -13,8 +13,7 @@ import kotlinx.coroutines.launch
 
 class TotpViewModel(
     private val totpRepository: TotpRepository
-) {
-    private val viewModelScope = CoroutineScope(Dispatchers.Main)
+) : BaseViewModel() {
 
     private val _uiState = MutableStateFlow(TotpUiState())
     val uiState: StateFlow<TotpUiState> = _uiState.asStateFlow()

@@ -16,8 +16,7 @@ import kotlinx.coroutines.launch
 
 class DeveloperPortalViewModel(
     private val oAuth2ClientRepository: OAuth2ClientRepository
-) {
-    private val viewModelScope = CoroutineScope(Dispatchers.Main)
+) : BaseViewModel() {
 
     private val _uiState = MutableStateFlow(DeveloperPortalUiState())
     val uiState: StateFlow<DeveloperPortalUiState> = _uiState.asStateFlow()

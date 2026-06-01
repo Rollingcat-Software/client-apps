@@ -18,8 +18,7 @@ import kotlinx.coroutines.launch
 class AnalyticsViewModel(
     private val dashboardRepository: DashboardRepository,
     private val fileSaver: IFileSaver
-) {
-    private val viewModelScope = CoroutineScope(Dispatchers.Main)
+) : BaseViewModel() {
 
     private val _uiState = MutableStateFlow(AnalyticsUiState())
     val uiState: StateFlow<AnalyticsUiState> = _uiState.asStateFlow()

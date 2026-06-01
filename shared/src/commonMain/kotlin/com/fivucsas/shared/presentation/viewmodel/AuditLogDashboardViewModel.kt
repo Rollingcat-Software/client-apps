@@ -25,8 +25,7 @@ private const val PAGE_SIZE = 20
 class AuditLogDashboardViewModel(
     private val auditLogRepository: AuditLogRepository,
     private val fileSaver: IFileSaver
-) {
-    private val viewModelScope = CoroutineScope(Dispatchers.Main)
+) : BaseViewModel() {
 
     private val _uiState = MutableStateFlow(AuditLogDashboardUiState())
     val uiState: StateFlow<AuditLogDashboardUiState> = _uiState.asStateFlow()

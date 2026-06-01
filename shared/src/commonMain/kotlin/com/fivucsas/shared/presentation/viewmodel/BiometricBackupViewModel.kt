@@ -29,14 +29,13 @@ data class BiometricBackupUiState(
 class BiometricBackupViewModel(
     private val enrollmentRepository: EnrollmentRepository,
     private val biometricRepository: BiometricRepository
-) {
-    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
+) : BaseViewModel() {
 
     private val _uiState = MutableStateFlow(BiometricBackupUiState())
     val uiState: StateFlow<BiometricBackupUiState> = _uiState.asStateFlow()
 
     fun loadEnrollments(userId: String) {
-        scope.launch {
+        viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
             enrollmentRepository.getEnrollments(userId).fold(
                 onSuccess = { enrollments ->
@@ -68,7 +67,7 @@ class BiometricBackupViewModel(
     }
 
     fun deleteAllBiometricData(userId: String) {
-        scope.launch {
+        viewModelScope.launch {
             _uiState.update { it.copy(isDeleting = true, deleteConfirmDialogVisible = false) }
 
             biometricRepository.deleteBiometricData(userId).fold(

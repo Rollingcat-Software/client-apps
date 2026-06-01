@@ -21,8 +21,7 @@ import kotlinx.coroutines.launch
  */
 class MultiStepAuthViewModel(
     private val authSessionRepository: AuthSessionRepository
-) {
-    private val viewModelScope = CoroutineScope(Dispatchers.Main)
+) : BaseViewModel() {
 
     private val _uiState = MutableStateFlow(MultiStepAuthUiState())
     val uiState: StateFlow<MultiStepAuthUiState> = _uiState.asStateFlow()

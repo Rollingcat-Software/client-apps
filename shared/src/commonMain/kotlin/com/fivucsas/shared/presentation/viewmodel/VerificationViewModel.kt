@@ -13,8 +13,7 @@ import kotlinx.coroutines.launch
 
 class VerificationViewModel(
     private val verificationRepository: VerificationRepository
-) {
-    private val viewModelScope = CoroutineScope(Dispatchers.Main)
+) : BaseViewModel() {
 
     private val _uiState = MutableStateFlow(VerificationUiState())
     val uiState: StateFlow<VerificationUiState> = _uiState.asStateFlow()

@@ -24,14 +24,13 @@ import kotlinx.coroutines.launch
  */
 class AccountLinkingViewModel(
     private val repository: AccountLinkingRepository
-) {
-    private val scope = CoroutineScope(Dispatchers.Main)
+) : BaseViewModel() {
 
     private val _uiState = MutableStateFlow(AccountLinkingUiState())
     val uiState: StateFlow<AccountLinkingUiState> = _uiState.asStateFlow()
 
     fun load() {
-        scope.launch { loadInternal() }
+        viewModelScope.launch { loadInternal() }
     }
 
     private suspend fun loadInternal() {
@@ -67,7 +66,7 @@ class AccountLinkingViewModel(
 
     /** Step 1 — send an OTP to the target email. */
     fun initiateLink(email: String) {
-        scope.launch {
+        viewModelScope.launch {
             _uiState.update { it.copy(linkInProgress = true, linkError = null) }
             repository.initiateLink(email).fold(
                 onSuccess = {
@@ -87,7 +86,7 @@ class AccountLinkingViewModel(
 
     /** Step 2 — verify OTP + step-up password, then link + refetch. */
     fun confirmLink(email: String, otp: String, password: String) {
-        scope.launch {
+        viewModelScope.launch {
             _uiState.update { it.copy(linkInProgress = true, linkError = null) }
             repository.confirmLink(email, otp, password).fold(
                 onSuccess = {
@@ -111,7 +110,7 @@ class AccountLinkingViewModel(
     // ── Unlink ─────────────────────────────────────────────────────
 
     fun unlink(membershipUserId: String) {
-        scope.launch {
+        viewModelScope.launch {
             _uiState.update { it.copy(unlinkingUserId = membershipUserId, errorMessage = null) }
             repository.unlink(membershipUserId).fold(
                 onSuccess = {
@@ -133,7 +132,7 @@ class AccountLinkingViewModel(
     // ── Switch membership ──────────────────────────────────────────
 
     fun switchMembership(targetUserId: String) {
-        scope.launch {
+        viewModelScope.launch {
             _uiState.update { it.copy(switchingUserId = targetUserId, errorMessage = null) }
             repository.switchMembership(targetUserId).fold(
                 onSuccess = {

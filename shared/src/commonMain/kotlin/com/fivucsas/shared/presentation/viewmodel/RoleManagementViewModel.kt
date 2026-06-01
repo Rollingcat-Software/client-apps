@@ -19,8 +19,7 @@ import kotlinx.coroutines.launch
  */
 class RoleManagementViewModel(
     private val rolesRepository: RolesRepository
-) {
-    private val viewModelScope = CoroutineScope(Dispatchers.Main)
+) : BaseViewModel() {
 
     private val _uiState = MutableStateFlow(RoleManagementUiState())
     val uiState: StateFlow<RoleManagementUiState> = _uiState.asStateFlow()

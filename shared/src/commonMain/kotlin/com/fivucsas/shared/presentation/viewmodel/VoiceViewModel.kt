@@ -17,8 +17,7 @@ import kotlinx.coroutines.launch
 
 class VoiceViewModel(
     private val voiceRepository: VoiceRepository
-) {
-    private val viewModelScope = CoroutineScope(Dispatchers.Main)
+) : BaseViewModel() {
 
     private val _uiState = MutableStateFlow(VoiceUiState())
     val uiState: StateFlow<VoiceUiState> = _uiState.asStateFlow()
