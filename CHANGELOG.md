@@ -4,6 +4,13 @@ All notable changes to the FIVUCSAS client apps (Android, iOS, Desktop).
 
 ## [Unreleased]
 
+## [5.3.0] - 2026-06-01
+
+> First release since 5.2.3. Bundles the full post-5.2.3 work: critical auth/data
+> fixes (#56–#67), wave-3 i18n + a11y (EN+TR) + NavigationPolicy fail-closed
+> (#69–#71), web-parity fonts (#72), and the ViewModel scope-leak refactor (#73).
+> versionCode 12 / versionName 5.3.0.
+
 ### Added
 
 - **Bundled Inter + Poppins fonts (web-app parity, PR #72).** `androidApp`'s
