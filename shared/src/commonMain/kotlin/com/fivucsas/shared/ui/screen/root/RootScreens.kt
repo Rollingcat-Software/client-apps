@@ -64,6 +64,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.fivucsas.shared.domain.repository.RootAdminRepository
+import com.fivucsas.shared.i18n.StringKey
+import com.fivucsas.shared.i18n.s
 import com.fivucsas.shared.domain.model.CapabilityPolicy
 import com.fivucsas.shared.domain.model.GlobalUser
 import com.fivucsas.shared.domain.model.RootPermission
@@ -123,7 +125,7 @@ fun RootConsoleScreen(
         viewModel.effect.collect { effect ->
             when (effect) {
                 is RootConsoleUiEffect.ShowMessage -> scope.launch { snackbarHostState.showSnackbar(effect.message) }
-                is RootConsoleUiEffect.OpenTenantContext -> scope.launch { snackbarHostState.showSnackbar("Impersonating ${effect.tenantId}") }
+                is RootConsoleUiEffect.OpenTenantContext -> scope.launch { snackbarHostState.showSnackbar(s(StringKey.ROOT_IMPERSONATING, effect.tenantId)) }
             }
         }
     }
@@ -153,7 +155,7 @@ fun RootConsoleScreen(
                 }
             )
         } else {
-            AppScaffold(title = "Root Dashboard", snackbarHostState = snackbarHostState) { baseModifier ->
+            AppScaffold(title = s(StringKey.ROOT_DASHBOARD), snackbarHostState = snackbarHostState) { baseModifier ->
                 Row(modifier = baseModifier.fillMaxSize().padding(16.dp)) {
                     Column(
                         modifier = Modifier
@@ -195,9 +197,9 @@ private fun RootConsoleMobileScaffold(
     content: @Composable () -> Unit
 ) {
     val navItems = listOf(
-        BottomNavItem("Dashboard", Icons.Default.Home, RouteIds.ROOT_CONSOLE),
-        BottomNavItem("History", Icons.Default.History, RouteIds.TENANT_HISTORY),
-        BottomNavItem("Profile", Icons.Default.Person, RouteIds.PROFILE)
+        BottomNavItem(s(StringKey.ROOT_NAV_DASHBOARD), Icons.Default.Home, RouteIds.ROOT_CONSOLE),
+        BottomNavItem(s(StringKey.ROOT_NAV_HISTORY), Icons.Default.History, RouteIds.TENANT_HISTORY),
+        BottomNavItem(s(StringKey.NAV_PROFILE), Icons.Default.Person, RouteIds.PROFILE)
     )
     Scaffold(
         modifier = baseModifier.fillMaxSize(),
@@ -206,7 +208,7 @@ private fun RootConsoleMobileScaffold(
                 title = {
                     Column {
                         Text(
-                            text = "Root Dashboard",
+                            text = s(StringKey.ROOT_DASHBOARD),
                             style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.Bold
                         )
@@ -217,14 +219,14 @@ private fun RootConsoleMobileScaffold(
                         BadgedBox(badge = { Badge { Text("3") } }) {
                             Icon(
                                 imageVector = Icons.Default.Notifications,
-                                contentDescription = "Notifications"
+                                contentDescription = s(StringKey.NAV_NOTIFICATIONS)
                             )
                         }
                     }
                     IconButton(onClick = onNavigateToProfile) {
                         Icon(
                             imageVector = Icons.Default.Person,
-                            contentDescription = "Profile"
+                            contentDescription = s(StringKey.NAV_PROFILE)
                         )
                     }
                 },
@@ -265,7 +267,7 @@ private fun RootConsoleBody(
         if (state.capabilities == CapabilityPolicy.rootCapabilities || state.capabilities == CapabilityPolicy.tenantAdminCapabilities) {
             SearchBar(
                 value = state.filter.query,
-                placeholder = "Search tenants/users/actions",
+                placeholder = s(StringKey.ROOT_SEARCH_TENANTS_USERS_ACTIONS),
                 onValueChange = onQuery
             )
             Spacer(modifier = Modifier.height(10.dp))
@@ -298,12 +300,12 @@ private fun RootConsoleDesktopTabs(
     onNavigate: (String, String?) -> Unit
 ) {
     val items = listOf(
-        "Console" to "root/console",
-        "Tenants" to "root/tenant-management",
-        "Global User Directory" to "root/global-user-directory",
-        "Audit Explorer" to "root/audit-explorer",
-        "Security Events" to "root/security-events",
-        "Settings" to "root/system-settings"
+        s(StringKey.ROOT_TAB_CONSOLE) to "root/console",
+        s(StringKey.ROOT_TAB_TENANTS) to "root/tenant-management",
+        s(StringKey.ROOT_GLOBAL_USER_DIRECTORY) to "root/global-user-directory",
+        s(StringKey.ROOT_AUDIT_EXPLORER) to "root/audit-explorer",
+        s(StringKey.ROOT_SECURITY_EVENTS) to "root/security-events",
+        s(StringKey.NAV_SETTINGS) to "root/system-settings"
     )
     Column(
         modifier = Modifier.fillMaxWidth(),
@@ -334,14 +336,14 @@ private fun RootConsoleCompact(
     onOpen: (String, String?) -> Unit
 ) {
     val quickActions = listOf(
-        QuickActionItem("Tenants", Icons.Default.Store, { onOpen("root/tenant-management", null) }, AppColors.Primary),
-        QuickActionItem("Admins", Icons.Default.Group, { onOpen("root/tenant-admins", null) }, AppColors.WarningDark),
-        QuickActionItem("Tenant Members", Icons.Default.VerifiedUser, { onOpen(RouteIds.ROOT_TENANT_MEMBERS, null) }, AppColors.SuccessDark),
-        QuickActionItem("Users", Icons.Default.People, { onOpen(RouteIds.ROOT_USERS, null) }, AppColors.InfoDark),
-        QuickActionItem("Invites", Icons.Default.Mail, { onOpen(RouteIds.ROOT_INVITE_MANAGEMENT, null) }, AppColors.SecondaryVariant),
-        QuickActionItem("Audit", Icons.Default.History, { onOpen("root/audit-explorer", null) }, AppColors.Warning),
-        QuickActionItem("Security", Icons.Default.Security, { onOpen("root/security-events", null) }, AppColors.ErrorDark),
-        QuickActionItem("Settings", Icons.Default.Settings, { onOpen(settingsRoute, null) }, AppColors.Gray700)
+        QuickActionItem(s(StringKey.ROOT_ACTION_TENANTS), Icons.Default.Store, { onOpen("root/tenant-management", null) }, AppColors.Primary),
+        QuickActionItem(s(StringKey.ROOT_ACTION_ADMINS), Icons.Default.Group, { onOpen("root/tenant-admins", null) }, AppColors.WarningDark),
+        QuickActionItem(s(StringKey.ROOT_ACTION_TENANT_MEMBERS), Icons.Default.VerifiedUser, { onOpen(RouteIds.ROOT_TENANT_MEMBERS, null) }, AppColors.SuccessDark),
+        QuickActionItem(s(StringKey.ROOT_ACTION_USERS), Icons.Default.People, { onOpen(RouteIds.ROOT_USERS, null) }, AppColors.InfoDark),
+        QuickActionItem(s(StringKey.ROOT_ACTION_INVITES), Icons.Default.Mail, { onOpen(RouteIds.ROOT_INVITE_MANAGEMENT, null) }, AppColors.SecondaryVariant),
+        QuickActionItem(s(StringKey.ROOT_ACTION_AUDIT), Icons.Default.History, { onOpen("root/audit-explorer", null) }, AppColors.Warning),
+        QuickActionItem(s(StringKey.ROOT_ACTION_SECURITY), Icons.Default.Security, { onOpen("root/security-events", null) }, AppColors.ErrorDark),
+        QuickActionItem(s(StringKey.NAV_SETTINGS), Icons.Default.Settings, { onOpen(settingsRoute, null) }, AppColors.Gray700)
     )
     Column(
         modifier = modifier
@@ -349,7 +351,7 @@ private fun RootConsoleCompact(
             .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        SectionHeader(title = "System Overview")
+        SectionHeader(title = s(StringKey.ROOT_SYSTEM_OVERVIEW))
 
         FlowRow(
             modifier = Modifier.fillMaxWidth(),
@@ -358,14 +360,14 @@ private fun RootConsoleCompact(
         ) {
             StatCard(
                 value = state.tenants.size.toString(),
-                label = "Tenants",
+                label = s(StringKey.ROOT_STAT_TENANTS),
                 icon = Icons.Default.Store,
                 iconTint = AppColors.Primary,
                 modifier = Modifier.weight(1f)
             )
             StatCard(
                 value = state.users.size.toString(),
-                label = "Global Users",
+                label = s(StringKey.ROOT_STAT_GLOBAL_USERS),
                 icon = Icons.Default.People,
                 iconTint = AppColors.Info,
                 modifier = Modifier.weight(1f)
@@ -378,24 +380,24 @@ private fun RootConsoleCompact(
         ) {
             StatCard(
                 value = state.tenantAdmins.size.toString(),
-                label = "Tenant Admins",
+                label = s(StringKey.ROOT_STAT_TENANT_ADMINS),
                 icon = Icons.Default.VerifiedUser,
                 iconTint = AppColors.WarningDark,
                 modifier = Modifier.weight(1f)
             )
             StatCard(
                 value = state.auditLogs.size.toString(),
-                label = "Audit Items",
+                label = s(StringKey.ROOT_STAT_AUDIT_ITEMS),
                 icon = Icons.Default.Analytics,
                 iconTint = AppColors.SuccessDark,
                 modifier = Modifier.weight(1f)
             )
         }
 
-        SectionHeader(title = "Quick Actions")
+        SectionHeader(title = s(StringKey.DASH_QUICK_ACTIONS))
         QuickActionGrid(actions = quickActions)
 
-        SectionHeader(title = "Recent Tenants")
+        SectionHeader(title = s(StringKey.ROOT_RECENT_TENANTS))
         state.tenants.take(5).forEach { tenant ->
             val tenantPalette = listOf(
                 AppColors.Primary.copy(alpha = 0.10f),
@@ -424,7 +426,7 @@ private fun RootConsoleCompact(
                         Column {
                             Text(tenant.name, fontWeight = FontWeight.SemiBold)
                             Text(
-                                "Admins: ${tenant.adminCount}  Members: ${tenant.memberCount}",
+                                s(StringKey.ROOT_ADMINS_MEMBERS_INLINE, tenant.adminCount, tenant.memberCount),
                                 style = MaterialTheme.typography.bodySmall
                             )
                         }
@@ -445,12 +447,12 @@ private fun RootConsoleDesktop(
     onOpen: (String, String?) -> Unit
 ) {
     val cards = listOf(
-        Triple("Tenant Management", "Create/update/delete tenants", "root/tenant-management"),
-        Triple("Tenant Admins", "Assign/unassign and disable", "root/tenant-admins"),
-        Triple("Global Users", "Cross-tenant user directory", "root/global-user-directory"),
-        Triple("Audit Explorer", "Filters and export", "root/audit-explorer"),
-        Triple("Security Events", "Suspicious activity monitor", "root/security-events"),
-        Triple("Roles & Permissions", "Global matrix editor", "root/roles-permissions")
+        Triple(s(StringKey.TENANT_MANAGEMENT), s(StringKey.ROOT_CARD_TENANT_MANAGEMENT_DESC), "root/tenant-management"),
+        Triple(s(StringKey.ROOT_TENANT_ADMINS), s(StringKey.ROOT_CARD_TENANT_ADMINS_DESC), "root/tenant-admins"),
+        Triple(s(StringKey.ROOT_GLOBAL_USERS), s(StringKey.ROOT_CARD_GLOBAL_USERS_DESC), "root/global-user-directory"),
+        Triple(s(StringKey.ROOT_AUDIT_EXPLORER), s(StringKey.ROOT_CARD_AUDIT_EXPLORER_DESC), "root/audit-explorer"),
+        Triple(s(StringKey.ROOT_SECURITY_EVENTS), s(StringKey.ROOT_CARD_SECURITY_EVENTS_DESC), "root/security-events"),
+        Triple(s(StringKey.ROOT_CARD_ROLES_PERMISSIONS), s(StringKey.ROOT_CARD_ROLES_PERMISSIONS_DESC), "root/roles-permissions")
     )
     LazyColumn(
         modifier = modifier.fillMaxWidth(),
@@ -465,7 +467,7 @@ private fun RootConsoleDesktop(
                         Text(title, fontWeight = FontWeight.Bold)
                         Text(subtitle, style = MaterialTheme.typography.bodySmall)
                     }
-                    OutlinedButton(onClick = { onOpen(route, null) }) { Text("Open") }
+                    OutlinedButton(onClick = { onOpen(route, null) }) { Text(s(StringKey.ROOT_OPEN)) }
                 }
             }
         }
@@ -482,11 +484,11 @@ fun TenantManagementScreen(
     val state by viewModel.state.collectAsState()
     LaunchedEffect(Unit) { viewModel.onEvent(RootConsoleUiEvent.Load()) }
 
-    AppScaffold(title = "Tenant Management", snackbarHostState = remember { SnackbarHostState() }) { modifier ->
+    AppScaffold(title = s(StringKey.TENANT_MANAGEMENT), snackbarHostState = remember { SnackbarHostState() }) { modifier ->
         Column(modifier = modifier.fillMaxSize().padding(16.dp)) {
             SearchBar(
                 value = state.filter.query,
-                placeholder = "Search tenant",
+                placeholder = s(StringKey.ROOT_SEARCH_TENANT),
                 onValueChange = { viewModel.onEvent(RootConsoleUiEvent.UpdateQuery(it)) }
             )
             Spacer(modifier = Modifier.height(10.dp))
@@ -496,7 +498,7 @@ fun TenantManagementScreen(
                 onDelete = { viewModel.onEvent(RootConsoleUiEvent.DeleteTenant(it)) }
             )
             Spacer(modifier = Modifier.height(8.dp))
-            OutlinedButton(onClick = onNavigateBack) { Text("Back") }
+            OutlinedButton(onClick = onNavigateBack) { Text(s(StringKey.BACK)) }
         }
     }
 }
@@ -515,10 +517,10 @@ private fun TenantListAdaptive(
                     Card(modifier = Modifier.fillMaxWidth().clickable { onOpenTenant(tenant.id) }) {
                         Column(modifier = Modifier.fillMaxWidth().padding(12.dp)) {
                             Text(tenant.name, fontWeight = FontWeight.SemiBold)
-                            Text("Quota ${tenant.quotaUsed}/${tenant.quotaLimit}")
+                            Text(s(StringKey.ROOT_QUOTA_INLINE, tenant.quotaUsed, tenant.quotaLimit))
                             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                                OutlinedButton(onClick = { onOpenTenant(tenant.id) }) { Text("Detail") }
-                                OutlinedButton(onClick = { onDelete(tenant.id) }) { Text("Delete") }
+                                OutlinedButton(onClick = { onOpenTenant(tenant.id) }) { Text(s(StringKey.ROOT_DETAIL)) }
+                                OutlinedButton(onClick = { onDelete(tenant.id) }) { Text(s(StringKey.DELETE)) }
                             }
                         }
                     }
@@ -528,11 +530,11 @@ private fun TenantListAdaptive(
             Card(modifier = Modifier.fillMaxWidth()) {
                 Column(modifier = Modifier.fillMaxWidth().padding(12.dp)) {
                     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                        Text("Tenant", fontWeight = FontWeight.Bold)
-                        Text("Usage", fontWeight = FontWeight.Bold)
-                        Text("Admins", fontWeight = FontWeight.Bold)
-                        Text("Members", fontWeight = FontWeight.Bold)
-                        Text("Actions", fontWeight = FontWeight.Bold)
+                        Text(s(StringKey.ROOT_TABLE_TENANT), fontWeight = FontWeight.Bold)
+                        Text(s(StringKey.ROOT_TABLE_USAGE), fontWeight = FontWeight.Bold)
+                        Text(s(StringKey.ROOT_TABLE_ADMINS), fontWeight = FontWeight.Bold)
+                        Text(s(StringKey.ROOT_TABLE_MEMBERS), fontWeight = FontWeight.Bold)
+                        Text(s(StringKey.ROOT_TABLE_ACTIONS), fontWeight = FontWeight.Bold)
                     }
                     Spacer(modifier = Modifier.height(8.dp))
                     tenants.forEach { tenant ->
@@ -542,8 +544,8 @@ private fun TenantListAdaptive(
                             Text(tenant.adminCount.toString())
                             Text(tenant.memberCount.toString())
                             Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                                OutlinedButton(onClick = { onOpenTenant(tenant.id) }) { Text("Open") }
-                                OutlinedButton(onClick = { onDelete(tenant.id) }) { Text("Delete") }
+                                OutlinedButton(onClick = { onOpenTenant(tenant.id) }) { Text(s(StringKey.ROOT_OPEN)) }
+                                OutlinedButton(onClick = { onDelete(tenant.id) }) { Text(s(StringKey.DELETE)) }
                             }
                         }
                     }
@@ -565,23 +567,23 @@ fun TenantDetailScreen(
     LaunchedEffect(tenantId) { viewModel.onEvent(RootConsoleUiEvent.Load(tenantId)) }
 
     val detail = state.tenantDetail
-    AppScaffold(title = "Tenant Detail", snackbarHostState = remember { SnackbarHostState() }) { modifier ->
+    AppScaffold(title = s(StringKey.ROOT_TENANT_DETAIL), snackbarHostState = remember { SnackbarHostState() }) { modifier ->
         Column(modifier = modifier.fillMaxSize().padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
             if (detail == null) {
                 LoadingState()
             } else {
                 TenantDetailCard(detail = detail)
                 if (state.capabilities?.can(RootPermission.USER_UPDATE) == true) {
-                    OutlinedButton(onClick = { askImpersonate = true }) { Text("Impersonate Tenant Admin") }
+                    OutlinedButton(onClick = { askImpersonate = true }) { Text(s(StringKey.ROOT_IMPERSONATE_TENANT_ADMIN)) }
                 }
-                OutlinedButton(onClick = onNavigateBack) { Text("Back") }
+                OutlinedButton(onClick = onNavigateBack) { Text(s(StringKey.BACK)) }
             }
         }
     }
     if (askImpersonate) {
         ConfirmDialog(
-            title = "Impersonate Admin",
-            body = "Enter tenant context for ${tenantId}?",
+            title = s(StringKey.ROOT_IMPERSONATE_ADMIN),
+            body = s(StringKey.ROOT_IMPERSONATE_CONFIRM, tenantId),
             onConfirm = {
                 viewModel.onEvent(RootConsoleUiEvent.ConfirmImpersonation(tenantId))
                 askImpersonate = false
@@ -596,10 +598,10 @@ private fun TenantDetailCard(detail: TenantDetail) {
     Card(modifier = Modifier.fillMaxWidth()) {
         Column(modifier = Modifier.fillMaxWidth().padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Text(detail.summary.name, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
-            Text("Status: ${detail.summary.status}")
-            Text("Admins: ${detail.admins.size} | Members: ${detail.members.size}")
-            Text("Usage: ${detail.summary.quotaUsed}/${detail.summary.quotaLimit}")
-            Text("Settings:")
+            Text(s(StringKey.ROOT_DETAIL_STATUS, detail.summary.status))
+            Text(s(StringKey.ROOT_DETAIL_ADMINS_MEMBERS, detail.admins.size, detail.members.size))
+            Text(s(StringKey.ROOT_DETAIL_USAGE, detail.summary.quotaUsed, detail.summary.quotaLimit))
+            Text(s(StringKey.ROOT_DETAIL_SETTINGS))
             detail.settings.forEach { (k, v) -> Text(" - $k: $v") }
         }
     }
@@ -608,7 +610,7 @@ private fun TenantDetailCard(detail: TenantDetail) {
 @Composable
 fun GlobalUserDirectoryScreen(
     role: UserRole,
-    screenTitle: String = "Global User Directory",
+    screenTitle: String = s(StringKey.ROOT_GLOBAL_USER_DIRECTORY),
     initialRoleFilter: String? = null,
     onNavigateBack: () -> Unit = {},
     viewModel: RootConsoleViewModel = koinInject<RootAdminRepository>().let { repo -> remember { RootConsoleViewModel(role, repo) } }
@@ -645,7 +647,7 @@ fun TenantAdminsScreen(
     val state by viewModel.state.collectAsState()
     LaunchedEffect(Unit) { viewModel.onEvent(RootConsoleUiEvent.Load()) }
     RootUserManagementScreen(
-        title = "Tenant Admins",
+        title = s(StringKey.ROOT_TENANT_ADMINS),
         users = state.tenantAdmins,
         onToggle = { id, enabled -> viewModel.onEvent(RootConsoleUiEvent.ToggleUserEnabled(id, enabled)) },
         onEdit = { id, fullName, email, role, tenantId ->
@@ -684,7 +686,7 @@ private fun RootUserManagementScreen(
     AppScaffold(title = title, snackbarHostState = remember { SnackbarHostState() }) { modifier ->
         Column(modifier = modifier.fillMaxSize().padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Text(
-                text = "User Type Filters",
+                text = s(StringKey.ROOT_USER_TYPE_FILTERS),
                 style = MaterialTheme.typography.titleSmall,
                 fontWeight = FontWeight.SemiBold
             )
@@ -717,21 +719,21 @@ private fun RootUserManagementScreen(
                                 Text(user.fullName, fontWeight = FontWeight.SemiBold)
                                 Text(user.email, style = MaterialTheme.typography.bodySmall)
                                 Text(
-                                    "Role: ${user.role}  Tenant: ${user.tenantId ?: "GLOBAL"}",
+                                    s(StringKey.ROOT_USER_ROLE_TENANT_INLINE, user.role, user.tenantId ?: s(StringKey.ROOT_INVITE_GLOBAL)),
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                             }
                             Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                                OutlinedButton(onClick = { onToggle(user.id, !user.enabled) }) { Text(if (user.enabled) "Disable" else "Enable") }
-                                OutlinedButton(onClick = { editingUser = user }) { Text("Edit") }
-                                OutlinedButton(onClick = { onDelete(user.id) }) { Text("Delete") }
+                                OutlinedButton(onClick = { onToggle(user.id, !user.enabled) }) { Text(if (user.enabled) s(StringKey.ROOT_USER_DISABLE) else s(StringKey.ROOT_USER_ENABLE)) }
+                                OutlinedButton(onClick = { editingUser = user }) { Text(s(StringKey.EDIT)) }
+                                OutlinedButton(onClick = { onDelete(user.id) }) { Text(s(StringKey.DELETE)) }
                             }
                         }
                     }
                 }
             }
-            OutlinedButton(onClick = onNavigateBack) { Text("Back") }
+            OutlinedButton(onClick = onNavigateBack) { Text(s(StringKey.BACK)) }
         }
     }
 
@@ -762,28 +764,28 @@ private fun EditRootUserDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Edit User") },
+        title = { Text(s(StringKey.EDIT_USER)) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 OutlinedTextField(
                     value = name,
                     onValueChange = { name = it },
-                    label = { Text("Full Name") },
+                    label = { Text(s(StringKey.ROOT_EDIT_FULL_NAME)) },
                     singleLine = true
                 )
                 OutlinedTextField(
                     value = email,
                     onValueChange = { email = it },
-                    label = { Text("Email") },
+                    label = { Text(s(StringKey.EMAIL)) },
                     singleLine = true
                 )
                 OutlinedTextField(
                     value = tenantId,
                     onValueChange = { tenantId = it },
-                    label = { Text("Tenant Id (optional)") },
+                    label = { Text(s(StringKey.ROOT_EDIT_TENANT_ID_OPTIONAL)) },
                     singleLine = true
                 )
-                Text("Role", style = MaterialTheme.typography.labelLarge)
+                Text(s(StringKey.ROOT_EDIT_ROLE), style = MaterialTheme.typography.labelLarge)
                 FlowRow(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(6.dp),
@@ -803,10 +805,10 @@ private fun EditRootUserDialog(
             }
         },
         confirmButton = {
-            TextButton(onClick = { onSave(name, email, role, tenantId.takeIf { it.isNotBlank() }) }) { Text("Save") }
+            TextButton(onClick = { onSave(name, email, role, tenantId.takeIf { it.isNotBlank() }) }) { Text(s(StringKey.SAVE)) }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) { Text("Cancel") }
+            TextButton(onClick = onDismiss) { Text(s(StringKey.CANCEL)) }
         }
     )
 }
@@ -839,14 +841,14 @@ fun RootInviteManagementScreen(
 
     LaunchedEffect(Unit) { viewModel.loadInvites() }
 
-    AppScaffold(title = "Invite Management", snackbarHostState = remember { SnackbarHostState() }) { modifier ->
+    AppScaffold(title = s(StringKey.ROOT_INVITE_MANAGEMENT), snackbarHostState = remember { SnackbarHostState() }) { modifier ->
         Column(
             modifier = modifier.fillMaxSize().padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             SearchBar(
                 value = state.searchQuery,
-                placeholder = "Search by email",
+                placeholder = s(StringKey.ROOT_INVITE_SEARCH_BY_EMAIL),
                 onValueChange = viewModel::updateSearch
             )
 
@@ -877,7 +879,7 @@ fun RootInviteManagementScreen(
                 item {
                     AssistChip(
                         onClick = { selectedInviteRole = null },
-                        label = { Text("All Roles") },
+                        label = { Text(s(StringKey.ROOT_INVITE_ALL_ROLES)) },
                         colors = AssistChipDefaults.assistChipColors(
                             containerColor = if (selectedInviteRole == null) MaterialTheme.colorScheme.primaryContainer
                             else MaterialTheme.colorScheme.surfaceVariant
@@ -900,7 +902,7 @@ fun RootInviteManagementScreen(
                 item {
                     AssistChip(
                         onClick = { viewModel.setTenantFilter(null) },
-                        label = { Text("All Tenants") },
+                        label = { Text(s(StringKey.ROOT_INVITE_ALL_TENANTS)) },
                         colors = AssistChipDefaults.assistChipColors(
                             containerColor = if (state.selectedTenantId == null) MaterialTheme.colorScheme.primaryContainer
                             else MaterialTheme.colorScheme.surfaceVariant
@@ -919,7 +921,7 @@ fun RootInviteManagementScreen(
                 }
             }
 
-            OutlinedButton(onClick = { viewModel.showCreateDialog() }) { Text("Send Invite") }
+            OutlinedButton(onClick = { viewModel.showCreateDialog() }) { Text(s(StringKey.ROOT_INVITE_SEND_INVITE)) }
 
             LazyColumn(
                 modifier = Modifier.weight(1f),
@@ -930,17 +932,17 @@ fun RootInviteManagementScreen(
                         Column(modifier = Modifier.fillMaxWidth().padding(12.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                             Text(invite.email, fontWeight = FontWeight.SemiBold)
                             Text(
-                                "Role: ${invite.role}  |  Tenant: ${invite.tenantName ?: "GLOBAL"}",
+                                s(StringKey.ROOT_INVITE_ROLE_TENANT_INLINE, invite.role, invite.tenantName ?: s(StringKey.ROOT_INVITE_GLOBAL)),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                             Text(
-                                "Status: ${invite.status.name}  |  Expires: ${invite.expiresAt}",
+                                s(StringKey.ROOT_INVITE_STATUS_EXPIRES_INLINE, invite.status.name, invite.expiresAt),
                                 style = MaterialTheme.typography.bodySmall
                             )
                             if (invite.status == InviteStatus.PENDING) {
                                 OutlinedButton(onClick = { viewModel.revokeInvite(invite.id) }) {
-                                    Text("Revoke")
+                                    Text(s(StringKey.ROOT_INVITE_REVOKE))
                                 }
                             }
                         }
@@ -948,20 +950,20 @@ fun RootInviteManagementScreen(
                 }
             }
 
-            OutlinedButton(onClick = onNavigateBack) { Text("Back") }
+            OutlinedButton(onClick = onNavigateBack) { Text(s(StringKey.BACK)) }
         }
     }
 
     if (state.showCreateDialog) {
         AlertDialog(
             onDismissRequest = { viewModel.hideCreateDialog() },
-            title = { Text("Create Invite") },
+            title = { Text(s(StringKey.ROOT_INVITE_CREATE_TITLE)) },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     OutlinedTextField(
                         value = inviteEmail,
                         onValueChange = { inviteEmail = it },
-                        label = { Text("Email") },
+                        label = { Text(s(StringKey.EMAIL)) },
                         singleLine = true
                     )
                     LazyRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -983,7 +985,7 @@ fun RootInviteManagementScreen(
                                     inviteTenantId = null
                                     inviteTenantName = null
                                 },
-                                label = { Text("GLOBAL") },
+                                label = { Text(s(StringKey.ROOT_INVITE_GLOBAL)) },
                                 colors = AssistChipDefaults.assistChipColors(
                                     containerColor = if (inviteTenantId == null) MaterialTheme.colorScheme.primaryContainer
                                     else MaterialTheme.colorScheme.surfaceVariant
@@ -1022,10 +1024,10 @@ fun RootInviteManagementScreen(
                             inviteTenantName = null
                         }
                     }
-                ) { Text("Send") }
+                ) { Text(s(StringKey.ROOT_INVITE_SEND)) }
             },
             dismissButton = {
-                TextButton(onClick = { viewModel.hideCreateDialog() }) { Text("Cancel") }
+                TextButton(onClick = { viewModel.hideCreateDialog() }) { Text(s(StringKey.CANCEL)) }
             }
         )
     }
@@ -1033,10 +1035,10 @@ fun RootInviteManagementScreen(
 
 @Composable
 fun RolesPermissionsScreen(onNavigateBack: () -> Unit = {}) {
-    AppScaffold(title = "Roles & Permissions", snackbarHostState = remember { SnackbarHostState() }) { modifier ->
+    AppScaffold(title = s(StringKey.ROOT_ROLES_PERMISSIONS), snackbarHostState = remember { SnackbarHostState() }) { modifier ->
         Column(modifier = modifier.fillMaxSize().padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            Text("Global RBAC matrix editor", style = MaterialTheme.typography.titleMedium)
-            Text("Use backend as source of truth. UI matrix is a convenience.")
+            Text(s(StringKey.ROOT_RBAC_TITLE), style = MaterialTheme.typography.titleMedium)
+            Text(s(StringKey.ROOT_RBAC_NOTE))
             Card(modifier = Modifier.fillMaxWidth()) {
                 Column(modifier = Modifier.fillMaxWidth().padding(12.dp)) {
                     Text("TENANT_ADMIN", fontWeight = FontWeight.Bold)
@@ -1046,7 +1048,7 @@ fun RolesPermissionsScreen(onNavigateBack: () -> Unit = {}) {
                     Text("VERIFY_SELF, ENROLL_SELF_CREATE, HISTORY_READ_SELF")
                 }
             }
-            OutlinedButton(onClick = onNavigateBack) { Text("Back") }
+            OutlinedButton(onClick = onNavigateBack) { Text(s(StringKey.BACK)) }
         }
     }
 }
@@ -1059,11 +1061,11 @@ fun AuditExplorerScreen(
 ) {
     val state by viewModel.state.collectAsState()
     LaunchedEffect(Unit) { viewModel.onEvent(RootConsoleUiEvent.Load()) }
-    AppScaffold(title = "Audit Explorer", snackbarHostState = remember { SnackbarHostState() }) { modifier ->
+    AppScaffold(title = s(StringKey.ROOT_AUDIT_EXPLORER), snackbarHostState = remember { SnackbarHostState() }) { modifier ->
         Column(modifier = modifier.fillMaxSize().padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
             SearchBar(
                 value = state.filter.query,
-                placeholder = "Filter by actor/action/tenant",
+                placeholder = s(StringKey.ROOT_AUDIT_FILTER),
                 onValueChange = { viewModel.onEvent(RootConsoleUiEvent.UpdateQuery(it)) }
             )
             FilterChips(
@@ -1071,19 +1073,19 @@ fun AuditExplorerScreen(
                 selected = state.filter.status,
                 onSelect = { }
             )
-            OutlinedButton(onClick = { viewModel.onEvent(RootConsoleUiEvent.RefreshAudit) }) { Text("Refresh") }
+            OutlinedButton(onClick = { viewModel.onEvent(RootConsoleUiEvent.RefreshAudit) }) { Text(s(StringKey.REFRESH)) }
             LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 items(state.auditLogs) { log ->
                     Card(modifier = Modifier.fillMaxWidth()) {
                         Column(modifier = Modifier.fillMaxWidth().padding(12.dp)) {
-                            Text("${log.actor} -> ${log.action}", fontWeight = FontWeight.SemiBold)
-                            Text("Status: ${log.status} | Tenant: ${log.tenantId ?: "GLOBAL"}")
+                            Text(s(StringKey.ROOT_AUDIT_ACTOR_ACTION, log.actor, log.action), fontWeight = FontWeight.SemiBold)
+                            Text(s(StringKey.ROOT_AUDIT_STATUS_TENANT_INLINE, log.status, log.tenantId ?: s(StringKey.ROOT_INVITE_GLOBAL)))
                             Text(log.details, style = MaterialTheme.typography.bodySmall)
                         }
                     }
                 }
             }
-            OutlinedButton(onClick = onNavigateBack) { Text("Back") }
+            OutlinedButton(onClick = onNavigateBack) { Text(s(StringKey.BACK)) }
         }
     }
 }
@@ -1096,9 +1098,9 @@ fun SecurityEventsScreen(
 ) {
     val state by viewModel.state.collectAsState()
     LaunchedEffect(Unit) { viewModel.onEvent(RootConsoleUiEvent.Load()) }
-    AppScaffold(title = "Security Events", snackbarHostState = remember { SnackbarHostState() }) { modifier ->
+    AppScaffold(title = s(StringKey.ROOT_SECURITY_EVENTS_TITLE), snackbarHostState = remember { SnackbarHostState() }) { modifier ->
         Column(modifier = modifier.fillMaxSize().padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            OutlinedButton(onClick = { viewModel.onEvent(RootConsoleUiEvent.RefreshSecurity) }) { Text("Refresh") }
+            OutlinedButton(onClick = { viewModel.onEvent(RootConsoleUiEvent.RefreshSecurity) }) { Text(s(StringKey.REFRESH)) }
             LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 items(state.securityEvents) { ev ->
                     Card(modifier = Modifier.fillMaxWidth()) {
@@ -1109,7 +1111,7 @@ fun SecurityEventsScreen(
                     }
                 }
             }
-            OutlinedButton(onClick = onNavigateBack) { Text("Back") }
+            OutlinedButton(onClick = onNavigateBack) { Text(s(StringKey.BACK)) }
         }
     }
 }
@@ -1124,13 +1126,13 @@ fun SystemSettingsScreen(
     var rateLimit by remember { mutableStateOf("120") }
     LaunchedEffect(Unit) { viewModel.onEvent(RootConsoleUiEvent.Load()) }
     val settings = state.settings
-    AppScaffold(title = "System Settings", snackbarHostState = remember { SnackbarHostState() }) { modifier ->
+    AppScaffold(title = s(StringKey.ROOT_SYSTEM_SETTINGS), snackbarHostState = remember { SnackbarHostState() }) { modifier ->
         Column(modifier = modifier.fillMaxSize().padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
             if (settings != null) {
-                Text("JWT policy (read-only): ${settings.jwtPolicySummary}")
+                Text(s(StringKey.ROOT_SETTINGS_JWT_POLICY, settings.jwtPolicySummary))
                 SearchBar(
                     value = rateLimit,
-                    placeholder = "Default rate limit per minute",
+                    placeholder = s(StringKey.ROOT_SETTINGS_RATE_LIMIT),
                     onValueChange = { rateLimit = it }
                 )
                 OutlinedButton(
@@ -1141,11 +1143,11 @@ fun SystemSettingsScreen(
                             passwordPolicy = settings.passwordPolicySummary
                         )
                     }
-                ) { Text("Save") }
+                ) { Text(s(StringKey.SAVE)) }
             } else {
                 LoadingState()
             }
-            OutlinedButton(onClick = onNavigateBack) { Text("Back") }
+            OutlinedButton(onClick = onNavigateBack) { Text(s(StringKey.BACK)) }
         }
     }
 }

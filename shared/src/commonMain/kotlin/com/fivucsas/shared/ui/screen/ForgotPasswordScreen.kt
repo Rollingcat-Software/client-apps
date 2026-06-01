@@ -38,6 +38,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import com.fivucsas.shared.config.UIDimens
+import com.fivucsas.shared.i18n.StringKey
+import com.fivucsas.shared.i18n.s
 import com.fivucsas.shared.ui.components.atoms.AppTextField
 import com.fivucsas.shared.ui.theme.AppColors
 
@@ -55,12 +57,12 @@ fun ForgotPasswordScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Reset Password") },
+                title = { Text(s(StringKey.FORGOT_RESET_PASSWORD_TITLE)) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back"
+                            contentDescription = s(StringKey.A11Y_NAVIGATE_BACK)
                         )
                     }
                 },
@@ -95,13 +97,13 @@ fun ForgotPasswordScreen(
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
-                    text = "Forgot Your Password?",
+                    text = s(StringKey.FORGOT_HEADER),
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = "Enter your email address and we will send you a reset link.",
+                    text = s(StringKey.FORGOT_DESCRIPTION),
                     style = MaterialTheme.typography.bodyMedium,
                     color = AppColors.OnSurfaceVariant
                 )
@@ -109,7 +111,7 @@ fun ForgotPasswordScreen(
                 AppTextField(
                     value = emailState.value.text,
                     onValueChange = { emailState.value = TextFieldValue(it) },
-                    label = "Email Address",
+                    label = s(StringKey.FORGOT_EMAIL_ADDRESS),
                     leadingIcon = Icons.Default.Email,
                     isError = errorMessage.value != null,
                     errorMessage = errorMessage.value
@@ -131,12 +133,12 @@ fun ForgotPasswordScreen(
                             color = AppColors.OnPrimary
                         )
                     } else {
-                        Text("Send Reset Link")
+                        Text(s(StringKey.FORGOT_SEND_RESET_LINK))
                     }
                 }
                 Spacer(modifier = Modifier.height(12.dp))
                 TextButton(onClick = onNavigateToLogin) {
-                    Text("Remember your password? Log in")
+                    Text(s(StringKey.FORGOT_REMEMBER_LOGIN))
                 }
             } else {
                 Icon(
@@ -147,13 +149,13 @@ fun ForgotPasswordScreen(
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
-                    text = "Check Your Email",
+                    text = s(StringKey.FORGOT_CHECK_EMAIL_TITLE),
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = "We have sent a reset link to ${emailState.value.text}.",
+                    text = s(StringKey.FORGOT_RESET_LINK_SENT, emailState.value.text),
                     style = MaterialTheme.typography.bodyMedium,
                     color = AppColors.OnSurfaceVariant
                 )
@@ -162,14 +164,14 @@ fun ForgotPasswordScreen(
                     onClick = { isSubmitted.value = false },
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text("Resend Email")
+                    Text(s(StringKey.FORGOT_RESEND_EMAIL))
                 }
                 Spacer(modifier = Modifier.height(12.dp))
                 Button(
                     onClick = onNavigateToLogin,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text("Back to Login")
+                    Text(s(StringKey.FORGOT_BACK_TO_LOGIN))
                 }
             }
         }
