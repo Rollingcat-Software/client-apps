@@ -17,6 +17,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import com.fivucsas.mobile.android.BuildConfig
 import com.fivucsas.shared.config.UIDimens
 import com.fivucsas.shared.ui.theme.AppColors
 
@@ -54,7 +55,7 @@ fun AboutScreen(
                 style = androidx.compose.material3.MaterialTheme.typography.headlineMedium
             )
             Text(
-                text = "Version 1.0.0",
+                text = "Version ${BuildConfig.VERSION_NAME}",
                 style = androidx.compose.material3.MaterialTheme.typography.bodyMedium,
                 color = AppColors.OnSurfaceVariant
             )

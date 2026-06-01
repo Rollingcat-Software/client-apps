@@ -640,6 +640,13 @@ fun AppNavigation() {
                 }
                 return@composable
             }
+            val operatorRole = currentUserRole()
+            if (!NavigationPolicy.canAccessRoute(operatorRole, RouteIds.OPERATOR_DASHBOARD)) {
+                LaunchedEffect(Unit) {
+                    navigateUnauthorized("No permission for the operator console.")
+                }
+                return@composable
+            }
             OperatorDashboardScreen(
                 currentRoute = Screen.OperatorDashboard.route,
                 onNavigateToNotifications = { navController.navigate(Screen.Notifications.route) },
@@ -1103,6 +1110,14 @@ fun AppNavigation() {
         }
 
         composable(Screen.NfcRead.route) {
+            if (!isAuthenticated()) {
+                LaunchedEffect(Unit) {
+                    navController.navigate(Screen.Login.route) {
+                        popUpTo(0) { inclusive = true }
+                    }
+                }
+                return@composable
+            }
             NfcReadScreen(
                 onNavigateBack = { navController.popBackStack() }
             )
@@ -1525,6 +1540,12 @@ fun AppNavigation() {
                 }
                 return@composable
             }
+            if (!NavigationPolicy.canAccessRoute(currentUserRole(), RouteIds.ANALYTICS)) {
+                LaunchedEffect(Unit) {
+                    navigateUnauthorized("No permission to view analytics.")
+                }
+                return@composable
+            }
             val viewModel = koinInject<com.fivucsas.shared.presentation.viewmodel.AnalyticsViewModel>()
             AnalyticsScreen(
                 viewModel = viewModel,
@@ -1567,6 +1588,12 @@ fun AppNavigation() {
             if (!isAuthenticated()) {
                 LaunchedEffect(Unit) {
                     navController.navigate(Screen.Login.route) { popUpTo(0) { inclusive = true } }
+                }
+                return@composable
+            }
+            if (!NavigationPolicy.canAccessRoute(currentUserRole(), RouteIds.HARDWARE_TOKEN)) {
+                LaunchedEffect(Unit) {
+                    navigateUnauthorized("No permission to register a hardware security key.")
                 }
                 return@composable
             }

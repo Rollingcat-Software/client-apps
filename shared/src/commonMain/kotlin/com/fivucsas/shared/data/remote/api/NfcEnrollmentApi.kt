@@ -11,9 +11,6 @@ import com.fivucsas.shared.data.remote.dto.NfcVerifyResponse
  * Endpoints (identity-core-api, Bearer auth):
  * - POST /nfc/enroll  → enroll a card serial against the current user
  * - POST /nfc/verify  → look a card serial up (advisory match)
- *
- * Distinct from [NfcApprovalApi], which only carries the push-approval
- * Allow/Deny decision for the cross-device NFC login protocol.
  */
 interface NfcEnrollmentApi {
     suspend fun enroll(request: NfcEnrollRequest): NfcEnrollResponse

@@ -10,8 +10,6 @@ import com.fivucsas.shared.domain.model.PendingApproveLogin
  * and shows the [pending] list with each request's two-digit match number; the
  * approver taps Allow (echoing the number) or Deny. A per-session [inFlight]
  * marks the request currently being decided so its row can show a spinner.
- *
- * Reuses {@link ApprovalDecision} from the NFC push-approval flow.
  */
 data class ApproveLoginUiState(
     val pending: List<PendingApproveLogin> = emptyList(),
@@ -27,3 +25,11 @@ data class ApproveLoginUiState(
         val decision: ApprovalDecision
     )
 }
+
+/**
+ * Allow / Deny outcome for an approve-login decision.
+ *
+ * Previously declared in the (now removed) NFC push-approval state; relocated
+ * here because the live approve-login stack is its only consumer.
+ */
+enum class ApprovalDecision { ALLOW, DENY }
