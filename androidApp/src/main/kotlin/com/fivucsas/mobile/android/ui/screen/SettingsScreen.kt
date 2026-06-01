@@ -55,7 +55,6 @@ import com.fivucsas.shared.domain.model.hasPermission
 import com.fivucsas.shared.i18n.StringKey
 import com.fivucsas.shared.i18n.StringResources
 import com.fivucsas.shared.i18n.s
-import com.fivucsas.shared.presentation.viewmodel.TenantSettingsViewModel
 import com.fivucsas.shared.ui.components.molecules.ExpandableCard
 import com.fivucsas.shared.ui.theme.AppColors
 import com.fivucsas.shared.ui.theme.ThemeMode
@@ -80,14 +79,22 @@ fun SettingsScreen(
     onNavigateToHardwareToken: () -> Unit = {},
     onNavigateToBiometricBackup: () -> Unit = {},
     onNavigateToAuthenticator: () -> Unit = {},
+    /**
+     * Navigates ROOT users to the real platform-level System Settings screen
+     * (shared `SystemSettingsScreen`, backed by RootConsoleViewModel /
+     * RootAdminRepository). The previous inline "System Settings" card here was
+     * wired to the *tenant*-scoped TenantSettingsViewModel, never called
+     * loadSettings(), and exposed a rate-limit field that mapped to no domain
+     * field — pressing Save could PUT tenants/settings with default values and
+     * overwrite real tenant config. We no longer offer that editor inline.
+     */
+    onNavigateToSystemSettings: () -> Unit = {},
     onLogout: () -> Unit,
-    tenantSettingsViewModel: TenantSettingsViewModel = koinInject(),
     themePreferences: ThemePreferences = koinInject()
 ) {
     val notificationsEnabled = remember { mutableStateOf(true) }
     val biometricEnabled = remember { mutableStateOf(true) }
     val analyticsEnabled = remember { mutableStateOf(false) }
-    val rateLimitInput = remember { mutableStateOf("120") }
 
     Scaffold(
         topBar = {
@@ -463,16 +470,16 @@ fun SettingsScreen(
                         color = AppColors.OnSurfaceVariant
                     )
                     Spacer(modifier = Modifier.height(10.dp))
-                    OutlinedTextField(
-                        value = rateLimitInput.value,
-                        onValueChange = { rateLimitInput.value = it },
-                        label = { Text("Default rate limit per minute") },
-                        singleLine = true,
+                    // Platform defaults (e.g. default rate limit) are edited in the
+                    // dedicated System Settings screen, which loads the live values
+                    // before editing and persists via RootAdminRepository. Editing
+                    // them inline here previously risked overwriting real config with
+                    // defaults, so we link out instead of duplicating the editor.
+                    Button(
+                        onClick = onNavigateToSystemSettings,
                         modifier = Modifier.fillMaxWidth()
-                    )
-                    Spacer(modifier = Modifier.height(10.dp))
-                    Button(onClick = { tenantSettingsViewModel.saveSettings() }) {
-                        Text(s(StringKey.SAVE_SETTINGS))
+                    ) {
+                        Text("Open System Settings")
                     }
                 }
             }

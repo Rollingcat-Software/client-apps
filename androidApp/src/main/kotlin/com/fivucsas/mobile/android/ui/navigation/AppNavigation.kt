@@ -50,6 +50,7 @@ import com.fivucsas.mobile.android.ui.screen.MfaFlowScreen
 import com.fivucsas.mobile.android.ui.viewmodel.DataExportViewModel as AndroidDataExportViewModel
 import com.fivucsas.authenticator.ui.AuthenticatorScreen
 import com.fivucsas.shared.data.local.TokenManager
+import com.fivucsas.shared.domain.repository.BiometricRepository
 import com.fivucsas.shared.domain.repository.DataExportRepository
 import com.fivucsas.shared.domain.model.ConfidenceBand
 import com.fivucsas.shared.domain.model.GuestFaceCheckOutcome
@@ -745,6 +746,7 @@ fun AppNavigation() {
             }
             val profileUserName = profileState.user?.name ?: tokenManager?.getUserName() ?: "User"
             val profileUserEmail = profileState.user?.email ?: tokenManager?.getUserEmail() ?: ""
+            val profileBiometricRepository = koinInject<BiometricRepository>()
             val dataExportRepository = koinInject<DataExportRepository>()
             val profileContext = LocalContext.current.applicationContext
             val dataExportVm = remember(dataExportRepository) {
@@ -778,7 +780,15 @@ fun AppNavigation() {
                 onOpenLinkedAccounts = { navController.navigate(Screen.LinkedAccounts.route) },
                 onOpenLoginRequests = { navController.navigate(Screen.ApproveLogin.route) },
                 onReEnroll = { navController.navigate(Screen.BiometricEnroll.createRoute(tokenManager?.getUserId() ?: "me")) },
-                onDeleteEnrollment = { /* Enrollment deletion not yet available */ },
+                onDeleteEnrollment = {
+                    // Real delete: DELETE biometric/face/{userId} via BiometricRepository.
+                    val deleteUserId = profileState.user?.id ?: tokenManager?.getUserId()
+                    if (deleteUserId.isNullOrBlank()) {
+                        Result.failure(IllegalStateException("No signed-in user to delete enrollment for."))
+                    } else {
+                        profileBiometricRepository.deleteBiometricData(deleteUserId)
+                    }
+                },
                 onOpenSettings = { navController.navigate(Screen.Settings.route) },
                 navItems = profileNavItems,
                 userId = profileState.user?.id ?: tokenManager?.getUserId() ?: "",
@@ -867,6 +877,7 @@ fun AppNavigation() {
                 onNavigateToHardwareToken = { navController.navigate(Screen.HardwareToken.route) },
                 onNavigateToBiometricBackup = { navController.navigate(Screen.BiometricBackup.createRoute(tokenManager?.getUserId() ?: "me")) },
                 onNavigateToAuthenticator = { navController.navigate(Screen.Authenticator.route) },
+                onNavigateToSystemSettings = { navController.navigate(Screen.RootSystemSettings.route) },
                 onLogout = {
                     tokenManager?.clearTokens()
                     navController.navigate(Screen.Login.route) {
