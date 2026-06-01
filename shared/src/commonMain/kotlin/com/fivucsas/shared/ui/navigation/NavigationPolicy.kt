@@ -72,10 +72,111 @@ object NavigationPolicy {
             // Operator console is an elevated surface — restrict to ROOT / TENANT_ADMIN
             // (same set as ADMIN_DASHBOARD).
             routeId == RouteIds.OPERATOR_DASHBOARD -> role == UserRole.ROOT || role == UserRole.TENANT_ADMIN
-            // NOTE: this default stays fail-open to avoid breaking the many reachable
-            // routes not yet enumerated above; a full fail-closed pass (flip to
-            // `else -> false` with an exhaustive route inventory) is a follow-up.
-            else -> true
+
+            // ── Permission-gated route ids that share a name with a Permission ──
+            // These RouteIds string constants (e.g. "tenant-manage") are platform
+            // capability surfaces, not the Permission enum values. Gate each to the
+            // matching platform/root permission so they cannot fall through.
+            routeId == RouteIds.TENANT_MANAGE -> canAccess(role, Permission.TENANT_MANAGE)
+            routeId == RouteIds.PLATFORM_HEALTH -> canAccess(role, Permission.PLATFORM_HEALTH_READ)
+            routeId == RouteIds.PLATFORM_AUDIT -> canAccess(role, Permission.PLATFORM_AUDIT_READ)
+            routeId == RouteIds.PLATFORM_SETTINGS -> canAccess(role, Permission.PLATFORM_SETTINGS_UPDATE)
+
+            // ── Voice / face-search surfaces ────────────────────────────────────
+            // 1:N voice search across the tenant is an identify-tenant action;
+            // single-user voice auth (VOICE_AUTH) is self-service (handled below).
+            routeId == RouteIds.VOICE_SEARCH -> canAccess(role, Permission.IDENTIFY_TENANT)
+
+            // ── Benign authenticated / pre-auth screens (default = allow) ────────
+            // Every screen below is reachable by any user who has gotten this far;
+            // access is governed by the composable's own isAuthenticated() check
+            // (see fail-closed note at the end). The policy must not DENY these, or
+            // legitimate users get locked out. Listing them explicitly keeps the
+            // `else` branch a true fail-closed catch-all for genuinely-unknown ids.
+            routeId == RouteIds.SPLASH -> true
+            routeId == RouteIds.ONBOARDING -> true
+            routeId == RouteIds.LOGIN -> true
+            routeId == RouteIds.REGISTER -> true
+            routeId == RouteIds.FORGOT_PASSWORD -> true
+            routeId == RouteIds.DASHBOARD -> true
+            routeId == RouteIds.CHANGE_PASSWORD -> true
+            routeId == RouteIds.SETTINGS -> true
+            routeId == RouteIds.NOTIFICATIONS -> true
+            routeId == RouteIds.HELP -> true
+            routeId == RouteIds.ABOUT -> true
+            routeId == RouteIds.QR_LOGIN_DISPLAY -> true
+            routeId == RouteIds.APPROVE_LOGIN -> true
+            routeId == RouteIds.UNAUTHORIZED -> true
+            routeId == RouteIds.GUEST_FACE_CHECK_RESULT -> true
+            routeId == RouteIds.NFC_READ -> true
+
+            // Second-factor enrollment / verification screens — self-service, the
+            // user is mid-flow (often pre-full-auth) so the policy stays permissive.
+            routeId == RouteIds.VOICE_AUTH -> true
+            routeId == RouteIds.EMAIL_OTP -> true
+            routeId == RouteIds.SMS_OTP -> true
+            routeId == RouteIds.TOTP_ENROLL -> true
+            routeId == RouteIds.BIOMETRIC_BACKUP -> true
+            routeId == RouteIds.LIVENESS_PUZZLE -> true
+            routeId == RouteIds.CARD_DETECTION -> true
+            routeId == RouteIds.MFA_FLOW -> true
+            routeId == RouteIds.AUTHENTICATOR -> true
+
+            // Self-service account-management screens.
+            routeId == RouteIds.AUTH_FLOWS -> true
+            routeId == RouteIds.LINKED_ACCOUNTS -> true
+            routeId == RouteIds.SESSIONS -> true
+            routeId == RouteIds.DEVICES -> true
+            routeId == RouteIds.ENROLLMENTS_LIST -> true
+
+            // Fingerprint biometric-gate sub-flow (both android-suffixed and common ids).
+            routeId == RouteIds.FINGERPRINT_GATE_ANDROID -> true
+            routeId == RouteIds.FINGERPRINT_SUCCESS_ANDROID -> true
+            routeId == RouteIds.FINGERPRINT_FAILURE_ANDROID -> true
+            routeId == RouteIds.FINGERPRINT_GATE_COMMON -> true
+            routeId == RouteIds.FINGERPRINT_SUCCESS_COMMON -> true
+            routeId == RouteIds.FINGERPRINT_FAILURE_COMMON -> true
+
+            // Desktop shell / home / auth routes — desktop renderer routes users to
+            // the correct home by role itself; the policy must not block the shell.
+            routeId == RouteIds.DESKTOP_LAUNCHER -> true
+            routeId == RouteIds.DESKTOP_KIOSK -> true
+            routeId == RouteIds.DESKTOP_ADMIN -> true
+            routeId == RouteIds.DESKTOP_QR_LOGIN -> true
+            routeId == RouteIds.DESKTOP_GUEST_FACE_CHECK -> true
+            routeId == RouteIds.DESKTOP_LOGIN -> true
+            routeId == RouteIds.DESKTOP_REGISTER -> true
+            routeId == RouteIds.DESKTOP_FORGOT_PASSWORD -> true
+            routeId == RouteIds.DESKTOP_USER_HOME -> true
+            routeId == RouteIds.DESKTOP_MEMBER_HOME -> true
+            routeId == RouteIds.DESKTOP_TENANT_ADMIN_HOME -> true
+            routeId == RouteIds.DESKTOP_ROOT_HOME -> true
+
+            // Embeddable widget / verification / developer surfaces — reachable by
+            // any authenticated user; the screens guard their own data access.
+            routeId == RouteIds.AUTH_WIDGET -> true
+            routeId == RouteIds.VERIFICATION_DASHBOARD -> true
+            routeId == RouteIds.VERIFICATION_SESSION_DETAIL -> true
+            routeId == RouteIds.WIDGET_DEMO -> true
+            routeId == RouteIds.DEVELOPER_PORTAL -> true
+
+            // ── FAIL-CLOSED DEFAULT ─────────────────────────────────────────────
+            // Anything that reaches this branch is a genuinely-unknown route id
+            // (typo, removed screen, or a newly-added RouteIds constant that has
+            // not yet been classified here). Deny by default — an unrecognized
+            // route must never be silently allowed.
+            //
+            // Auth-vs-permission is LAYERED, not collapsed into this method:
+            //   1. This policy answers "may this ROLE reach this route id?" — it is
+            //      a permission/role gate, returning `true` for benign screens that
+            //      any role may legitimately reach.
+            //   2. The destination composable still calls isAuthenticated() (and,
+            //      for sensitive data, scopes queries to the caller). A `true` here
+            //      is NOT a grant of an unauthenticated session.
+            // When adding a new RouteIds constant, add an explicit case above:
+            // map it to the right Permission if sensitive, or to `true` if it is a
+            // benign authenticated screen. Do NOT rely on this default to allow it.
+            else -> false
         }
     }
 
