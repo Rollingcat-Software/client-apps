@@ -70,6 +70,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import com.fivucsas.mobile.android.ui.util.toCompressedJpegBytes
+import com.fivucsas.shared.i18n.StringKey
+import com.fivucsas.shared.i18n.s
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
@@ -99,11 +101,11 @@ fun CardScanScreen(
     var backBytes by remember { mutableStateOf<ByteArray?>(null) }
 
     val title = when (currentStep) {
-        STEP_PREVIEW_FRONT -> "Review Front"
-        STEP_CAPTURE_BACK -> "Scan Back"
-        STEP_PREVIEW_BACK -> "Review Back"
-        STEP_SUCCESS -> "Card Added"
-        else -> "Scan ID Card"
+        STEP_PREVIEW_FRONT -> s(StringKey.CARDSCAN_TITLE_REVIEW_FRONT)
+        STEP_CAPTURE_BACK -> s(StringKey.CARDSCAN_TITLE_SCAN_BACK)
+        STEP_PREVIEW_BACK -> s(StringKey.CARDSCAN_TITLE_REVIEW_BACK)
+        STEP_SUCCESS -> s(StringKey.CARDSCAN_TITLE_CARD_ADDED)
+        else -> s(StringKey.CARDSCAN_TITLE)
     }
 
     Scaffold(
@@ -132,7 +134,7 @@ fun CardScanScreen(
                             else -> onNavigateBack()
                         }
                     }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = s(StringKey.A11Y_NAVIGATE_BACK))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -158,7 +160,7 @@ fun CardScanScreen(
                 STEP_PREVIEW_BACK -> {
                     CardPreviewContent(
                         imageBytes = backBytes!!,
-                        sideLabel = "Back of ID Card",
+                        sideLabel = s(StringKey.CARDSCAN_BACK_OF_CARD),
                         onRetake = {
                             backBytes = null
                             currentStep = STEP_CAPTURE_BACK
@@ -168,7 +170,8 @@ fun CardScanScreen(
                 }
                 STEP_CAPTURE_BACK -> {
                     CardCaptureContent(
-                        sideLabel = "back",
+                        sideLabel = s(StringKey.CARDSCAN_SIDE_BACK),
+                        sideLabelCapitalized = s(StringKey.CARDSCAN_BACK_LABEL),
                         onPhotoCaptured = { bytes ->
                             backBytes = bytes
                             currentStep = STEP_PREVIEW_BACK
@@ -179,7 +182,7 @@ fun CardScanScreen(
                 STEP_PREVIEW_FRONT -> {
                     CardPreviewContent(
                         imageBytes = frontBytes!!,
-                        sideLabel = "Front of ID Card",
+                        sideLabel = s(StringKey.CARDSCAN_FRONT_OF_CARD),
                         onRetake = {
                             frontBytes = null
                             currentStep = STEP_CAPTURE_FRONT
@@ -189,7 +192,8 @@ fun CardScanScreen(
                 }
                 else -> {
                     CardCaptureContent(
-                        sideLabel = "front",
+                        sideLabel = s(StringKey.CARDSCAN_SIDE_FRONT),
+                        sideLabelCapitalized = s(StringKey.CARDSCAN_FRONT_LABEL),
                         onPhotoCaptured = { bytes ->
                             frontBytes = bytes
                             currentStep = STEP_PREVIEW_FRONT
@@ -210,6 +214,7 @@ fun CardScanScreen(
 @Composable
 private fun CardCaptureContent(
     sideLabel: String,
+    sideLabelCapitalized: String,
     onPhotoCaptured: (ByteArray) -> Unit,
     onSkip: () -> Unit
 ) {
@@ -291,13 +296,13 @@ private fun CardCaptureContent(
                     )
                     Column {
                         Text(
-                            "Scan Your ID Card",
+                            s(StringKey.CARDSCAN_HEADER),
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onPrimaryContainer
                         )
                         Text(
-                            "Photograph the $sideLabel of your ID card",
+                            s(StringKey.CARDSCAN_HEADER_SUBTITLE, sideLabel),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onPrimaryContainer
                         )
@@ -307,7 +312,7 @@ private fun CardCaptureContent(
 
             // Instruction text
             Text(
-                text = "Place the $sideLabel of your ID card within the frame",
+                text = s(StringKey.CARDSCAN_FRAME_INSTRUCTION, sideLabel),
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.SemiBold,
                 color = MaterialTheme.colorScheme.onPrimary,
@@ -370,7 +375,7 @@ private fun CardCaptureContent(
                     Icon(Icons.Default.CameraAlt, contentDescription = null)
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        "Capture ${sideLabel.replaceFirstChar { it.uppercase() }}",
+                        s(StringKey.CARDSCAN_CAPTURE_SIDE, sideLabelCapitalized),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.SemiBold
                     )
@@ -385,7 +390,7 @@ private fun CardCaptureContent(
                 ) {
                     Icon(Icons.Default.SkipNext, contentDescription = null)
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text("Skip")
+                    Text(s(StringKey.CARDSCAN_SKIP))
                 }
             }
         }
@@ -439,7 +444,7 @@ private fun CardPreviewContent(
                         color = MaterialTheme.colorScheme.onSecondaryContainer
                     )
                     Text(
-                        "Review your captured image",
+                        s(StringKey.CARDSCAN_REVIEW_SUBTITLE),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSecondaryContainer
                     )
@@ -476,7 +481,7 @@ private fun CardPreviewContent(
             ) {
                 Icon(Icons.Default.CameraAlt, contentDescription = null)
                 Spacer(modifier = Modifier.width(8.dp))
-                Text("Retake", fontWeight = FontWeight.SemiBold)
+                Text(s(StringKey.CARDSCAN_RETAKE), fontWeight = FontWeight.SemiBold)
             }
 
             Button(
@@ -488,7 +493,7 @@ private fun CardPreviewContent(
             ) {
                 Icon(Icons.Default.CheckCircle, contentDescription = null)
                 Spacer(modifier = Modifier.width(8.dp))
-                Text("Confirm", fontWeight = FontWeight.SemiBold)
+                Text(s(StringKey.CARDSCAN_CONFIRM), fontWeight = FontWeight.SemiBold)
             }
         }
     }
@@ -530,23 +535,20 @@ private fun CardSuccessContent(
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
-                    "Card Added Successfully",
+                    s(StringKey.CARDSCAN_SUCCESS_TITLE),
                     color = MaterialTheme.colorScheme.onPrimaryContainer,
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold
                 )
                 Spacer(modifier = Modifier.height(8.dp))
+                val parts = mutableListOf<String>()
+                if (frontBytes != null) parts.add(s(StringKey.CARDSCAN_FRONT_LABEL))
+                if (backBytes != null) parts.add(s(StringKey.CARDSCAN_BACK_LABEL))
                 Text(
-                    text = buildString {
-                        val parts = mutableListOf<String>()
-                        if (frontBytes != null) parts.add("Front")
-                        if (backBytes != null) parts.add("Back")
-                        if (parts.isEmpty()) {
-                            append("No card images captured (skipped)")
-                        } else {
-                            append(parts.joinToString(" & "))
-                            append(" captured")
-                        }
+                    text = if (parts.isEmpty()) {
+                        s(StringKey.CARDSCAN_SUCCESS_NONE)
+                    } else {
+                        s(StringKey.CARDSCAN_SUCCESS_CAPTURED, parts.joinToString(" & "))
                     },
                     color = MaterialTheme.colorScheme.onPrimaryContainer,
                     style = MaterialTheme.typography.bodyMedium,
@@ -571,14 +573,14 @@ private fun CardSuccessContent(
                                     horizontalAlignment = Alignment.CenterHorizontally
                                 ) {
                                     Text(
-                                        "Front",
+                                        s(StringKey.CARDSCAN_FRONT_LABEL),
                                         style = MaterialTheme.typography.labelSmall,
                                         color = MaterialTheme.colorScheme.onPrimaryContainer
                                     )
                                     Spacer(modifier = Modifier.height(4.dp))
                                     Image(
                                         bitmap = bitmap.asImageBitmap(),
-                                        contentDescription = "Front of ID card",
+                                        contentDescription = s(StringKey.CARDSCAN_FRONT_OF_CARD),
                                         modifier = Modifier
                                             .fillMaxWidth()
                                             .aspectRatio(1.586f)
@@ -598,14 +600,14 @@ private fun CardSuccessContent(
                                     horizontalAlignment = Alignment.CenterHorizontally
                                 ) {
                                     Text(
-                                        "Back",
+                                        s(StringKey.CARDSCAN_BACK_LABEL),
                                         style = MaterialTheme.typography.labelSmall,
                                         color = MaterialTheme.colorScheme.onPrimaryContainer
                                     )
                                     Spacer(modifier = Modifier.height(4.dp))
                                     Image(
                                         bitmap = bitmap.asImageBitmap(),
-                                        contentDescription = "Back of ID card",
+                                        contentDescription = s(StringKey.CARDSCAN_BACK_OF_CARD),
                                         modifier = Modifier
                                             .fillMaxWidth()
                                             .aspectRatio(1.586f)
@@ -623,7 +625,7 @@ private fun CardSuccessContent(
                     onClick = onDone,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text("Done", style = MaterialTheme.typography.titleMedium)
+                    Text(s(StringKey.COMMON_DONE), style = MaterialTheme.typography.titleMedium)
                 }
             }
         }
@@ -655,7 +657,7 @@ private fun CameraPermissionContent(
         )
         Spacer(modifier = Modifier.height(24.dp))
         Text(
-            "Camera Permission Required",
+            s(StringKey.COMMON_CAMERA_PERMISSION_REQUIRED),
             style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center
@@ -663,9 +665,9 @@ private fun CameraPermissionContent(
         Spacer(modifier = Modifier.height(8.dp))
         Text(
             text = if (permanentlyDenied) {
-                "Camera permission was permanently denied. Please enable it in app settings to scan your ID card."
+                s(StringKey.CARDSCAN_PERMISSION_PERMANENTLY_DENIED)
             } else {
-                "We need camera access to photograph your ID card."
+                s(StringKey.CARDSCAN_PERMISSION_RATIONALE)
             },
             style = MaterialTheme.typography.bodyMedium,
             textAlign = TextAlign.Center,
@@ -680,14 +682,14 @@ private fun CameraPermissionContent(
             ) {
                 Icon(Icons.Default.Settings, contentDescription = null)
                 Spacer(modifier = Modifier.width(8.dp))
-                Text("Open App Settings")
+                Text(s(StringKey.COMMON_OPEN_APP_SETTINGS))
             }
         } else {
             Button(
                 onClick = onRequestPermission,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Grant Camera Permission")
+                Text(s(StringKey.COMMON_GRANT_CAMERA_PERMISSION))
             }
         }
     }

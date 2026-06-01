@@ -39,6 +39,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.fivucsas.shared.config.UIDimens
+import com.fivucsas.shared.i18n.StringKey
+import com.fivucsas.shared.i18n.s
 import com.fivucsas.shared.presentation.viewmodel.TenantSettingsViewModel
 import com.fivucsas.shared.ui.components.molecules.ExpandableCard
 import com.fivucsas.shared.ui.components.molecules.ErrorMessage
@@ -67,7 +69,7 @@ fun TenantSettingsScreen(
                             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
                         )
                         Text(
-                            text = "Tenant Settings",
+                            text = s(StringKey.TENANTSET_TITLE),
                             style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.Bold
                         )
@@ -75,7 +77,7 @@ fun TenantSettingsScreen(
                 },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = s(StringKey.A11Y_NAVIGATE_BACK))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -98,13 +100,13 @@ fun TenantSettingsScreen(
 
             // Biometric Policies
             ExpandableCard(
-                title = "Biometric Policies",
-                subtitle = "Face recognition and liveness settings"
+                title = s(StringKey.TENANTSET_BIOMETRIC_POLICIES),
+                subtitle = s(StringKey.TENANTSET_BIOMETRIC_POLICIES_SUB)
             ) {
                 SettingsToggleRow(
                     icon = Icons.Default.Face,
-                    label = "Liveness Check",
-                    description = "Require liveness detection during verification",
+                    label = s(StringKey.TENANTSET_LIVENESS_CHECK),
+                    description = s(StringKey.TENANTSET_LIVENESS_CHECK_DESC),
                     checked = state.livenessCheckEnabled,
                     onCheckedChange = { viewModel.setLivenessCheck(it) }
                 )
@@ -112,7 +114,7 @@ fun TenantSettingsScreen(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Text(
-                    text = "Confidence Threshold: ${(state.confidenceThreshold * 100).toInt()}%",
+                    text = s(StringKey.TENANTSET_CONFIDENCE_THRESHOLD, (state.confidenceThreshold * 100).toInt()),
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.Medium
                 )
@@ -126,7 +128,7 @@ fun TenantSettingsScreen(
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Text(
-                    text = "Max Enrollment Attempts: ${state.maxEnrollmentAttempts}",
+                    text = s(StringKey.TENANTSET_MAX_ENROLLMENT_ATTEMPTS, state.maxEnrollmentAttempts),
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.Medium
                 )
@@ -140,13 +142,13 @@ fun TenantSettingsScreen(
 
             // Security
             ExpandableCard(
-                title = "Security",
-                subtitle = "Session and lock settings"
+                title = s(StringKey.TENANTSET_SECURITY),
+                subtitle = s(StringKey.TENANTSET_SECURITY_SUB)
             ) {
                 SettingsToggleRow(
                     icon = Icons.Default.Lock,
-                    label = "Auto Lock",
-                    description = "Lock app after inactivity timeout",
+                    label = s(StringKey.TENANTSET_AUTO_LOCK),
+                    description = s(StringKey.TENANTSET_AUTO_LOCK_DESC),
                     checked = state.autoLockEnabled,
                     onCheckedChange = { viewModel.setAutoLock(it) }
                 )
@@ -154,7 +156,7 @@ fun TenantSettingsScreen(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Text(
-                    text = "Session Timeout: ${state.sessionTimeoutMinutes} min",
+                    text = s(StringKey.TENANTSET_SESSION_TIMEOUT, state.sessionTimeoutMinutes),
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.Medium
                 )
@@ -168,13 +170,13 @@ fun TenantSettingsScreen(
 
             // NFC & Exam
             ExpandableCard(
-                title = "NFC & Exam Entry",
-                subtitle = "Exam entry and card scan settings"
+                title = s(StringKey.TENANTSET_NFC_EXAM),
+                subtitle = s(StringKey.TENANTSET_NFC_EXAM_SUB)
             ) {
                 SettingsToggleRow(
                     icon = Icons.Default.Nfc,
-                    label = "NFC Exam Entry",
-                    description = "Enable NFC-based exam entry for this tenant",
+                    label = s(StringKey.TENANTSET_NFC_EXAM_ENTRY),
+                    description = s(StringKey.TENANTSET_NFC_EXAM_ENTRY_DESC),
                     checked = state.nfcExamEntryEnabled,
                     onCheckedChange = { viewModel.setNfcExamEntry(it) }
                 )
@@ -182,8 +184,8 @@ fun TenantSettingsScreen(
 
             // Invitations
             ExpandableCard(
-                title = "Invitations",
-                subtitle = "User invitation settings"
+                title = s(StringKey.TENANTSET_INVITATIONS),
+                subtitle = s(StringKey.TENANTSET_INVITATIONS_SUB)
             ) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -197,7 +199,7 @@ fun TenantSettingsScreen(
                     Spacer(modifier = Modifier.size(8.dp))
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
-                            text = "Invite Expiry: ${state.inviteExpiryDays} days",
+                            text = s(StringKey.TENANTSET_INVITE_EXPIRY, state.inviteExpiryDays),
                             style = MaterialTheme.typography.bodyMedium,
                             fontWeight = FontWeight.Medium
                         )
@@ -219,7 +221,7 @@ fun TenantSettingsScreen(
                 ) {
                     Icon(Icons.Default.Save, contentDescription = null, modifier = Modifier.size(20.dp))
                     Spacer(modifier = Modifier.size(8.dp))
-                    Text("Save Changes")
+                    Text(s(StringKey.TENANTSET_SAVE_CHANGES))
                 }
             }
 

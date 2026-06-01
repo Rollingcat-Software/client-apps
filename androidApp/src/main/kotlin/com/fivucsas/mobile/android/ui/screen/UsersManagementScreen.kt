@@ -50,6 +50,8 @@ import com.fivucsas.shared.domain.model.User
 import com.fivucsas.shared.domain.model.UserRole
 import com.fivucsas.shared.domain.model.UserStatus
 import com.fivucsas.shared.domain.model.hasPermission
+import com.fivucsas.shared.i18n.StringKey
+import com.fivucsas.shared.i18n.s
 import com.fivucsas.shared.presentation.viewmodel.AdminViewModel
 import com.fivucsas.shared.ui.components.atoms.AppTextField
 import com.fivucsas.shared.ui.components.atoms.SearchTextField
@@ -88,13 +90,13 @@ fun UsersManagementScreen(
                     IconButton(onClick = onNavigateBack) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back"
+                            contentDescription = s(StringKey.A11Y_NAVIGATE_BACK)
                         )
                     }
                 },
                 title = {
                     Text(
-                        text = "Users Management",
+                        text = s(StringKey.USERSMGMT_TITLE),
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold
                     )
@@ -103,7 +105,7 @@ fun UsersManagementScreen(
                     IconButton(onClick = { viewModel.showAddUserDialog() }) {
                         Icon(
                             imageVector = Icons.Default.Add,
-                            contentDescription = "Add User"
+                            contentDescription = s(StringKey.USERSMGMT_A11Y_ADD_USER)
                         )
                     }
                 },
@@ -127,7 +129,7 @@ fun UsersManagementScreen(
             ) {
                 Icon(
                     imageVector = Icons.Default.Add,
-                    contentDescription = "Add User",
+                    contentDescription = s(StringKey.USERSMGMT_A11Y_ADD_USER),
                     tint = AppColors.OnPrimary
                 )
             }
@@ -152,13 +154,13 @@ fun UsersManagementScreen(
             SearchTextField(
                 value = uiState.searchQuery,
                 onValueChange = { viewModel.updateSearchQuery(it) },
-                placeholder = "Search users...",
+                placeholder = s(StringKey.SEARCH_USERS),
                 modifier = Modifier.fillMaxWidth()
             )
 
             // User count label
             Text(
-                text = "${uiState.filteredUsers.size} users found",
+                text = s(StringKey.USERSMGMT_USERS_FOUND, uiState.filteredUsers.size),
                 style = MaterialTheme.typography.bodySmall,
                 color = AppColors.OnSurfaceVariant,
                 modifier = Modifier.padding(vertical = 4.dp)
@@ -177,11 +179,11 @@ fun UsersManagementScreen(
             } else if (uiState.filteredUsers.isEmpty()) {
                 // Empty state
                 EmptyState(
-                    title = "No users found",
+                    title = s(StringKey.USERSMGMT_NO_USERS_FOUND),
                     message = if (uiState.searchQuery.isNotBlank())
-                        "No users match \"${uiState.searchQuery}\". Try a different search."
+                        s(StringKey.USERSMGMT_NO_USERS_MATCH, uiState.searchQuery)
                     else
-                        "No users yet. Tap + to add a new user.",
+                        s(StringKey.USERSMGMT_NO_USERS_YET),
                     icon = Icons.Default.PersonSearch,
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -233,10 +235,13 @@ fun UsersManagementScreen(
     // Delete Confirmation Dialog
     if (uiState.showDeleteConfirmation) {
         ConfirmationDialog(
-            title = "Delete User",
-            message = "Are you sure you want to delete ${uiState.userToDelete?.name ?: "this user"}? This action cannot be undone.",
-            confirmText = "Delete",
-            dismissText = "Cancel",
+            title = s(StringKey.USERSMGMT_DELETE_USER_TITLE),
+            message = s(
+                StringKey.USERSMGMT_DELETE_USER_MESSAGE,
+                uiState.userToDelete?.name ?: s(StringKey.USERSMGMT_DELETE_USER_FALLBACK)
+            ),
+            confirmText = s(StringKey.DELETE),
+            dismissText = s(StringKey.CANCEL),
             onConfirm = { viewModel.confirmDelete() },
             onDismiss = { viewModel.hideDeleteConfirmation() }
         )
@@ -245,10 +250,10 @@ fun UsersManagementScreen(
     // Delete Enrollment Confirmation Dialog
     showEnrollDeleteDialog?.let { user ->
         ConfirmationDialog(
-            title = "Delete Enrollment",
-            message = "Are you sure you want to delete the biometric enrollment for ${user.name}? They will need to re-enroll.",
-            confirmText = "Delete Enrollment",
-            dismissText = "Cancel",
+            title = s(StringKey.USERSMGMT_DELETE_ENROLLMENT_TITLE),
+            message = s(StringKey.USERSMGMT_DELETE_ENROLLMENT_MESSAGE, user.name),
+            confirmText = s(StringKey.USERSMGMT_DELETE_ENROLLMENT_CONFIRM),
+            dismissText = s(StringKey.CANCEL),
             onConfirm = {
                 viewModel.updateUser(user.copy(hasBiometric = false))
                 showEnrollDeleteDialog = null
@@ -318,7 +323,7 @@ private fun UserRow(
             IconButton(onClick = onEnrollUser) {
                 Icon(
                     imageVector = Icons.Default.CameraAlt,
-                    contentDescription = "Enroll user",
+                    contentDescription = s(StringKey.USERSMGMT_A11Y_ENROLL_USER),
                     tint = AppColors.Primary
                 )
             }
@@ -327,7 +332,7 @@ private fun UserRow(
             IconButton(onClick = onDeleteEnrollment) {
                 Icon(
                     imageVector = Icons.Default.NoAccounts,
-                    contentDescription = "Delete enrollment",
+                    contentDescription = s(StringKey.USERSMGMT_A11Y_DELETE_ENROLLMENT),
                     tint = AppColors.Error
                 )
             }
@@ -335,14 +340,14 @@ private fun UserRow(
         IconButton(onClick = onEdit) {
             Icon(
                 imageVector = Icons.Default.Edit,
-                contentDescription = "Edit user",
+                contentDescription = s(StringKey.USERSMGMT_A11Y_EDIT_USER),
                 tint = AppColors.Primary
             )
         }
         IconButton(onClick = onDelete) {
             Icon(
                 imageVector = Icons.Default.Delete,
-                contentDescription = "Delete user",
+                contentDescription = s(StringKey.USERSMGMT_A11Y_DELETE_USER),
                 tint = AppColors.Error
             )
         }
@@ -364,7 +369,7 @@ private fun AddEditUserDialog(
     val isValid = name.isNotBlank() && email.isNotBlank()
 
     FormDialog(
-        title = if (isEditMode) "Edit User" else "Add User",
+        title = if (isEditMode) s(StringKey.EDIT_USER) else s(StringKey.ADD_USER),
         onDismiss = onDismiss,
         onConfirm = {
             if (isValid) {
@@ -382,38 +387,38 @@ private fun AddEditUserDialog(
                 onConfirm(newUser)
             }
         },
-        confirmText = if (isEditMode) "Save" else "Add",
-        dismissText = "Cancel"
+        confirmText = if (isEditMode) s(StringKey.SAVE) else s(StringKey.USERSMGMT_ADD),
+        dismissText = s(StringKey.CANCEL)
     ) {
         Column(verticalArrangement = Arrangement.spacedBy(UIDimens.SpacingSmall)) {
             AppTextField(
                 value = name,
                 onValueChange = { name = it },
-                label = "Name",
-                placeholder = "Enter full name",
+                label = s(StringKey.USER_NAME),
+                placeholder = s(StringKey.USERSMGMT_NAME_PLACEHOLDER),
                 isError = name.isBlank(),
                 modifier = Modifier.fillMaxWidth()
             )
             AppTextField(
                 value = email,
                 onValueChange = { email = it },
-                label = "Email",
-                placeholder = "Enter email address",
+                label = s(StringKey.USER_EMAIL),
+                placeholder = s(StringKey.USERSMGMT_EMAIL_PLACEHOLDER),
                 isError = email.isBlank(),
                 modifier = Modifier.fillMaxWidth()
             )
             AppTextField(
                 value = idNumber,
                 onValueChange = { idNumber = it },
-                label = "ID Number",
-                placeholder = "Enter ID number",
+                label = s(StringKey.USERSMGMT_ID_NUMBER),
+                placeholder = s(StringKey.USERSMGMT_ID_NUMBER_PLACEHOLDER),
                 modifier = Modifier.fillMaxWidth()
             )
             AppTextField(
                 value = phoneNumber,
                 onValueChange = { phoneNumber = it },
-                label = "Phone Number",
-                placeholder = "Enter phone number",
+                label = s(StringKey.USERSMGMT_PHONE_NUMBER),
+                placeholder = s(StringKey.USERSMGMT_PHONE_NUMBER_PLACEHOLDER),
                 modifier = Modifier.fillMaxWidth()
             )
         }

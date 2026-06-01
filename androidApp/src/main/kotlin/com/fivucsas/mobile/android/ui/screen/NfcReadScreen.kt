@@ -128,14 +128,14 @@ fun NfcReadScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = "NFC Card Reader",
+                        text = s(StringKey.NFCREAD_TITLE),
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.SemiBold
                     )
                 },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = s(StringKey.A11Y_NAVIGATE_BACK))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -259,13 +259,13 @@ private fun MrzInputSection(
                 Spacer(modifier = Modifier.width(12.dp))
                 Column {
                     Text(
-                        "Identity Document Reader",
+                        s(StringKey.NFCREAD_DOC_READER_HEADER),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onPrimaryContainer
                     )
                     Text(
-                        "Enter MRZ data to read passport or eID chip",
+                        s(StringKey.NFCREAD_DOC_READER_SUBTITLE),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onPrimaryContainer
                     )
@@ -279,8 +279,8 @@ private fun MrzInputSection(
     OutlinedTextField(
         value = documentNumber,
         onValueChange = { if (it.length <= 9) onDocumentNumberChange(it.uppercase()) },
-        label = { Text("Document Number") },
-        placeholder = { Text("e.g. A12345678") },
+        label = { Text(s(StringKey.NFCREAD_FIELD_DOCUMENT_NUMBER)) },
+        placeholder = { Text(s(StringKey.NFCREAD_FIELD_DOCUMENT_NUMBER_HINT)) },
         modifier = Modifier.fillMaxWidth(),
         singleLine = true
     )
@@ -294,8 +294,8 @@ private fun MrzInputSection(
         OutlinedTextField(
             value = dateOfBirth,
             onValueChange = { if (it.length <= 6 && it.all { c -> c.isDigit() }) onDateOfBirthChange(it) },
-            label = { Text("Date of Birth") },
-            placeholder = { Text("YYMMDD") },
+            label = { Text(s(StringKey.NFCREAD_FIELD_DATE_OF_BIRTH)) },
+            placeholder = { Text(s(StringKey.NFCREAD_DATE_HINT_YYMMDD)) },
             modifier = Modifier.weight(1f),
             singleLine = true,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
@@ -304,8 +304,8 @@ private fun MrzInputSection(
         OutlinedTextField(
             value = dateOfExpiry,
             onValueChange = { if (it.length <= 6 && it.all { c -> c.isDigit() }) onDateOfExpiryChange(it) },
-            label = { Text("Date of Expiry") },
-            placeholder = { Text("YYMMDD") },
+            label = { Text(s(StringKey.NFCREAD_FIELD_DATE_OF_EXPIRY)) },
+            placeholder = { Text(s(StringKey.NFCREAD_DATE_HINT_YYMMDD)) },
             modifier = Modifier.weight(1f),
             singleLine = true,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
@@ -324,7 +324,7 @@ private fun MrzInputSection(
     ) {
         Icon(Icons.Default.Nfc, contentDescription = null)
         Spacer(modifier = Modifier.width(8.dp))
-        Text("Scan with MRZ", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+        Text(s(StringKey.NFCREAD_SCAN_WITH_MRZ), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
     }
 
     Spacer(modifier = Modifier.height(12.dp))
@@ -338,7 +338,7 @@ private fun MrzInputSection(
     ) {
         Icon(Icons.Default.CreditCard, contentDescription = null)
         Spacer(modifier = Modifier.width(8.dp))
-        Text("Scan Any NFC Card")
+        Text(s(StringKey.NFCREAD_SCAN_ANY_CARD))
     }
 }
 
@@ -357,13 +357,13 @@ private fun WaitingForCardSection(onCancel: () -> Unit) {
         )
         Spacer(modifier = Modifier.height(24.dp))
         Text(
-            "Ready to Scan",
+            s(StringKey.NFCREAD_READY_TITLE),
             style = MaterialTheme.typography.headlineSmall,
             fontWeight = FontWeight.Bold
         )
         Spacer(modifier = Modifier.height(8.dp))
         Text(
-            "Hold your card against the back of your phone",
+            s(StringKey.NFCREAD_READY_SUBTITLE),
             style = MaterialTheme.typography.bodyLarge,
             textAlign = TextAlign.Center,
             color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -372,7 +372,7 @@ private fun WaitingForCardSection(onCancel: () -> Unit) {
         CircularProgressIndicator()
         Spacer(modifier = Modifier.height(32.dp))
         OutlinedButton(onClick = onCancel) {
-            Text("Cancel")
+            Text(s(StringKey.CANCEL))
         }
     }
 }
@@ -387,13 +387,13 @@ private fun ReadingSection(cardTypeName: String) {
         CircularProgressIndicator(modifier = Modifier.size(64.dp))
         Spacer(modifier = Modifier.height(24.dp))
         Text(
-            "Reading Card...",
+            s(StringKey.NFCREAD_READING_TITLE),
             style = MaterialTheme.typography.headlineSmall,
             fontWeight = FontWeight.Bold
         )
         Spacer(modifier = Modifier.height(8.dp))
         Text(
-            "Keep the card steady. Do not move it.",
+            s(StringKey.NFCREAD_READING_SUBTITLE),
             style = MaterialTheme.typography.bodyLarge,
             textAlign = TextAlign.Center,
             color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -401,7 +401,7 @@ private fun ReadingSection(cardTypeName: String) {
         if (cardTypeName != "Unknown") {
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                "Detected: $cardTypeName",
+                s(StringKey.NFCREAD_DETECTED_PREFIX, cardTypeName),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.primary
             )
@@ -455,7 +455,7 @@ private fun ResultSection(
         }
         is NfcReadResult.NfcNotAvailable -> {
             ErrorSection(
-                message = "NFC is not available on this device.",
+                message = s(StringKey.NFCREAD_ERROR_NOT_AVAILABLE),
                 isRecoverable = false,
                 onRetry = {},
                 onBack = onScanAgain
@@ -463,7 +463,7 @@ private fun ResultSection(
         }
         is NfcReadResult.NfcDisabled -> {
             ErrorSection(
-                message = "NFC is disabled. Please enable it in your device settings.",
+                message = s(StringKey.NFCREAD_ERROR_DISABLED),
                 isRecoverable = true,
                 onRetry = onScanAgain,
                 onBack = onScanAgain
@@ -507,7 +507,7 @@ private fun IdentityDocumentResult(
             )
             if (data.bacSuccessful) {
                 Text(
-                    "BAC Authentication Successful",
+                    s(StringKey.NFCREAD_BAC_SUCCESSFUL),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.primary
                 )
@@ -525,7 +525,7 @@ private fun IdentityDocumentResult(
         if (bitmap != null) {
             Image(
                 bitmap = bitmap.asImageBitmap(),
-                contentDescription = "Document photo",
+                contentDescription = s(StringKey.NFCREAD_DOCUMENT_PHOTO_DESC),
                 modifier = Modifier
                     .size(120.dp)
                     .clip(CircleShape),
@@ -541,17 +541,17 @@ private fun IdentityDocumentResult(
         shape = RoundedCornerShape(12.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            Text("Personal Information", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+            Text(s(StringKey.NFCREAD_PERSONAL_INFO), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
             Spacer(modifier = Modifier.height(12.dp))
 
-            if (data.fullName.isNotBlank()) DataRow("Name", data.fullName)
-            if (data.documentNumber.isNotBlank()) DataRow("Document No", data.documentNumber)
-            if (data.nationality.isNotBlank()) DataRow("Nationality", data.nationality)
-            if (data.dateOfBirth.isNotBlank()) DataRow("Date of Birth", data.dateOfBirth)
-            if (data.sex.isNotBlank()) DataRow("Sex", data.sex)
-            if (data.dateOfExpiry.isNotBlank()) DataRow("Expiry Date", data.dateOfExpiry)
-            if (data.personalNumber.isNotBlank()) DataRow("Personal No", data.personalNumber)
-            if (data.issuingCountry.isNotBlank()) DataRow("Issuing Country", data.issuingCountry)
+            if (data.fullName.isNotBlank()) DataRow(s(StringKey.NFCREAD_LABEL_NAME), data.fullName)
+            if (data.documentNumber.isNotBlank()) DataRow(s(StringKey.NFCREAD_LABEL_DOCUMENT_NO), data.documentNumber)
+            if (data.nationality.isNotBlank()) DataRow(s(StringKey.NFCREAD_LABEL_NATIONALITY), data.nationality)
+            if (data.dateOfBirth.isNotBlank()) DataRow(s(StringKey.NFCREAD_LABEL_DATE_OF_BIRTH), data.dateOfBirth)
+            if (data.sex.isNotBlank()) DataRow(s(StringKey.NFCREAD_LABEL_SEX), data.sex)
+            if (data.dateOfExpiry.isNotBlank()) DataRow(s(StringKey.NFCREAD_LABEL_EXPIRY_DATE), data.dateOfExpiry)
+            if (data.personalNumber.isNotBlank()) DataRow(s(StringKey.NFCREAD_LABEL_PERSONAL_NO), data.personalNumber)
+            if (data.issuingCountry.isNotBlank()) DataRow(s(StringKey.NFCREAD_LABEL_ISSUING_COUNTRY), data.issuingCountry)
         }
     }
 
@@ -563,18 +563,18 @@ private fun IdentityDocumentResult(
             shape = RoundedCornerShape(12.dp)
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
-                Text("Security Validation", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                Text(s(StringKey.NFCREAD_SECURITY_VALIDATION), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                 Spacer(modifier = Modifier.height(12.dp))
-                data.sodValid?.let { DataRow("SOD Signature", if (it) "Valid" else "Invalid") }
-                data.dg1HashValid?.let { DataRow("MRZ Hash", if (it) "Valid" else "Invalid") }
-                data.dg2HashValid?.let { DataRow("Photo Hash", if (it) "Valid" else "Invalid") }
+                data.sodValid?.let { DataRow(s(StringKey.NFCREAD_LABEL_SOD_SIGNATURE), if (it) s(StringKey.NFCREAD_VALID) else s(StringKey.NFCREAD_INVALID)) }
+                data.dg1HashValid?.let { DataRow(s(StringKey.NFCREAD_LABEL_MRZ_HASH), if (it) s(StringKey.NFCREAD_VALID) else s(StringKey.NFCREAD_INVALID)) }
+                data.dg2HashValid?.let { DataRow(s(StringKey.NFCREAD_LABEL_PHOTO_HASH), if (it) s(StringKey.NFCREAD_VALID) else s(StringKey.NFCREAD_INVALID)) }
             }
         }
     }
 
     Spacer(modifier = Modifier.height(12.dp))
-    DataRow("UID", data.uid)
-    DataRow("Technologies", data.technologies.joinToString(", "))
+    DataRow(s(StringKey.NFCREAD_LABEL_UID), data.uid)
+    DataRow(s(StringKey.NFCREAD_LABEL_TECHNOLOGIES), data.technologies.joinToString(", "))
 
     // Passive authentication (server-authoritative) — only offered when the
     // chip yielded an EF.SOD to verify.
@@ -600,7 +600,7 @@ private fun IdentityDocumentResult(
     ) {
         Icon(Icons.Default.Refresh, contentDescription = null)
         Spacer(modifier = Modifier.width(8.dp))
-        Text("Scan Another Card")
+        Text(s(StringKey.NFCREAD_SCAN_ANOTHER_CARD))
     }
 }
 
@@ -642,8 +642,8 @@ private fun GenericCardResult(
 
     Card(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(12.dp)) {
         Column(modifier = Modifier.padding(16.dp)) {
-            DataRow("UID", data.uid)
-            DataRow("Technologies", data.technologies.joinToString(", "))
+            DataRow(s(StringKey.NFCREAD_LABEL_UID), data.uid)
+            DataRow(s(StringKey.NFCREAD_LABEL_TECHNOLOGIES), data.technologies.joinToString(", "))
             data.details.forEach { (key, value) ->
                 DataRow(key, value)
             }
@@ -664,7 +664,7 @@ private fun GenericCardResult(
     ) {
         Icon(Icons.Default.Refresh, contentDescription = null)
         Spacer(modifier = Modifier.width(8.dp))
-        Text("Scan Another Card")
+        Text(s(StringKey.NFCREAD_SCAN_ANOTHER_CARD))
     }
 }
 
@@ -845,12 +845,12 @@ private fun ErrorSection(
             Button(onClick = onRetry, modifier = Modifier.fillMaxWidth()) {
                 Icon(Icons.Default.Refresh, contentDescription = null)
                 Spacer(modifier = Modifier.width(8.dp))
-                Text("Try Again")
+                Text(s(StringKey.COMMON_TRY_AGAIN))
             }
             Spacer(modifier = Modifier.height(8.dp))
         }
         OutlinedButton(onClick = onBack, modifier = Modifier.fillMaxWidth()) {
-            Text("Back")
+            Text(s(StringKey.BACK))
         }
     }
 }

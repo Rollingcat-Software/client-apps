@@ -27,6 +27,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
+import com.fivucsas.shared.i18n.StringKey
+import com.fivucsas.shared.i18n.s
 import com.fivucsas.shared.ui.components.organisms.OnboardingPage
 import kotlinx.coroutines.launch
 
@@ -38,18 +40,18 @@ fun OnboardingScreen(
 ) {
     val pages = listOf(
         OnboardingPageData(
-            title = "Secure Biometric Authentication",
-            description = "Verify your identity instantly using facial recognition.",
+            title = s(StringKey.ONBOARD_PAGE1_TITLE),
+            description = s(StringKey.ONBOARD_PAGE1_DESC),
             icon = Icons.Default.Fingerprint
         ),
         OnboardingPageData(
-            title = "How It Works",
-            description = "Register, enroll your face, then verify anytime.",
+            title = s(StringKey.ONBOARD_PAGE2_TITLE),
+            description = s(StringKey.ONBOARD_PAGE2_DESC),
             icon = Icons.Default.VerifiedUser
         ),
         OnboardingPageData(
-            title = "Permissions",
-            description = "Camera access is required to capture your face securely.",
+            title = s(StringKey.ONBOARD_PAGE3_TITLE),
+            description = s(StringKey.ONBOARD_PAGE3_DESC),
             icon = Icons.Default.CameraAlt
         )
     )
@@ -67,7 +69,7 @@ fun OnboardingScreen(
             horizontalArrangement = Arrangement.End
         ) {
             TextButton(onClick = onSkip) {
-                Text("Skip")
+                Text(s(StringKey.ONBOARD_SKIP))
             }
         }
 
@@ -115,7 +117,7 @@ fun OnboardingScreen(
                 .fillMaxWidth()
                 .height(52.dp)
         ) {
-            Text(if (pagerState.currentPage == pages.lastIndex) "Get Started" else "Next")
+            Text(if (pagerState.currentPage == pages.lastIndex) s(StringKey.ONBOARD_GET_STARTED) else s(StringKey.ONBOARD_NEXT))
         }
     }
 }

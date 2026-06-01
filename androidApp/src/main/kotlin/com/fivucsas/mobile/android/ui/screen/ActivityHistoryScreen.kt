@@ -26,6 +26,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.fivucsas.shared.config.UIDimens
+import com.fivucsas.shared.i18n.StringKey
+import com.fivucsas.shared.i18n.s
 import com.fivucsas.shared.ui.components.atoms.SectionHeader
 import com.fivucsas.shared.ui.components.atoms.StatusBadgeType
 import com.fivucsas.shared.ui.components.molecules.ActivityItem
@@ -50,9 +52,9 @@ fun ActivityHistoryScreen(
     )
 
     val filters = listOf(
-        FilterChipItem("All", "all"),
-        FilterChipItem("Verifications", "verification"),
-        FilterChipItem("Enrollments", "enrollment")
+        FilterChipItem(s(StringKey.VERIFICATION_FILTER_ALL), "all"),
+        FilterChipItem(s(StringKey.VERIFICATIONS), "verification"),
+        FilterChipItem(s(StringKey.ENROLLMENTS), "enrollment")
     )
     var selectedFilter by remember { mutableStateOf(filters.first().value) }
 
@@ -76,13 +78,13 @@ fun ActivityHistoryScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Activity History") },
+                title = { Text(s(StringKey.DASH_ACTIVITY_HISTORY)) },
                 actions = {
                     if (showExportButton) {
                         IconButton(onClick = onExport) {
                             Icon(
                                 imageVector = Icons.Default.FileDownload,
-                                contentDescription = "Export History"
+                                contentDescription = s(StringKey.ACTHIST_EXPORT_DESC)
                             )
                         }
                     }
@@ -120,7 +122,7 @@ fun ActivityHistoryScreen(
                     horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = "No activity history yet",
+                        text = s(StringKey.ACTHIST_EMPTY),
                         style = androidx.compose.material3.MaterialTheme.typography.bodyLarge,
                         color = AppColors.OnSurfaceVariant
                     )

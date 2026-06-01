@@ -51,6 +51,8 @@ import androidx.compose.ui.unit.dp
 import com.fivucsas.shared.config.UIDimens
 import com.fivucsas.shared.domain.model.Invite
 import com.fivucsas.shared.domain.model.InviteStatus
+import com.fivucsas.shared.i18n.StringKey
+import com.fivucsas.shared.i18n.s
 import com.fivucsas.shared.presentation.viewmodel.InviteViewModel
 import com.fivucsas.shared.ui.components.atoms.SearchTextField
 import com.fivucsas.shared.ui.components.atoms.StatusBadge
@@ -73,11 +75,11 @@ fun InviteManagementScreen(
     LaunchedEffect(Unit) { viewModel.loadInvites() }
 
     val filters = listOf(
-        FilterChipItem("All", "all"),
-        FilterChipItem("Pending", "PENDING"),
-        FilterChipItem("Accepted", "ACCEPTED"),
-        FilterChipItem("Expired", "EXPIRED"),
-        FilterChipItem("Revoked", "REVOKED")
+        FilterChipItem(s(StringKey.INVITE_FILTER_ALL), "all"),
+        FilterChipItem(s(StringKey.INVITE_FILTER_PENDING), "PENDING"),
+        FilterChipItem(s(StringKey.INVITE_FILTER_ACCEPTED), "ACCEPTED"),
+        FilterChipItem(s(StringKey.INVITE_FILTER_EXPIRED), "EXPIRED"),
+        FilterChipItem(s(StringKey.INVITE_FILTER_REVOKED), "REVOKED")
     )
     var selectedFilterValue by remember { mutableStateOf("all") }
 
@@ -86,14 +88,14 @@ fun InviteManagementScreen(
             TopAppBar(
                 title = {
                     Text(
-                        "Invite Management",
+                        s(StringKey.INVITE_TITLE),
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.SemiBold
                     )
                 },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = s(StringKey.A11Y_NAVIGATE_BACK))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -104,7 +106,7 @@ fun InviteManagementScreen(
         },
         floatingActionButton = {
             FloatingActionButton(onClick = { viewModel.showCreateDialog() }) {
-                Icon(Icons.Default.Add, contentDescription = "Create Invitation")
+                Icon(Icons.Default.Add, contentDescription = s(StringKey.INVITE_A11Y_CREATE))
             }
         }
     ) { paddingValues ->
@@ -120,7 +122,7 @@ fun InviteManagementScreen(
             SearchTextField(
                 value = uiState.searchQuery,
                 onValueChange = { viewModel.updateSearch(it) },
-                placeholder = "Search by email...",
+                placeholder = s(StringKey.INVITE_SEARCH_PLACEHOLDER),
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 8.dp)
@@ -190,13 +192,18 @@ private fun InviteCard(invite: Invite, onRevoke: () -> Unit) {
                         fontWeight = FontWeight.Medium
                     )
                     Text(
-                        text = "Role: ${invite.role}",
+                        text = s(StringKey.INVITE_ROLE_LABEL, invite.role),
                         style = MaterialTheme.typography.bodySmall,
                         color = AppColors.OnSurfaceVariant
                     )
                 }
                 StatusBadge(
-                    text = invite.status.name,
+                    text = when (invite.status) {
+                        InviteStatus.PENDING -> s(StringKey.INVITE_STATUS_PENDING)
+                        InviteStatus.ACCEPTED -> s(StringKey.INVITE_STATUS_ACCEPTED)
+                        InviteStatus.EXPIRED -> s(StringKey.INVITE_STATUS_EXPIRED)
+                        InviteStatus.REVOKED -> s(StringKey.INVITE_STATUS_REVOKED)
+                    },
                     type = when (invite.status) {
                         InviteStatus.PENDING -> StatusBadgeType.Warning
                         InviteStatus.ACCEPTED -> StatusBadgeType.Success
@@ -220,7 +227,7 @@ private fun InviteCard(invite: Invite, onRevoke: () -> Unit) {
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
-                        text = "Expires: ${invite.expiresAt}",
+                        text = s(StringKey.INVITE_EXPIRES_LABEL, invite.expiresAt),
                         style = MaterialTheme.typography.bodySmall,
                         color = AppColors.OnSurfaceVariant
                     )
@@ -232,7 +239,7 @@ private fun InviteCard(invite: Invite, onRevoke: () -> Unit) {
                     ) {
                         Icon(Icons.Default.Block, contentDescription = null, modifier = Modifier.size(16.dp))
                         Spacer(modifier = Modifier.width(4.dp))
-                        Text("Revoke", style = MaterialTheme.typography.labelSmall)
+                        Text(s(StringKey.INVITE_REVOKE), style = MaterialTheme.typography.labelSmall)
                     }
                 }
             }
@@ -250,13 +257,13 @@ private fun CreateInviteDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Create Invitation") },
+        title = { Text(s(StringKey.INVITE_CREATE_TITLE)) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 OutlinedTextField(
                     value = email,
                     onValueChange = { email = it },
-                    label = { Text("Email Address") },
+                    label = { Text(s(StringKey.INVITE_EMAIL_LABEL)) },
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true
                 )
@@ -283,11 +290,11 @@ private fun CreateInviteDialog(
                 onClick = { if (email.isNotBlank()) onCreate(email, role) },
                 enabled = email.isNotBlank()
             ) {
-                Text("Send Invitation")
+                Text(s(StringKey.INVITE_SEND))
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) { Text("Cancel") }
+            TextButton(onClick = onDismiss) { Text(s(StringKey.CANCEL)) }
         }
     )
 }

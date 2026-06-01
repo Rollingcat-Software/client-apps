@@ -44,6 +44,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.fivucsas.shared.domain.model.TenantInfo
 import com.fivucsas.shared.domain.repository.RootAdminRepository
+import com.fivucsas.shared.i18n.StringKey
+import com.fivucsas.shared.i18n.s
 import com.fivucsas.shared.ui.components.atoms.SearchTextField
 import com.fivucsas.shared.ui.theme.AppColors
 import kotlinx.coroutines.launch
@@ -67,14 +69,14 @@ fun RequestMembershipScreen(
                     TenantInfo(
                         id = summary.id,
                         name = summary.name,
-                        description = "Members: ${summary.memberCount}",
+                        description = s(StringKey.REQMEM_MEMBERS_PREFIX, summary.memberCount),
                         memberCount = summary.memberCount
                     )
                 }
                 isLoading = false
             },
             onFailure = { error ->
-                errorMessage = error.message ?: "Failed to load tenants"
+                errorMessage = error.message ?: s(StringKey.REQMEM_LOAD_FAILED)
                 isLoading = false
             }
         )
@@ -93,14 +95,14 @@ fun RequestMembershipScreen(
             TopAppBar(
                 title = {
                     Text(
-                        "Join a Tenant",
+                        s(StringKey.REQMEM_TITLE),
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.SemiBold
                     )
                 },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = s(StringKey.A11Y_NAVIGATE_BACK))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -131,9 +133,7 @@ fun RequestMembershipScreen(
                 shape = RoundedCornerShape(12.dp)
             ) {
                 Text(
-                    text = "Self-service join requests aren't available yet. To join a " +
-                        "tenant, ask an administrator to send you an invitation — it " +
-                        "will appear under My Invitations.",
+                    text = s(StringKey.REQMEM_NOTICE),
                     style = MaterialTheme.typography.bodySmall,
                     color = AppColors.OnSurfaceVariant,
                     modifier = Modifier.padding(12.dp)
@@ -143,14 +143,14 @@ fun RequestMembershipScreen(
             SearchTextField(
                 value = searchQuery,
                 onValueChange = { searchQuery = it },
-                placeholder = "Search tenants...",
+                placeholder = s(StringKey.REQMEM_SEARCH_PLACEHOLDER),
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 8.dp)
             )
 
             Text(
-                text = "${filteredTenants.size} tenants available",
+                text = s(StringKey.REQMEM_TENANTS_AVAILABLE, filteredTenants.size),
                 style = MaterialTheme.typography.bodySmall,
                 color = AppColors.OnSurfaceVariant,
                 modifier = Modifier.padding(vertical = 4.dp)
@@ -172,14 +172,14 @@ fun RequestMembershipScreen(
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(
-                        text = "No tenants found",
+                        text = s(StringKey.REQMEM_NO_TENANTS_TITLE),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
                         color = AppColors.OnSurfaceVariant
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        text = "Try a different search term.",
+                        text = s(StringKey.REQMEM_NO_TENANTS_BODY),
                         style = MaterialTheme.typography.bodyMedium,
                         color = AppColors.OnSurfaceVariant,
                         textAlign = TextAlign.Center
@@ -252,7 +252,7 @@ private fun TenantCard(
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
-                        text = "${tenant.memberCount} members",
+                        text = s(StringKey.REQMEM_MEMBERS_LABEL, tenant.memberCount),
                         style = MaterialTheme.typography.bodySmall,
                         color = AppColors.OnSurfaceVariant
                     )
@@ -264,7 +264,7 @@ private fun TenantCard(
                     onClick = {},
                     enabled = false
                 ) {
-                    Text("Invite only")
+                    Text(s(StringKey.REQMEM_INVITE_ONLY))
                 }
             }
         }

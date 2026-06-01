@@ -18,6 +18,8 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.fivucsas.shared.config.UIDimens
+import com.fivucsas.shared.i18n.StringKey
+import com.fivucsas.shared.i18n.s
 import com.fivucsas.shared.ui.components.molecules.ExpandableCard
 import com.fivucsas.shared.ui.theme.AppColors
 
@@ -29,10 +31,10 @@ fun HelpScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Help & FAQ") },
+                title = { Text(s(StringKey.HELP_TITLE)) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = s(StringKey.A11Y_NAVIGATE_BACK))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -51,22 +53,22 @@ fun HelpScreen(
             verticalArrangement = Arrangement.spacedBy(UIDimens.SpacingMedium)
         ) {
             ExpandableCard(
-                title = "Why do we need camera access?",
-                subtitle = "Permissions"
+                title = s(StringKey.HELP_Q_CAMERA),
+                subtitle = s(StringKey.HELP_CAT_PERMISSIONS)
             ) {
-                Text("We use the camera to securely capture your face for verification.")
+                Text(s(StringKey.HELP_A_CAMERA))
             }
             ExpandableCard(
-                title = "How long does verification take?",
-                subtitle = "Timing"
+                title = s(StringKey.HELP_Q_DURATION),
+                subtitle = s(StringKey.HELP_CAT_TIMING)
             ) {
-                Text("Most verifications complete in under one minute.")
+                Text(s(StringKey.HELP_A_DURATION))
             }
             ExpandableCard(
-                title = "What if verification fails?",
-                subtitle = "Recovery"
+                title = s(StringKey.HELP_Q_FAILURE),
+                subtitle = s(StringKey.HELP_CAT_RECOVERY)
             ) {
-                Text("Try again in better lighting or remove any obstructions like glasses.")
+                Text(s(StringKey.HELP_A_FAILURE))
             }
         }
     }

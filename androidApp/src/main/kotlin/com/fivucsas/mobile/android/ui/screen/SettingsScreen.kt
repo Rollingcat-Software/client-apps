@@ -123,7 +123,7 @@ fun SettingsScreen(
             // Language Selection
             ExpandableCard(
                 title = s(StringKey.LANGUAGE),
-                subtitle = "Turkish / English"
+                subtitle = "Türkçe / English"
             ) {
                 var languageExpanded by remember { mutableStateOf(false) }
                 var currentLang by remember { mutableStateOf(StringResources.currentLanguage) }
@@ -180,9 +180,7 @@ fun SettingsScreen(
                 ThemeMode.DARK -> s(StringKey.THEME_DARK)
             }
             ExpandableCard(
-                // TODO(i18n-20D): replace with StringKey.THEME_SECTION_TITLE once added
-                // to StringResources.kt. See /tmp/i18n_agent_20D.txt.
-                title = s(StringKey.THEME),
+                title = s(StringKey.THEME_SECTION_TITLE),
                 subtitle = themeSubtitle
             ) {
                 val options = listOf(
@@ -276,7 +274,7 @@ fun SettingsScreen(
 
             ExpandableCard(
                 title = s(StringKey.NAV_SETTINGS),
-                subtitle = "Data and privacy"
+                subtitle = s(StringKey.SETTINGS_DATA_PRIVACY_SUB)
             ) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -322,7 +320,7 @@ fun SettingsScreen(
             // Authentication Methods
             ExpandableCard(
                 title = s(StringKey.BIOMETRIC_AUTH),
-                subtitle = "Voice, Voice Search, OTP, TOTP, Liveness, Card, Token"
+                subtitle = s(StringKey.SETTINGS_AUTH_METHODS_SUB)
             ) {
                 Text(
                     text = s(StringKey.VOICE_RECOGNITION),
@@ -447,25 +445,25 @@ fun SettingsScreen(
 
             if (userRole.hasPermission(Permission.PLATFORM_SETTINGS_UPDATE)) {
                 ExpandableCard(
-                    title = "System Settings",
-                    subtitle = "Platform-level defaults"
+                    title = s(StringKey.SETTINGS_SYSTEM_TITLE),
+                    subtitle = s(StringKey.SETTINGS_SYSTEM_SUB)
                 ) {
                     Text(
-                        text = "Session Policy",
+                        text = s(StringKey.SETTINGS_SESSION_POLICY),
                         style = MaterialTheme.typography.bodyMedium
                     )
                     Text(
-                        text = "Token and access-session rules are managed centrally.",
+                        text = s(StringKey.SETTINGS_SESSION_POLICY_DESC),
                         style = MaterialTheme.typography.bodySmall,
                         color = AppColors.OnSurfaceVariant
                     )
                     Spacer(modifier = Modifier.height(10.dp))
                     Text(
-                        text = "Password Policy",
+                        text = s(StringKey.SETTINGS_PASSWORD_POLICY),
                         style = MaterialTheme.typography.bodyMedium
                     )
                     Text(
-                        text = "Global password requirements are applied for all tenants.",
+                        text = s(StringKey.SETTINGS_PASSWORD_POLICY_DESC),
                         style = MaterialTheme.typography.bodySmall,
                         color = AppColors.OnSurfaceVariant
                     )
@@ -479,7 +477,7 @@ fun SettingsScreen(
                         onClick = onNavigateToSystemSettings,
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        Text("Open System Settings")
+                        Text(s(StringKey.SETTINGS_OPEN_SYSTEM_SETTINGS))
                     }
                 }
             }
