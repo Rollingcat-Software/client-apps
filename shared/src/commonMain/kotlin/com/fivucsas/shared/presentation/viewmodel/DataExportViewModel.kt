@@ -35,8 +35,7 @@ import kotlinx.datetime.Clock
 class DataExportViewModel(
     private val dataExportRepository: DataExportRepository,
     private val fileSaver: IFileSaver,
-) {
-    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
+) : BaseViewModel() {
 
     private val _uiState = MutableStateFlow<DataExportUiState>(DataExportUiState.Idle)
     val uiState: StateFlow<DataExportUiState> = _uiState.asStateFlow()
@@ -50,7 +49,7 @@ class DataExportViewModel(
         if (_uiState.value is DataExportUiState.Exporting) return
         _uiState.value = DataExportUiState.Exporting
 
-        scope.launch {
+        viewModelScope.launch {
             dataExportRepository.exportUserData(userId).fold(
                 onSuccess = { json ->
                     val filename = "fivucsas-data-export-${timestampSuffix()}.json"
@@ -91,10 +90,6 @@ class DataExportViewModel(
     /** Reset back to Idle (e.g. after the user dismisses a snackbar). */
     fun reset() {
         _uiState.value = DataExportUiState.Idle
-    }
-
-    fun dispose() {
-        scope.coroutineContext[Job]?.cancel()
     }
 
     private fun timestampSuffix(): String {

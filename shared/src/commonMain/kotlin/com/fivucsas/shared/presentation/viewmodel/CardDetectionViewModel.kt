@@ -77,8 +77,7 @@ object CardTypeLabels {
  */
 class CardDetectionViewModel(
     private val biometricRepository: BiometricRepository
-) {
-    private val viewModelScope = CoroutineScope(Dispatchers.Main)
+) : BaseViewModel() {
 
     private val _uiState = MutableStateFlow(CardDetectionUiState())
     val uiState: StateFlow<CardDetectionUiState> = _uiState.asStateFlow()

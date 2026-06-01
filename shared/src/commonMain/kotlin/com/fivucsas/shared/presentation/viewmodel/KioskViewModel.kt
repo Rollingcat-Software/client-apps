@@ -30,8 +30,7 @@ class KioskViewModel(
     private val enrollUserUseCase: EnrollUserUseCase,
     private val verifyUserUseCase: VerifyUserUseCase,
     private val checkLivenessUseCase: CheckLivenessUseCase
-) {
-    private val viewModelScope = CoroutineScope(Dispatchers.Main)
+) : BaseViewModel() {
 
     private val _uiState = MutableStateFlow(KioskUiState())
     val uiState: StateFlow<KioskUiState> = _uiState.asStateFlow()

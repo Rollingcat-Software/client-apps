@@ -13,8 +13,7 @@ import kotlinx.coroutines.launch
 
 class AuthFlowViewModel(
     private val authFlowRepository: AuthFlowRepository
-) {
-    private val viewModelScope = CoroutineScope(Dispatchers.Main)
+) : BaseViewModel() {
 
     private val _uiState = MutableStateFlow(AuthFlowUiState())
     val uiState: StateFlow<AuthFlowUiState> = _uiState.asStateFlow()

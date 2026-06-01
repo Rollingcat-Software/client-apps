@@ -2,6 +2,7 @@ package com.fivucsas.mobile.android.ui.navigation
 
 import android.net.Uri
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -87,6 +88,7 @@ import com.fivucsas.shared.ui.screen.root.TenantDetailScreen
 import com.fivucsas.shared.ui.screen.root.TenantManagementScreen
 import com.fivucsas.shared.ui.navigation.NavigationPolicy
 import com.fivucsas.shared.ui.navigation.RouteIds
+import com.fivucsas.shared.ui.util.disposeOnLeave
 import org.koin.compose.koinInject
 
 private const val PREFS_NAME = "fivucsas_prefs"
@@ -741,7 +743,7 @@ fun AppNavigation() {
                 return@composable
             }
             val userRole = currentUserRole()
-            val profileVm = koinInject<UserProfileViewModel>()
+            val profileVm = koinInject<UserProfileViewModel>().disposeOnLeave()
             val profileState by profileVm.state.collectAsState()
             LaunchedEffect(Unit) { profileVm.loadProfile() }
             val profileNavItems = when (userRole) {
@@ -761,6 +763,11 @@ fun AppNavigation() {
                     repository = dataExportRepository,
                     appContext = profileContext,
                 )
+            }
+            // AndroidDataExportViewModel owns a CoroutineScope but is not a BaseViewModel
+            // (its dispatcher is injectable for tests); dispose it on leave directly.
+            DisposableEffect(dataExportVm) {
+                onDispose { dataExportVm.dispose() }
             }
             ProfileScreen(
                 userName = profileUserName,
@@ -812,7 +819,7 @@ fun AppNavigation() {
                 }
                 return@composable
             }
-            val editProfileVm = koinInject<UserProfileViewModel>()
+            val editProfileVm = koinInject<UserProfileViewModel>().disposeOnLeave()
             val editProfileState by editProfileVm.state.collectAsState()
             LaunchedEffect(Unit) { editProfileVm.loadProfile() }
             val editUser = editProfileState.user
@@ -840,7 +847,7 @@ fun AppNavigation() {
                 }
                 return@composable
             }
-            val changePasswordVm = koinInject<ChangePasswordViewModel>()
+            val changePasswordVm = koinInject<ChangePasswordViewModel>().disposeOnLeave()
             val cpState by changePasswordVm.state.collectAsState()
             LaunchedEffect(cpState.isSuccess) {
                 if (cpState.isSuccess) {
@@ -1371,7 +1378,7 @@ fun AppNavigation() {
                 return@composable
             }
             val tenantId = backStackEntry.arguments?.getString("tenantId") ?: ""
-            val viewModel = koinInject<com.fivucsas.shared.presentation.viewmodel.AuthFlowViewModel>()
+            val viewModel = koinInject<com.fivucsas.shared.presentation.viewmodel.AuthFlowViewModel>().disposeOnLeave()
             com.fivucsas.shared.ui.screen.AuthFlowsScreen(
                 viewModel = viewModel,
                 tenantId = tenantId,
@@ -1387,7 +1394,7 @@ fun AppNavigation() {
                 }
                 return@composable
             }
-            val viewModel = koinInject<com.fivucsas.shared.presentation.viewmodel.SessionViewModel>()
+            val viewModel = koinInject<com.fivucsas.shared.presentation.viewmodel.SessionViewModel>().disposeOnLeave()
             com.fivucsas.shared.ui.screen.SessionsScreen(
                 viewModel = viewModel,
                 onBack = { navController.popBackStack() }
@@ -1402,7 +1409,7 @@ fun AppNavigation() {
                 }
                 return@composable
             }
-            val viewModel = koinInject<com.fivucsas.shared.presentation.viewmodel.AccountLinkingViewModel>()
+            val viewModel = koinInject<com.fivucsas.shared.presentation.viewmodel.AccountLinkingViewModel>().disposeOnLeave()
             com.fivucsas.shared.ui.screen.LinkedAccountsScreen(
                 viewModel = viewModel,
                 onSwitched = {
@@ -1428,7 +1435,7 @@ fun AppNavigation() {
                 return@composable
             }
             val userId = backStackEntry.arguments?.getString("userId") ?: ""
-            val viewModel = koinInject<com.fivucsas.shared.presentation.viewmodel.DeviceViewModel>()
+            val viewModel = koinInject<com.fivucsas.shared.presentation.viewmodel.DeviceViewModel>().disposeOnLeave()
             com.fivucsas.shared.ui.screen.DevicesScreen(
                 viewModel = viewModel,
                 userId = userId,
@@ -1448,7 +1455,7 @@ fun AppNavigation() {
                 return@composable
             }
             val userId = backStackEntry.arguments?.getString("userId") ?: ""
-            val viewModel = koinInject<com.fivucsas.shared.presentation.viewmodel.EnrollmentViewModel>()
+            val viewModel = koinInject<com.fivucsas.shared.presentation.viewmodel.EnrollmentViewModel>().disposeOnLeave()
             com.fivucsas.shared.ui.screen.EnrollmentsScreen(
                 viewModel = viewModel,
                 userId = userId,
@@ -1468,7 +1475,7 @@ fun AppNavigation() {
                 return@composable
             }
             val userId = backStackEntry.arguments?.getString("userId") ?: ""
-            val viewModel = koinInject<com.fivucsas.shared.presentation.viewmodel.VoiceViewModel>()
+            val viewModel = koinInject<com.fivucsas.shared.presentation.viewmodel.VoiceViewModel>().disposeOnLeave()
             VoiceEnrollScreen(
                 userId = userId,
                 viewModel = viewModel,
@@ -1484,7 +1491,7 @@ fun AppNavigation() {
                 }
                 return@composable
             }
-            val viewModel = koinInject<com.fivucsas.shared.presentation.viewmodel.VoiceViewModel>()
+            val viewModel = koinInject<com.fivucsas.shared.presentation.viewmodel.VoiceViewModel>().disposeOnLeave()
             com.fivucsas.mobile.android.ui.screen.AndroidVoiceSearchScreen(
                 viewModel = viewModel,
                 onNavigateBack = { navController.popBackStack() }
@@ -1503,7 +1510,7 @@ fun AppNavigation() {
                 return@composable
             }
             val userId = backStackEntry.arguments?.getString("userId") ?: ""
-            val viewModel = koinInject<com.fivucsas.shared.presentation.viewmodel.OtpViewModel>()
+            val viewModel = koinInject<com.fivucsas.shared.presentation.viewmodel.OtpViewModel>().disposeOnLeave()
             EmailOtpScreen(
                 userId = userId,
                 viewModel = viewModel,
@@ -1523,7 +1530,7 @@ fun AppNavigation() {
                 return@composable
             }
             val userId = backStackEntry.arguments?.getString("userId") ?: ""
-            val viewModel = koinInject<com.fivucsas.shared.presentation.viewmodel.OtpViewModel>()
+            val viewModel = koinInject<com.fivucsas.shared.presentation.viewmodel.OtpViewModel>().disposeOnLeave()
             SmsOtpScreen(
                 userId = userId,
                 viewModel = viewModel,
@@ -1543,7 +1550,7 @@ fun AppNavigation() {
                 return@composable
             }
             val userId = backStackEntry.arguments?.getString("userId") ?: ""
-            val viewModel = koinInject<com.fivucsas.shared.presentation.viewmodel.TotpViewModel>()
+            val viewModel = koinInject<com.fivucsas.shared.presentation.viewmodel.TotpViewModel>().disposeOnLeave()
             TotpEnrollScreen(
                 userId = userId,
                 viewModel = viewModel,
@@ -1572,7 +1579,7 @@ fun AppNavigation() {
                 }
                 return@composable
             }
-            val viewModel = koinInject<com.fivucsas.shared.presentation.viewmodel.AnalyticsViewModel>()
+            val viewModel = koinInject<com.fivucsas.shared.presentation.viewmodel.AnalyticsViewModel>().disposeOnLeave()
             AnalyticsScreen(
                 viewModel = viewModel,
                 onNavigateBack = { navController.popBackStack() }
@@ -1587,7 +1594,7 @@ fun AppNavigation() {
                 }
                 return@composable
             }
-            val viewModel = koinInject<com.fivucsas.shared.presentation.viewmodel.LivenessViewModel>()
+            val viewModel = koinInject<com.fivucsas.shared.presentation.viewmodel.LivenessViewModel>().disposeOnLeave()
             LivenessScreen(
                 viewModel = viewModel,
                 onNavigateBack = { navController.popBackStack() }
@@ -1602,7 +1609,7 @@ fun AppNavigation() {
                 }
                 return@composable
             }
-            val viewModel = koinInject<com.fivucsas.shared.presentation.viewmodel.CardDetectionViewModel>()
+            val viewModel = koinInject<com.fivucsas.shared.presentation.viewmodel.CardDetectionViewModel>().disposeOnLeave()
             CardDetectionScreen(
                 viewModel = viewModel,
                 onNavigateBack = { navController.popBackStack() }
@@ -1623,7 +1630,7 @@ fun AppNavigation() {
                 }
                 return@composable
             }
-            val viewModel = koinInject<com.fivucsas.shared.presentation.viewmodel.HardwareTokenViewModel>()
+            val viewModel = koinInject<com.fivucsas.shared.presentation.viewmodel.HardwareTokenViewModel>().disposeOnLeave()
             HardwareTokenScreen(
                 viewModel = viewModel,
                 onNavigateBack = { navController.popBackStack() }
@@ -1642,7 +1649,7 @@ fun AppNavigation() {
                 return@composable
             }
             val userId = backStackEntry.arguments?.getString("userId") ?: "me"
-            val viewModel = koinInject<com.fivucsas.shared.presentation.viewmodel.BiometricBackupViewModel>()
+            val viewModel = koinInject<com.fivucsas.shared.presentation.viewmodel.BiometricBackupViewModel>().disposeOnLeave()
             BiometricBackupScreen(
                 viewModel = viewModel,
                 userId = userId,

@@ -37,8 +37,7 @@ class AdminViewModel(
     private val updateUserUseCase: UpdateUserUseCase,
     private val getStatisticsUseCase: GetStatisticsUseCase,
     private val checkSystemHealthUseCase: CheckSystemHealthUseCase
-) {
-    private val viewModelScope = CoroutineScope(Dispatchers.Main)
+) : BaseViewModel() {
 
     private val _uiState = MutableStateFlow(AdminUiState())
     val uiState: StateFlow<AdminUiState> = _uiState.asStateFlow()

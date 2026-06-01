@@ -62,6 +62,7 @@ import com.fivucsas.shared.ui.components.organisms.BottomNavBar
 import com.fivucsas.shared.ui.components.organisms.QuickActionGrid
 import com.fivucsas.shared.ui.components.organisms.QuickActionItem
 import com.fivucsas.shared.ui.theme.AppColors
+import com.fivucsas.shared.ui.util.disposeOnLeave
 import androidx.compose.material.icons.filled.GroupAdd
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -84,7 +85,7 @@ fun DashboardScreen(
     onNavigateToNfcRead: () -> Unit = {},
     onNavigateBottom: (String) -> Unit,
     sessionRepository: SessionRepository = koinInject(),
-    analyticsViewModel: AnalyticsViewModel = koinInject()
+    analyticsViewModel: AnalyticsViewModel = koinInject<AnalyticsViewModel>().disposeOnLeave()
 ) {
     val analyticsState by analyticsViewModel.uiState.collectAsState()
     LaunchedEffect(Unit) { analyticsViewModel.loadStatistics() }

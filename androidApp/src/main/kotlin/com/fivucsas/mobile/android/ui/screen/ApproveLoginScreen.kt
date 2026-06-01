@@ -52,6 +52,7 @@ import com.fivucsas.shared.i18n.StringKey
 import com.fivucsas.shared.i18n.s
 import com.fivucsas.shared.presentation.viewmodel.ApproveLoginViewModel
 import com.fivucsas.shared.ui.theme.AppColors
+import com.fivucsas.shared.ui.util.disposeOnLeave
 import org.koin.compose.koinInject
 
 /**
@@ -70,7 +71,7 @@ import org.koin.compose.koinInject
 @Composable
 fun ApproveLoginScreen(
     onNavigateBack: () -> Unit,
-    viewModel: ApproveLoginViewModel = koinInject()
+    viewModel: ApproveLoginViewModel = koinInject<ApproveLoginViewModel>().disposeOnLeave()
 ) {
     val state by viewModel.state.collectAsState()
 

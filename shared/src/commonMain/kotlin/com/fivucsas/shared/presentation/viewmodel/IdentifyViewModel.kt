@@ -15,15 +15,14 @@ import kotlinx.coroutines.launch
 
 class IdentifyViewModel(
     private val identifyUserUseCase: IdentifyUserUseCase
-) {
-    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
+) : BaseViewModel() {
     private val _state = MutableStateFlow(IdentifyUiState())
     val state: StateFlow<IdentifyUiState> = _state.asStateFlow()
 
     fun identifyFace(imageBytes: ByteArray) {
         _state.update { IdentifyUiState(isLoading = true) }
 
-        scope.launch {
+        viewModelScope.launch {
             identifyUserUseCase(imageBytes).fold(
                 onSuccess = { result ->
                     _state.update {
@@ -54,7 +53,4 @@ class IdentifyViewModel(
         _state.update { IdentifyUiState() }
     }
 
-    fun dispose() {
-        scope.coroutineContext[Job]?.cancel()
-    }
 }

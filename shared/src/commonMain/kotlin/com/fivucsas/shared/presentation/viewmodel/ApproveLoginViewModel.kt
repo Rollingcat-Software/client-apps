@@ -36,8 +36,7 @@ import kotlinx.coroutines.launch
 class ApproveLoginViewModel(
     private val repository: ApproveLoginRepository,
     private val pollIntervalMillis: Long = DEFAULT_POLL_INTERVAL_MILLIS
-) {
-    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
+) : BaseViewModel() {
 
     private val _state = MutableStateFlow(ApproveLoginUiState())
     val state: StateFlow<ApproveLoginUiState> = _state.asStateFlow()
@@ -47,7 +46,7 @@ class ApproveLoginViewModel(
     /** Begins (or restarts) polling the pending list. Idempotent. */
     fun startPolling() {
         if (pollJob?.isActive == true) return
-        pollJob = scope.launch {
+        pollJob = viewModelScope.launch {
             while (isActive) {
                 loadPending()
                 delay(pollIntervalMillis)
@@ -62,7 +61,7 @@ class ApproveLoginViewModel(
 
     /** One-shot refresh (pull-to-refresh). */
     fun refresh() {
-        scope.launch { loadPending() }
+        viewModelScope.launch { loadPending() }
     }
 
     private suspend fun loadPending() {
@@ -98,7 +97,7 @@ class ApproveLoginViewModel(
         if (_state.value.inFlightSessionId != null) return // one decision at a time
         _state.update { it.copy(inFlightSessionId = sessionId, errorMessage = null) }
 
-        scope.launch {
+        viewModelScope.launch {
             repository.submitDecision(sessionId, decision, matchNumber).fold(
                 onSuccess = {
                     _state.update { current ->
@@ -125,10 +124,6 @@ class ApproveLoginViewModel(
     /** Clears the transient decision/error banners after they've been shown. */
     fun consumeTransient() {
         _state.update { it.copy(lastDecision = null, errorMessage = null) }
-    }
-
-    fun dispose() {
-        scope.coroutineContext[Job]?.cancel()
     }
 
     companion object {

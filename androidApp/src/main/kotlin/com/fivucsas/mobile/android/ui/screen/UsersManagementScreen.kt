@@ -64,6 +64,7 @@ import com.fivucsas.shared.ui.components.molecules.SuccessMessage
 import com.fivucsas.shared.ui.components.organisms.BottomNavBar
 import com.fivucsas.shared.ui.components.organisms.EmptyState
 import com.fivucsas.shared.ui.theme.AppColors
+import com.fivucsas.shared.ui.util.disposeOnLeave
 import org.koin.compose.koinInject
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -74,7 +75,7 @@ fun UsersManagementScreen(
     onNavigateBack: () -> Unit,
     onNavigateBottom: (String) -> Unit,
     onNavigateToEnrollUser: (String) -> Unit = {},
-    viewModel: AdminViewModel = koinInject()
+    viewModel: AdminViewModel = koinInject<AdminViewModel>().disposeOnLeave()
 ) {
     val uiState by viewModel.uiState.collectAsState()
     var showEnrollDeleteDialog by remember { mutableStateOf<User?>(null) }

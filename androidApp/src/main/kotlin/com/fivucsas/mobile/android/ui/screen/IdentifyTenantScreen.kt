@@ -67,6 +67,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import com.fivucsas.mobile.android.ui.util.toCompressedJpegBytes
+import com.fivucsas.shared.ui.util.disposeOnLeave
 import com.fivucsas.shared.i18n.StringKey
 import com.fivucsas.shared.i18n.s
 import com.fivucsas.shared.presentation.viewmodel.IdentifyViewModel
@@ -80,7 +81,7 @@ import org.koin.compose.koinInject
 @Composable
 fun IdentifyTenantScreen(
     onNavigateBack: () -> Unit,
-    viewModel: IdentifyViewModel = koinInject()
+    viewModel: IdentifyViewModel = koinInject<IdentifyViewModel>().disposeOnLeave()
 ) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current

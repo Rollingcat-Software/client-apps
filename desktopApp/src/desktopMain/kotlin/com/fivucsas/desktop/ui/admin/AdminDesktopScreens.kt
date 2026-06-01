@@ -60,6 +60,7 @@ import com.fivucsas.shared.presentation.viewmodel.IdentifyViewModel
 import com.fivucsas.shared.domain.model.InviteStatus
 import com.fivucsas.shared.domain.model.TenantHistoryEntry
 import com.fivucsas.shared.presentation.viewmodel.InviteViewModel
+import com.fivucsas.shared.ui.util.disposeOnLeave
 import org.koin.compose.koinInject
 
 // ─── Standalone Users Management Screen ──────────────────────────────────────
@@ -69,7 +70,7 @@ fun AdminDesktopUsersScreen(
     onBack: () -> Unit,
     onLogout: () -> Unit
 ) {
-    val viewModel: AdminViewModel = koinInject()
+    val viewModel: AdminViewModel = koinInject<AdminViewModel>().disposeOnLeave()
     DesktopAppShell(
         title = "Users Management",
         onBack = onBack,
@@ -86,7 +87,7 @@ fun AdminDesktopAnalyticsScreen(
     onBack: () -> Unit,
     onLogout: () -> Unit
 ) {
-    val viewModel: AdminViewModel = koinInject()
+    val viewModel: AdminViewModel = koinInject<AdminViewModel>().disposeOnLeave()
     DesktopAppShell(
         title = "Analytics",
         onBack = onBack,
@@ -103,7 +104,7 @@ fun AdminDesktopSettingsScreen(
     onBack: () -> Unit,
     onLogout: () -> Unit
 ) {
-    val viewModel: AdminViewModel = koinInject()
+    val viewModel: AdminViewModel = koinInject<AdminViewModel>().disposeOnLeave()
     DesktopAppShell(
         title = "Tenant Settings",
         onBack = onBack,
@@ -243,7 +244,7 @@ fun AdminDesktopIdentifyTenantScreen(
     onBack: () -> Unit,
     onLogout: () -> Unit
 ) {
-    val viewModel: IdentifyViewModel = koinInject()
+    val viewModel: IdentifyViewModel = koinInject<IdentifyViewModel>().disposeOnLeave()
     val state by viewModel.state.collectAsState()
     val cameraService = remember { DesktopCameraService() }
     var showCamera by remember { mutableStateOf(false) }
@@ -578,7 +579,7 @@ fun AdminDesktopInviteManagementScreen(
     onBack: () -> Unit,
     onLogout: () -> Unit
 ) {
-    val viewModel: InviteViewModel = koinInject()
+    val viewModel: InviteViewModel = koinInject<InviteViewModel>().disposeOnLeave()
     val state by viewModel.state.collectAsState()
     var inviteEmail by remember { mutableStateOf("") }
     var inviteRole by remember { mutableStateOf("TENANT_MEMBER") }

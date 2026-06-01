@@ -93,6 +93,7 @@ import com.fivucsas.shared.ui.components.root.RootNavItem
 import com.fivucsas.shared.ui.components.root.SearchBar
 import com.fivucsas.shared.ui.navigation.RouteIds
 import com.fivucsas.shared.ui.theme.AppColors
+import com.fivucsas.shared.ui.util.disposeOnLeave
 import org.koin.compose.koinInject
 import kotlinx.coroutines.launch
 
@@ -114,7 +115,7 @@ fun RootConsoleScreen(
     onNavigateToProfile: () -> Unit = {},
     onNavigateBottom: (String) -> Unit = {},
     onNavigate: (String, String?) -> Unit = { _, _ -> },
-    viewModel: RootConsoleViewModel = koinInject<RootAdminRepository>().let { repo -> remember { RootConsoleViewModel(role, repo) } }
+    viewModel: RootConsoleViewModel = koinInject<RootAdminRepository>().let { repo -> remember { RootConsoleViewModel(role, repo) } }.disposeOnLeave()
 ) {
     val state by viewModel.state.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -479,7 +480,7 @@ fun TenantManagementScreen(
     role: UserRole,
     onOpenTenant: (String) -> Unit,
     onNavigateBack: () -> Unit = {},
-    viewModel: RootConsoleViewModel = koinInject<RootAdminRepository>().let { repo -> remember { RootConsoleViewModel(role, repo) } }
+    viewModel: RootConsoleViewModel = koinInject<RootAdminRepository>().let { repo -> remember { RootConsoleViewModel(role, repo) } }.disposeOnLeave()
 ) {
     val state by viewModel.state.collectAsState()
     LaunchedEffect(Unit) { viewModel.onEvent(RootConsoleUiEvent.Load()) }
@@ -560,7 +561,7 @@ fun TenantDetailScreen(
     role: UserRole,
     tenantId: String,
     onNavigateBack: () -> Unit = {},
-    viewModel: RootConsoleViewModel = koinInject<RootAdminRepository>().let { repo -> remember { RootConsoleViewModel(role, repo) } }
+    viewModel: RootConsoleViewModel = koinInject<RootAdminRepository>().let { repo -> remember { RootConsoleViewModel(role, repo) } }.disposeOnLeave()
 ) {
     val state by viewModel.state.collectAsState()
     var askImpersonate by remember { mutableStateOf(false) }
@@ -613,7 +614,7 @@ fun GlobalUserDirectoryScreen(
     screenTitle: String = s(StringKey.ROOT_GLOBAL_USER_DIRECTORY),
     initialRoleFilter: String? = null,
     onNavigateBack: () -> Unit = {},
-    viewModel: RootConsoleViewModel = koinInject<RootAdminRepository>().let { repo -> remember { RootConsoleViewModel(role, repo) } }
+    viewModel: RootConsoleViewModel = koinInject<RootAdminRepository>().let { repo -> remember { RootConsoleViewModel(role, repo) } }.disposeOnLeave()
 ) {
     val state by viewModel.state.collectAsState()
     LaunchedEffect(Unit) { viewModel.onEvent(RootConsoleUiEvent.Load()) }
@@ -642,7 +643,7 @@ fun GlobalUserDirectoryScreen(
 fun TenantAdminsScreen(
     role: UserRole,
     onNavigateBack: () -> Unit = {},
-    viewModel: RootConsoleViewModel = koinInject<RootAdminRepository>().let { repo -> remember { RootConsoleViewModel(role, repo) } }
+    viewModel: RootConsoleViewModel = koinInject<RootAdminRepository>().let { repo -> remember { RootConsoleViewModel(role, repo) } }.disposeOnLeave()
 ) {
     val state by viewModel.state.collectAsState()
     LaunchedEffect(Unit) { viewModel.onEvent(RootConsoleUiEvent.Load()) }
@@ -816,7 +817,7 @@ private fun EditRootUserDialog(
 @Composable
 fun RootInviteManagementScreen(
     onNavigateBack: () -> Unit = {},
-    viewModel: InviteViewModel = koinInject()
+    viewModel: InviteViewModel = koinInject<InviteViewModel>().disposeOnLeave()
 ) {
     val state by viewModel.state.collectAsState()
     var inviteEmail by remember { mutableStateOf("") }
@@ -1057,7 +1058,7 @@ fun RolesPermissionsScreen(onNavigateBack: () -> Unit = {}) {
 fun AuditExplorerScreen(
     role: UserRole,
     onNavigateBack: () -> Unit = {},
-    viewModel: RootConsoleViewModel = koinInject<RootAdminRepository>().let { repo -> remember { RootConsoleViewModel(role, repo) } }
+    viewModel: RootConsoleViewModel = koinInject<RootAdminRepository>().let { repo -> remember { RootConsoleViewModel(role, repo) } }.disposeOnLeave()
 ) {
     val state by viewModel.state.collectAsState()
     LaunchedEffect(Unit) { viewModel.onEvent(RootConsoleUiEvent.Load()) }
@@ -1094,7 +1095,7 @@ fun AuditExplorerScreen(
 fun SecurityEventsScreen(
     role: UserRole,
     onNavigateBack: () -> Unit = {},
-    viewModel: RootConsoleViewModel = koinInject<RootAdminRepository>().let { repo -> remember { RootConsoleViewModel(role, repo) } }
+    viewModel: RootConsoleViewModel = koinInject<RootAdminRepository>().let { repo -> remember { RootConsoleViewModel(role, repo) } }.disposeOnLeave()
 ) {
     val state by viewModel.state.collectAsState()
     LaunchedEffect(Unit) { viewModel.onEvent(RootConsoleUiEvent.Load()) }
@@ -1120,7 +1121,7 @@ fun SecurityEventsScreen(
 fun SystemSettingsScreen(
     role: UserRole,
     onNavigateBack: () -> Unit = {},
-    viewModel: RootConsoleViewModel = koinInject<RootAdminRepository>().let { repo -> remember { RootConsoleViewModel(role, repo) } }
+    viewModel: RootConsoleViewModel = koinInject<RootAdminRepository>().let { repo -> remember { RootConsoleViewModel(role, repo) } }.disposeOnLeave()
 ) {
     val state by viewModel.state.collectAsState()
     var rateLimit by remember { mutableStateOf("120") }

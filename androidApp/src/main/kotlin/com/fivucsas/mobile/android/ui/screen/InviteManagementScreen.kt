@@ -62,13 +62,14 @@ import com.fivucsas.shared.ui.components.molecules.FilterChipItem
 import com.fivucsas.shared.ui.components.molecules.FilterChipRow
 import com.fivucsas.shared.ui.components.molecules.SuccessMessage
 import com.fivucsas.shared.ui.theme.AppColors
+import com.fivucsas.shared.ui.util.disposeOnLeave
 import org.koin.compose.koinInject
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun InviteManagementScreen(
     onNavigateBack: () -> Unit,
-    viewModel: InviteViewModel = koinInject()
+    viewModel: InviteViewModel = koinInject<InviteViewModel>().disposeOnLeave()
 ) {
     val uiState by viewModel.state.collectAsState()
 

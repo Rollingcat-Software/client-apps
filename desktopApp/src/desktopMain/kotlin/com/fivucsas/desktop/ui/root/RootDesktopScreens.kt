@@ -55,6 +55,7 @@ import com.fivucsas.shared.domain.model.InviteStatus
 import com.fivucsas.shared.presentation.viewmodel.InviteViewModel
 import com.fivucsas.shared.presentation.state.RootConsoleUiEvent
 import com.fivucsas.shared.presentation.viewmodel.RootConsoleViewModel
+import com.fivucsas.shared.ui.util.disposeOnLeave
 import org.koin.compose.koinInject
 
 private data class RootRailItem(val label: String, val mode: AppMode)
@@ -118,7 +119,7 @@ fun RootDesktopConsoleScreen(
     onLogout: () -> Unit
 ) {
     val rootAdminRepository: RootAdminRepository = koinInject()
-    val viewModel = remember { RootConsoleViewModel(role, rootAdminRepository) }
+    val viewModel = remember { RootConsoleViewModel(role, rootAdminRepository) }.disposeOnLeave()
     val state by viewModel.state.collectAsState()
     LaunchedEffect(Unit) { viewModel.onEvent(RootConsoleUiEvent.Load()) }
 
@@ -223,7 +224,7 @@ fun RootDesktopTenantManagementScreen(
     onLogout: () -> Unit
 ) {
     val rootAdminRepository: RootAdminRepository = koinInject()
-    val viewModel = remember { RootConsoleViewModel(role, rootAdminRepository) }
+    val viewModel = remember { RootConsoleViewModel(role, rootAdminRepository) }.disposeOnLeave()
     val state by viewModel.state.collectAsState()
     LaunchedEffect(Unit) { viewModel.onEvent(RootConsoleUiEvent.Load()) }
 
@@ -262,7 +263,7 @@ fun RootDesktopTenantDetailScreen(
     onLogout: () -> Unit
 ) {
     val rootAdminRepository: RootAdminRepository = koinInject()
-    val viewModel = remember { RootConsoleViewModel(role, rootAdminRepository) }
+    val viewModel = remember { RootConsoleViewModel(role, rootAdminRepository) }.disposeOnLeave()
     val state by viewModel.state.collectAsState()
     LaunchedEffect(tenantId) { if (tenantId != null) viewModel.onEvent(RootConsoleUiEvent.Load(tenantId)) }
 
@@ -306,7 +307,7 @@ fun RootDesktopUserListScreen(
     onLogout: () -> Unit
 ) {
     val rootAdminRepository: RootAdminRepository = koinInject()
-    val viewModel = remember { RootConsoleViewModel(role, rootAdminRepository) }
+    val viewModel = remember { RootConsoleViewModel(role, rootAdminRepository) }.disposeOnLeave()
     val state by viewModel.state.collectAsState()
     var selectedRole by remember { mutableStateOf(if (showTenantAdmins) "TENANT_ADMIN" else "ALL") }
     var editingUser by remember { mutableStateOf<com.fivucsas.shared.domain.model.GlobalUser?>(null) }
@@ -423,7 +424,7 @@ fun RootDesktopInviteManagementScreen(
     onBack: () -> Unit,
     onLogout: () -> Unit
 ) {
-    val viewModel: InviteViewModel = koinInject()
+    val viewModel: InviteViewModel = koinInject<InviteViewModel>().disposeOnLeave()
     val state by viewModel.state.collectAsState()
     var inviteEmail by remember { mutableStateOf("") }
     var inviteRole by remember { mutableStateOf("TENANT_MEMBER") }
@@ -706,7 +707,7 @@ fun RootDesktopAuditScreen(
     onLogout: () -> Unit
 ) {
     val rootAdminRepository: RootAdminRepository = koinInject()
-    val viewModel = remember { RootConsoleViewModel(role, rootAdminRepository) }
+    val viewModel = remember { RootConsoleViewModel(role, rootAdminRepository) }.disposeOnLeave()
     val state by viewModel.state.collectAsState()
     LaunchedEffect(Unit) { viewModel.onEvent(RootConsoleUiEvent.Load()) }
 
@@ -739,7 +740,7 @@ fun RootDesktopSecurityScreen(
     onLogout: () -> Unit
 ) {
     val rootAdminRepository: RootAdminRepository = koinInject()
-    val viewModel = remember { RootConsoleViewModel(role, rootAdminRepository) }
+    val viewModel = remember { RootConsoleViewModel(role, rootAdminRepository) }.disposeOnLeave()
     val state by viewModel.state.collectAsState()
     LaunchedEffect(Unit) { viewModel.onEvent(RootConsoleUiEvent.Load()) }
 
@@ -771,7 +772,7 @@ fun RootDesktopSystemSettingsScreen(
     onLogout: () -> Unit
 ) {
     val rootAdminRepository: RootAdminRepository = koinInject()
-    val viewModel = remember { RootConsoleViewModel(role, rootAdminRepository) }
+    val viewModel = remember { RootConsoleViewModel(role, rootAdminRepository) }.disposeOnLeave()
     val state by viewModel.state.collectAsState()
     var rateLimitInput by remember { mutableStateOf("") }
     LaunchedEffect(Unit) { viewModel.onEvent(RootConsoleUiEvent.Load()) }

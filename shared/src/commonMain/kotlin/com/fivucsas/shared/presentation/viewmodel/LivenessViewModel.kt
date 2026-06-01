@@ -56,8 +56,7 @@ data class LivenessUiState(
  */
 class LivenessViewModel(
     private val biometricRepository: BiometricRepository
-) {
-    private val viewModelScope = CoroutineScope(Dispatchers.Main)
+) : BaseViewModel() {
 
     private val _uiState = MutableStateFlow(LivenessUiState())
     val uiState: StateFlow<LivenessUiState> = _uiState.asStateFlow()

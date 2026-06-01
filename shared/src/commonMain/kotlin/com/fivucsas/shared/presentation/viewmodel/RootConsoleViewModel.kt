@@ -23,8 +23,7 @@ import kotlinx.coroutines.launch
 class RootConsoleViewModel(
     private val role: UserRole,
     private val repository: RootAdminRepository
-) {
-    private val scope = CoroutineScope(Dispatchers.Main)
+) : BaseViewModel() {
     private val _state = MutableStateFlow(
         RootConsoleUiState(
             capabilities = CapabilityPolicy.fromRole(role)
@@ -60,7 +59,7 @@ class RootConsoleViewModel(
     }
 
     private fun load(tenantId: String?) {
-        scope.launch {
+        viewModelScope.launch {
             _state.update { it.copy(isLoading = true, errorMessage = null) }
             val filter = _state.value.filter.copy(tenantId = tenantId)
             val tenants = repository.getTenants(filter).getOrElse { return@launch failFrom(it) }
@@ -90,7 +89,7 @@ class RootConsoleViewModel(
     private fun updateQuery(value: String) {
         _state.update { it.copy(filter = it.filter.copy(query = value)) }
         searchJob?.cancel()
-        searchJob = scope.launch {
+        searchJob = viewModelScope.launch {
             delay(SEARCH_DEBOUNCE_MS)
             load(_state.value.selectedTenantId)
         }
@@ -105,7 +104,7 @@ class RootConsoleViewModel(
     }
 
     private fun toggleUser(userId: String, enabled: Boolean) {
-        scope.launch {
+        viewModelScope.launch {
             val result = repository.updateUser(userId, enabled)
             if (result.isFailure) return@launch failFrom(result.exceptionOrNull() ?: Exception("422"))
             load(_state.value.selectedTenantId)
@@ -113,7 +112,7 @@ class RootConsoleViewModel(
     }
 
     private fun deleteTenant(tenantId: String) {
-        scope.launch {
+        viewModelScope.launch {
             val result = repository.deleteTenant(tenantId)
             if (result.isFailure) return@launch failFrom(result.exceptionOrNull() ?: Exception("422"))
             _effect.emit(RootConsoleUiEffect.ShowMessage("Tenant deleted"))
@@ -122,7 +121,7 @@ class RootConsoleViewModel(
     }
 
     private fun deleteUser(userId: String) {
-        scope.launch {
+        viewModelScope.launch {
             val result = repository.deleteUser(userId)
             if (result.isFailure) return@launch failFrom(result.exceptionOrNull() ?: Exception("422"))
             _effect.emit(RootConsoleUiEffect.ShowMessage("User removed"))
@@ -137,7 +136,7 @@ class RootConsoleViewModel(
         role: String,
         tenantId: String?
     ) {
-        scope.launch {
+        viewModelScope.launch {
             val result = repository.updateUserProfile(
                 userId = userId,
                 fullName = fullName,
@@ -152,7 +151,7 @@ class RootConsoleViewModel(
     }
 
     private fun refreshAudit() {
-        scope.launch {
+        viewModelScope.launch {
             val audit = repository.getAuditLogs(_state.value.filter)
                 .getOrElse { return@launch failFrom(it) }
             _state.update { it.copy(auditLogs = audit) }
@@ -160,7 +159,7 @@ class RootConsoleViewModel(
     }
 
     private fun refreshSecurity() {
-        scope.launch {
+        viewModelScope.launch {
             val events = repository.getSecurityEvents(_state.value.filter)
                 .getOrElse { return@launch failFrom(it) }
             _state.update { it.copy(securityEvents = events) }
@@ -168,7 +167,7 @@ class RootConsoleViewModel(
     }
 
     private fun confirmImpersonation(tenantId: String) {
-        scope.launch {
+        viewModelScope.launch {
             _state.update { it.copy(impersonatingTenantId = tenantId, showImpersonationConfirm = true) }
             _effect.emit(RootConsoleUiEffect.OpenTenantContext(tenantId))
         }
@@ -188,7 +187,7 @@ class RootConsoleViewModel(
     }
 
     fun applySystemSettings(settingsText: String, rateLimit: Int, passwordPolicy: String) {
-        scope.launch {
+        viewModelScope.launch {
             val payload = com.fivucsas.shared.domain.model.RootSystemSettings(
                 jwtPolicySummary = settingsText,
                 defaultRateLimitPerMinute = rateLimit,

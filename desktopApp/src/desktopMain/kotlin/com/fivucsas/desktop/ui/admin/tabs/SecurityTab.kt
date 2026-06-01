@@ -38,6 +38,7 @@ import com.fivucsas.shared.presentation.viewmodel.AdminViewModel
 import com.fivucsas.shared.presentation.viewmodel.SessionViewModel
 import com.fivucsas.shared.ui.components.atoms.StatusBadge
 import com.fivucsas.shared.ui.components.organisms.EmptyState
+import com.fivucsas.shared.ui.util.disposeOnLeave
 import org.koin.compose.koinInject
 
 /**
@@ -50,7 +51,7 @@ import org.koin.compose.koinInject
 @Composable
 fun SecurityTab(
     viewModel: AdminViewModel,
-    sessionViewModel: SessionViewModel = koinInject()
+    sessionViewModel: SessionViewModel = koinInject<SessionViewModel>().disposeOnLeave()
 ) {
     val uiState by sessionViewModel.uiState.collectAsState()
 

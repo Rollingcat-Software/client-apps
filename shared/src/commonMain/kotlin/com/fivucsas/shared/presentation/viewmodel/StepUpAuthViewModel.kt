@@ -21,8 +21,7 @@ import kotlinx.coroutines.launch
  */
 class StepUpAuthViewModel(
     private val fingerprintRepository: FingerprintRepository
-) {
-    private val viewModelScope = CoroutineScope(Dispatchers.Main)
+) : BaseViewModel() {
 
     private val _uiState = MutableStateFlow(StepUpAuthUiState())
     val uiState: StateFlow<StepUpAuthUiState> = _uiState.asStateFlow()

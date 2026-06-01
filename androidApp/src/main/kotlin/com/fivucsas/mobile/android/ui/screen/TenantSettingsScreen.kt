@@ -46,13 +46,14 @@ import com.fivucsas.shared.ui.components.molecules.ExpandableCard
 import com.fivucsas.shared.ui.components.molecules.ErrorMessage
 import com.fivucsas.shared.ui.components.molecules.SuccessMessage
 import com.fivucsas.shared.ui.theme.AppColors
+import com.fivucsas.shared.ui.util.disposeOnLeave
 import org.koin.compose.koinInject
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TenantSettingsScreen(
     onNavigateBack: () -> Unit,
-    viewModel: TenantSettingsViewModel = koinInject()
+    viewModel: TenantSettingsViewModel = koinInject<TenantSettingsViewModel>().disposeOnLeave()
 ) {
     val state by viewModel.state.collectAsState()
 

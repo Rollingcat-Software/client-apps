@@ -16,8 +16,7 @@ import kotlinx.coroutines.launch
 
 class SessionViewModel(
     private val sessionRepository: SessionRepository
-) {
-    private val viewModelScope = CoroutineScope(Dispatchers.Main)
+) : BaseViewModel() {
 
     private val _uiState = MutableStateFlow(SessionUiState())
     val uiState: StateFlow<SessionUiState> = _uiState.asStateFlow()

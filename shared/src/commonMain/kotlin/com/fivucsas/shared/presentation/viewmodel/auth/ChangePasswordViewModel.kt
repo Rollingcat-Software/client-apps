@@ -3,6 +3,7 @@ package com.fivucsas.shared.presentation.viewmodel.auth
 import com.fivucsas.shared.domain.usecase.auth.ChangePasswordUseCase
 import com.fivucsas.shared.presentation.state.ChangePasswordUiState
 import com.fivucsas.shared.presentation.util.ErrorMapper
+import com.fivucsas.shared.presentation.viewmodel.BaseViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -15,15 +16,14 @@ import kotlinx.coroutines.launch
 
 class ChangePasswordViewModel(
     private val changePasswordUseCase: ChangePasswordUseCase
-) {
-    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
+) : BaseViewModel() {
     private val _state = MutableStateFlow(ChangePasswordUiState())
     val state: StateFlow<ChangePasswordUiState> = _state.asStateFlow()
 
     fun changePassword(currentPassword: String, newPassword: String, confirmPassword: String) {
         _state.update { ChangePasswordUiState(isLoading = true) }
 
-        scope.launch {
+        viewModelScope.launch {
             changePasswordUseCase(currentPassword, newPassword, confirmPassword).fold(
                 onSuccess = {
                     _state.update { ChangePasswordUiState(isSuccess = true) }
@@ -41,9 +41,5 @@ class ChangePasswordViewModel(
 
     fun clearError() {
         _state.update { it.copy(errorMessage = null) }
-    }
-
-    fun dispose() {
-        scope.coroutineContext[Job]?.cancel()
     }
 }

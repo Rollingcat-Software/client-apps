@@ -11,6 +11,7 @@ import com.fivucsas.shared.presentation.state.QrLoginStatus
 import com.fivucsas.shared.i18n.StringKey
 import com.fivucsas.shared.i18n.s
 import com.fivucsas.shared.presentation.util.ErrorMapper
+import com.fivucsas.shared.presentation.viewmodel.BaseViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -25,8 +26,7 @@ class QrLoginViewModel(
     private val startQrLoginSessionUseCase: StartQrLoginSessionUseCase,
     private val getQrLoginSessionUseCase: GetQrLoginSessionUseCase,
     private val approveQrLoginSessionUseCase: ApproveQrLoginSessionUseCase
-) {
-    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
+) : BaseViewModel() {
     private val _state = MutableStateFlow(QrLoginState())
     val state: StateFlow<QrLoginState> = _state.asStateFlow()
 
@@ -36,7 +36,7 @@ class QrLoginViewModel(
         pollJob?.cancel()
         _state.value = QrLoginState(isLoading = true)
 
-        scope.launch {
+        viewModelScope.launch {
             startQrLoginSessionUseCase(platform = "DESKTOP").fold(
                 onSuccess = { session ->
                     _state.value = QrLoginState(
@@ -74,7 +74,7 @@ class QrLoginViewModel(
         }
 
         _state.value = _state.value.copy(isLoading = true, error = null)
-        scope.launch {
+        viewModelScope.launch {
             approveQrLoginSessionUseCase(
                 sessionId = sessionId,
                 approverPlatform = "MOBILE"
@@ -107,14 +107,14 @@ class QrLoginViewModel(
         pollJob = null
     }
 
-    fun dispose() {
+    override fun dispose() {
         stopPolling()
-        scope.coroutineContext[Job]?.cancel()
+        super.dispose()
     }
 
     private fun startPolling(sessionId: String) {
         pollJob?.cancel()
-        pollJob = scope.launch {
+        pollJob = viewModelScope.launch {
             var retries = 0
             val maxRetries = 90
             while (retries < maxRetries) {

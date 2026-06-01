@@ -24,8 +24,7 @@ class UserProfileViewModel(
     private val updateUserUseCase: UpdateUserUseCase,
     private val offlineCache: OfflineCache,
     private val networkMonitor: INetworkMonitor
-) {
-    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
+) : BaseViewModel() {
     private val _state = MutableStateFlow(UserProfileUiState())
     val state: StateFlow<UserProfileUiState> = _state.asStateFlow()
 
@@ -66,7 +65,7 @@ class UserProfileViewModel(
             return
         }
 
-        scope.launch {
+        viewModelScope.launch {
             getMyProfileUseCase().fold(
                 onSuccess = { user ->
                     // Cache profile for offline use
@@ -135,7 +134,7 @@ class UserProfileViewModel(
         val currentUser = _state.value.user ?: return
         _state.update { it.copy(isLoading = true, errorMessage = null, successMessage = null) }
 
-        scope.launch {
+        viewModelScope.launch {
             val fullName = listOf(firstName.trim(), lastName.trim())
                 .filter { it.isNotBlank() }
                 .joinToString(" ")
@@ -184,7 +183,4 @@ class UserProfileViewModel(
         _state.update { it.copy(errorMessage = null, successMessage = null) }
     }
 
-    fun dispose() {
-        scope.coroutineContext[Job]?.cancel()
-    }
 }

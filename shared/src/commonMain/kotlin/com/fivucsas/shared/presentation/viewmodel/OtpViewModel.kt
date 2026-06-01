@@ -13,8 +13,7 @@ import kotlinx.coroutines.launch
 
 class OtpViewModel(
     private val otpRepository: OtpRepository
-) {
-    private val viewModelScope = CoroutineScope(Dispatchers.Main)
+) : BaseViewModel() {
 
     private val _uiState = MutableStateFlow(OtpUiState())
     val uiState: StateFlow<OtpUiState> = _uiState.asStateFlow()

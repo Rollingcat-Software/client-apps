@@ -30,13 +30,14 @@ import com.fivucsas.desktop.ui.components.DesktopBannerType
 import com.fivucsas.desktop.ui.components.DesktopInfoBanner
 import com.fivucsas.desktop.ui.components.DesktopSectionHeader
 import com.fivucsas.shared.presentation.viewmodel.auth.ChangePasswordViewModel
+import com.fivucsas.shared.ui.util.disposeOnLeave
 import org.koin.compose.koinInject
 
 @Composable
 fun DesktopChangePasswordScreen(
     onBack: () -> Unit
 ) {
-    val viewModel: ChangePasswordViewModel = koinInject()
+    val viewModel: ChangePasswordViewModel = koinInject<ChangePasswordViewModel>().disposeOnLeave()
     val state by viewModel.state.collectAsState()
 
     var currentPassword by remember { mutableStateOf("") }
