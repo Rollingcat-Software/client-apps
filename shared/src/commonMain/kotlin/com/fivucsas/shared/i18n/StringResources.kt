@@ -725,6 +725,29 @@ enum class StringKey {
     AUTH_QR_SCAN_SOON,
     AUTH_RENAME,
 
+    // === Info screens i18n ===
+    // AboutScreen (ABOUT_)
+    ABOUT_VERSION,
+    ABOUT_DESCRIPTION,
+    ABOUT_DEVELOPED_AT,
+    // HelpScreen (HELP_)
+    HELP_TITLE,
+    HELP_CAT_PERMISSIONS,
+    HELP_Q_CAMERA,
+    HELP_A_CAMERA,
+    HELP_CAT_TIMING,
+    HELP_Q_DURATION,
+    HELP_A_DURATION,
+    HELP_CAT_RECOVERY,
+    HELP_Q_FAILURE,
+    HELP_A_FAILURE,
+    // NotificationsScreen (NOTIF_)
+    NOTIF_EMPTY,
+    // ActivityHistoryScreen (ACTHIST_)
+    ACTHIST_EXPORT_DESC,
+    ACTHIST_EMPTY,
+    // === end Info screens i18n ===
+
     // Approve Login (number-matching approver — Android)
     APPROVE_LOGIN_TITLE,
     APPROVE_LOGIN_SUBTITLE,
@@ -1628,6 +1651,25 @@ private val enStrings = mapOf(
     StringKey.AUTH_QR_SCAN_SOON to "QR scanning coming soon — use manual entry for now.",
     StringKey.AUTH_RENAME to "Rename",
 
+    // === Info screens i18n ===
+    StringKey.ABOUT_VERSION to "Version {0}",
+    StringKey.ABOUT_DESCRIPTION to "Secure identity verification with biometric authentication.",
+    StringKey.ABOUT_DEVELOPED_AT to "Developed at Marmara University.",
+    StringKey.HELP_TITLE to "Help & FAQ",
+    StringKey.HELP_CAT_PERMISSIONS to "Permissions",
+    StringKey.HELP_Q_CAMERA to "Why do we need camera access?",
+    StringKey.HELP_A_CAMERA to "We use the camera to securely capture your face for verification.",
+    StringKey.HELP_CAT_TIMING to "Timing",
+    StringKey.HELP_Q_DURATION to "How long does verification take?",
+    StringKey.HELP_A_DURATION to "Most verifications complete in under one minute.",
+    StringKey.HELP_CAT_RECOVERY to "Recovery",
+    StringKey.HELP_Q_FAILURE to "What if verification fails?",
+    StringKey.HELP_A_FAILURE to "Try again in better lighting or remove any obstructions like glasses.",
+    StringKey.NOTIF_EMPTY to "No notifications yet",
+    StringKey.ACTHIST_EXPORT_DESC to "Export History",
+    StringKey.ACTHIST_EMPTY to "No activity history yet",
+    // === end Info screens i18n ===
+
     // Approve Login (number-matching approver — Android)
     StringKey.APPROVE_LOGIN_TITLE to "Login requests",
     StringKey.APPROVE_LOGIN_SUBTITLE to "Approve a sign-in on another device by matching the number shown there.",
@@ -2530,6 +2572,25 @@ private val trStrings = mapOf(
     StringKey.AUTH_INVALID_SECRET to "Geçersiz base32 gizli anahtarı",
     StringKey.AUTH_QR_SCAN_SOON to "QR tarama yakında — şimdilik elle girişi kullanın.",
     StringKey.AUTH_RENAME to "Yeniden adlandır",
+
+    // === Info screens i18n ===
+    StringKey.ABOUT_VERSION to "Sürüm {0}",
+    StringKey.ABOUT_DESCRIPTION to "Biyometrik kimlik doğrulama ile güvenli kimlik doğrulaması.",
+    StringKey.ABOUT_DEVELOPED_AT to "Marmara Üniversitesi'nde geliştirildi.",
+    StringKey.HELP_TITLE to "Yardım ve SSS",
+    StringKey.HELP_CAT_PERMISSIONS to "İzinler",
+    StringKey.HELP_Q_CAMERA to "Neden kamera erişimine ihtiyacımız var?",
+    StringKey.HELP_A_CAMERA to "Doğrulama için yüzünüzü güvenli bir şekilde yakalamak amacıyla kamerayı kullanıyoruz.",
+    StringKey.HELP_CAT_TIMING to "Süre",
+    StringKey.HELP_Q_DURATION to "Doğrulama ne kadar sürer?",
+    StringKey.HELP_A_DURATION to "Doğrulamaların çoğu bir dakikadan kısa sürede tamamlanır.",
+    StringKey.HELP_CAT_RECOVERY to "Kurtarma",
+    StringKey.HELP_Q_FAILURE to "Doğrulama başarısız olursa ne olur?",
+    StringKey.HELP_A_FAILURE to "Daha iyi bir ışıkta tekrar deneyin veya gözlük gibi engelleri kaldırın.",
+    StringKey.NOTIF_EMPTY to "Henüz bildirim yok",
+    StringKey.ACTHIST_EXPORT_DESC to "Geçmişi Dışa Aktar",
+    StringKey.ACTHIST_EMPTY to "Henüz etkinlik geçmişi yok",
+    // === end Info screens i18n ===
 
     // Approve Login (number-matching approver — Android)
     StringKey.APPROVE_LOGIN_TITLE to "Giriş istekleri",

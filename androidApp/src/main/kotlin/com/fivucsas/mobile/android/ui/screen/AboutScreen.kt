@@ -19,6 +19,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.fivucsas.mobile.android.BuildConfig
 import com.fivucsas.shared.config.UIDimens
+import com.fivucsas.shared.i18n.StringKey
+import com.fivucsas.shared.i18n.s
 import com.fivucsas.shared.ui.theme.AppColors
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -29,10 +31,10 @@ fun AboutScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("About") },
+                title = { Text(s(StringKey.NAV_ABOUT)) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = s(StringKey.A11Y_NAVIGATE_BACK))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -55,16 +57,16 @@ fun AboutScreen(
                 style = androidx.compose.material3.MaterialTheme.typography.headlineMedium
             )
             Text(
-                text = "Version ${BuildConfig.VERSION_NAME}",
+                text = s(StringKey.ABOUT_VERSION, BuildConfig.VERSION_NAME),
                 style = androidx.compose.material3.MaterialTheme.typography.bodyMedium,
                 color = AppColors.OnSurfaceVariant
             )
             Text(
-                text = "Secure identity verification with biometric authentication.",
+                text = s(StringKey.ABOUT_DESCRIPTION),
                 style = androidx.compose.material3.MaterialTheme.typography.bodyMedium
             )
             Text(
-                text = "Developed at Marmara University.",
+                text = s(StringKey.ABOUT_DEVELOPED_AT),
                 style = androidx.compose.material3.MaterialTheme.typography.bodySmall,
                 color = AppColors.OnSurfaceVariant
             )
