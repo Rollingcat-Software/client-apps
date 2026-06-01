@@ -53,11 +53,26 @@ import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.json
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.serialization.json.Json
 import org.koin.core.module.dsl.bind
 import org.koin.core.module.dsl.singleOf
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
+
+/**
+ * Serializes concurrent 401-triggered token refreshes.
+ *
+ * Without this guard, N parallel requests that all receive a 401 would each
+ * fire `POST /auth/refresh`. With refresh-token rotation enabled server-side,
+ * only the first rotation is accepted; the rest present an already-rotated
+ * (now-invalid) refresh token, get rejected, and clear the tokens — logging
+ * the user out. The mutex ensures only one refresh runs at a time; callers
+ * that arrive while a refresh is in flight await it and then reuse the freshly
+ * stored access token on their transparent retry.
+ */
+private val refreshMutex = Mutex()
 
 /**
  * Network module - Provides HTTP clients and API clients
@@ -69,7 +84,10 @@ import org.koin.dsl.module
 val networkModule = module {
     // Token Manager (singleton) - must be created before HttpClient
     single { TokenManager(get<TokenStorage>()) }
-    single { StepUpTokenManager() }
+    // Pass the platform ISecureStorage so step-up tokens persist across app
+    // backgrounding (the manager keeps an in-memory cache with secure-storage
+    // fallback). The ISecureStorage single is registered in each platform module.
+    single { StepUpTokenManager(secureStorage = get()) }
 
     // Shared JSON configuration
     single {
@@ -132,24 +150,47 @@ val networkModule = module {
                             return@validateResponse
                         }
 
-                        val refreshToken = tokenManager.getRefreshToken() ?: return@validateResponse
+                        // Snapshot the access token that this request used. If
+                        // it differs from the current one by the time we hold
+                        // the lock, another coroutine already refreshed and we
+                        // must NOT refresh again (that would burn the just-issued
+                        // rotated refresh token and log the user out).
+                        val staleAccessToken = response.call.request.headers[HttpHeaders.Authorization]
 
-                        try {
-                            // Create a temporary client to avoid interceptor recursion
-                            val refreshResponse = response.call.client.post(ApiConfig.identityBaseUrl + "/auth/refresh") {
-                                contentType(ContentType.Application.Json)
-                                setBody(mapOf("refreshToken" to refreshToken))
+                        refreshMutex.withLock {
+                            // A refresh already happened while we waited for the lock.
+                            val currentAccessToken = tokenManager.getAccessToken()
+                            if (currentAccessToken != null &&
+                                staleAccessToken != "Bearer $currentAccessToken") {
+                                // Tokens were rotated by a concurrent 401 handler;
+                                // reuse them on the transparent retry below.
+                                return@withLock
                             }
-                            if (refreshResponse.status == HttpStatusCode.OK) {
-                                val authResponse = refreshResponse.body<AuthResponseDto>()
-                                tokenManager.updateTokens(authResponse.toModel())
-                            } else {
-                                // Refresh failed — clear tokens to force re-login
+
+                            val refreshToken = tokenManager.getRefreshToken() ?: return@withLock
+
+                            try {
+                                // Reuse the call's client; the recursion guard above
+                                // prevents this /auth/refresh POST from re-entering.
+                                val refreshResponse = response.call.client.post(ApiConfig.identityBaseUrl + "/auth/refresh") {
+                                    contentType(ContentType.Application.Json)
+                                    setBody(mapOf("refreshToken" to refreshToken))
+                                }
+                                if (refreshResponse.status == HttpStatusCode.OK) {
+                                    val authResponse = refreshResponse.body<AuthResponseDto>()
+                                    tokenManager.updateTokens(authResponse.toModel())
+                                } else {
+                                    // Refresh failed — clear tokens to force re-login
+                                    tokenManager.clearTokens()
+                                }
+                            } catch (_: Exception) {
                                 tokenManager.clearTokens()
                             }
-                        } catch (_: Exception) {
-                            tokenManager.clearTokens()
                         }
+                        // TODO: transparently retry the original request with the
+                        // refreshed access token. Currently the caller receives the
+                        // 401 and must retry; the next request picks up the new token
+                        // via defaultRequest. The mutex is the load-bearing fix here.
                     }
                 }
             }

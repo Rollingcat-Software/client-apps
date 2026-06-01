@@ -16,14 +16,14 @@ import kotlinx.serialization.Serializable
  */
 @Serializable
 data class InviteDto(
-    val id: String,
-    val email: String,
-    val role: String,
+    val id: String = "",
+    val email: String = "",
+    val role: String = "",
     val tenantId: String? = null,
     val tenantName: String? = null,
-    val status: String,
-    val createdAt: String,
-    val expiresAt: String
+    val status: String = "",
+    val createdAt: String = "",
+    val expiresAt: String = ""
 )
 
 /**
@@ -48,13 +48,13 @@ data class CreateInviteRequestDto(
  */
 @Serializable
 data class ReceivedInviteDto(
-    val id: String,
-    val tenantName: String,
-    val invitedBy: String,
-    val role: String,
-    val receivedAt: String,
-    val expiresAt: String,
-    val status: String
+    val id: String = "",
+    val tenantName: String = "",
+    val invitedBy: String = "",
+    val role: String = "",
+    val receivedAt: String = "",
+    val expiresAt: String = "",
+    val status: String = ""
 )
 
 // ── Outbound invite mappers ─────────────────────────────────────────────────

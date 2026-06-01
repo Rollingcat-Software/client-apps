@@ -17,7 +17,7 @@ import com.fivucsas.shared.data.remote.dto.StepResultDto
 interface AuthSessionApi {
     suspend fun startSession(command: StartSessionCommand): AuthSessionDetailDto
     suspend fun getSession(sessionId: String): AuthSessionDetailDto
-    suspend fun completeStep(sessionId: String, stepOrder: Int, data: Map<String, Any?>): StepResultDto
+    suspend fun completeStep(sessionId: String, stepOrder: Int, data: Map<String, String>): StepResultDto
     suspend fun skipStep(sessionId: String, stepOrder: Int): StepResultDto
     suspend fun cancelSession(sessionId: String)
 }

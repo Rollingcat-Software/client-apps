@@ -81,7 +81,7 @@ data class AuthResponseDto(
  */
 @Serializable
 data class AvailableMethodDto(
-    val methodType: String,
+    val methodType: String = "",
     val name: String = "",
     val category: String = "",
     val enrolled: Boolean = false,

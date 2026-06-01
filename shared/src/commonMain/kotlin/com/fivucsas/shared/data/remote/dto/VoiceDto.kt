@@ -10,7 +10,7 @@ data class VoiceEnrollRequestDto(
 
 @Serializable
 data class VoiceEnrollResponseDto(
-    val success: Boolean,
+    val success: Boolean = false,
     @SerialName("user_id")
     val userId: String = "",
     val message: String = "",
@@ -28,7 +28,7 @@ data class VoiceVerifyResponseDto(
 @Serializable
 data class VoiceSearchMatchDto(
     @SerialName("user_id")
-    val userId: String,
+    val userId: String = "",
     val similarity: Float = 0f
 )
 
