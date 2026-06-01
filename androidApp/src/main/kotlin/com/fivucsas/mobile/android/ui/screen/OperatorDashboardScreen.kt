@@ -51,6 +51,7 @@ import com.fivucsas.shared.ui.components.molecules.ErrorMessage
 import com.fivucsas.shared.ui.components.molecules.StatCard
 import com.fivucsas.shared.ui.components.organisms.BottomNavBar
 import com.fivucsas.shared.ui.theme.AppColors
+import com.fivucsas.shared.ui.util.disposeOnLeave
 import org.koin.compose.koinInject
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -63,7 +64,7 @@ fun OperatorDashboardScreen(
     onNavigateToVerify: () -> Unit,
     onNavigateToHistory: () -> Unit,
     onNavigateBottom: (String) -> Unit,
-    viewModel: AdminViewModel = koinInject()
+    viewModel: AdminViewModel = koinInject<AdminViewModel>().disposeOnLeave()
 ) {
     val uiState by viewModel.uiState.collectAsState()
 

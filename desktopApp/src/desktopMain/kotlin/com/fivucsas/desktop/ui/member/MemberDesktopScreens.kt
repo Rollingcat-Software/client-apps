@@ -56,6 +56,7 @@ import com.fivucsas.shared.domain.model.TenantInfo
 import com.fivucsas.shared.domain.model.UserRole
 import com.fivucsas.shared.domain.model.hasPermission
 import com.fivucsas.shared.presentation.viewmodel.UserProfileViewModel
+import com.fivucsas.shared.ui.util.disposeOnLeave
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import org.koin.compose.koinInject
@@ -73,7 +74,7 @@ fun MemberDesktopProfileScreen(
     onBack: () -> Unit,
     onLogout: () -> Unit
 ) {
-    val viewModel: UserProfileViewModel = koinInject()
+    val viewModel: UserProfileViewModel = koinInject<UserProfileViewModel>().disposeOnLeave()
     val profileState by viewModel.state.collectAsState()
     LaunchedEffect(Unit) { viewModel.loadProfile() }
 
@@ -232,7 +233,7 @@ fun MemberDesktopEditProfileScreen(
     onSave: (String, String, String) -> Unit,
     onBack: () -> Unit
 ) {
-    val viewModel: UserProfileViewModel = koinInject()
+    val viewModel: UserProfileViewModel = koinInject<UserProfileViewModel>().disposeOnLeave()
     val profileState by viewModel.state.collectAsState()
     LaunchedEffect(Unit) { viewModel.loadProfile() }
 

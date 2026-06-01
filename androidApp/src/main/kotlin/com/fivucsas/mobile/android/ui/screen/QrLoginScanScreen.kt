@@ -57,6 +57,7 @@ import com.fivucsas.shared.platform.LensFacing
 import com.fivucsas.shared.presentation.state.QrLoginStatus
 import com.fivucsas.shared.presentation.viewmodel.auth.QrLoginViewModel
 import com.fivucsas.shared.ui.platform.AndroidCameraPreview
+import com.fivucsas.shared.ui.util.disposeOnLeave
 import com.google.mlkit.vision.barcode.BarcodeScanning
 import com.google.mlkit.vision.barcode.common.Barcode
 import com.google.mlkit.vision.common.InputImage
@@ -71,7 +72,7 @@ import org.koin.compose.koinInject
 @Composable
 fun QRLoginScanScreen(
     onNavigateBack: () -> Unit,
-    qrLoginViewModel: QrLoginViewModel = koinInject()
+    qrLoginViewModel: QrLoginViewModel = koinInject<QrLoginViewModel>().disposeOnLeave()
 ) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current

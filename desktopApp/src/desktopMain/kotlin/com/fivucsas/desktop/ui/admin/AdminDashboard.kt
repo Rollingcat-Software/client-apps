@@ -29,6 +29,7 @@ import com.fivucsas.shared.presentation.state.AdminTab
 import com.fivucsas.shared.presentation.viewmodel.AdminViewModel
 import com.fivucsas.shared.ui.components.molecules.ErrorMessage
 import com.fivucsas.shared.ui.components.molecules.SuccessMessage
+import com.fivucsas.shared.ui.util.disposeOnLeave
 import org.koin.compose.koinInject
 
 /**
@@ -51,7 +52,7 @@ import org.koin.compose.koinInject
 fun AdminDashboard(
     onBack: () -> Unit,
     onLogout: (() -> Unit)? = null,
-    viewModel: AdminViewModel = koinInject()
+    viewModel: AdminViewModel = koinInject<AdminViewModel>().disposeOnLeave()
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val selectedTab = uiState.selectedTab

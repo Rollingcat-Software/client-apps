@@ -12,6 +12,7 @@ import com.fivucsas.desktop.ui.kiosk.screens.VerifyScreen
 import com.fivucsas.desktop.ui.kiosk.screens.WelcomeScreen
 import com.fivucsas.shared.presentation.state.KioskScreen
 import com.fivucsas.shared.presentation.viewmodel.KioskViewModel
+import com.fivucsas.shared.ui.util.disposeOnLeave
 import org.koin.compose.koinInject
 
 /**
@@ -32,7 +33,7 @@ import org.koin.compose.koinInject
 @Composable
 fun KioskMode(
     onBack: () -> Unit,
-    viewModel: KioskViewModel = koinInject()
+    viewModel: KioskViewModel = koinInject<KioskViewModel>().disposeOnLeave()
 ) {
     val uiState by viewModel.uiState.collectAsState()
 

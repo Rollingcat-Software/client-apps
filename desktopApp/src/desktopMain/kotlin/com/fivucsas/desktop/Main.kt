@@ -115,6 +115,7 @@ import com.fivucsas.shared.ui.screen.RegisterScreen
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import com.fivucsas.shared.ui.util.disposeOnLeave
 import org.koin.compose.koinInject
 import org.koin.core.context.startKoin
 import org.koin.java.KoinJavaComponent.inject
@@ -243,7 +244,7 @@ private fun AppContent(
     unauthorizedMessage: String
 ) {
     val tokenManager: TokenManager by inject(TokenManager::class.java)
-    val qrLoginViewModel: QrLoginViewModel = koinInject()
+    val qrLoginViewModel: QrLoginViewModel = koinInject<QrLoginViewModel>().disposeOnLeave()
     val loginViewModel: LoginViewModel = koinInject()
     val registerViewModel: RegisterViewModel = koinInject()
     val qrState by qrLoginViewModel.state.collectAsState()
@@ -800,7 +801,7 @@ private fun UserInvitationsScreen(
     onBack: () -> Unit,
     onLogout: () -> Unit
 ) {
-    val viewModel: InviteViewModel = koinInject()
+    val viewModel: InviteViewModel = koinInject<InviteViewModel>().disposeOnLeave()
     val state by viewModel.state.collectAsState()
     LaunchedEffect(Unit) { viewModel.loadInvites() }
     DesktopAppShell(title = "Invitations", onBack = onBack, onLogout = onLogout) {
@@ -839,7 +840,7 @@ private fun UserProfileScreen(
     onBack: () -> Unit,
     onLogout: () -> Unit
 ) {
-    val viewModel: com.fivucsas.shared.presentation.viewmodel.UserProfileViewModel = koinInject()
+    val viewModel: com.fivucsas.shared.presentation.viewmodel.UserProfileViewModel = koinInject<com.fivucsas.shared.presentation.viewmodel.UserProfileViewModel>().disposeOnLeave()
     val profileState by viewModel.state.collectAsState()
     LaunchedEffect(Unit) { viewModel.loadProfile() }
 

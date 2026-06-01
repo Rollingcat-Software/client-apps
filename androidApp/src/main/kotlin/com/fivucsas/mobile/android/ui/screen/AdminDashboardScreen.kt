@@ -54,6 +54,7 @@ import com.fivucsas.shared.domain.model.UserStatus
 import com.fivucsas.shared.i18n.StringKey
 import com.fivucsas.shared.i18n.s
 import com.fivucsas.shared.presentation.viewmodel.AdminViewModel
+import com.fivucsas.shared.ui.util.disposeOnLeave
 import com.fivucsas.shared.ui.components.atoms.SearchTextField
 import com.fivucsas.shared.ui.components.atoms.SectionHeader
 import com.fivucsas.shared.ui.components.atoms.StatusBadge
@@ -81,7 +82,7 @@ fun AdminDashboardScreen(
     onNavigateToInvitations: () -> Unit,
     onNavigateToExamEntry: () -> Unit,
     onNavigateBottom: (String) -> Unit,
-    viewModel: AdminViewModel = koinInject()
+    viewModel: AdminViewModel = koinInject<AdminViewModel>().disposeOnLeave()
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
