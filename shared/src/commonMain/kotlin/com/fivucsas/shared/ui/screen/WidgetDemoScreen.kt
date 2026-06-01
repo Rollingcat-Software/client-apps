@@ -212,8 +212,7 @@ fun WidgetDemoScreen(
 ) {
     val scrollState = rememberScrollState()
 
-    val layers = remember {
-        listOf(
+    val layers = listOf(
             ArchitectureLayer(
                 title = "SDK Layer",
                 subtitle = "Client-side integration",
@@ -251,7 +250,6 @@ fun WidgetDemoScreen(
                 color = AppColors.Success
             )
         )
-    }
 
     Column(
         modifier = Modifier
