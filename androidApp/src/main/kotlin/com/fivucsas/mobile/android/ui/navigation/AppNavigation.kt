@@ -14,6 +14,7 @@ import androidx.navigation.navArgument
 import com.fivucsas.mobile.android.ui.screen.AboutScreen
 import com.fivucsas.mobile.android.ui.screen.ActivityHistoryScreen
 import com.fivucsas.mobile.android.ui.screen.AdminDashboardScreen
+import com.fivucsas.mobile.android.ui.screen.ApproveLoginScreen
 import com.fivucsas.mobile.android.ui.screen.BiometricEnrollScreen
 import com.fivucsas.mobile.android.ui.screen.BiometricVerifyScreen
 import com.fivucsas.mobile.android.ui.screen.CardScanScreen
@@ -106,6 +107,7 @@ sealed class Screen(val route: String) {
     object Help : Screen(RouteIds.HELP)
     object About : Screen(RouteIds.ABOUT)
     object QrLoginScan : Screen(RouteIds.QR_LOGIN_SCAN)
+    object ApproveLogin : Screen(RouteIds.APPROVE_LOGIN)
     object TenantHistory : Screen(RouteIds.TENANT_HISTORY)
     object TenantSettings : Screen(RouteIds.TENANT_SETTINGS)
     object Unauthorized : Screen("${RouteIds.UNAUTHORIZED}/{message}") {
@@ -774,6 +776,7 @@ fun AppNavigation() {
                 onEditProfile = { navController.navigate(Screen.EditProfile.route) },
                 onChangePassword = { navController.navigate(Screen.ChangePassword.route) },
                 onOpenLinkedAccounts = { navController.navigate(Screen.LinkedAccounts.route) },
+                onOpenLoginRequests = { navController.navigate(Screen.ApproveLogin.route) },
                 onReEnroll = { navController.navigate(Screen.BiometricEnroll.createRoute(tokenManager?.getUserId() ?: "me")) },
                 onDeleteEnrollment = { /* Enrollment deletion not yet available */ },
                 onOpenSettings = { navController.navigate(Screen.Settings.route) },
@@ -947,6 +950,18 @@ fun AppNavigation() {
                 return@composable
             }
             QRLoginScanScreen(onNavigateBack = { navController.popBackStack() })
+        }
+
+        composable(Screen.ApproveLogin.route) {
+            if (!isAuthenticated()) {
+                LaunchedEffect(Unit) {
+                    navController.navigate(Screen.Login.route) {
+                        popUpTo(0) { inclusive = true }
+                    }
+                }
+                return@composable
+            }
+            ApproveLoginScreen(onNavigateBack = { navController.popBackStack() })
         }
 
         composable(Screen.GuestFaceCheckCapture.route) {
