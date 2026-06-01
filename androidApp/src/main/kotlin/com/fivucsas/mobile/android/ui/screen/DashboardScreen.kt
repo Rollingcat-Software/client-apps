@@ -51,6 +51,8 @@ import com.fivucsas.shared.config.UIDimens
 import com.fivucsas.shared.domain.model.Permission
 import com.fivucsas.shared.domain.model.UserRole
 import com.fivucsas.shared.domain.model.hasPermission
+import com.fivucsas.shared.i18n.StringKey
+import com.fivucsas.shared.i18n.s
 import com.fivucsas.shared.ui.components.atoms.SectionHeader
 import com.fivucsas.shared.ui.components.atoms.StatusBadgeType
 import com.fivucsas.shared.ui.components.molecules.ActivityItem
@@ -94,63 +96,63 @@ fun DashboardScreen(
     val actions = listOf(
         QuickAction(
             id = "enroll-face",
-            title = "Enroll Face",
+            title = s(StringKey.DASH_ENROLL_FACE),
             icon = Icons.Default.CameraAlt,
             route = Screen.BiometricEnroll.route,
             anyPermissions = setOf(Permission.ENROLL_SELF_CREATE)
         ),
         QuickAction(
             id = "verify-identity",
-            title = "Verify Identity",
+            title = s(StringKey.DASH_VERIFY_IDENTITY),
             icon = Icons.Default.Security,
             route = Screen.BiometricVerify.route,
             anyPermissions = setOf(Permission.VERIFY_SELF)
         ),
         QuickAction(
             id = "qr",
-            title = "QR",
+            title = s(StringKey.DASH_QR),
             icon = Icons.Default.CameraAlt,
             route = Screen.QrLoginScan.route,
             anyPermissions = setOf(Permission.QR_SCAN, Permission.QR_DISPLAY)
         ),
         QuickAction(
             id = "activity-history",
-            title = "Activity History",
+            title = s(StringKey.DASH_ACTIVITY_HISTORY),
             icon = Icons.Default.History,
             route = Screen.ActivityHistory.route,
             anyPermissions = setOf(Permission.HISTORY_READ_SELF)
         ),
         QuickAction(
             id = "invite-accept",
-            title = "Invitations",
+            title = s(StringKey.DASH_INVITATIONS),
             icon = Icons.Default.Notifications,
             route = Screen.InviteAccept.route,
             anyPermissions = setOf(Permission.TENANT_INVITE_ACCEPT)
         ),
         QuickAction(
             id = "profile",
-            title = "Profile",
+            title = s(StringKey.NAV_PROFILE),
             icon = Icons.Default.Person,
             route = Screen.Profile.route,
             anyPermissions = setOf(Permission.PROFILE_READ_SELF)
         ),
         QuickAction(
             id = "request-membership",
-            title = "Join a Tenant",
+            title = s(StringKey.DASH_JOIN_TENANT),
             icon = Icons.Default.PersonAdd,
             route = Screen.RequestMembership.route,
             anyPermissions = setOf(Permission.TENANT_MEMBERSHIP_REQUEST)
         ),
         QuickAction(
             id = "card-scan",
-            title = "Add card",
+            title = s(StringKey.DASH_ADD_CARD),
             icon = Icons.Default.CreditCard,
             route = Screen.CardScan.route,
             anyPermissions = setOf(Permission.CARD_ADD_SELF)
         ),
         QuickAction(
             id = "nfc-read",
-            title = "NFC Reader",
+            title = s(StringKey.DASH_NFC_READER),
             icon = Icons.Default.Contactless,
             route = Screen.NfcRead.route
         )
@@ -182,7 +184,7 @@ fun DashboardScreen(
         sessionRepository.getSessions().onSuccess { sessions ->
             activityItems = sessions.take(5).map { session ->
                 ActivityItemData(
-                    title = session.deviceInfo.ifBlank { "Session" },
+                    title = session.deviceInfo.ifBlank { s(StringKey.DASH_SESSION_FALLBACK) },
                     description = session.ipAddress.ifBlank { session.userAgent },
                     timestamp = session.lastActiveAt.ifBlank { session.createdAt },
                     status = when (session.status) {
@@ -202,12 +204,12 @@ fun DashboardScreen(
                 title = {
                     Column {
                         Text(
-                            text = "FIVUCSAS",
+                            text = s(StringKey.APP_NAME),
                             style = MaterialTheme.typography.titleMedium,
                             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
                         )
                         Text(
-                            text = "Good day, $userName",
+                            text = s(StringKey.DASH_GREETING, userName),
                             style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.Bold
                         )
@@ -217,13 +219,13 @@ fun DashboardScreen(
                     IconButton(onClick = onNavigateToNotifications) {
                         Icon(
                             imageVector = Icons.Default.Notifications,
-                            contentDescription = "Notifications"
+                            contentDescription = s(StringKey.NAV_NOTIFICATIONS)
                         )
                     }
                     IconButton(onClick = onNavigateToProfile) {
                         Icon(
                             imageVector = Icons.Default.Person,
-                            contentDescription = "Profile"
+                            contentDescription = s(StringKey.NAV_PROFILE)
                         )
                     }
                 },
@@ -259,7 +261,7 @@ fun DashboardScreen(
                         modifier = Modifier.padding(UIDimens.SpacingMedium)
                     ) {
                         Text(
-                            text = "Enrollment Status",
+                            text = s(StringKey.DASH_ENROLLMENT_STATUS),
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.SemiBold
                         )
@@ -277,7 +279,7 @@ fun DashboardScreen(
                                         color = AppColors.Primary
                                     )
                                     Text(
-                                        text = "Total Users",
+                                        text = s(StringKey.TOTAL_USERS),
                                         style = MaterialTheme.typography.bodySmall,
                                         color = AppColors.OnSurfaceVariant
                                     )
@@ -290,7 +292,7 @@ fun DashboardScreen(
                                         color = AppColors.Primary
                                     )
                                     Text(
-                                        text = "Verifications Today",
+                                        text = s(StringKey.ANALYTICS_VERIFICATIONS_TODAY),
                                         style = MaterialTheme.typography.bodySmall,
                                         color = AppColors.OnSurfaceVariant
                                     )
@@ -303,7 +305,7 @@ fun DashboardScreen(
                                         color = AppColors.Primary
                                     )
                                     Text(
-                                        text = "Success Rate",
+                                        text = s(StringKey.ANALYTICS_SUCCESS_RATE),
                                         style = MaterialTheme.typography.bodySmall,
                                         color = AppColors.OnSurfaceVariant
                                     )
@@ -311,7 +313,7 @@ fun DashboardScreen(
                             }
                         } else {
                             Text(
-                                text = "Enroll your face to enable biometric verification.",
+                                text = s(StringKey.DASH_ENROLL_PROMPT),
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = AppColors.OnSurfaceVariant
                             )
@@ -326,7 +328,7 @@ fun DashboardScreen(
                     colors = CardDefaults.cardColors(containerColor = AppColors.Warning.copy(alpha = 0.12f))
                 ) {
                     Text(
-                        text = "You are not a tenant member yet. Accept invite / request access.",
+                        text = s(StringKey.DASH_NOT_TENANT_MEMBER),
                         style = MaterialTheme.typography.bodyMedium,
                         color = AppColors.OnSurface,
                         modifier = Modifier.padding(UIDimens.SpacingMedium)
@@ -334,15 +336,15 @@ fun DashboardScreen(
                 }
             }
 
-            SectionHeader(title = "Quick Actions")
+            SectionHeader(title = s(StringKey.DASH_QUICK_ACTIONS))
             QuickActionGrid(actions = quickActions)
 
             if (canViewRecentActivity) {
                 SectionHeader(
-                    title = "Recent Activity",
+                    title = s(StringKey.ANALYTICS_RECENT_ACTIVITY),
                     actionContent = {
                         Text(
-                            text = "View All",
+                            text = s(StringKey.DASH_VIEW_ALL),
                             style = MaterialTheme.typography.labelLarge,
                             color = AppColors.Primary
                         )
@@ -350,7 +352,7 @@ fun DashboardScreen(
                 )
                 if (activityItems.isEmpty()) {
                     Text(
-                        text = "No recent activity yet.",
+                        text = s(StringKey.DASH_NO_RECENT_ACTIVITY),
                         style = MaterialTheme.typography.bodyMedium,
                         color = AppColors.OnSurfaceVariant
                     )

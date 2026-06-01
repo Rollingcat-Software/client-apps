@@ -610,6 +610,57 @@ enum class StringKey {
     DEV_PORTAL_STEP3_DESC,
     NAV_DEVELOPER_PORTAL,
 
+    // === Dashboards i18n ===
+    // DashboardScreen (DASH_)
+    DASH_GREETING,
+    DASH_ENROLL_FACE,
+    DASH_VERIFY_IDENTITY,
+    DASH_QR,
+    DASH_ACTIVITY_HISTORY,
+    DASH_INVITATIONS,
+    DASH_JOIN_TENANT,
+    DASH_ADD_CARD,
+    DASH_NFC_READER,
+    DASH_SESSION_FALLBACK,
+    DASH_ENROLLMENT_STATUS,
+    DASH_ENROLL_PROMPT,
+    DASH_NOT_TENANT_MEMBER,
+    DASH_QUICK_ACTIONS,
+    DASH_VIEW_ALL,
+    DASH_NO_RECENT_ACTIVITY,
+
+    // HomeScreen (HOME_)
+    HOME_WELCOME_BACK,
+    HOME_SYSTEM_SUBTITLE,
+    HOME_USER_INFORMATION,
+    HOME_NAME_LABEL,
+    HOME_USER_ID_LABEL,
+    HOME_BIOMETRIC_ACTIONS,
+    HOME_ENROLL_FACE_BIOMETRIC,
+    HOME_VERIFY_FACE_BIOMETRIC,
+    HOME_ENROLL_HELP,
+
+    // AdminDashboardScreen (ADMIN_)
+    ADMIN_TITLE_BADGE,
+    ADMIN_DASHBOARD_TITLE,
+    ADMIN_SYSTEM_OVERVIEW,
+    ADMIN_MANAGE_USERS,
+    ADMIN_VIEW_ANALYTICS,
+    ADMIN_ACTIVITY_LOG,
+    ADMIN_IDENTIFY,
+    ADMIN_EXAM_ENTRY,
+    ADMIN_USERS_SECTION,
+    ADMIN_VIEW_ALL_USERS,
+
+    // OperatorDashboardScreen (OPER_)
+    OPER_STATION_TITLE,
+    OPER_ENROLL_NEW_USER,
+    OPER_TODAYS_STATISTICS,
+    OPER_STAT_TOTAL,
+    OPER_STAT_SUCCESSFUL,
+    OPER_STAT_FAILED,
+    // === end Dashboards i18n ===
+
     // MFA Flow
     MFA_TITLE,
     MFA_STEP_COUNTER,
@@ -1467,6 +1518,54 @@ private val enStrings = mapOf(
     StringKey.NAV_DEVELOPER_PORTAL to "Developer Portal",
 
     // MFA Flow
+    // === Dashboards i18n ===
+    // DashboardScreen (DASH_)
+    StringKey.DASH_GREETING to "Good day, {0}",
+    StringKey.DASH_ENROLL_FACE to "Enroll Face",
+    StringKey.DASH_VERIFY_IDENTITY to "Verify Identity",
+    StringKey.DASH_QR to "QR",
+    StringKey.DASH_ACTIVITY_HISTORY to "Activity History",
+    StringKey.DASH_INVITATIONS to "Invitations",
+    StringKey.DASH_JOIN_TENANT to "Join a Tenant",
+    StringKey.DASH_ADD_CARD to "Add card",
+    StringKey.DASH_NFC_READER to "NFC Reader",
+    StringKey.DASH_SESSION_FALLBACK to "Session",
+    StringKey.DASH_ENROLLMENT_STATUS to "Enrollment Status",
+    StringKey.DASH_ENROLL_PROMPT to "Enroll your face to enable biometric verification.",
+    StringKey.DASH_NOT_TENANT_MEMBER to "You are not a tenant member yet. Accept invite / request access.",
+    StringKey.DASH_QUICK_ACTIONS to "Quick Actions",
+    StringKey.DASH_VIEW_ALL to "View All",
+    StringKey.DASH_NO_RECENT_ACTIVITY to "No recent activity yet.",
+    // HomeScreen (HOME_)
+    StringKey.HOME_WELCOME_BACK to "Welcome Back",
+    StringKey.HOME_SYSTEM_SUBTITLE to "Biometric Authentication System",
+    StringKey.HOME_USER_INFORMATION to "User Information",
+    StringKey.HOME_NAME_LABEL to "Name:",
+    StringKey.HOME_USER_ID_LABEL to "User ID:",
+    StringKey.HOME_BIOMETRIC_ACTIONS to "Biometric Actions",
+    StringKey.HOME_ENROLL_FACE_BIOMETRIC to "Enroll Face Biometric",
+    StringKey.HOME_VERIFY_FACE_BIOMETRIC to "Verify Face Biometric",
+    StringKey.HOME_ENROLL_HELP to "Enroll your face to enable secure biometric authentication",
+    // AdminDashboardScreen (ADMIN_)
+    StringKey.ADMIN_TITLE_BADGE to "FIVUCSAS Admin",
+    StringKey.ADMIN_DASHBOARD_TITLE to "Admin Dashboard",
+    StringKey.ADMIN_SYSTEM_OVERVIEW to "System Overview",
+    StringKey.ADMIN_MANAGE_USERS to "Manage Users",
+    StringKey.ADMIN_VIEW_ANALYTICS to "View Analytics",
+    StringKey.ADMIN_ACTIVITY_LOG to "Activity Log",
+    StringKey.ADMIN_IDENTIFY to "Identify",
+    StringKey.ADMIN_EXAM_ENTRY to "Exam Entry",
+    StringKey.ADMIN_USERS_SECTION to "Users",
+    StringKey.ADMIN_VIEW_ALL_USERS to "View all {0} users",
+    // OperatorDashboardScreen (OPER_)
+    StringKey.OPER_STATION_TITLE to "Operator Station",
+    StringKey.OPER_ENROLL_NEW_USER to "Enroll New User",
+    StringKey.OPER_TODAYS_STATISTICS to "Today's Statistics",
+    StringKey.OPER_STAT_TOTAL to "Total",
+    StringKey.OPER_STAT_SUCCESSFUL to "Successful",
+    StringKey.OPER_STAT_FAILED to "Failed",
+    // === end Dashboards i18n ===
+
     StringKey.MFA_TITLE to "Multi-Factor Authentication",
     StringKey.MFA_STEP_COUNTER to "Step {0} of {1}",
     StringKey.MFA_SELECT_METHOD to "Select Verification Method",
@@ -2322,6 +2421,54 @@ private val trStrings = mapOf(
     StringKey.NAV_DEVELOPER_PORTAL to "Geliştirici Portalı",
 
     // MFA Flow
+    // === Dashboards i18n ===
+    // DashboardScreen (DASH_)
+    StringKey.DASH_GREETING to "İyi günler, {0}",
+    StringKey.DASH_ENROLL_FACE to "Yüz Kaydı",
+    StringKey.DASH_VERIFY_IDENTITY to "Kimlik Doğrula",
+    StringKey.DASH_QR to "QR",
+    StringKey.DASH_ACTIVITY_HISTORY to "Etkinlik Geçmişi",
+    StringKey.DASH_INVITATIONS to "Davetler",
+    StringKey.DASH_JOIN_TENANT to "Kuruluşa Katıl",
+    StringKey.DASH_ADD_CARD to "Kart Ekle",
+    StringKey.DASH_NFC_READER to "NFC Okuyucu",
+    StringKey.DASH_SESSION_FALLBACK to "Oturum",
+    StringKey.DASH_ENROLLMENT_STATUS to "Kayıt Durumu",
+    StringKey.DASH_ENROLL_PROMPT to "Biyometrik doğrulamayı etkinleştirmek için yüzünüzü kaydedin.",
+    StringKey.DASH_NOT_TENANT_MEMBER to "Henüz bir kuruluş üyesi değilsiniz. Daveti kabul edin / erişim talep edin.",
+    StringKey.DASH_QUICK_ACTIONS to "Hızlı İşlemler",
+    StringKey.DASH_VIEW_ALL to "Tümünü Gör",
+    StringKey.DASH_NO_RECENT_ACTIVITY to "Henüz son etkinlik yok.",
+    // HomeScreen (HOME_)
+    StringKey.HOME_WELCOME_BACK to "Tekrar Hoş Geldiniz",
+    StringKey.HOME_SYSTEM_SUBTITLE to "Biyometrik Kimlik Doğrulama Sistemi",
+    StringKey.HOME_USER_INFORMATION to "Kullanıcı Bilgileri",
+    StringKey.HOME_NAME_LABEL to "Ad:",
+    StringKey.HOME_USER_ID_LABEL to "Kullanıcı Kimliği:",
+    StringKey.HOME_BIOMETRIC_ACTIONS to "Biyometrik İşlemler",
+    StringKey.HOME_ENROLL_FACE_BIOMETRIC to "Yüz Biyometrisi Kaydet",
+    StringKey.HOME_VERIFY_FACE_BIOMETRIC to "Yüz Biyometrisi Doğrula",
+    StringKey.HOME_ENROLL_HELP to "Güvenli biyometrik kimlik doğrulamayı etkinleştirmek için yüzünüzü kaydedin",
+    // AdminDashboardScreen (ADMIN_)
+    StringKey.ADMIN_TITLE_BADGE to "FIVUCSAS Yönetici",
+    StringKey.ADMIN_DASHBOARD_TITLE to "Yönetici Paneli",
+    StringKey.ADMIN_SYSTEM_OVERVIEW to "Sistem Özeti",
+    StringKey.ADMIN_MANAGE_USERS to "Kullanıcıları Yönet",
+    StringKey.ADMIN_VIEW_ANALYTICS to "Analitiği Görüntüle",
+    StringKey.ADMIN_ACTIVITY_LOG to "Etkinlik Günlüğü",
+    StringKey.ADMIN_IDENTIFY to "Tanımla",
+    StringKey.ADMIN_EXAM_ENTRY to "Sınav Girişi",
+    StringKey.ADMIN_USERS_SECTION to "Kullanıcılar",
+    StringKey.ADMIN_VIEW_ALL_USERS to "{0} kullanıcının tümünü gör",
+    // OperatorDashboardScreen (OPER_)
+    StringKey.OPER_STATION_TITLE to "Operatör İstasyonu",
+    StringKey.OPER_ENROLL_NEW_USER to "Yeni Kullanıcı Kaydet",
+    StringKey.OPER_TODAYS_STATISTICS to "Bugünün İstatistikleri",
+    StringKey.OPER_STAT_TOTAL to "Toplam",
+    StringKey.OPER_STAT_SUCCESSFUL to "Başarılı",
+    StringKey.OPER_STAT_FAILED to "Başarısız",
+    // === end Dashboards i18n ===
+
     StringKey.MFA_TITLE to "Cok Faktorlu Kimlik Doğrulama",
     StringKey.MFA_STEP_COUNTER to "Adım {0} / {1}",
     StringKey.MFA_SELECT_METHOD to "Doğrulama Yöntemini Secin",
