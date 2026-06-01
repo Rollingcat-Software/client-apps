@@ -51,7 +51,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -60,15 +59,6 @@ import com.fivucsas.shared.i18n.StringKey
 import com.fivucsas.shared.i18n.s
 import com.fivucsas.shared.presentation.viewmodel.AnalyticsViewModel
 import com.fivucsas.shared.ui.theme.AppColors
-
-// Color palette for stat cards
-private val GreenGood = Color(0xFF1B5E20)
-private val GreenLight = Color(0xFF4CAF50)
-private val BlueInfo = Color(0xFF1565C0)
-private val OrangeWarning = Color(0xFFE65100)
-private val RedDanger = Color(0xFFC62828)
-private val PurpleAccent = Color(0xFF6A1B9A)
-private val TealAccent = Color(0xFF00796B)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -163,7 +153,7 @@ fun AnalyticsScreen(
                         title = s(StringKey.ACTIVE_USERS),
                         value = stats?.activeUsers?.toString() ?: "0",
                         icon = Icons.Default.Person,
-                        color = GreenGood,
+                        color = AppColors.Success,
                         modifier = Modifier.weight(1f)
                     )
                 }
@@ -176,14 +166,14 @@ fun AnalyticsScreen(
                         title = s(StringKey.ANALYTICS_VERIFICATIONS_TODAY),
                         value = stats?.verificationsToday?.toString() ?: "0",
                         icon = Icons.Default.Verified,
-                        color = BlueInfo,
+                        color = AppColors.Info,
                         modifier = Modifier.weight(1f)
                     )
                     StatCard(
                         title = s(StringKey.ANALYTICS_FAILED_ATTEMPTS),
                         value = stats?.failedAttempts?.toString() ?: "0",
                         icon = Icons.Default.Error,
-                        color = if ((stats?.failedAttempts ?: 0) > 10) RedDanger else OrangeWarning,
+                        color = if ((stats?.failedAttempts ?: 0) > 10) AppColors.Error else AppColors.Warning,
                         modifier = Modifier.weight(1f)
                     )
                 }
@@ -191,9 +181,9 @@ fun AnalyticsScreen(
                 // -- Success Rate Card --
                 val successRateValue = (stats?.successRate ?: 0.0) * 100
                 val successColor = when {
-                    successRateValue >= 90.0 -> GreenGood
-                    successRateValue >= 70.0 -> OrangeWarning
-                    else -> RedDanger
+                    successRateValue >= 90.0 -> AppColors.Success
+                    successRateValue >= 70.0 -> AppColors.Warning
+                    else -> AppColors.Error
                 }
                 Card(
                     modifier = Modifier.fillMaxWidth(),
@@ -244,7 +234,7 @@ fun AnalyticsScreen(
                             text = stats?.pendingVerifications?.toString() ?: "0",
                             style = MaterialTheme.typography.headlineSmall,
                             fontWeight = FontWeight.Bold,
-                            color = OrangeWarning
+                            color = AppColors.Warning
                         )
                     }
                 }
@@ -257,35 +247,35 @@ fun AnalyticsScreen(
                     count = stats?.faceEnrollments ?: 0,
                     total = stats?.totalUsers ?: 1,
                     icon = Icons.Default.Face,
-                    color = BlueInfo
+                    color = AppColors.Info
                 )
                 EnrollmentMethodRow(
                     label = s(StringKey.VOICE_RECOGNITION),
                     count = stats?.voiceEnrollments ?: 0,
                     total = stats?.totalUsers ?: 1,
                     icon = Icons.Default.Mic,
-                    color = PurpleAccent
+                    color = AppColors.Primary
                 )
                 EnrollmentMethodRow(
                     label = s(StringKey.FINGERPRINT),
                     count = stats?.fingerprintEnrollments ?: 0,
                     total = stats?.totalUsers ?: 1,
                     icon = Icons.Default.Fingerprint,
-                    color = TealAccent
+                    color = AppColors.Secondary
                 )
                 EnrollmentMethodRow(
                     label = s(StringKey.TOTP),
                     count = stats?.totpEnrollments ?: 0,
                     total = stats?.totalUsers ?: 1,
                     icon = Icons.Default.Shield,
-                    color = GreenLight
+                    color = AppColors.Success
                 )
                 EnrollmentMethodRow(
                     label = s(StringKey.NFC_DOCUMENT),
                     count = stats?.nfcEnrollments ?: 0,
                     total = stats?.totalUsers ?: 1,
                     icon = Icons.Default.Nfc,
-                    color = OrangeWarning
+                    color = AppColors.Warning
                 )
 
                 // -- Recent Activity --
@@ -299,21 +289,21 @@ fun AnalyticsScreen(
                         title = s(StringKey.ANALYTICS_LOGINS_TODAY),
                         value = stats?.loginsToday?.toString() ?: "0",
                         icon = Icons.AutoMirrored.Filled.Login,
-                        color = BlueInfo,
+                        color = AppColors.Info,
                         modifier = Modifier.weight(1f)
                     )
                     ActivityCard(
                         title = s(StringKey.ANALYTICS_REGISTRATIONS_TODAY),
                         value = stats?.registrationsToday?.toString() ?: "0",
                         icon = Icons.Default.PersonAdd,
-                        color = GreenGood,
+                        color = AppColors.Success,
                         modifier = Modifier.weight(1f)
                     )
                     ActivityCard(
                         title = s(StringKey.ANALYTICS_ENROLLMENTS_TODAY),
                         value = stats?.enrollmentsToday?.toString() ?: "0",
                         icon = Icons.Default.PhonelinkSetup,
-                        color = PurpleAccent,
+                        color = AppColors.Primary,
                         modifier = Modifier.weight(1f)
                     )
                 }

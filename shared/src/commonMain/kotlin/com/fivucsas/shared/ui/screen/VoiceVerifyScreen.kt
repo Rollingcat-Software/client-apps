@@ -44,7 +44,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -52,6 +51,7 @@ import com.fivucsas.shared.i18n.StringKey
 import com.fivucsas.shared.i18n.s
 import com.fivucsas.shared.presentation.state.VoiceMode
 import com.fivucsas.shared.presentation.viewmodel.VoiceViewModel
+import com.fivucsas.shared.ui.theme.AppColors
 
 /**
  * Voice Verify Screen (Shared / Cross-platform)
@@ -227,7 +227,7 @@ fun VoiceVerifyScreen(
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 colors = CardDefaults.cardColors(
-                    containerColor = Color(0xFF1B5E20).copy(alpha = 0.1f)
+                    containerColor = AppColors.Success.copy(alpha = 0.1f)
                 )
             ) {
                 Row(
@@ -237,13 +237,13 @@ fun VoiceVerifyScreen(
                     Icon(
                         Icons.Default.CheckCircle,
                         contentDescription = null,
-                        tint = Color(0xFF1B5E20),
+                        tint = AppColors.Success,
                         modifier = Modifier.size(24.dp)
                     )
                     Spacer(modifier = Modifier.width(12.dp))
                     Text(
                         text = message,
-                        color = Color(0xFF1B5E20),
+                        color = AppColors.Success,
                         style = MaterialTheme.typography.bodyMedium,
                         fontWeight = FontWeight.SemiBold
                     )
@@ -287,7 +287,7 @@ fun VoiceVerifyScreen(
                         text = if (result.verified) s(StringKey.VOICE_VERIFIED) else s(StringKey.VOICE_NOT_VERIFIED),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
-                        color = if (result.verified) Color(0xFF1B5E20)
+                        color = if (result.verified) AppColors.Success
                         else MaterialTheme.colorScheme.error
                     )
                     Spacer(modifier = Modifier.height(8.dp))
@@ -316,7 +316,7 @@ fun VoiceVerifyScreen(
                         text = if (result.found) s(StringKey.VOICE_USER_FOUND) else s(StringKey.VOICE_USER_NOT_FOUND),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
-                        color = if (result.found) Color(0xFF1B5E20)
+                        color = if (result.found) AppColors.Success
                         else MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     if (result.found && result.userId != null) {

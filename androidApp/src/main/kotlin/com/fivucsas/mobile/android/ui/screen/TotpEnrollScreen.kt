@@ -119,7 +119,7 @@ fun TotpEnrollScreen(
             if (uiState.isEnabled && uiState.otpAuthUri == null) {
                 Card(
                     modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(containerColor = Color(0xFF1B5E20).copy(alpha = 0.1f))
+                    colors = CardDefaults.cardColors(containerColor = AppColors.Success.copy(alpha = 0.1f))
                 ) {
                     Column(
                         modifier = Modifier.padding(16.dp),
@@ -128,7 +128,7 @@ fun TotpEnrollScreen(
                         Icon(
                             imageVector = Icons.Default.CheckCircle,
                             contentDescription = null,
-                            tint = Color(0xFF1B5E20),
+                            tint = AppColors.Success,
                             modifier = Modifier.size(32.dp)
                         )
                         Spacer(modifier = Modifier.height(8.dp))
@@ -136,7 +136,7 @@ fun TotpEnrollScreen(
                             text = s(StringKey.TOTP_ALREADY_ENABLED),
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
-                            color = Color(0xFF1B5E20)
+                            color = AppColors.Success
                         )
                     }
                 }
@@ -242,7 +242,7 @@ fun TotpEnrollScreen(
             if (uiState.setupComplete) {
                 Card(
                     modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(containerColor = Color(0xFF1B5E20).copy(alpha = 0.1f))
+                    colors = CardDefaults.cardColors(containerColor = AppColors.Success.copy(alpha = 0.1f))
                 ) {
                     Column(
                         modifier = Modifier.padding(16.dp),
@@ -251,7 +251,7 @@ fun TotpEnrollScreen(
                         Icon(
                             imageVector = Icons.Default.CheckCircle,
                             contentDescription = null,
-                            tint = Color(0xFF1B5E20),
+                            tint = AppColors.Success,
                             modifier = Modifier.size(32.dp)
                         )
                         Spacer(modifier = Modifier.height(8.dp))
@@ -259,7 +259,7 @@ fun TotpEnrollScreen(
                             text = s(StringKey.TOTP_SETUP_COMPLETE),
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
-                            color = Color(0xFF1B5E20)
+                            color = AppColors.Success
                         )
                     }
                 }

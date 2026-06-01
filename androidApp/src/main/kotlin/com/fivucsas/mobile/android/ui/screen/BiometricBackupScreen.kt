@@ -46,7 +46,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -133,7 +132,7 @@ fun BiometricBackupScreen(
             // GDPR/KVKK info card
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = Color(0xFF1565C0).copy(alpha = 0.08f))
+                colors = CardDefaults.cardColors(containerColor = AppColors.Info.copy(alpha = 0.08f))
             ) {
                 Row(
                     modifier = Modifier.padding(16.dp),
@@ -142,7 +141,7 @@ fun BiometricBackupScreen(
                     Icon(
                         Icons.Default.Info,
                         contentDescription = null,
-                        tint = Color(0xFF1565C0),
+                        tint = AppColors.Info,
                         modifier = Modifier.size(24.dp)
                     )
                     Column {
@@ -189,7 +188,7 @@ fun BiometricBackupScreen(
                     Card(
                         modifier = Modifier.fillMaxWidth(),
                         colors = CardDefaults.cardColors(
-                            containerColor = Color(0xFF1B5E20).copy(alpha = 0.1f)
+                            containerColor = AppColors.Success.copy(alpha = 0.1f)
                         )
                     ) {
                         Row(
@@ -200,9 +199,9 @@ fun BiometricBackupScreen(
                             Icon(
                                 Icons.Default.CheckCircle,
                                 contentDescription = null,
-                                tint = Color(0xFF1B5E20)
+                                tint = AppColors.Success
                             )
-                            Text(text = msg, color = Color(0xFF1B5E20))
+                            Text(text = msg, color = AppColors.Success)
                         }
                     }
                 }
@@ -289,7 +288,7 @@ private fun BiometricStatusRow(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
             containerColor = if (enrolled)
-                Color(0xFF1B5E20).copy(alpha = 0.06f)
+                AppColors.Success.copy(alpha = 0.06f)
             else
                 MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
         )
@@ -306,7 +305,7 @@ private fun BiometricStatusRow(
                 Icon(
                     imageVector = icon,
                     contentDescription = null,
-                    tint = if (enrolled) Color(0xFF1B5E20) else MaterialTheme.colorScheme.onSurfaceVariant
+                    tint = if (enrolled) AppColors.Success else MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Text(
                     text = label,
@@ -317,7 +316,7 @@ private fun BiometricStatusRow(
                 text = if (enrolled) s(StringKey.ENROLLED) else s(StringKey.NOT_ENROLLED),
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.SemiBold,
-                color = if (enrolled) Color(0xFF1B5E20) else MaterialTheme.colorScheme.onSurfaceVariant
+                color = if (enrolled) AppColors.Success else MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
     }
