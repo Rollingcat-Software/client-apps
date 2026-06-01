@@ -53,12 +53,12 @@ import kotlinx.coroutines.launch
  *
  *  - `PASSWORD` (or null/legacy / unknown tenant): legacy email + password
  *    form. The backend's `/auth/login` endpoint handles it as today.
- *  - `EMAIL_OTP`, `FACE`, `TOTP`: a thin pre-screen that collects the
- *    user's email and then routes through the existing MFA pipeline,
- *    where the dedicated step composables already live.
- *  - Any other type (SMS_OTP / QR_CODE / NFC_DOCUMENT / HARDWARE_KEY /
- *    FINGERPRINT / VOICE as PRIMARY): a "not supported in this app yet"
- *    fallback with a link to the web sign-in page.
+ *  - Any non-PASSWORD primary (EMAIL_OTP / FACE / TOTP / SMS_OTP /
+ *    QR_CODE / NFC_DOCUMENT / HARDWARE_KEY / FINGERPRINT / VOICE): a
+ *    "not supported in this app yet" fallback with a link to the web
+ *    sign-in page. These cannot be driven through `/auth/login` (it
+ *    requires a non-blank password), so the app must not send an empty
+ *    password — it hands off to hosted web sign-in instead.
  *
  * Discovery is best-effort. If the backend rejects the unauthenticated
  * call (the per-tenant auth-flows endpoint requires admin auth), the
@@ -142,37 +142,18 @@ fun LoginScreen(
             when {
                 state.flowDiscoveryLoading -> PrimaryStepShimmer()
                 else -> when (state.primaryStepMethod) {
-                    // EMAIL_OTP / FACE / TOTP — passwordless primaries that
-                    // delegate to the MFA pipeline. Until we hoist the
-                    // dedicated step composables out of androidApp, these
-                    // share a common pre-screen that collects the email.
-                    "EMAIL_OTP" -> PasswordlessPrimaryStep(
-                        title = s(StringKey.LOGIN_PRIMARY_EMAIL_OTP_TITLE),
-                        instruction = s(StringKey.LOGIN_PRIMARY_EMAIL_OTP_INSTRUCTION),
-                        viewModel = viewModel,
-                        scope = scope,
-                        onNavigateToForgotPassword = onNavigateToForgotPassword,
-                        onNavigateToRegister = onNavigateToRegister
-                    )
-                    "FACE" -> PasswordlessPrimaryStep(
-                        title = s(StringKey.LOGIN_PRIMARY_FACE_TITLE),
-                        instruction = s(StringKey.LOGIN_PRIMARY_FACE_INSTRUCTION),
-                        viewModel = viewModel,
-                        scope = scope,
-                        onNavigateToForgotPassword = onNavigateToForgotPassword,
-                        onNavigateToRegister = onNavigateToRegister
-                    )
-                    "TOTP" -> PasswordlessPrimaryStep(
-                        title = s(StringKey.LOGIN_PRIMARY_TOTP_TITLE),
-                        instruction = s(StringKey.LOGIN_PRIMARY_TOTP_INSTRUCTION),
-                        viewModel = viewModel,
-                        scope = scope,
-                        onNavigateToForgotPassword = onNavigateToForgotPassword,
-                        onNavigateToRegister = onNavigateToRegister
-                    )
-                    // Methods we don't yet render dynamically as PRIMARY.
-                    // SMS_OTP / QR_CODE / NFC_DOCUMENT / HARDWARE_KEY /
-                    // FINGERPRINT / VOICE all fall through here.
+                    // EMAIL_OTP / FACE / TOTP and every other non-PASSWORD
+                    // primary fall through to the "use web sign-in" fallback.
+                    //
+                    // These were previously routed to PasswordlessPrimaryStep,
+                    // which called `login(email, password = "")`. The backend's
+                    // `/auth/login` rejects a blank password (`@NotBlank` →
+                    // HTTP 400), so those tenants could never sign in from the
+                    // app. Until the dedicated step composables are hoisted out
+                    // of androidApp and rendered here directly (skipping the
+                    // empty-password round-trip), we offer the web sign-in page
+                    // instead of sending a request the server will reject.
+                    "EMAIL_OTP", "FACE", "TOTP",
                     "SMS_OTP", "QR_CODE", "NFC_DOCUMENT", "HARDWARE_KEY",
                     "FINGERPRINT", "VOICE" -> UnsupportedPrimaryStep(
                         method = state.primaryStepMethod ?: "",
@@ -311,101 +292,6 @@ private fun LegacyPasswordPrimaryStep(
         onClick = onNavigateToRegister,
         enabled = !state.isLoading
     ) {
-        Text(s(StringKey.DONT_HAVE_ACCOUNT))
-    }
-}
-
-/**
- * Passwordless primary step (EMAIL_OTP / FACE / TOTP) — collects the
- * user's email, then submits via the legacy `/auth/login` endpoint with
- * an empty password.
- *
- * The backend's adaptive-MFA path responds with an MFA challenge whose
- * first step is the configured primary method, so the existing
- * `MfaFlowScreen` picks it up and renders the dedicated step UI
- * (EmailOtpStep / FaceCaptureStep / TotpStepInput) without changes.
- *
- * NOTE: this avoids duplicating each method-specific UI inside the
- * shared LoginScreen. A future pass can hoist the method composables
- * out of `androidApp/MfaFlowScreen.kt` and render them here directly,
- * skipping the `mfa_session_token` round-trip.
- */
-@Composable
-private fun PasswordlessPrimaryStep(
-    title: String,
-    instruction: String,
-    viewModel: LoginViewModel,
-    scope: kotlinx.coroutines.CoroutineScope,
-    onNavigateToForgotPassword: () -> Unit,
-    onNavigateToRegister: () -> Unit
-) {
-    var email by remember { mutableStateOf("") }
-    val state by viewModel.state.collectAsState()
-
-    Text(
-        text = title,
-        style = MaterialTheme.typography.titleMedium,
-        textAlign = TextAlign.Center
-    )
-
-    Spacer(modifier = Modifier.height(8.dp))
-
-    Text(
-        text = instruction,
-        style = MaterialTheme.typography.bodyMedium,
-        textAlign = TextAlign.Center
-    )
-
-    Spacer(modifier = Modifier.height(24.dp))
-
-    OutlinedTextField(
-        value = email,
-        onValueChange = { email = it },
-        label = { Text(s(StringKey.EMAIL)) },
-        modifier = Modifier.fillMaxWidth(),
-        enabled = !state.isLoading
-    )
-
-    if (state.error != null) {
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(
-            text = state.error!!,
-            color = MaterialTheme.colorScheme.error,
-            style = MaterialTheme.typography.bodySmall
-        )
-    }
-
-    Spacer(modifier = Modifier.height(24.dp))
-
-    Button(
-        onClick = {
-            scope.launch {
-                // Empty password triggers the adaptive-MFA path on the
-                // backend: the response is an MFA challenge starting with
-                // the configured primary method. The existing onMfaRequired
-                // navigation handler in this screen will route to MfaFlowScreen.
-                viewModel.login(email, password = "")
-            }
-        },
-        modifier = Modifier.fillMaxWidth(),
-        enabled = !state.isLoading && email.isNotBlank()
-    ) {
-        if (state.isLoading) {
-            CircularProgressIndicator(
-                modifier = Modifier.size(24.dp),
-                color = MaterialTheme.colorScheme.onPrimary
-            )
-        } else {
-            Text(s(StringKey.LOGIN_PRIMARY_CONTINUE))
-        }
-    }
-
-    Spacer(modifier = Modifier.height(16.dp))
-
-    TextButton(onClick = onNavigateToForgotPassword, enabled = !state.isLoading) {
-        Text(s(StringKey.FORGOT_PASSWORD))
-    }
-    TextButton(onClick = onNavigateToRegister, enabled = !state.isLoading) {
         Text(s(StringKey.DONT_HAVE_ACCOUNT))
     }
 }

@@ -56,50 +56,69 @@ class LoginViewModel(
 
     suspend fun login(email: String, password: String) {
         _state.value = LoginState(isLoading = true)
-        loginUseCase(email, password).fold(
-            onSuccess = { loginResult ->
-                when (loginResult) {
-                    is LoginResult.Authenticated -> {
-                        val tokens = loginResult.tokens
-                        // Cache login data for offline mode
-                        offlineCache.cacheLoginData(
-                            userId = tokens.userId,
-                            userName = tokens.userName,
-                            userEmail = tokens.userEmail,
-                            role = tokens.role
-                        )
-                        // Remember the tenant for next launch's flow discovery.
-                        offlineCache.cacheTenantId(tokens.tenantId)
-                        _state.value = LoginState(
-                            isLoading = false,
-                            tokens = tokens,
-                            isSuccess = true,
-                            role = UserRole.fromString(tokens.role)
-                        )
+        try {
+            loginUseCase(email, password).fold(
+                onSuccess = { loginResult ->
+                    when (loginResult) {
+                        is LoginResult.Authenticated -> {
+                            val tokens = loginResult.tokens
+                            // The server has AUTHENTICATED us and minted tokens —
+                            // this is a committed success. Publish the Authenticated
+                            // state FIRST, before any side effect, so a throw in
+                            // offline-cache / push-token can NEVER flip a real 200
+                            // success into a stuck button or a false failure (the
+                            // Phase-0 "200 AUTHENTICATED → stuck/failed" regression —
+                            // mirrors the v5.2.3 fix in MfaFlowViewModel).
+                            _state.value = LoginState(
+                                isLoading = false,
+                                tokens = tokens,
+                                isSuccess = true,
+                                role = UserRole.fromString(tokens.role)
+                            )
+                            // Best-effort side effects — must not affect the verdict.
+                            runCatching {
+                                offlineCache.cacheLoginData(
+                                    userId = tokens.userId,
+                                    userName = tokens.userName,
+                                    userEmail = tokens.userEmail,
+                                    role = tokens.role
+                                )
+                            }
+                            // Remember the tenant for next launch's flow discovery.
+                            runCatching { offlineCache.cacheTenantId(tokens.tenantId) }
+                            // Register FCM push token with the backend (fire-and-forget).
+                            runCatching { registerPushToken(tokens.userId) }
+                        }
 
-                        // Register FCM push token with the backend (fire-and-forget)
-                        registerPushToken(tokens.userId)
+                        is LoginResult.MfaChallenge -> {
+                            _state.value = LoginState(
+                                isLoading = false,
+                                mfaRequired = true,
+                                mfaSessionToken = loginResult.mfaSessionToken,
+                                mfaAvailableMethods = loginResult.availableMethods,
+                                mfaCurrentStep = loginResult.currentStep,
+                                mfaTotalSteps = loginResult.totalSteps
+                            )
+                        }
                     }
-
-                    is LoginResult.MfaChallenge -> {
-                        _state.value = LoginState(
-                            isLoading = false,
-                            mfaRequired = true,
-                            mfaSessionToken = loginResult.mfaSessionToken,
-                            mfaAvailableMethods = loginResult.availableMethods,
-                            mfaCurrentStep = loginResult.currentStep,
-                            mfaTotalSteps = loginResult.totalSteps
-                        )
-                    }
+                },
+                onFailure = { error ->
+                    _state.value = LoginState(
+                        isLoading = false,
+                        error = mapErrorToUserMessage(error)
+                    )
                 }
-            },
-            onFailure = { error ->
-                _state.value = LoginState(
-                    isLoading = false,
-                    error = mapErrorToUserMessage(error)
-                )
-            }
-        )
+            )
+        } catch (e: Exception) {
+            // Never override a committed authentication. If we've already
+            // published a success (server said AUTHENTICATED), a late throw
+            // must not strand the user on a false failure or a stuck button.
+            if (_state.value.isSuccess) return
+            _state.value = LoginState(
+                isLoading = false,
+                error = mapErrorToUserMessage(e)
+            )
+        }
     }
 
     /**
