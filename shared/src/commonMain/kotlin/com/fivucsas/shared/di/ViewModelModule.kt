@@ -8,7 +8,6 @@ import com.fivucsas.shared.presentation.viewmodel.BiometricBackupViewModel
 import com.fivucsas.shared.presentation.viewmodel.DeviceViewModel
 import com.fivucsas.shared.presentation.viewmodel.EnrollmentViewModel
 import com.fivucsas.shared.presentation.viewmodel.MultiStepAuthViewModel
-import com.fivucsas.shared.presentation.viewmodel.NfcApprovalViewModel
 import com.fivucsas.shared.presentation.viewmodel.IdentifyViewModel
 import com.fivucsas.shared.presentation.viewmodel.InviteViewModel
 import com.fivucsas.shared.presentation.viewmodel.KioskViewModel
@@ -70,11 +69,6 @@ val viewModelModule = module {
     factoryOf(::AuditLogDashboardViewModel)
     factoryOf(::DataExportViewModel)
     factoryOf(::AccountLinkingViewModel)
-
-    // NfcApprovalViewModel is a singleton because the deep-link activity and
-    // the ApprovalActionReceiver (notification action buttons) need to observe
-    // and drive the same state instance. See NFC_PUSH_APPROVAL_PROTOCOL.md.
-    single { NfcApprovalViewModel(repository = get()) }
 
     // Approve-login "Login requests" screen — factory (new instance per screen).
     // This is a per-screen list+poll ViewModel that owns a CoroutineScope and a
