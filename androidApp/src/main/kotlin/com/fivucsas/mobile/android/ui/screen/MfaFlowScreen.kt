@@ -502,8 +502,17 @@ private fun MfaStepInputContent(
                 authenticatorAttachment = "platform",
                 onVerify = { assertionPayload ->
                     scope.launch {
-                        // Backend FingerprintAuthHandler accepts `fingerprintData` (or `assertion`).
-                        viewModel.verifyStep(method, mapOf("fingerprintData" to assertionPayload))
+                        // Backend FingerprintVerifyMfaStepHandler reads data.get("assertion")
+                        // ONLY (same as HARDWARE_KEY) — the previous "fingerprintData" key
+                        // was never read, so FINGERPRINT always failed. Send `assertion`
+                        // (and `fingerprintData` too, harmlessly, for safety).
+                        viewModel.verifyStep(
+                            method,
+                            mapOf(
+                                "assertion" to assertionPayload,
+                                "fingerprintData" to assertionPayload
+                            )
+                        )
                     }
                 }
             )
