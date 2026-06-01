@@ -187,11 +187,20 @@ fun FIVUCSASTheme(
     val mode by prefs.themeMode.collectAsState()
 
     CompositionLocalProvider(LocalThemeMode provides mode) {
-        val useDark = darkTheme ?: when (mode) {
+        // The legacy shared `AppColors` palette is LIGHT-only, and many screens
+        // read it directly alongside `MaterialTheme.colorScheme`. Rendering the
+        // dark scheme while those screens stay light yields broken, low-contrast
+        // UI (e.g. light text on a white card). Until `AppColors` is made
+        // theme-aware, render LIGHT consistently so the whole app matches the
+        // web app's (light-first) look. Proper dark mode is a tracked follow-up.
+        // An explicit [darkTheme] (e.g. screenshot tests) is still honoured.
+        @Suppress("UNUSED_VARIABLE")
+        val resolvedMode = when (mode) {
             ThemeMode.LIGHT -> false
             ThemeMode.DARK -> true
             ThemeMode.SYSTEM -> isSystemInDarkTheme()
         }
+        val useDark = darkTheme ?: false
         val colors = if (useDark) DarkColors else LightColors
 
         MaterialTheme(

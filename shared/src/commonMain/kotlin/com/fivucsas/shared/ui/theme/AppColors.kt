@@ -6,86 +6,98 @@ import androidx.compose.ui.graphics.Color
 /**
  * Application Color Palette
  *
- * Defines all colors used throughout the application.
- * Based on Material Design 3 color system.
+ * Ported from the web app design tokens (`web-app/src/theme.ts`) so the mobile
+ * app and app.fivucsas.com share ONE FIVUCSAS brand:
+ *   - Primary  : Indigo  #6366f1   (was stock Material blue #1976d2)
+ *   - Secondary: Purple  #8b5cf6   (was cyan #00acc1)
+ *   - Neutrals : Slate scale (#0f172a … #f8fafc)
+ *   - Semantic : emerald / amber / red / sky
+ *
+ * Property NAMES are unchanged so every existing call site keeps compiling;
+ * only the values moved onto the web palette. This is what eliminates the
+ * blue/cyan-vs-indigo clash on screens that read `AppColors.*` directly while
+ * the rest of the app reads the (already web-aligned) `MaterialTheme.colorScheme`.
+ *
+ * NOTE: these are LIGHT-mode tokens. Theme-aware screens should prefer
+ * `MaterialTheme.colorScheme` (Theme.kt mirrors these for both light and dark).
  */
 object AppColors {
     // ============================================
-    // Primary Colors
+    // Primary — Indigo (#6366f1)
     // ============================================
 
-    val Primary = Color(0xFF1976D2)           // Deep Blue
-    val PrimaryVariant = Color(0xFF1565C0)    // Darker Blue
-    val OnPrimary = Color(0xFFFFFFFF)         // White on primary
+    val Primary = Color(0xFF6366F1)
+    val PrimaryVariant = Color(0xFF4F46E5)
+    val OnPrimary = Color(0xFFFFFFFF)
 
     // ============================================
-    // Secondary Colors
+    // Secondary — Purple / iris (#8b5cf6)
     // ============================================
 
-    val Secondary = Color(0xFF00ACC1)         // Cyan
-    val SecondaryVariant = Color(0xFF0097A7)  // Darker Cyan
-    val OnSecondary = Color(0xFFFFFFFF)       // White on secondary
+    val Secondary = Color(0xFF8B5CF6)
+    val SecondaryVariant = Color(0xFF7C3AED)
+    val OnSecondary = Color(0xFFFFFFFF)
 
     // ============================================
     // Semantic Colors
     // ============================================
 
-    val Success = Color(0xFF4CAF50)           // Green
-    val SuccessDark = Color(0xFF388E3C)       // Darker Green
-    val OnSuccess = Color(0xFFFFFFFF)         // White on success
+    val Success = Color(0xFF10B981)           // Emerald
+    val SuccessDark = Color(0xFF059669)
+    val OnSuccess = Color(0xFFFFFFFF)
 
-    val Warning = Color(0xFFFFA726)           // Orange
-    val WarningDark = Color(0xFFF57C00)       // Darker Orange
-    val OnWarning = Color(0xFF000000)         // Black on warning
+    val Warning = Color(0xFFF59E0B)           // Amber
+    val WarningDark = Color(0xFFD97706)
+    val OnWarning = Color(0xFF1F2937)         // Slate-800 text on amber
 
-    val Error = Color(0xFFF44336)             // Red
-    val ErrorDark = Color(0xFFD32F2F)         // Darker Red
-    val OnError = Color(0xFFFFFFFF)           // White on error
+    val Error = Color(0xFFEF4444)             // Red
+    val ErrorDark = Color(0xFFDC2626)
+    val OnError = Color(0xFFFFFFFF)
 
-    val Info = Color(0xFF2196F3)              // Blue
-    val InfoDark = Color(0xFF1976D2)          // Darker Blue
-    val OnInfo = Color(0xFFFFFFFF)            // White on info
+    val Info = Color(0xFF3B82F6)              // Sky
+    val InfoDark = Color(0xFF2563EB)
+    val OnInfo = Color(0xFFFFFFFF)
 
     // ============================================
-    // Surface Colors
+    // Surface Colors — slate neutrals
     // ============================================
 
-    val Background = Color(0xFFF5F5F5)        // Light gray
-    val OnBackground = Color(0xFF212121)      // Dark gray
+    val Background = Color(0xFFF8FAFC)        // slate-50 (app background)
+    val OnBackground = Color(0xFF0F172A)      // slate-900
 
     val Surface = Color(0xFFFFFFFF)           // White
-    val SurfaceVariant = Color(0xFFFAFAFA)    // Off-white
-    val OnSurface = Color(0xFF212121)         // Dark gray
-    val OnSurfaceVariant = Color(0xFF757575)  // Medium gray
+    val SurfaceVariant = Color(0xFFF1F5F9)    // slate-100
+    val OnSurface = Color(0xFF0F172A)         // slate-900
+    val OnSurfaceVariant = Color(0xFF64748B)  // slate-500
 
     // ============================================
-    // Neutral Colors
+    // Neutral Colors — slate scale
     // ============================================
 
     val White = Color(0xFFFFFFFF)
     val Black = Color(0xFF000000)
 
-    val Gray50 = Color(0xFFFAFAFA)
-    val Gray100 = Color(0xFFF5F5F5)
-    val Gray200 = Color(0xFFEEEEEE)
-    val Gray300 = Color(0xFFE0E0E0)
-    val Gray400 = Color(0xFFBDBDBD)
-    val Gray500 = Color(0xFF9E9E9E)
-    val Gray600 = Color(0xFF757575)
-    val Gray700 = Color(0xFF616161)
-    val Gray800 = Color(0xFF424242)
-    val Gray900 = Color(0xFF212121)
+    val Gray50 = Color(0xFFF8FAFC)
+    val Gray100 = Color(0xFFF1F5F9)
+    val Gray200 = Color(0xFFE2E8F0)
+    val Gray300 = Color(0xFFCBD5E1)
+    val Gray400 = Color(0xFF94A3B8)
+    val Gray500 = Color(0xFF64748B)
+    val Gray600 = Color(0xFF475569)
+    val Gray700 = Color(0xFF334155)
+    val Gray800 = Color(0xFF1E293B)
+    val Gray900 = Color(0xFF0F172A)
 
     // ============================================
-    // Gradients
+    // Gradients — mirror the web brand gradients
     // ============================================
 
     val PrimaryGradient = Brush.linearGradient(
-        colors = listOf(Primary, PrimaryVariant)
+        colors = listOf(Primary, Secondary)            // indigo → iris (web primary gradient)
     )
 
     val SecondaryGradient = Brush.linearGradient(
-        colors = listOf(Secondary, SecondaryVariant)
+        colors = listOf(Secondary, Color(0xFFEC4899))  // iris → fuchsia
     )
 
     val SuccessGradient = Brush.linearGradient(
@@ -93,11 +105,11 @@ object AppColors {
     )
 
     val BackgroundGradient = Brush.verticalGradient(
-        colors = listOf(Color(0xFFE3F2FD), Color(0xFFFAFAFA))
+        colors = listOf(Color(0xFFF8FAFC), Color(0xFFEEF2FF))  // slate-50 → indigo-50
     )
 
     val KioskBackgroundGradient = Brush.verticalGradient(
-        colors = listOf(Color(0xFFE3F2FD), White)
+        colors = listOf(Color(0xFFEEF2FF), White)
     )
 
     // ============================================
