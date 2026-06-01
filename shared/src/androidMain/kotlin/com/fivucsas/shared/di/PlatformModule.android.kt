@@ -1,12 +1,10 @@
 package com.fivucsas.shared.di
 
-import com.fivucsas.shared.platform.AndroidCameraService
 import com.fivucsas.shared.platform.AndroidSecureStorage
 import com.fivucsas.shared.platform.FingerprintAuthenticator
 import com.fivucsas.shared.platform.WebAuthnAuthenticator
 import com.fivucsas.shared.platform.provideWebAuthnAuthenticator
 import com.fivucsas.shared.platform.AndroidTokenStorage
-import com.fivucsas.shared.platform.ICameraService
 import com.fivucsas.shared.platform.INetworkMonitor
 import com.fivucsas.shared.platform.IFileSaver
 import com.fivucsas.shared.platform.AndroidFileSaver
@@ -27,7 +25,6 @@ import org.koin.dsl.module
  * Uses Koin for dependency injection with Android-specific bindings.
  *
  * Provides:
- * - AndroidCameraService: CameraX-based camera implementation
  * - AndroidTokenStorage: Encrypted SharedPreferences for secure token storage
  *
  * Note: NFC service is registered as a no-op default here.
@@ -39,14 +36,12 @@ import org.koin.dsl.module
  * - Factory Pattern: Creates platform-specific instances
  */
 actual val platformModule = module {
-    // Camera Service
-    // Single instance that requires Android Context and LifecycleOwner
-    single<ICameraService> {
-        AndroidCameraService(
-            context = androidContext(),
-            lifecycleOwner = get() // LifecycleOwner must be provided by the app
-        )
-    }
+    // NOTE: No ICameraService binding on Android. Android camera screens use
+    // CameraX LifecycleCameraController with LocalLifecycleOwner.current directly
+    // (see AndroidCameraPreview.kt and the *ScannerScreen composables); nothing
+    // resolves ICameraService from Koin here. The former AndroidCameraService
+    // binding required a LifecycleOwner that no module provides, so it was
+    // unsatisfiable (NoBeanDefFoundException) and dead. Removed deliberately.
 
     // Token Storage
     // Secure storage using EncryptedSharedPreferences

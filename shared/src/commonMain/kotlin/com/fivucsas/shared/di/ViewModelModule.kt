@@ -76,7 +76,8 @@ val viewModelModule = module {
     // and drive the same state instance. See NFC_PUSH_APPROVAL_PROTOCOL.md.
     single { NfcApprovalViewModel(repository = get()) }
 
-    // Approve-login "Login requests" screen — singleton so the polling job
-    // and the screen observe the same state instance across recompositions.
-    single { ApproveLoginViewModel(repository = get()) }
+    // Approve-login "Login requests" screen — factory (new instance per screen).
+    // This is a per-screen list+poll ViewModel that owns a CoroutineScope and a
+    // while(isActive) poll loop; a singleton scope can outlive the screen.
+    factory { ApproveLoginViewModel(repository = get()) }
 }
