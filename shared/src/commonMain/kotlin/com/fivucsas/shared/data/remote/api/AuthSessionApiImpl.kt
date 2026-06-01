@@ -10,10 +10,19 @@ import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
+import kotlinx.serialization.Serializable
 
 class AuthSessionApiImpl(
     private val client: HttpClient
 ) : AuthSessionApi {
+
+    /**
+     * Request body wrapper for completeStep. The server expects
+     * `{ "data": { ... } }`; constraining the inner map to String values keeps
+     * it serializable (kotlinx.serialization has no Any serializer).
+     */
+    @Serializable
+    private data class StepBody(val data: Map<String, String>)
 
     override suspend fun startSession(command: StartSessionCommand): AuthSessionDetailDto {
         return client.post("auth/sessions") {
@@ -29,11 +38,14 @@ class AuthSessionApiImpl(
     override suspend fun completeStep(
         sessionId: String,
         stepOrder: Int,
-        data: Map<String, Any?>
+        data: Map<String, String>
     ): StepResultDto {
+        // Body type MUST be a serializable concrete type. kotlinx.serialization
+        // has no serializer for Any, so the step payload is constrained to
+        // Map<String, String> (matching the MfaStepRequest.data convention).
         return client.post("auth/sessions/$sessionId/steps/$stepOrder") {
             contentType(ContentType.Application.Json)
-            setBody(mapOf("data" to data))
+            setBody(StepBody(data))
         }.body()
     }
 

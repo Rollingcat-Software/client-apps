@@ -16,9 +16,9 @@ data class QrLoginApproveRequestDto(
 
 @Serializable
 data class QrLoginSessionResponseDto(
-    val sessionId: String,
-    val qrContent: String,
-    val status: String,
+    val sessionId: String = "",
+    val qrContent: String = "",
+    val status: String = "",
     val expiresAtEpochSeconds: Long? = null,
     val message: String? = null,
     val accessToken: String? = null,

@@ -21,8 +21,8 @@ data class RegisterBiometricDeviceRequestDto(
  */
 @Serializable
 data class CreateBiometricChallengeResponseDto(
-    val challengeId: String,
-    val nonce: String
+    val challengeId: String = "",
+    val nonce: String = ""
 )
 
 /**

@@ -35,7 +35,7 @@ class RootAdminApiImpl(
 
     @Serializable
     private data class PagedResponse<T>(
-        val content: List<T>,
+        val content: List<T> = emptyList(),
         val page: Int = 0,
         val size: Int = 20,
         val totalPages: Int = 0

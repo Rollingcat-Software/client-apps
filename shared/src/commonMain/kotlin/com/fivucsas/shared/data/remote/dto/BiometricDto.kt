@@ -49,11 +49,11 @@ fun BiometricEnrollmentResponseDto.toModel(): EnrollmentResult {
  */
 @Serializable
 data class VerificationResponseDto(
-    val verified: Boolean,
-    val confidence: Float,
+    val verified: Boolean = false,
+    val confidence: Float = 0f,
     val distance: Float = 0f,
     val threshold: Float = 0f,
-    val message: String
+    val message: String = ""
 )
 
 fun VerificationResponseDto.toModel(): VerificationResult {
@@ -73,13 +73,13 @@ fun VerificationResponseDto.toModel(): VerificationResult {
 @Serializable
 data class LivenessResponseDto(
     @SerialName("is_live")
-    val isLive: Boolean,
+    val isLive: Boolean = false,
     @SerialName("liveness_score")
-    val livenessScore: Float,
+    val livenessScore: Float = 0f,
     val challenge: String = "",
     @SerialName("challenge_completed")
     val challengeCompleted: Boolean = false,
-    val message: String
+    val message: String = ""
 )
 
 fun LivenessResponseDto.toModel(): LivenessResult {

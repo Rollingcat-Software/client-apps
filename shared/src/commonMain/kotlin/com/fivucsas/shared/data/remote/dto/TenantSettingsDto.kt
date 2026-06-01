@@ -5,14 +5,14 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class TenantSettingsDto(
-    val tenantName: String,
-    val livenessCheckEnabled: Boolean,
-    val confidenceThreshold: Float,
-    val maxEnrollmentAttempts: Int,
-    val sessionTimeoutMinutes: Int,
-    val autoLockEnabled: Boolean,
-    val nfcExamEntryEnabled: Boolean,
-    val inviteExpiryDays: Int
+    val tenantName: String = "",
+    val livenessCheckEnabled: Boolean = false,
+    val confidenceThreshold: Float = 0f,
+    val maxEnrollmentAttempts: Int = 0,
+    val sessionTimeoutMinutes: Int = 0,
+    val autoLockEnabled: Boolean = false,
+    val nfcExamEntryEnabled: Boolean = false,
+    val inviteExpiryDays: Int = 0
 )
 
 fun TenantSettingsDto.toModel(): TenantSettings {

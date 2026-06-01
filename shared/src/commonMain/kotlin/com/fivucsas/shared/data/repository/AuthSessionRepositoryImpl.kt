@@ -45,7 +45,14 @@ class AuthSessionRepositoryImpl(
         data: Map<String, Any?>
     ): Result<StepResult> {
         return try {
-            val dto = authSessionApi.completeStep(sessionId, stepOrder, data)
+            // The wire body must be Map<String, String> (no Any serializer).
+            // Drop nulls and stringify any non-String values at this boundary so
+            // the upstream domain/presentation layers keep their Map<String, Any?>
+            // convenience signature.
+            val stringData: Map<String, String> = data.entries
+                .mapNotNull { (key, value) -> value?.let { key to it.toString() } }
+                .toMap()
+            val dto = authSessionApi.completeStep(sessionId, stepOrder, stringData)
             Result.success(dto.toDomain())
         } catch (e: Exception) {
             Result.failure(e)
