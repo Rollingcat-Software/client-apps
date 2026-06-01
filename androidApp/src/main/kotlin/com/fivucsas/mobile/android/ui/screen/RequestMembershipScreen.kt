@@ -19,7 +19,6 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Business
 import androidx.compose.material.icons.filled.Groups
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -82,8 +81,6 @@ fun RequestMembershipScreen(
     }
 
     var searchQuery by remember { mutableStateOf("") }
-    var requestedTenantIds by remember { mutableStateOf(setOf<String>()) }
-    var successMessage by remember { mutableStateOf<String?>(null) }
 
     val filteredTenants = if (searchQuery.isBlank()) allTenants
     else allTenants.filter {
@@ -119,23 +116,28 @@ fun RequestMembershipScreen(
                 .padding(paddingValues)
                 .padding(horizontal = 16.dp)
         ) {
-            successMessage?.let { msg ->
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 8.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = AppColors.Success.copy(alpha = 0.12f)
-                    ),
-                    shape = RoundedCornerShape(12.dp)
-                ) {
-                    Text(
-                        text = msg,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = AppColors.Success,
-                        modifier = Modifier.padding(12.dp)
-                    )
-                }
+            // Honest notice: there is no self-service "request membership" /
+            // join-tenant endpoint on the platform. Membership is granted by a
+            // tenant admin sending an invitation (see My Invitations). This screen
+            // is therefore a read-only directory of tenants — we never claim to
+            // have sent a request we cannot actually send.
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = AppColors.OnSurfaceVariant.copy(alpha = 0.08f)
+                ),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Text(
+                    text = "Self-service join requests aren't available yet. To join a " +
+                        "tenant, ask an administrator to send you an invitation — it " +
+                        "will appear under My Invitations.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = AppColors.OnSurfaceVariant,
+                    modifier = Modifier.padding(12.dp)
+                )
             }
 
             SearchTextField(
@@ -190,14 +192,7 @@ fun RequestMembershipScreen(
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     items(filteredTenants, key = { it.id }) { tenant ->
-                        TenantCard(
-                            tenant = tenant,
-                            isRequested = tenant.id in requestedTenantIds,
-                            onRequestMembership = {
-                                requestedTenantIds = requestedTenantIds + tenant.id
-                                successMessage = "Membership request sent to ${tenant.name}"
-                            }
-                        )
+                        TenantCard(tenant = tenant)
                     }
                 }
             }
@@ -207,9 +202,7 @@ fun RequestMembershipScreen(
 
 @Composable
 private fun TenantCard(
-    tenant: TenantInfo,
-    isRequested: Boolean,
-    onRequestMembership: () -> Unit
+    tenant: TenantInfo
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -265,17 +258,13 @@ private fun TenantCard(
                     )
                 }
 
-                if (isRequested) {
-                    OutlinedButton(
-                        onClick = {},
-                        enabled = false
-                    ) {
-                        Text("Requested")
-                    }
-                } else {
-                    Button(onClick = onRequestMembership) {
-                        Text("Request Membership")
-                    }
+                // No join-tenant endpoint exists, so this control is disabled with
+                // honest copy rather than faking a "request sent" success.
+                OutlinedButton(
+                    onClick = {},
+                    enabled = false
+                ) {
+                    Text("Invite only")
                 }
             }
         }
