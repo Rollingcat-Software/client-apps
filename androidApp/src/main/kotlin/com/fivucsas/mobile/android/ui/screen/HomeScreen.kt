@@ -35,6 +35,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.fivucsas.shared.i18n.StringKey
+import com.fivucsas.shared.i18n.s
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -51,7 +53,7 @@ fun HomeScreen(
                 title = {
                     Column {
                         Text(
-                            "Welcome Back",
+                            s(StringKey.HOME_WELCOME_BACK),
                             style = MaterialTheme.typography.titleMedium,
                             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
                         )
@@ -66,7 +68,7 @@ fun HomeScreen(
                     IconButton(onClick = onLogout) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.Logout,
-                            contentDescription = "Logout",
+                            contentDescription = s(StringKey.LOGOUT),
                             tint = MaterialTheme.colorScheme.onSurface
                         )
                     }
@@ -94,14 +96,14 @@ fun HomeScreen(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "FIVUCSAS",
+                    text = s(StringKey.APP_NAME),
                     style = MaterialTheme.typography.headlineLarge,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.primary
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = "Biometric Authentication System",
+                    text = s(StringKey.HOME_SYSTEM_SUBTITLE),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -119,7 +121,7 @@ fun HomeScreen(
                     modifier = Modifier.padding(20.dp)
                 ) {
                     Text(
-                        text = "User Information",
+                        text = s(StringKey.HOME_USER_INFORMATION),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.primary
@@ -131,7 +133,7 @@ fun HomeScreen(
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Text(
-                            "Name:",
+                            s(StringKey.HOME_NAME_LABEL),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -149,7 +151,7 @@ fun HomeScreen(
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Text(
-                            "User ID:",
+                            s(StringKey.HOME_USER_ID_LABEL),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -166,7 +168,7 @@ fun HomeScreen(
 
             // Biometric Actions Section
             Text(
-                text = "Biometric Actions",
+                text = s(StringKey.HOME_BIOMETRIC_ACTIONS),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.align(Alignment.Start)
@@ -185,7 +187,7 @@ fun HomeScreen(
                 )
                 Spacer(modifier = Modifier.padding(4.dp))
                 Text(
-                    "Enroll Face Biometric",
+                    s(StringKey.HOME_ENROLL_FACE_BIOMETRIC),
                     style = MaterialTheme.typography.titleMedium
                 )
             }
@@ -203,7 +205,7 @@ fun HomeScreen(
                 )
                 Spacer(modifier = Modifier.padding(4.dp))
                 Text(
-                    "Verify Face Biometric",
+                    s(StringKey.HOME_VERIFY_FACE_BIOMETRIC),
                     style = MaterialTheme.typography.titleMedium
                 )
             }
@@ -230,7 +232,7 @@ fun HomeScreen(
                     )
                     Spacer(modifier = Modifier.padding(8.dp))
                     Text(
-                        text = "Enroll your face to enable secure biometric authentication",
+                        text = s(StringKey.HOME_ENROLL_HELP),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSecondaryContainer
                     )

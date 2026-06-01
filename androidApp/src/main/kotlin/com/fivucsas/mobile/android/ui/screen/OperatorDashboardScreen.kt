@@ -38,6 +38,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.fivucsas.mobile.android.ui.navigation.BottomNavDestinations
 import com.fivucsas.shared.config.UIDimens
+import com.fivucsas.shared.i18n.StringKey
+import com.fivucsas.shared.i18n.s
 import com.fivucsas.shared.presentation.viewmodel.AdminViewModel
 import com.fivucsas.shared.ui.components.atoms.PrimaryButton
 import com.fivucsas.shared.ui.components.atoms.SecondaryButton
@@ -78,12 +80,12 @@ fun OperatorDashboardScreen(
                 title = {
                     Column {
                         Text(
-                            text = "FIVUCSAS",
+                            text = s(StringKey.APP_NAME),
                             style = MaterialTheme.typography.titleMedium,
                             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
                         )
                         Text(
-                            text = "Operator Station",
+                            text = s(StringKey.OPER_STATION_TITLE),
                             style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.Bold
                         )
@@ -93,13 +95,13 @@ fun OperatorDashboardScreen(
                     IconButton(onClick = onNavigateToNotifications) {
                         Icon(
                             imageVector = Icons.Default.Notifications,
-                            contentDescription = "Notifications"
+                            contentDescription = s(StringKey.NAV_NOTIFICATIONS)
                         )
                     }
                     IconButton(onClick = onNavigateToProfile) {
                         Icon(
                             imageVector = Icons.Default.Person,
-                            contentDescription = "Profile"
+                            contentDescription = s(StringKey.NAV_PROFILE)
                         )
                     }
                 },
@@ -144,13 +146,13 @@ fun OperatorDashboardScreen(
                 ) {
                     PrimaryButton(
                         onClick = onNavigateToVerify,
-                        text = "Verify Identity",
+                        text = s(StringKey.DASH_VERIFY_IDENTITY),
                         icon = Icons.Default.Security,
                         modifier = Modifier.fillMaxWidth()
                     )
                     SecondaryButton(
                         onClick = onNavigateToEnroll,
-                        text = "Enroll New User",
+                        text = s(StringKey.OPER_ENROLL_NEW_USER),
                         icon = Icons.Default.CameraAlt,
                         modifier = Modifier.fillMaxWidth()
                     )
@@ -158,7 +160,7 @@ fun OperatorDashboardScreen(
             }
 
             // [C] Today's Statistics - 3-column row
-            SectionHeader(title = "Today's Statistics")
+            SectionHeader(title = s(StringKey.OPER_TODAYS_STATISTICS))
 
             val stats = uiState.statistics
             val successful = stats.verificationsToday - stats.failedAttempts
@@ -168,21 +170,21 @@ fun OperatorDashboardScreen(
             ) {
                 StatCard(
                     value = stats.verificationsToday.toString(),
-                    label = "Total",
+                    label = s(StringKey.OPER_STAT_TOTAL),
                     modifier = Modifier.weight(1f),
                     icon = Icons.Default.Security,
                     iconTint = AppColors.Primary
                 )
                 StatCard(
                     value = successful.toString(),
-                    label = "Successful",
+                    label = s(StringKey.OPER_STAT_SUCCESSFUL),
                     modifier = Modifier.weight(1f),
                     icon = Icons.Default.CheckCircle,
                     iconTint = AppColors.Success
                 )
                 StatCard(
                     value = stats.failedAttempts.toString(),
-                    label = "Failed",
+                    label = s(StringKey.OPER_STAT_FAILED),
                     modifier = Modifier.weight(1f),
                     icon = Icons.Default.Error,
                     iconTint = AppColors.Error
@@ -203,7 +205,7 @@ fun OperatorDashboardScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "Success Rate",
+                        text = s(StringKey.ANALYTICS_SUCCESS_RATE),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Medium
                     )
@@ -219,10 +221,10 @@ fun OperatorDashboardScreen(
 
             // [E] Recent Activity + "View All" link
             SectionHeader(
-                title = "Recent Activity",
+                title = s(StringKey.ANALYTICS_RECENT_ACTIVITY),
                 actionContent = {
                     Text(
-                        text = "View All",
+                        text = s(StringKey.DASH_VIEW_ALL),
                         style = MaterialTheme.typography.labelLarge,
                         color = AppColors.Primary,
                         modifier = Modifier.clickable { onNavigateToHistory() }
@@ -231,7 +233,7 @@ fun OperatorDashboardScreen(
             )
             if (recentActivities.isEmpty()) {
                 Text(
-                    text = "No recent activity yet.",
+                    text = s(StringKey.DASH_NO_RECENT_ACTIVITY),
                     style = MaterialTheme.typography.bodyMedium,
                     color = AppColors.OnSurfaceVariant
                 )

@@ -51,6 +51,8 @@ import com.fivucsas.shared.domain.model.UserRole
 import com.fivucsas.shared.domain.model.hasPermission
 import com.fivucsas.shared.domain.model.User
 import com.fivucsas.shared.domain.model.UserStatus
+import com.fivucsas.shared.i18n.StringKey
+import com.fivucsas.shared.i18n.s
 import com.fivucsas.shared.presentation.viewmodel.AdminViewModel
 import com.fivucsas.shared.ui.components.atoms.SearchTextField
 import com.fivucsas.shared.ui.components.atoms.SectionHeader
@@ -94,12 +96,12 @@ fun AdminDashboardScreen(
                 title = {
                     Column {
                         Text(
-                            text = "FIVUCSAS Admin",
+                            text = s(StringKey.ADMIN_TITLE_BADGE),
                             style = MaterialTheme.typography.titleMedium,
                             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
                         )
                         Text(
-                            text = "Admin Dashboard",
+                            text = s(StringKey.ADMIN_DASHBOARD_TITLE),
                             style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.Bold
                         )
@@ -109,13 +111,13 @@ fun AdminDashboardScreen(
                     IconButton(onClick = onNavigateToNotifications) {
                         Icon(
                             imageVector = Icons.Default.Notifications,
-                            contentDescription = "Notifications"
+                            contentDescription = s(StringKey.NAV_NOTIFICATIONS)
                         )
                     }
                     IconButton(onClick = onNavigateToProfile) {
                         Icon(
                             imageVector = Icons.Default.Person,
-                            contentDescription = "Profile"
+                            contentDescription = s(StringKey.NAV_PROFILE)
                         )
                     }
                 },
@@ -150,7 +152,7 @@ fun AdminDashboardScreen(
             }
 
             // [B] System Overview - 2x2 StatCard grid
-            SectionHeader(title = "System Overview")
+            SectionHeader(title = s(StringKey.ADMIN_SYSTEM_OVERVIEW))
 
             val stats = uiState.statistics
             FlowRow(
@@ -160,14 +162,14 @@ fun AdminDashboardScreen(
             ) {
                 StatCard(
                     value = stats.totalUsers.toString(),
-                    label = "Total Users",
+                    label = s(StringKey.TOTAL_USERS),
                     modifier = Modifier.weight(1f),
                     icon = Icons.Default.People,
                     iconTint = AppColors.Primary
                 )
                 StatCard(
                     value = stats.activeUsers.toString(),
-                    label = "Active Users",
+                    label = s(StringKey.ACTIVE_USERS),
                     modifier = Modifier.weight(1f),
                     icon = Icons.Default.VerifiedUser,
                     iconTint = AppColors.Success
@@ -180,14 +182,14 @@ fun AdminDashboardScreen(
             ) {
                 StatCard(
                     value = stats.verificationsToday.toString(),
-                    label = "Verifications",
+                    label = s(StringKey.VERIFICATIONS),
                     modifier = Modifier.weight(1f),
                     icon = Icons.Default.Security,
                     iconTint = AppColors.Info
                 )
                 StatCard(
                     value = "${(stats.successRate * 100).toInt()}%",
-                    label = "Success Rate",
+                    label = s(StringKey.ANALYTICS_SUCCESS_RATE),
                     modifier = Modifier.weight(1f),
                     icon = Icons.Default.Analytics,
                     iconTint = if (stats.successRate >= 0.8) AppColors.Success else AppColors.Warning
@@ -195,35 +197,35 @@ fun AdminDashboardScreen(
             }
 
             // [C] Quick Actions
-            SectionHeader(title = "Quick Actions")
+            SectionHeader(title = s(StringKey.DASH_QUICK_ACTIONS))
             val adminQuickActions = buildList {
                 if (userRole.hasPermission(Permission.TENANT_USERS_READ)) {
-                    add(QuickActionItem("Manage Users", Icons.Default.Group, onNavigateToUsers))
+                    add(QuickActionItem(s(StringKey.ADMIN_MANAGE_USERS), Icons.Default.Group, onNavigateToUsers))
                 }
                 if (userRole.hasPermission(Permission.HISTORY_READ_TENANT)) {
-                    add(QuickActionItem("View Analytics", Icons.Default.Analytics, onNavigateToHistory))
+                    add(QuickActionItem(s(StringKey.ADMIN_VIEW_ANALYTICS), Icons.Default.Analytics, onNavigateToHistory))
                 }
-                add(QuickActionItem("Activity Log", Icons.Default.History, onNavigateToHistory))
+                add(QuickActionItem(s(StringKey.ADMIN_ACTIVITY_LOG), Icons.Default.History, onNavigateToHistory))
                 if (userRole.hasPermission(Permission.TENANT_SETTINGS_READ)) {
-                    add(QuickActionItem("Settings", Icons.Default.Settings, onNavigateToSettings))
+                    add(QuickActionItem(s(StringKey.NAV_SETTINGS), Icons.Default.Settings, onNavigateToSettings))
                 }
                 if (userRole.hasPermission(Permission.IDENTIFY_TENANT)) {
-                    add(QuickActionItem("Identify", Icons.Default.PersonSearch, onNavigateToIdentify))
+                    add(QuickActionItem(s(StringKey.ADMIN_IDENTIFY), Icons.Default.PersonSearch, onNavigateToIdentify))
                 }
                 if (userRole.hasPermission(Permission.TENANT_INVITE_CREATE)) {
-                    add(QuickActionItem("Invitations", Icons.Default.Mail, onNavigateToInvitations))
+                    add(QuickActionItem(s(StringKey.DASH_INVITATIONS), Icons.Default.Mail, onNavigateToInvitations))
                 }
-                add(QuickActionItem("Exam Entry", Icons.Default.Nfc, onNavigateToExamEntry))
+                add(QuickActionItem(s(StringKey.ADMIN_EXAM_ENTRY), Icons.Default.Nfc, onNavigateToExamEntry))
             }
             QuickActionGrid(actions = adminQuickActions)
 
             // [D] Users section with search (gated)
             if (userRole.hasPermission(Permission.TENANT_USERS_READ)) {
-            SectionHeader(title = "Users")
+            SectionHeader(title = s(StringKey.ADMIN_USERS_SECTION))
             SearchTextField(
                 value = uiState.searchQuery,
                 onValueChange = { viewModel.updateSearchQuery(it) },
-                placeholder = "Search users...",
+                placeholder = s(StringKey.SEARCH_USERS),
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -238,7 +240,7 @@ fun AdminDashboardScreen(
             // [F] "View all N users" link
             if (uiState.filteredUsers.size > 5) {
                 Text(
-                    text = "View all ${uiState.filteredUsers.size} users",
+                    text = s(StringKey.ADMIN_VIEW_ALL_USERS, uiState.filteredUsers.size),
                     style = MaterialTheme.typography.labelLarge,
                     color = AppColors.Primary,
                     modifier = Modifier
