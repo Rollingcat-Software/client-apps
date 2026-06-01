@@ -673,6 +673,15 @@ enum class StringKey {
     AUTH_QR_SCAN_SOON,
     AUTH_RENAME,
 
+    // Approve Login (number-matching approver — Android)
+    APPROVE_LOGIN_TITLE,
+    APPROVE_LOGIN_SUBTITLE,
+    APPROVE_LOGIN_MATCH_NUMBER,
+    APPROVE_LOGIN_ALLOW,
+    APPROVE_LOGIN_DENY,
+    APPROVE_LOGIN_EMPTY_TITLE,
+    APPROVE_LOGIN_EMPTY_BODY,
+
     // QR Login Scan (Android — v10)
     QR_LOGIN_SCAN_TITLE,
     QR_LOGIN_POINT_CAMERA,
@@ -1518,6 +1527,15 @@ private val enStrings = mapOf(
     StringKey.AUTH_QR_SCAN_SOON to "QR scanning coming soon — use manual entry for now.",
     StringKey.AUTH_RENAME to "Rename",
 
+    // Approve Login (number-matching approver — Android)
+    StringKey.APPROVE_LOGIN_TITLE to "Login requests",
+    StringKey.APPROVE_LOGIN_SUBTITLE to "Approve a sign-in on another device by matching the number shown there.",
+    StringKey.APPROVE_LOGIN_MATCH_NUMBER to "Match number",
+    StringKey.APPROVE_LOGIN_ALLOW to "Allow",
+    StringKey.APPROVE_LOGIN_DENY to "Deny",
+    StringKey.APPROVE_LOGIN_EMPTY_TITLE to "No login requests",
+    StringKey.APPROVE_LOGIN_EMPTY_BODY to "When you sign in on another device, the approval request will appear here.",
+
     // QR Login Scan (Android — v10)
     StringKey.QR_LOGIN_SCAN_TITLE to "Scan QR to Login",
     StringKey.QR_LOGIN_POINT_CAMERA to "Point your camera at the QR code on desktop",
@@ -2362,6 +2380,15 @@ private val trStrings = mapOf(
     StringKey.AUTH_INVALID_SECRET to "Geçersiz base32 gizli anahtarı",
     StringKey.AUTH_QR_SCAN_SOON to "QR tarama yakında — şimdilik elle girişi kullanın.",
     StringKey.AUTH_RENAME to "Yeniden adlandır",
+
+    // Approve Login (number-matching approver — Android)
+    StringKey.APPROVE_LOGIN_TITLE to "Giriş istekleri",
+    StringKey.APPROVE_LOGIN_SUBTITLE to "Başka bir cihazdaki girişi, orada görünen numarayı eşleştirerek onaylayın.",
+    StringKey.APPROVE_LOGIN_MATCH_NUMBER to "Eşleşme numarası",
+    StringKey.APPROVE_LOGIN_ALLOW to "İzin ver",
+    StringKey.APPROVE_LOGIN_DENY to "Reddet",
+    StringKey.APPROVE_LOGIN_EMPTY_TITLE to "Giriş isteği yok",
+    StringKey.APPROVE_LOGIN_EMPTY_BODY to "Başka bir cihazda giriş yaptığınızda, onay isteği burada görünecek.",
 
     // QR Login Scan (Android — v10)
     StringKey.QR_LOGIN_SCAN_TITLE to "Giriş için QR Kodu Tara",
