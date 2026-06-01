@@ -6,6 +6,13 @@ All notable changes to the FIVUCSAS client apps (Android, iOS, Desktop).
 
 ### Added
 
+- **Bundled Inter + Poppins fonts (web-app parity, PR #72).** `androidApp`'s
+  `AppTypography` now renders the real web typefaces instead of the system
+  sans-serif fallback: **Poppins** for headings (`display*`/`headline*`/
+  `titleLarge`), **Inter** for body/title/label. Fonts ship under
+  `androidApp/src/main/res/font/` (Inter variable + Poppins 4 static weights).
+  Matches `web-app/src/theme.ts`.
+
 - **NFC PACE: EF.CardAccess parse + vector-tested key derivation.** New
   `CardAccessParser` parses the chip's advertised `PACEInfo` entries (protocol
   OID + version + domain-parameter id; BouncyCastle ASN.1, no card needed). New
@@ -61,6 +68,16 @@ All notable changes to the FIVUCSAS client apps (Android, iOS, Desktop).
   guarantees we never emit separators.)
 
 ### Changed
+
+- **ViewModel CoroutineScope leak fixed (PR #73).** Shared ViewModels each
+  created their own `Dispatchers.Main` scope but, as Koin `factory` instances,
+  were never cancelled — every navigation leaked a scope and the polling VMs
+  (Approve-login / QR-login / Kiosk) leaked live `while (isActive)` loops. New
+  `BaseViewModel` (owns `viewModelScope` + `dispose()`) + a `disposeOnLeave()`
+  Compose helper that cancels on composition-leave. 30 ViewModels converted; 58
+  call sites wired across android/shared/desktop. The no-scope auth VMs
+  (Login/Register/Biometric/Fingerprint/Mfa) are unchanged. See
+  `CLAUDE.md` › "ViewModel lifecycle".
 
 - **Desktop installers track the release line.** `desktopApp` version 1.0.0 →
   5.2.3, so the produced `.deb` / `.msi` match the published app version
