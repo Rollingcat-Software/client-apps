@@ -85,6 +85,30 @@ leading zeros drop). The approver SCREEN is deferred (gated on Phase 0); the sta
 CLAUDE.md): Android uses Chrome Custom Tabs + AppAuth; Desktop uses an RFC 8252 loopback
 listener + OS token storage. Parity matrix: `docs/plans/CLIENT_APPS_PARITY.md`.
 
+## ViewModel lifecycle — scope disposal (PR #73, 2026-06-01)
+
+ViewModels are Koin `factory` instances (a fresh one per screen). They must NOT
+create their own `CoroutineScope` — that leaks on every navigation (polling VMs
+leak live `while (isActive)` loops). The convention:
+
+- **Extend `BaseViewModel`** (`shared/.../presentation/viewmodel/BaseViewModel.kt`):
+  it owns `protected val viewModelScope` (`SupervisorJob() + Dispatchers.Main`)
+  and `open fun dispose()`. Override `dispose()` for extra teardown (call
+  `super.dispose()` last — see `QrLoginViewModel.stopPolling()`).
+- **Wire every injection site** with `.disposeOnLeave()` (the `@Composable`
+  helper in `shared/.../ui/util/ComposeViewModelExt.kt`):
+  `val vm = koinInject<XxxViewModel>().disposeOnLeave()`. It cancels the scope
+  when the composable leaves composition. A missed site = a leak (no compile
+  error), so grep new injection sites.
+- **Exceptions:** the 5 no-scope auth VMs (Login/Register/Biometric/Fingerprint/
+  Mfa) hold no scope — leave them alone. The android-only `DataExportViewModel`
+  (injectable dispatcher → not a BaseViewModel) wires its own `dispose()` via a
+  `DisposableEffect` at its `remember` site.
+
+**Fonts (PR #72):** `androidApp/src/main/res/font/` ships Inter (variable) +
+Poppins (4 static weights). `Theme.kt`'s `AppTypography` uses Poppins for
+headings, Inter for body — matching `web-app/src/theme.ts`.
+
 ## Known open incident
 
 - **GitGuardian #29836028** — Android keystore password `fivucsas2026` leaked in public git
