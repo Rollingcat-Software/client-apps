@@ -35,7 +35,9 @@ class RootAdminApiImpl(
 
     @Serializable
     private data class PagedResponse<T>(
-        val content: List<T>,
+        // Defaulted so a non-2xx error envelope (which has no `content`) or a
+        // partial body can't crash deserialization on the Root Dashboard.
+        val content: List<T> = emptyList(),
         val page: Int = 0,
         val size: Int = 20,
         val totalPages: Int = 0
