@@ -26,6 +26,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -39,9 +40,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.fivucsas.shared.i18n.StringKey
 import com.fivucsas.shared.i18n.s
+import com.fivucsas.shared.platform.FingerprintAuthenticator
 import com.fivucsas.shared.presentation.state.FingerprintUiState
 import com.fivucsas.shared.presentation.viewmodel.auth.FingerprintViewModel
 import kotlinx.coroutines.launch
+import org.koin.compose.koinInject
 
 @Composable
 fun FingerprintGateScreen(
@@ -54,6 +57,20 @@ fun FingerprintGateScreen(
 ) {
     val state by viewModel.state.collectAsState()
     val scope = rememberCoroutineScope()
+
+    // If the device has no usable/enrolled biometric (or it's a debug build
+    // where WebAuthn can't pass), don't trap the user on a gate they cannot
+    // clear — the session is already authenticated and the step-up token is an
+    // optional convenience. Auto-skip straight to Home.
+    val authenticator: FingerprintAuthenticator = koinInject()
+    val biometricAvailable by produceState<Boolean?>(initialValue = null) {
+        value = runCatching { authenticator.isSupported() }.getOrDefault(false)
+    }
+    LaunchedEffect(biometricAvailable) {
+        if (biometricAvailable == false && state == FingerprintUiState.Idle) {
+            onSkip()
+        }
+    }
 
     LaunchedEffect(state) {
         when (state) {

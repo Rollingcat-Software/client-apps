@@ -96,6 +96,9 @@ val networkModule = module {
             isLenient = true
             ignoreUnknownKeys = true
             encodeDefaults = true
+            // Coerce an explicit null on a field that has a default to its
+            // default (e.g. `content: List = emptyList()`), instead of throwing.
+            coerceInputValues = true
         }
     }
 
