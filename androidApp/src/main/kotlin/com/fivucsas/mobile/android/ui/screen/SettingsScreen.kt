@@ -314,21 +314,10 @@ fun SettingsScreen(
             ) {
                 SettingsNavRow(text = s(StringKey.VOICE_RECOGNITION), onClick = onNavigateToVoiceAuth)
                 SettingsNavRow(text = s(StringKey.VOICE_SEARCH_TITLE), onClick = onNavigateToVoiceSearch)
-                SettingsNavRow(text = s(StringKey.EMAIL_OTP), onClick = onNavigateToEmailOtp)
-                SettingsNavRow(text = s(StringKey.SMS_OTP), onClick = onNavigateToSmsOtp)
                 SettingsNavRow(text = s(StringKey.TOTP), onClick = onNavigateToTotpEnroll)
                 SettingsNavRow(text = s(StringKey.AUTH_TITLE), onClick = onNavigateToAuthenticator)
                 SettingsNavRow(text = s(StringKey.LIVENESS_TITLE), onClick = onNavigateToLiveness)
                 SettingsNavRow(text = s(StringKey.CARD_DETECTION_TITLE), onClick = onNavigateToCardDetection)
-                SettingsNavRow(text = s(StringKey.HARDWARE_TOKEN_TITLE), onClick = onNavigateToHardwareToken)
-            }
-
-            // Analytics
-            ExpandableCard(
-                title = s(StringKey.ANALYTICS_TITLE),
-                subtitle = s(StringKey.ANALYTICS_SUBTITLE)
-            ) {
-                SettingsNavRow(text = s(StringKey.ANALYTICS_TITLE), onClick = onNavigateToAnalytics)
             }
 
             // Biometric Backup / Data Privacy (P3)
@@ -343,54 +332,6 @@ fun SettingsScreen(
                 )
                 Spacer(modifier = Modifier.size(4.dp))
                 SettingsNavRow(text = s(StringKey.BIOMETRIC_BACKUP_TITLE), onClick = onNavigateToBiometricBackup)
-            }
-
-            if (userRole.hasPermission(Permission.PLATFORM_SETTINGS_UPDATE)) {
-                ExpandableCard(
-                    title = s(StringKey.SETTINGS_SYSTEM_TITLE),
-                    subtitle = s(StringKey.SETTINGS_SYSTEM_SUB)
-                ) {
-                    Text(
-                        text = s(StringKey.SETTINGS_SESSION_POLICY),
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                    Text(
-                        text = s(StringKey.SETTINGS_SESSION_POLICY_DESC),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = AppColors.OnSurfaceVariant
-                    )
-                    Spacer(modifier = Modifier.height(10.dp))
-                    Text(
-                        text = s(StringKey.SETTINGS_PASSWORD_POLICY),
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                    Text(
-                        text = s(StringKey.SETTINGS_PASSWORD_POLICY_DESC),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = AppColors.OnSurfaceVariant
-                    )
-                    Spacer(modifier = Modifier.height(10.dp))
-                    // Platform defaults (e.g. default rate limit) are edited in the
-                    // dedicated System Settings screen, which loads the live values
-                    // before editing and persists via RootAdminRepository. Editing
-                    // them inline here previously risked overwriting real config with
-                    // defaults, so we link out instead of duplicating the editor.
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(48.dp)
-                            .clip(RoundedCornerShape(12.dp))
-                            .background(AppColors.PrimaryGradient)
-                            .clickable(onClick = onNavigateToSystemSettings),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = s(StringKey.SETTINGS_OPEN_SYSTEM_SETTINGS),
-                            color = Color.White,
-                            fontWeight = FontWeight.SemiBold
-                        )
-                    }
-                }
             }
 
             Spacer(modifier = Modifier.height(8.dp))
