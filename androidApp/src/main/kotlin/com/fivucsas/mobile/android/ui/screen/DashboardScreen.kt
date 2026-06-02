@@ -1,27 +1,33 @@
 package com.fivucsas.mobile.android.ui.screen
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CameraAlt
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Contactless
 import androidx.compose.material.icons.filled.CreditCard
+import androidx.compose.material.icons.filled.Groups
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.PersonAdd
 import androidx.compose.material.icons.filled.Security
-import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
+import androidx.compose.material.icons.automirrored.filled.TrendingUp
+import androidx.compose.material.icons.outlined.VerifiedUser
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -39,8 +45,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.fivucsas.mobile.android.ui.model.QuickAction
 import com.fivucsas.mobile.android.ui.navigation.Screen
 import com.fivucsas.shared.domain.model.Statistics
@@ -53,7 +63,6 @@ import com.fivucsas.shared.domain.model.UserRole
 import com.fivucsas.shared.domain.model.hasPermission
 import com.fivucsas.shared.i18n.StringKey
 import com.fivucsas.shared.i18n.s
-import com.fivucsas.shared.ui.components.atoms.SectionHeader
 import com.fivucsas.shared.ui.components.atoms.StatusBadgeType
 import com.fivucsas.shared.ui.components.molecules.ActivityItem
 import com.fivucsas.shared.ui.components.molecules.ActivityItemData
@@ -63,7 +72,6 @@ import com.fivucsas.shared.ui.components.organisms.QuickActionGrid
 import com.fivucsas.shared.ui.components.organisms.QuickActionItem
 import com.fivucsas.shared.ui.theme.AppColors
 import com.fivucsas.shared.ui.util.disposeOnLeave
-import androidx.compose.material.icons.filled.GroupAdd
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -247,110 +255,107 @@ fun DashboardScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .background(AppColors.Background)
                 .padding(paddingValues)
                 .padding(UIDimens.SpacingMedium)
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(UIDimens.SpacingMedium)
         ) {
+            // Greeting banner — gradient accent header mirroring the web dashboard hero.
+            DashboardGreetingBanner(userName = userName)
+
             if (canViewEnrollmentStatus) {
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(containerColor = AppColors.Surface),
-                    elevation = CardDefaults.cardElevation(defaultElevation = UIDimens.ElevationLow)
-                ) {
-                    Column(
-                        modifier = Modifier.padding(UIDimens.SpacingMedium)
+                if (stats != null) {
+                    DashboardSectionLabel(text = s(StringKey.DASH_ENROLLMENT_STATUS))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(UIDimens.SpacingSmall)
                     ) {
+                        DashboardStatTile(
+                            modifier = Modifier.weight(1f),
+                            icon = Icons.Default.Groups,
+                            value = "${stats.totalUsers}",
+                            caption = s(StringKey.TOTAL_USERS)
+                        )
+                        DashboardStatTile(
+                            modifier = Modifier.weight(1f),
+                            icon = Icons.Default.CheckCircle,
+                            value = "${stats.verificationsToday}",
+                            caption = s(StringKey.ANALYTICS_VERIFICATIONS_TODAY)
+                        )
+                        DashboardStatTile(
+                            modifier = Modifier.weight(1f),
+                            icon = Icons.AutoMirrored.Filled.TrendingUp,
+                            value = "${((stats.successRate) * 100).toInt()}%",
+                            caption = s(StringKey.ANALYTICS_SUCCESS_RATE)
+                        )
+                    }
+                } else {
+                    DashboardSurfaceCard {
                         Text(
                             text = s(StringKey.DASH_ENROLLMENT_STATUS),
                             style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.SemiBold
+                            fontWeight = FontWeight.SemiBold,
+                            color = AppColors.OnSurface
                         )
                         Spacer(modifier = Modifier.size(8.dp))
-                        if (stats != null) {
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween
-                            ) {
-                                Column {
-                                    Text(
-                                        text = "${stats.totalUsers}",
-                                        style = MaterialTheme.typography.titleLarge,
-                                        fontWeight = FontWeight.Bold,
-                                        color = AppColors.Primary
-                                    )
-                                    Text(
-                                        text = s(StringKey.TOTAL_USERS),
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = AppColors.OnSurfaceVariant
-                                    )
-                                }
-                                Column {
-                                    Text(
-                                        text = "${stats.verificationsToday}",
-                                        style = MaterialTheme.typography.titleLarge,
-                                        fontWeight = FontWeight.Bold,
-                                        color = AppColors.Primary
-                                    )
-                                    Text(
-                                        text = s(StringKey.ANALYTICS_VERIFICATIONS_TODAY),
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = AppColors.OnSurfaceVariant
-                                    )
-                                }
-                                Column {
-                                    Text(
-                                        text = "${((stats.successRate) * 100).toInt()}%",
-                                        style = MaterialTheme.typography.titleLarge,
-                                        fontWeight = FontWeight.Bold,
-                                        color = AppColors.Primary
-                                    )
-                                    Text(
-                                        text = s(StringKey.ANALYTICS_SUCCESS_RATE),
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = AppColors.OnSurfaceVariant
-                                    )
-                                }
-                            }
-                        } else {
-                            Text(
-                                text = s(StringKey.DASH_ENROLL_PROMPT),
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = AppColors.OnSurfaceVariant
-                            )
-                        }
+                        Text(
+                            text = s(StringKey.DASH_ENROLL_PROMPT),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = AppColors.OnSurfaceVariant
+                        )
                     }
                 }
             }
 
             if (userRole == UserRole.USER) {
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(containerColor = AppColors.Warning.copy(alpha = 0.12f))
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(AppColors.Warning.copy(alpha = 0.12f))
+                        .border(
+                            1.dp,
+                            AppColors.Warning.copy(alpha = 0.30f),
+                            RoundedCornerShape(16.dp)
+                        )
+                        .padding(UIDimens.SpacingMedium),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(UIDimens.SpacingSmall)
                 ) {
+                    Icon(
+                        imageVector = Icons.Default.PersonAdd,
+                        contentDescription = null,
+                        tint = AppColors.WarningDark,
+                        modifier = Modifier.size(20.dp)
+                    )
                     Text(
                         text = s(StringKey.DASH_NOT_TENANT_MEMBER),
                         style = MaterialTheme.typography.bodyMedium,
-                        color = AppColors.OnSurface,
-                        modifier = Modifier.padding(UIDimens.SpacingMedium)
+                        color = AppColors.OnSurface
                     )
                 }
             }
 
-            SectionHeader(title = s(StringKey.DASH_QUICK_ACTIONS))
+            DashboardSectionLabel(text = s(StringKey.DASH_QUICK_ACTIONS))
             QuickActionGrid(actions = quickActions)
 
             if (canViewRecentActivity) {
-                SectionHeader(
-                    title = s(StringKey.ANALYTICS_RECENT_ACTIVITY),
-                    actionContent = {
-                        Text(
-                            text = s(StringKey.DASH_VIEW_ALL),
-                            style = MaterialTheme.typography.labelLarge,
-                            color = AppColors.Primary
-                        )
-                    }
-                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    DashboardSectionLabel(
+                        text = s(StringKey.ANALYTICS_RECENT_ACTIVITY),
+                        modifier = Modifier.weight(1f)
+                    )
+                    Text(
+                        text = s(StringKey.DASH_VIEW_ALL),
+                        style = MaterialTheme.typography.labelLarge,
+                        fontWeight = FontWeight.SemiBold,
+                        color = AppColors.Primary
+                    )
+                }
                 if (activityItems.isEmpty()) {
                     Text(
                         text = s(StringKey.DASH_NO_RECENT_ACTIVITY),
@@ -365,6 +370,136 @@ fun DashboardScreen(
                     }
                 }
             }
+
+            Spacer(modifier = Modifier.size(UIDimens.SpacingSmall))
         }
+    }
+}
+
+/**
+ * Small bold uppercase-ish section label in the muted variant colour — the web
+ * dashboard's group headers.
+ */
+@Composable
+private fun DashboardSectionLabel(
+    text: String,
+    modifier: Modifier = Modifier
+) {
+    Text(
+        text = text,
+        style = MaterialTheme.typography.labelMedium,
+        fontWeight = FontWeight.Bold,
+        letterSpacing = 0.6.sp,
+        color = AppColors.OnSurfaceVariant,
+        modifier = modifier
+    )
+}
+
+/** Bordered Surface card matching the hosted-login card language. */
+@Composable
+private fun DashboardSurfaceCard(
+    modifier: Modifier = Modifier,
+    content: @Composable androidx.compose.foundation.layout.ColumnScope.() -> Unit
+) {
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(16.dp))
+            .background(AppColors.Surface)
+            .border(1.dp, AppColors.OnSurfaceVariant.copy(alpha = 0.15f), RoundedCornerShape(16.dp))
+            .padding(20.dp),
+        content = content
+    )
+}
+
+/**
+ * Gradient-accented greeting hero — indigo→purple band with a waving-hand mark,
+ * mirroring the app.fivucsas dashboard header.
+ */
+@Composable
+private fun DashboardGreetingBanner(userName: String) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(20.dp))
+            .background(AppColors.PrimaryGradient)
+            .padding(horizontal = 20.dp, vertical = 22.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(UIDimens.SpacingMedium)
+    ) {
+        Box(
+            modifier = Modifier
+                .size(48.dp)
+                .clip(RoundedCornerShape(14.dp))
+                .background(Color.White.copy(alpha = 0.18f)),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                imageVector = Icons.Outlined.VerifiedUser,
+                contentDescription = null,
+                tint = Color.White,
+                modifier = Modifier.size(26.dp)
+            )
+        }
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = s(StringKey.DASH_GREETING, userName),
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold,
+                color = Color.White
+            )
+            Text(
+                text = s(StringKey.APP_NAME),
+                style = MaterialTheme.typography.bodyMedium,
+                color = Color.White.copy(alpha = 0.85f)
+            )
+        }
+    }
+}
+
+/**
+ * Gradient stat tile — colored icon chip, big bold value, caption. Matches the
+ * web's indigo→purple stat cards.
+ */
+@Composable
+private fun DashboardStatTile(
+    icon: ImageVector,
+    value: String,
+    caption: String,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier
+            .clip(RoundedCornerShape(16.dp))
+            .background(AppColors.PrimaryGradient)
+            .padding(horizontal = 14.dp, vertical = 16.dp)
+    ) {
+        Box(
+            modifier = Modifier
+                .size(34.dp)
+                .clip(RoundedCornerShape(10.dp))
+                .background(Color.White.copy(alpha = 0.20f)),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = Color.White,
+                modifier = Modifier.size(20.dp)
+            )
+        }
+        Spacer(modifier = Modifier.height(10.dp))
+        Text(
+            text = value,
+            style = MaterialTheme.typography.headlineSmall,
+            fontWeight = FontWeight.Bold,
+            color = Color.White
+        )
+        Spacer(modifier = Modifier.height(2.dp))
+        Text(
+            text = caption,
+            style = MaterialTheme.typography.bodySmall,
+            color = Color.White.copy(alpha = 0.85f)
+        )
     }
 }
