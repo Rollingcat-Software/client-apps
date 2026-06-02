@@ -86,8 +86,9 @@ fun HostedLoginScreen(
                 tokenManager.saveTokens(
                     AuthTokens(
                         accessToken = hosted.accessToken,
-                        refreshToken = "",
+                        refreshToken = hosted.refreshToken ?: "",
                         expiresIn = hosted.expiresIn,
+                        oauthSession = true,
                     ),
                 )
                 val user = runCatching { identityApi.getMyProfile() }.getOrNull()
@@ -97,13 +98,14 @@ fun HostedLoginScreen(
                 tokenManager.saveTokens(
                     AuthTokens(
                         accessToken = hosted.accessToken,
-                        refreshToken = "",
+                        refreshToken = hosted.refreshToken ?: "",
                         expiresIn = hosted.expiresIn,
                         role = role,
                         userName = fullName,
                         userEmail = user?.email ?: "",
                         userId = user?.id ?: "",
                         tenantId = user?.tenantId ?: "",
+                        oauthSession = true,
                     ),
                 )
                 loading = false

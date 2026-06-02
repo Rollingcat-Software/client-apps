@@ -22,28 +22,38 @@ class InviteApiImpl(
 ) : InviteApi {
 
     companion object {
-        private const val BASE_PATH = "invites"
-        private const val RECEIVED_PATH = "$BASE_PATH/received"
+        // Backend invite/guest endpoints live under /api/v1/guests (UserController,
+        // merged from GuestController) — there is NO /api/v1/invites controller.
+        private const val BASE_PATH = "guests"
+        // NOTE: member-side "received invites" endpoints (RECEIVED_PATH) have NO
+        // backend equivalent. The only inbound flow the API exposes is the
+        // token-based POST /api/v1/guests/accept (public, no listing / decline).
+        // These paths are left as-is pending a backend listing endpoint.
+        private const val RECEIVED_PATH = "invites/received"
     }
 
     // ── Admin operations ────────────────────────────────────────────────────
 
     override suspend fun getInvites(): List<InviteDto> {
+        // GET /api/v1/guests — list guest invitations for the current tenant.
         return client.get(BASE_PATH).body()
     }
 
     override suspend fun createInvite(request: CreateInviteRequestDto): InviteDto {
-        return client.post(BASE_PATH) {
+        // POST /api/v1/guests/invite — create + send a guest invitation.
+        return client.post("$BASE_PATH/invite") {
             contentType(ContentType.Application.Json)
             setBody(request)
         }.body()
     }
 
     override suspend fun revokeInvite(inviteId: String): InviteDto {
-        return client.put("$BASE_PATH/$inviteId/revoke").body()
+        // POST /api/v1/guests/invitations/{id}/revoke — revoke a PENDING invitation.
+        return client.post("$BASE_PATH/invitations/$inviteId/revoke").body()
     }
 
     override suspend fun resendInvite(inviteId: String): InviteDto {
+        // POST /api/v1/guests/{id}/resend — resend a pending invitation email.
         return client.post("$BASE_PATH/$inviteId/resend").body()
     }
 

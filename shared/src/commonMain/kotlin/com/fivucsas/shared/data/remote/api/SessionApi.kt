@@ -6,8 +6,8 @@ import com.fivucsas.shared.data.remote.dto.AuthSessionDto
  * Session API interface
  *
  * Endpoints:
- * - GET    /sessions     → getSessions()
- * - DELETE /sessions/{id} → revokeSession()
+ * - GET    /auth/sessions/my      → getSessions()
+ * - DELETE /auth/sessions/my/{id} → revokeSession()
  */
 interface SessionApi {
     suspend fun getSessions(): List<AuthSessionDto>

@@ -109,6 +109,18 @@ class AndroidTokenStorage(context: Context) : TokenStorage {
         sharedPreferences.edit().remove(KEY_TENANT_ID).apply()
     }
 
+    override fun saveOAuthSession(oauth: Boolean) {
+        sharedPreferences.edit().putBoolean(KEY_OAUTH_SESSION, oauth).apply()
+    }
+
+    override fun getOAuthSession(): Boolean {
+        return sharedPreferences.getBoolean(KEY_OAUTH_SESSION, false)
+    }
+
+    override fun clearOAuthSession() {
+        sharedPreferences.edit().remove(KEY_OAUTH_SESSION).apply()
+    }
+
     companion object {
         private const val KEY_TOKEN = "auth_token"
         private const val KEY_REFRESH_TOKEN = "refresh_token"
@@ -117,5 +129,6 @@ class AndroidTokenStorage(context: Context) : TokenStorage {
         private const val KEY_USER_EMAIL = "user_email"
         private const val KEY_USER_ID = "user_id"
         private const val KEY_TENANT_ID = "tenant_id"
+        private const val KEY_OAUTH_SESSION = "oauth_session"
     }
 }

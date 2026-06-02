@@ -26,6 +26,7 @@ class TokenManager(
         cachedTokens = tokens
         tokenStorage.saveToken(tokens.accessToken)
         tokenStorage.saveRefreshToken(tokens.refreshToken)
+        tokenStorage.saveOAuthSession(tokens.oauthSession)
         tokenStorage.saveRole(tokens.role)
         cachedRole = tokens.role
         if (tokens.userName.isNotBlank()) {
@@ -58,6 +59,15 @@ class TokenManager(
      */
     fun getRefreshToken(): String? {
         return cachedTokens?.refreshToken ?: tokenStorage.getRefreshToken()
+    }
+
+    /**
+     * True when the stored session originated from the hosted-first OAuth login,
+     * so silent refresh must use `grant_type=refresh_token` against
+     * `/oauth2/token` rather than the legacy `/auth/refresh`.
+     */
+    fun isOAuthSession(): Boolean {
+        return cachedTokens?.oauthSession ?: tokenStorage.getOAuthSession()
     }
 
     /**
@@ -114,6 +124,7 @@ class TokenManager(
         cachedTenantId = null
         tokenStorage.clearToken()
         tokenStorage.clearRefreshToken()
+        tokenStorage.clearOAuthSession()
         tokenStorage.clearRole()
         tokenStorage.clearUserName()
         tokenStorage.clearUserEmail()

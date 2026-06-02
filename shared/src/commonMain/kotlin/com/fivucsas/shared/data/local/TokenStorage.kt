@@ -22,4 +22,15 @@ interface TokenStorage {
     fun saveTenantId(tenantId: String) {}
     fun getTenantId(): String? = null
     fun clearTenantId() {}
+
+    /**
+     * Marks whether the stored refresh token is an OAuth (hosted-login) token.
+     * When true, silent refresh must use the OAuth `grant_type=refresh_token`
+     * flow against `/oauth2/token` instead of the legacy `/auth/refresh`.
+     * Default no-ops keep non-persisting platforms working (the flag then lives
+     * only in the in-memory [TokenManager] cache for the session).
+     */
+    fun saveOAuthSession(oauth: Boolean) {}
+    fun getOAuthSession(): Boolean = false
+    fun clearOAuthSession() {}
 }

@@ -27,7 +27,7 @@ class DeviceApiImpl(
     }
 
     override suspend fun getWebAuthnCredentials(userId: String): List<WebAuthnCredentialDto> {
-        return client.get("devices/webauthn/credentials/$userId").body()
+        return client.get("webauthn/credentials/$userId").body()
     }
 
     override suspend fun registerPushToken(userId: String, token: String, platform: String) {
