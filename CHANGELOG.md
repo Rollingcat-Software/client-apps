@@ -4,14 +4,31 @@ All notable changes to the FIVUCSAS client apps (Android, iOS, Desktop).
 
 ## [Unreleased]
 
-## [5.3.0] - 2026-06-01
+## [5.3.0] - 2026-06-02
 
-> First release since 5.2.3. Bundles the full post-5.2.3 work: critical auth/data
-> fixes (#56–#67), wave-3 i18n + a11y (EN+TR) + NavigationPolicy fail-closed
-> (#69–#71), web-parity fonts (#72), and the ViewModel scope-leak refactor (#73).
-> versionCode 12 / versionName 5.3.0.
+> First release since 5.2.3 (production-signed APK). Bundles the full post-5.2.3
+> work: **hosted-first login** (AppAuth + Chrome Custom Tabs, #76), full **NFC
+> e-document** support incl. MRZ camera scan (#50/#51/#79/#80), the slim-down to a
+> **focused authenticator** (redundant server-biometric screens + dead
+> web-dashboard routes removed, #79/#80), critical auth/data fixes (#56–#67),
+> wave-3 i18n + a11y (EN+TR) + NavigationPolicy fail-closed (#69–#71), web-parity
+> fonts (#72), the ViewModel scope-leak refactor (#73), and stale-endpoint +
+> OAuth-refresh wiring (#78). versionCode 12 / versionName 5.3.0.
 
 ### Added
+
+- **Hosted-first login (AppAuth + Chrome Custom Tabs, PR #76).** The credential +
+  MFA ceremony now runs on `verify.fivucsas.com` in a Custom Tab; the app is a
+  thin OAuth 2.0 / OIDC client that exchanges the returned code and routes by the
+  role from `/auth/me`. The shell is restyled to match the web app (brand mark,
+  "Secured by FIVUCSAS" pill, gradient action, `verify.fivucsas.com` footer).
+
+- **NFC MRZ scan via the camera (PR #80).** `NfcReadScreen` now offers "Scan MRZ
+  with camera" — ML Kit OCR (ICAO 9303 TD1/TD3) reads the passport/ID
+  machine-readable zone and auto-fills the document-number / DOB / expiry fields,
+  enabling the chip read without hand-typing the MRZ (manual entry kept as a
+  fallback). Re-wires the existing camera scanner that had been stranded on a
+  screen orphaned by the hosted-login switch.
 
 - **Bundled Inter + Poppins fonts (web-app parity, PR #72).** `androidApp`'s
   `AppTypography` now renders the real web typefaces instead of the system
@@ -104,6 +121,33 @@ All notable changes to the FIVUCSAS client apps (Android, iOS, Desktop).
   primary *third-party* integration mode. `docs/TODO.md` records the enroll
   wiring as done and the passive-auth / CSCA / PACE work as deferred
   (operator-blocked: needs CSCA roots + test cards).
+- **Stale REST endpoint paths + OAuth refresh-token wiring (PR #78).** Corrected
+  out-of-date API paths and wired the OAuth refresh-token flow for the
+  hosted-login session.
+- **QR scan screens made responsive (PR #80).** `QrLoginScanScreen` +
+  `OtpQrScannerScreen` now scroll, apply keyboard (`imePadding`) + system-nav-bar
+  insets, and use a width-scaled square camera box/reticle instead of a fixed
+  420/400dp height — the Submit/Cancel controls stay reachable on short screens
+  and in landscape, and the keyboard no longer hides the payload field.
+- **Server-side logout (PR #80).** Settings logout now calls
+  `AuthRepository.logout()` (`POST /auth/logout` + step-up-token clear) instead
+  of only clearing the local access token, so the session/refresh token is
+  revoked server-side.
+- **Localized the hosted-login screen + bottom navigation, EN + TR (PR #80).**
+  The hosted-login screen (the first screen every user sees) was English-only;
+  its labels + error messages are now localized, and the bottom-nav
+  Home/Invites/QR/History labels are localized.
+
+### Removed
+
+- **Slimmed the Android app to a focused authenticator (PR #79 + #80).** Removed
+  server-pipeline biometric screens (face/voice enroll + verify, liveness, TOTP
+  enroll, card detection, biometric backup) and dead web-dashboard routes
+  (auth-flows, sessions, devices, enrollments, invite-management) plus an
+  unreachable fingerprint step-up flow and orphan screens — those surfaces live
+  on the web dashboard / hosted page. The mobile app is now login + TOTP
+  authenticator + approve-login + QR login + NFC/card capture + personal
+  self-service. Shared screens/ViewModels remain for desktopApp.
 
 ## [5.2.3] — 2026-05-30 — MFA completion false-failure fix (P0)
 
