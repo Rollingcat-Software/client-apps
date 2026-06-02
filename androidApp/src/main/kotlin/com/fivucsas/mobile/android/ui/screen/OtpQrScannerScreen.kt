@@ -10,12 +10,17 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.CameraAlt
@@ -68,12 +73,13 @@ import kotlinx.coroutines.launch
  * OtpQrScannerScreen
  *
  * Camera-based scanner dedicated to the standalone TOTP Authenticator.
- * Unlike [QrScannerScreen] (which accepts any QR payload for the MFA web-login
- * flow), this screen enforces an `otpauth://` scheme denylist + full structural
- * validation via [OtpQrScanFilter]. Website URLs, Wi-Fi payloads, vCards, etc.
- * are rejected with a user-visible error so they never land in the TOTP vault.
+ * Unlike the generic QR-login scanner (which accepts any QR payload for the MFA
+ * web-login flow), this screen enforces an `otpauth://` scheme denylist + full
+ * structural validation via [OtpQrScanFilter]. Website URLs, Wi-Fi payloads,
+ * vCards, etc. are rejected with a user-visible error so they never land in the
+ * TOTP vault.
  *
- * Pattern mirrors [QrScannerScreen]: CameraX preview via [AndroidCameraService],
+ * Pattern: CameraX preview via [AndroidCameraService],
  * ML Kit [BarcodeScanning] analyzer, Accompanist permission state, viewfinder
  * overlay, and the same initializing/permission-denied UI states.
  *
@@ -193,6 +199,9 @@ fun OtpQrScannerScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
+                .verticalScroll(rememberScrollState())
+                .navigationBarsPadding()
+                .imePadding()
                 .padding(horizontal = 24.dp, vertical = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Top
@@ -210,7 +219,7 @@ fun OtpQrScannerScreen(
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(400.dp)
+                        .aspectRatio(1f)
                         .background(Color.Black, RoundedCornerShape(16.dp))
                 ) {
                     AndroidCameraPreview(
@@ -241,7 +250,8 @@ fun OtpQrScannerScreen(
                     Box(
                         modifier = Modifier
                             .align(Alignment.Center)
-                            .size(220.dp)
+                            .fillMaxWidth(0.6f)
+                            .aspectRatio(1f)
                             .border(
                                 width = 3.dp,
                                 color = MaterialTheme.colorScheme.primary,
@@ -310,7 +320,7 @@ fun OtpQrScannerScreen(
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(400.dp)
+                        .aspectRatio(1f)
                         .background(Color.Black, RoundedCornerShape(16.dp))
                         .padding(24.dp),
                     contentAlignment = Alignment.Center
