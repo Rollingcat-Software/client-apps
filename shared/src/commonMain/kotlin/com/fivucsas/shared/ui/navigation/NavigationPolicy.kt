@@ -10,19 +10,18 @@ import com.fivucsas.shared.domain.model.hasPermission
  */
 object NavigationPolicy {
     fun loginSuccessRoute(role: UserRole?): String {
-        return when (role) {
-            UserRole.ROOT -> RouteIds.ROOT_CONSOLE
-            UserRole.TENANT_ADMIN -> RouteIds.ADMIN_DASHBOARD
-            else -> RouteIds.DASHBOARD
-        }
+        // Hosted-first / thin-companion architecture (2026-06-02 lock): the mobile
+        // app no longer ships admin/root management surfaces — those live only on
+        // the web dashboard (app.fivucsas.com). Every role lands on the personal
+        // DASHBOARD; admins use the web for management tools.
+        return RouteIds.DASHBOARD
     }
 
     fun postQrApprovalRoute(role: UserRole): String {
-        return when {
-            role == UserRole.ROOT -> RouteIds.ROOT_CONSOLE
-            canAccess(role, Permission.TENANT_USERS_READ) -> RouteIds.ADMIN_DASHBOARD
-            else -> RouteIds.DASHBOARD
-        }
+        // Same thin-companion rule as loginSuccessRoute: no admin/root home on
+        // mobile, so every role returns to the personal DASHBOARD after approving
+        // a cross-device QR login.
+        return RouteIds.DASHBOARD
     }
 
     fun canAccessRoute(role: UserRole, routeId: String): Boolean {

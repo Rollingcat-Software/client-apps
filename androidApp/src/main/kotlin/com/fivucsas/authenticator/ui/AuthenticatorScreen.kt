@@ -101,7 +101,7 @@ fun AuthenticatorScreen(
     val scope = rememberCoroutineScope()
 
     // Full-screen overlay: while the scanner is active, replace the
-    // authenticator list entirely (same pattern as MfaFlowScreen → QrScannerScreen).
+    // authenticator list entirely (same overlay pattern used by the QR scanner).
     if (showQrScanner) {
         OtpQrScannerScreen(
             onAccepted = { uri ->

@@ -1,8 +1,10 @@
 package com.fivucsas.mobile.android.ui.screen
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -11,11 +13,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Language
-import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Security
 import androidx.compose.material.icons.filled.Settings
@@ -34,7 +37,6 @@ import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
-import androidx.compose.material3.Button
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.collectAsState
@@ -45,7 +47,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.layout.height
 import com.fivucsas.mobile.android.data.preferences.ThemePreferences
 import com.fivucsas.shared.config.UIDimens
@@ -115,11 +121,14 @@ fun SettingsScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .background(AppColors.Background)
                 .padding(paddingValues)
                 .padding(UIDimens.SpacingMedium)
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(UIDimens.SpacingMedium)
         ) {
+            SettingsSectionLabel(text = s(StringKey.SETTINGS_TITLE))
+
             // Language Selection
             ExpandableCard(
                 title = s(StringKey.LANGUAGE),
@@ -260,15 +269,10 @@ fun SettingsScreen(
                     )
                 }
 
-                Spacer(modifier = Modifier.size(12.dp))
-                Text(
+                Spacer(modifier = Modifier.size(8.dp))
+                SettingsNavRow(
                     text = s(StringKey.CHANGE_PASSWORD),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = AppColors.Primary,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 4.dp)
-                        .clickable { onNavigateToChangePassword() }
+                    onClick = onNavigateToChangePassword
                 )
             }
 
@@ -296,129 +300,24 @@ fun SettingsScreen(
                         onCheckedChange = { analyticsEnabled.value = it }
                     )
                 }
-                Spacer(modifier = Modifier.size(12.dp))
-                Text(
-                    text = s(StringKey.NAV_HELP),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = AppColors.Primary,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 4.dp)
-                        .clickable { onNavigateToHelp() }
-                )
-                Text(
-                    text = s(StringKey.NAV_ABOUT),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = AppColors.Primary,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 4.dp)
-                        .clickable { onNavigateToAbout() }
-                )
+                Spacer(modifier = Modifier.size(4.dp))
+                SettingsNavRow(text = s(StringKey.NAV_HELP), onClick = onNavigateToHelp)
+                SettingsNavRow(text = s(StringKey.NAV_ABOUT), onClick = onNavigateToAbout)
             }
+
+            SettingsSectionLabel(text = s(StringKey.BIOMETRIC_AUTH))
 
             // Authentication Methods
             ExpandableCard(
                 title = s(StringKey.BIOMETRIC_AUTH),
                 subtitle = s(StringKey.SETTINGS_AUTH_METHODS_SUB)
             ) {
-                Text(
-                    text = s(StringKey.VOICE_RECOGNITION),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = AppColors.Primary,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 6.dp)
-                        .clickable { onNavigateToVoiceAuth() }
-                )
-                Text(
-                    text = s(StringKey.VOICE_SEARCH_TITLE),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = AppColors.Primary,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 6.dp)
-                        .clickable { onNavigateToVoiceSearch() }
-                )
-                Text(
-                    text = s(StringKey.EMAIL_OTP),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = AppColors.Primary,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 6.dp)
-                        .clickable { onNavigateToEmailOtp() }
-                )
-                Text(
-                    text = s(StringKey.SMS_OTP),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = AppColors.Primary,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 6.dp)
-                        .clickable { onNavigateToSmsOtp() }
-                )
-                Text(
-                    text = s(StringKey.TOTP),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = AppColors.Primary,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 6.dp)
-                        .clickable { onNavigateToTotpEnroll() }
-                )
-                Text(
-                    text = s(StringKey.AUTH_TITLE),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = AppColors.Primary,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 6.dp)
-                        .clickable { onNavigateToAuthenticator() }
-                )
-                Text(
-                    text = s(StringKey.LIVENESS_TITLE),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = AppColors.Primary,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 6.dp)
-                        .clickable { onNavigateToLiveness() }
-                )
-                Text(
-                    text = s(StringKey.CARD_DETECTION_TITLE),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = AppColors.Primary,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 6.dp)
-                        .clickable { onNavigateToCardDetection() }
-                )
-                Text(
-                    text = s(StringKey.HARDWARE_TOKEN_TITLE),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = AppColors.Primary,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 6.dp)
-                        .clickable { onNavigateToHardwareToken() }
-                )
-            }
-
-            // Analytics
-            ExpandableCard(
-                title = s(StringKey.ANALYTICS_TITLE),
-                subtitle = s(StringKey.ANALYTICS_SUBTITLE)
-            ) {
-                Text(
-                    text = s(StringKey.ANALYTICS_TITLE),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = AppColors.Primary,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 6.dp)
-                        .clickable { onNavigateToAnalytics() }
-                )
+                SettingsNavRow(text = s(StringKey.VOICE_RECOGNITION), onClick = onNavigateToVoiceAuth)
+                SettingsNavRow(text = s(StringKey.VOICE_SEARCH_TITLE), onClick = onNavigateToVoiceSearch)
+                SettingsNavRow(text = s(StringKey.TOTP), onClick = onNavigateToTotpEnroll)
+                SettingsNavRow(text = s(StringKey.AUTH_TITLE), onClick = onNavigateToAuthenticator)
+                SettingsNavRow(text = s(StringKey.LIVENESS_TITLE), onClick = onNavigateToLiveness)
+                SettingsNavRow(text = s(StringKey.CARD_DETECTION_TITLE), onClick = onNavigateToCardDetection)
             }
 
             // Biometric Backup / Data Privacy (P3)
@@ -431,64 +330,18 @@ fun SettingsScreen(
                     style = MaterialTheme.typography.bodySmall,
                     color = AppColors.OnSurfaceVariant
                 )
-                Spacer(modifier = Modifier.size(8.dp))
-                Text(
-                    text = s(StringKey.BIOMETRIC_BACKUP_TITLE),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = AppColors.Primary,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 6.dp)
-                        .clickable { onNavigateToBiometricBackup() }
-                )
+                Spacer(modifier = Modifier.size(4.dp))
+                SettingsNavRow(text = s(StringKey.BIOMETRIC_BACKUP_TITLE), onClick = onNavigateToBiometricBackup)
             }
 
-            if (userRole.hasPermission(Permission.PLATFORM_SETTINGS_UPDATE)) {
-                ExpandableCard(
-                    title = s(StringKey.SETTINGS_SYSTEM_TITLE),
-                    subtitle = s(StringKey.SETTINGS_SYSTEM_SUB)
-                ) {
-                    Text(
-                        text = s(StringKey.SETTINGS_SESSION_POLICY),
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                    Text(
-                        text = s(StringKey.SETTINGS_SESSION_POLICY_DESC),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = AppColors.OnSurfaceVariant
-                    )
-                    Spacer(modifier = Modifier.height(10.dp))
-                    Text(
-                        text = s(StringKey.SETTINGS_PASSWORD_POLICY),
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                    Text(
-                        text = s(StringKey.SETTINGS_PASSWORD_POLICY_DESC),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = AppColors.OnSurfaceVariant
-                    )
-                    Spacer(modifier = Modifier.height(10.dp))
-                    // Platform defaults (e.g. default rate limit) are edited in the
-                    // dedicated System Settings screen, which loads the live values
-                    // before editing and persists via RootAdminRepository. Editing
-                    // them inline here previously risked overwriting real config with
-                    // defaults, so we link out instead of duplicating the editor.
-                    Button(
-                        onClick = onNavigateToSystemSettings,
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text(s(StringKey.SETTINGS_OPEN_SYSTEM_SETTINGS))
-                    }
-                }
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             OutlinedButton(
                 onClick = onLogout,
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth().height(52.dp),
+                shape = RoundedCornerShape(12.dp),
                 colors = ButtonDefaults.outlinedButtonColors(
-                    contentColor = MaterialTheme.colorScheme.error
+                    contentColor = AppColors.Error
                 )
             ) {
                 Icon(
@@ -497,8 +350,59 @@ fun SettingsScreen(
                     modifier = Modifier.size(20.dp)
                 )
                 Spacer(modifier = Modifier.size(8.dp))
-                Text(s(StringKey.LOGOUT))
+                Text(s(StringKey.LOGOUT), fontWeight = FontWeight.Medium)
             }
+
+            Spacer(modifier = Modifier.height(UIDimens.SpacingSmall))
         }
+    }
+}
+
+/** Small bold muted section label — matches the web settings group headers. */
+@Composable
+private fun SettingsSectionLabel(
+    text: String,
+    modifier: Modifier = Modifier
+) {
+    Text(
+        text = text,
+        style = MaterialTheme.typography.labelMedium,
+        fontWeight = FontWeight.Bold,
+        letterSpacing = 0.6.sp,
+        color = AppColors.OnSurfaceVariant,
+        modifier = modifier
+    )
+}
+
+/**
+ * Consistent navigation row inside a settings card: an indigo label and a
+ * trailing chevron, full-width tappable. Replaces the bare clickable links so
+ * every in-card action reads the same.
+ */
+@Composable
+private fun SettingsNavRow(
+    text: String,
+    onClick: () -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick)
+            .padding(vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = text,
+            style = MaterialTheme.typography.bodyMedium,
+            fontWeight = FontWeight.Medium,
+            color = AppColors.Primary,
+            modifier = Modifier.weight(1f)
+        )
+        Icon(
+            imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+            contentDescription = null,
+            tint = AppColors.OnSurfaceVariant,
+            modifier = Modifier.size(18.dp)
+        )
     }
 }
