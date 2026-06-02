@@ -1,7 +1,6 @@
 package com.fivucsas.mobile.android.ui.navigation
 
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Business
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Notifications
@@ -41,31 +40,6 @@ object BottomNavDestinations {
     val items: List<BottomNavItem>
         get() = listOf(
             BottomNavItem("Home", Icons.Default.Home, RouteIds.DASHBOARD),
-            BottomNavItem("History", Icons.Default.History, RouteIds.ACTIVITY_HISTORY),
-            BottomNavItem(s(StringKey.NAV_PROFILE), Icons.Default.Person, RouteIds.PROFILE)
-        )
-
-    /** TENANT_ADMIN */
-    val adminItems: List<BottomNavItem>
-        get() = listOf(
-            BottomNavItem(s(StringKey.NAV_DASHBOARD), Icons.Default.Home, RouteIds.ADMIN_DASHBOARD),
-            BottomNavItem(s(StringKey.NAV_USERS), Icons.Default.Person, RouteIds.USERS_MANAGEMENT),
-            BottomNavItem("History", Icons.Default.History, RouteIds.TENANT_HISTORY),
-            BottomNavItem(s(StringKey.NAV_SETTINGS), Icons.Default.Settings, RouteIds.TENANT_SETTINGS)
-        )
-
-    /** ROOT */
-    val rootItems: List<BottomNavItem>
-        get() = listOf(
-            BottomNavItem("Console", Icons.Default.Home, RouteIds.ROOT_CONSOLE),
-            BottomNavItem("Tenants", Icons.Default.Business, RouteIds.ROOT_TENANT_MANAGEMENT),
-            BottomNavItem("Audit", Icons.Default.History, RouteIds.ROOT_AUDIT_EXPLORER),
-            BottomNavItem(s(StringKey.NAV_PROFILE), Icons.Default.Person, RouteIds.PROFILE)
-        )
-
-    val operatorItems: List<BottomNavItem>
-        get() = listOf(
-            BottomNavItem(s(StringKey.NAV_DASHBOARD), Icons.Default.Home, RouteIds.OPERATOR_DASHBOARD),
             BottomNavItem("History", Icons.Default.History, RouteIds.ACTIVITY_HISTORY),
             BottomNavItem(s(StringKey.NAV_PROFILE), Icons.Default.Person, RouteIds.PROFILE)
         )
