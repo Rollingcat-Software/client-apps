@@ -23,6 +23,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.ContactPage
 import androidx.compose.material.icons.filled.CreditCard
+import androidx.compose.material.icons.filled.DocumentScanner
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.Nfc
 import androidx.compose.material.icons.filled.Refresh
@@ -30,6 +31,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -86,6 +88,7 @@ fun NfcReadScreen(
     var dateOfBirth by rememberSaveable { mutableStateOf("") }
     var dateOfExpiry by rememberSaveable { mutableStateOf("") }
     var showMrzInput by rememberSaveable { mutableStateOf(true) }
+    var showMrzScanner by remember { mutableStateOf(false) }
 
     // "Register this card" state for the result screen. Reset on each new scan.
     var enrollState by remember { mutableStateOf<EnrollUiState>(EnrollUiState.Idle) }
@@ -163,6 +166,7 @@ fun NfcReadScreen(
                             onDocumentNumberChange = { documentNumber = it },
                             onDateOfBirthChange = { dateOfBirth = it },
                             onDateOfExpiryChange = { dateOfExpiry = it },
+                            onScanMrzWithCamera = { showMrzScanner = true },
                             onStartScan = {
                                 val mrz = MrzInputData(documentNumber, dateOfBirth, dateOfExpiry)
                                 if (mrz.isValid()) {
@@ -180,6 +184,23 @@ fun NfcReadScreen(
                     } else {
                         // Reset to input
                         showMrzInput = true
+                    }
+
+                    // Camera MRZ scanner (ML Kit OCR). On a valid read it fills the
+                    // document-number / DOB / expiry fields above so the "Scan with
+                    // MRZ" button enables itself — previously this affordance only
+                    // existed on the orphaned NfcStepScreen, so the button looked
+                    // permanently disabled.
+                    if (showMrzScanner) {
+                        MrzScannerScreen(
+                            onMrzScanned = { data ->
+                                documentNumber = data.documentNumber
+                                dateOfBirth = data.dateOfBirth
+                                dateOfExpiry = data.dateOfExpiry
+                                showMrzScanner = false
+                            },
+                            onDismiss = { showMrzScanner = false }
+                        )
                     }
                 }
 
@@ -238,6 +259,7 @@ private fun MrzInputSection(
     onDocumentNumberChange: (String) -> Unit,
     onDateOfBirthChange: (String) -> Unit,
     onDateOfExpiryChange: (String) -> Unit,
+    onScanMrzWithCamera: () -> Unit,
     onStartScan: () -> Unit,
     onScanWithoutMrz: () -> Unit
 ) {
@@ -272,6 +294,22 @@ private fun MrzInputSection(
                 }
             }
         }
+    }
+
+    Spacer(modifier = Modifier.height(16.dp))
+
+    // Primary path: scan the MRZ with the camera (ML Kit OCR) — auto-fills the
+    // fields below. Manual entry remains as a fallback.
+    FilledTonalButton(
+        onClick = onScanMrzWithCamera,
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(52.dp),
+        shape = RoundedCornerShape(16.dp)
+    ) {
+        Icon(Icons.Default.DocumentScanner, contentDescription = null)
+        Spacer(modifier = Modifier.width(8.dp))
+        Text(s(StringKey.NFCREAD_SCAN_MRZ_CAMERA), fontWeight = FontWeight.SemiBold)
     }
 
     Spacer(modifier = Modifier.height(16.dp))
