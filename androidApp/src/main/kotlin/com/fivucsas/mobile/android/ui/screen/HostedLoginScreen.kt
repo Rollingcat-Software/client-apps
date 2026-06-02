@@ -43,6 +43,8 @@ import com.fivucsas.mobile.android.auth.HostedAuthManager
 import com.fivucsas.shared.data.local.TokenManager
 import com.fivucsas.shared.data.remote.api.IdentityApi
 import com.fivucsas.shared.domain.repository.AuthTokens
+import com.fivucsas.shared.i18n.StringKey
+import com.fivucsas.shared.i18n.s
 import com.fivucsas.shared.ui.theme.AppColors
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
@@ -112,7 +114,7 @@ fun HostedLoginScreen(
                 onLoginSuccess(role)
             } catch (e: Throwable) {
                 loading = false
-                error = e.message ?: "Sign-in failed. Please try again."
+                error = s(StringKey.LOGIN_ERROR_GENERIC)
             }
         }
     }
@@ -165,7 +167,7 @@ fun HostedLoginScreen(
                 )
                 Spacer(Modifier.size(6.dp))
                 Text(
-                    text = "SECURED BY FIVUCSAS",
+                    text = s(StringKey.LOGIN_SECURED_BY),
                     color = AppColors.Primary,
                     fontSize = 11.sp,
                     fontWeight = FontWeight.Bold,
@@ -176,14 +178,14 @@ fun HostedLoginScreen(
             Spacer(Modifier.height(16.dp))
 
             Text(
-                text = "Sign in to FIVUCSAS",
+                text = s(StringKey.LOGIN_TITLE),
                 style = MaterialTheme.typography.headlineSmall,
                 color = AppColors.OnBackground,
                 textAlign = TextAlign.Center,
             )
             Spacer(Modifier.height(6.dp))
             Text(
-                text = "Continue securely to your account",
+                text = s(StringKey.LOGIN_SUBTITLE),
                 style = MaterialTheme.typography.bodyMedium,
                 color = AppColors.OnSurfaceVariant,
                 textAlign = TextAlign.Center,
@@ -217,7 +219,7 @@ fun HostedLoginScreen(
                             runCatching { launcher.launch(authManager.authorizeIntent()) }
                                 .onFailure {
                                     loading = false
-                                    error = it.message ?: "Could not open the sign-in page."
+                                    error = s(StringKey.LOGIN_ERROR_OPEN)
                                 }
                         },
                     contentAlignment = Alignment.Center,
@@ -230,7 +232,7 @@ fun HostedLoginScreen(
                         )
                     } else {
                         Text(
-                            text = "Sign in",
+                            text = s(StringKey.LOGIN_BUTTON),
                             color = Color.White,
                             fontWeight = FontWeight.SemiBold,
                             fontSize = 16.sp,
@@ -240,7 +242,7 @@ fun HostedLoginScreen(
 
                 Spacer(Modifier.height(12.dp))
                 Text(
-                    text = "You'll complete sign-in — including any extra verification — on the secure verify.fivucsas.com page, then return here.",
+                    text = s(StringKey.LOGIN_HOSTED_EXPLAINER),
                     style = MaterialTheme.typography.bodySmall,
                     color = AppColors.OnSurfaceVariant,
                     textAlign = TextAlign.Center,
