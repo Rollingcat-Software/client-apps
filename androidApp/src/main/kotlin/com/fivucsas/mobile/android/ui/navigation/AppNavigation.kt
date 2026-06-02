@@ -23,6 +23,7 @@ import com.fivucsas.mobile.android.ui.screen.NfcReadScreen
 import com.fivucsas.mobile.android.ui.screen.ChangePasswordScreen
 import com.fivucsas.mobile.android.ui.screen.DashboardScreen
 import com.fivucsas.mobile.android.ui.screen.EditProfileScreen
+import com.fivucsas.mobile.android.ui.screen.HostedLoginScreen
 import com.fivucsas.mobile.android.ui.screen.ExamEntryScreen
 import com.fivucsas.mobile.android.ui.screen.InviteAcceptScreen
 import com.fivucsas.mobile.android.ui.screen.MyInvitationsScreen
@@ -301,36 +302,18 @@ fun AppNavigation() {
         }
 
         composable(Screen.Login.route) {
-            val viewModel = koinInject<LoginViewModel>()
-            val context = androidx.compose.ui.platform.LocalContext.current
-            LoginScreen(
-                viewModel = viewModel,
-                onNavigateToRegister = { navController.navigate(Screen.Register.route) },
-                onNavigateToForgotPassword = { navController.navigate(Screen.ForgotPassword.route) },
-                onLoginSuccess = {
-                    viewModel.state.value.tokens?.let { tokenManager?.saveTokens(it) }
-                    val loginRole = viewModel.state.value.role
-                    val destination = NavigationPolicy.loginSuccessRoute(loginRole)
-                    navController.navigate(Screen.FingerprintGate.createRoute(destination)) {
+            // Hosted-first login (2026-06-02 architecture lock): the whole
+            // credential + MFA ceremony runs on verify.fivucsas.com in a Custom
+            // Tab; this app is a thin OAuth client. On success we route by the
+            // role from /auth/me. Native password/MFA/register/forgot screens are
+            // retired in favour of the hosted page.
+            HostedLoginScreen(
+                onLoginSuccess = { role ->
+                    val destination = NavigationPolicy.loginSuccessRoute(UserRole.fromString(role))
+                    navController.navigate(destination) {
                         popUpTo(Screen.Login.route) { inclusive = true }
                     }
                 },
-                onMfaRequired = { handoff ->
-                    // Carry the MFA session state forward in the route so the
-                    // MfaFlow destination initializes from explicit args, not
-                    // a fresh (null-token) LoginViewModel factory instance.
-                    navController.navigate(Screen.MfaFlow.createRoute(handoff.encode()))
-                },
-                onOpenWebSignIn = {
-                    // PR #18 fallback for primary methods this app cannot
-                    // render natively (SMS_OTP, QR_CODE, NFC_DOCUMENT,
-                    // HARDWARE_KEY, FINGERPRINT, VOICE as PRIMARY).
-                    val intent = android.content.Intent(
-                        android.content.Intent.ACTION_VIEW,
-                        android.net.Uri.parse("https://app.fivucsas.com/login")
-                    ).apply { addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK) }
-                    runCatching { context.startActivity(intent) }
-                }
             )
         }
 

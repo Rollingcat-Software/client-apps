@@ -47,6 +47,12 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
+        // AppAuth (RFC 8252 hosted-first login) redirect scheme. The mobile OAuth
+        // client `fivucsas-mobile` is registered on the backend with redirect URI
+        // `fivucsas://callback`; AppAuth's RedirectUriReceiverActivity binds this
+        // scheme via the manifest placeholder below.
+        manifestPlaceholders["appAuthRedirectScheme"] = "fivucsas"
+
         vectorDrawables {
             useSupportLibrary = true
         }
@@ -169,6 +175,11 @@ dependencies {
     // Koin for Android
     implementation("io.insert-koin:koin-android:4.0.2")
     implementation("io.insert-koin:koin-androidx-compose:4.0.2")
+
+    // AppAuth — hosted-first OAuth 2.0 / OIDC login via Chrome Custom Tabs (RFC 8252).
+    // Opens verify.fivucsas.com/login, returns the code on fivucsas://callback, and
+    // exchanges it (PKCE S256) at api.fivucsas.com/api/v1/oauth2/token.
+    implementation("net.openid:appauth:0.11.1")
 
     // Firebase (Cloud Messaging for push notifications)
     implementation(platform("com.google.firebase:firebase-bom:33.7.0"))
