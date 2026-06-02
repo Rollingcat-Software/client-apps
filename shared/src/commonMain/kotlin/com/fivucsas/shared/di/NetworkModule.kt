@@ -33,6 +33,7 @@ import com.fivucsas.shared.data.remote.api.TenantSettingsApi
 import com.fivucsas.shared.data.remote.api.TenantSettingsApiImpl
 import com.fivucsas.shared.data.remote.config.ApiConfig
 import com.fivucsas.shared.data.remote.dto.AuthResponseDto
+import com.fivucsas.shared.data.remote.dto.OAuthTokenResponseDto
 import com.fivucsas.shared.data.remote.dto.toModel
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -44,6 +45,7 @@ import io.ktor.client.plugins.logging.DEFAULT
 import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logger
 import io.ktor.client.plugins.logging.Logging
+import io.ktor.client.request.forms.submitForm
 import io.ktor.client.request.header
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
@@ -51,6 +53,7 @@ import io.ktor.client.statement.HttpResponse
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
+import io.ktor.http.Parameters
 import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.sync.Mutex
@@ -73,6 +76,13 @@ import org.koin.dsl.module
  * stored access token on their transparent retry.
  */
 private val refreshMutex = Mutex()
+
+/**
+ * OAuth public client_id for the native apps. Must match the redirect-allowlisted
+ * client registered server-side and the value AppAuth uses on Android
+ * (`HostedAuthManager.CLIENT_ID`). Sent on the `grant_type=refresh_token` call.
+ */
+private const val OAUTH_MOBILE_CLIENT_ID = "fivucsas-mobile"
 
 /**
  * Network module - Provides HTTP clients and API clients
@@ -148,8 +158,11 @@ val networkModule = module {
                 validateResponse { response: HttpResponse ->
                     if (response.status == HttpStatusCode.Unauthorized) {
                         val url = response.call.request.url.toString()
-                        // Don't attempt refresh on auth endpoints to avoid infinite loops
-                        if (url.contains("/auth/login") || url.contains("/auth/refresh") || url.contains("/auth/logout")) {
+                        // Don't attempt refresh on auth endpoints to avoid infinite loops.
+                        // Includes the OAuth token endpoint so a 401 from the
+                        // refresh_token grant itself can't recurse into another refresh.
+                        if (url.contains("/auth/login") || url.contains("/auth/refresh") ||
+                            url.contains("/auth/logout") || url.contains("/oauth2/token")) {
                             return@validateResponse
                         }
 
@@ -174,17 +187,50 @@ val networkModule = module {
 
                             try {
                                 // Reuse the call's client; the recursion guard above
-                                // prevents this /auth/refresh POST from re-entering.
-                                val refreshResponse = response.call.client.post(ApiConfig.identityBaseUrl + "/auth/refresh") {
-                                    contentType(ContentType.Application.Json)
-                                    setBody(mapOf("refreshToken" to refreshToken))
-                                }
-                                if (refreshResponse.status == HttpStatusCode.OK) {
-                                    val authResponse = refreshResponse.body<AuthResponseDto>()
-                                    tokenManager.updateTokens(authResponse.toModel())
+                                // prevents the refresh POST from re-entering.
+                                if (tokenManager.isOAuthSession()) {
+                                    // Hosted-first OAuth session — renew via the
+                                    // OAuth refresh-token grant (RFC 6749 §6) at the
+                                    // OAuth token endpoint, form-url-encoded.
+                                    val refreshResponse = response.call.client.submitForm(
+                                        url = ApiConfig.identityBaseUrl + "/oauth2/token",
+                                        formParameters = Parameters.build {
+                                            append("grant_type", "refresh_token")
+                                            append("refresh_token", refreshToken)
+                                            append("client_id", OAUTH_MOBILE_CLIENT_ID)
+                                        },
+                                    )
+                                    if (refreshResponse.status == HttpStatusCode.OK) {
+                                        val oauth = refreshResponse.body<OAuthTokenResponseDto>().toModel()
+                                        // The OAuth refresh response carries no profile
+                                        // fields — re-apply the cached identity so role/
+                                        // tenant context survives the rotation.
+                                        tokenManager.updateTokens(
+                                            oauth.copy(
+                                                role = tokenManager.getRole() ?: oauth.role,
+                                                userName = tokenManager.getUserName() ?: "",
+                                                userEmail = tokenManager.getUserEmail() ?: "",
+                                                userId = tokenManager.getUserId() ?: "",
+                                                tenantId = tokenManager.getTenantId() ?: "",
+                                            ),
+                                        )
+                                    } else {
+                                        tokenManager.clearTokens()
+                                    }
                                 } else {
-                                    // Refresh failed — clear tokens to force re-login
-                                    tokenManager.clearTokens()
+                                    // Legacy password/MFA session — the original
+                                    // /auth/refresh JSON path (unchanged).
+                                    val refreshResponse = response.call.client.post(ApiConfig.identityBaseUrl + "/auth/refresh") {
+                                        contentType(ContentType.Application.Json)
+                                        setBody(mapOf("refreshToken" to refreshToken))
+                                    }
+                                    if (refreshResponse.status == HttpStatusCode.OK) {
+                                        val authResponse = refreshResponse.body<AuthResponseDto>()
+                                        tokenManager.updateTokens(authResponse.toModel())
+                                    } else {
+                                        // Refresh failed — clear tokens to force re-login
+                                        tokenManager.clearTokens()
+                                    }
                                 }
                             } catch (_: Exception) {
                                 tokenManager.clearTokens()

@@ -1,6 +1,7 @@
 package com.fivucsas.shared.data.remote.dto
 
 import com.fivucsas.shared.domain.repository.AuthTokens
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /**
@@ -253,6 +254,34 @@ fun AuthResponseDto.toModel(): AuthTokens {
         tenantId = user?.tenantId ?: ""
     )
 }
+
+/**
+ * OAuth 2.0 token-endpoint response (RFC 6749 §5.1) — returned by
+ * `POST /api/v1/oauth2/token` for both the authorization_code and the
+ * refresh_token grants. Standard snake_case wire format (the OAuth endpoint
+ * serializes a raw map, NOT the camelCase [AuthResponseDto]).
+ */
+@Serializable
+data class OAuthTokenResponseDto(
+    @SerialName("access_token") val accessToken: String? = null,
+    @SerialName("refresh_token") val refreshToken: String? = null,
+    @SerialName("id_token") val idToken: String? = null,
+    @SerialName("token_type") val tokenType: String = "Bearer",
+    @SerialName("expires_in") val expiresIn: Long? = null
+)
+
+/**
+ * Map an OAuth token response onto [AuthTokens], preserving the OAuth-session
+ * marker so the next silent refresh again routes through `/oauth2/token`. The
+ * refresh endpoint does not echo profile fields, so the caller is responsible
+ * for re-applying role/name/email/tenant from the prior session.
+ */
+fun OAuthTokenResponseDto.toModel(): AuthTokens = AuthTokens(
+    accessToken = accessToken ?: "",
+    refreshToken = refreshToken ?: "",
+    expiresIn = expiresIn ?: 0L,
+    oauthSession = true
+)
 
 /**
  * Convert MfaStepResponse to AuthTokens (when AUTHENTICATED).

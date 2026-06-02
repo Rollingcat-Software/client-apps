@@ -9,7 +9,7 @@ import com.fivucsas.shared.data.remote.dto.WebAuthnCredentialDto
  * Endpoints:
  * - GET    /devices?userId={userId}                    → getDevices()
  * - DELETE /devices/{id}                               → removeDevice()
- * - GET    /devices/webauthn/credentials/{userId}      → getWebAuthnCredentials()
+ * - GET    /webauthn/credentials/{userId}              → getWebAuthnCredentials()
  * - POST   /devices/push-token                         → registerPushToken()
  */
 interface DeviceApi {

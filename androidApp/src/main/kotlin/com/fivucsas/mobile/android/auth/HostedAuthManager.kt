@@ -67,6 +67,7 @@ class HostedAuthManager(context: Context) {
         return HostedTokens(
             accessToken = access,
             idToken = tokenResponse.idToken,
+            refreshToken = tokenResponse.refreshToken,
             expiresIn = expiresIn,
         )
     }
@@ -98,5 +99,11 @@ class HostedAuthManager(context: Context) {
 data class HostedTokens(
     val accessToken: String,
     val idToken: String?,
+    /**
+     * OAuth refresh token from the token exchange (null when the server doesn't
+     * issue one). Stored so the app can silently renew the access token via the
+     * `grant_type=refresh_token` flow against `POST /api/v1/oauth2/token`.
+     */
+    val refreshToken: String?,
     val expiresIn: Long,
 )

@@ -11,10 +11,10 @@ class SessionApiImpl(
 ) : SessionApi {
 
     override suspend fun getSessions(): List<AuthSessionDto> {
-        return client.get("sessions").body()
+        return client.get("auth/sessions/my").body()
     }
 
     override suspend fun revokeSession(sessionId: String) {
-        client.delete("sessions/$sessionId")
+        client.delete("auth/sessions/my/$sessionId")
     }
 }

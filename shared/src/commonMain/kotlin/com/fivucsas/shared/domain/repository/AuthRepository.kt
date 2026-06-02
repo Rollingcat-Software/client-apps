@@ -166,5 +166,12 @@ data class AuthTokens(
     val userName: String = "",
     val userEmail: String = "",
     val userId: String = "",
-    val tenantId: String = ""
+    val tenantId: String = "",
+    /**
+     * True when these tokens came from the hosted-first OAuth login (the
+     * refresh token must be renewed via `grant_type=refresh_token` against
+     * `/oauth2/token`). False for the legacy `/auth/login` + `/auth/refresh`
+     * flow. Defaulted so existing call sites are unaffected.
+     */
+    val oauthSession: Boolean = false
 )
