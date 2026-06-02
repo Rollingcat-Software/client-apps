@@ -73,7 +73,6 @@ fun ProfileScreen(
     onNavigateBottom: (String) -> Unit,
     onEditProfile: () -> Unit,
     onChangePassword: () -> Unit,
-    onReEnroll: () -> Unit,
     /**
      * Performs the real biometric-enrollment deletion (DELETE biometric/face/{userId})
      * and returns its [Result]. The success dialog is shown only when this resolves
@@ -222,12 +221,6 @@ fun ProfileScreen(
                     text = s(StringKey.APPROVE_LOGIN_TITLE),
                     onClick = onOpenLoginRequests
                 )
-                if (isSelfBiometricRole && userRole.hasPermission(Permission.ENROLL_SELF_UPDATE)) {
-                    ProfileOutlinedAction(
-                        text = s(StringKey.PROFILE_RE_ENROLL_FACE),
-                        onClick = onReEnroll
-                    )
-                }
                 ProfileOutlinedAction(
                     text = s(StringKey.PROFILE_OPEN_SETTINGS),
                     onClick = onOpenSettings

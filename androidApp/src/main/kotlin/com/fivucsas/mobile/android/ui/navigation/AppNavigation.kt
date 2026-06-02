@@ -15,8 +15,6 @@ import androidx.navigation.navArgument
 import com.fivucsas.mobile.android.ui.screen.AboutScreen
 import com.fivucsas.mobile.android.ui.screen.ActivityHistoryScreen
 import com.fivucsas.mobile.android.ui.screen.ApproveLoginScreen
-import com.fivucsas.mobile.android.ui.screen.BiometricEnrollScreen
-import com.fivucsas.mobile.android.ui.screen.BiometricVerifyScreen
 import com.fivucsas.mobile.android.ui.screen.CardScanScreen
 import com.fivucsas.mobile.android.ui.screen.NfcReadScreen
 import com.fivucsas.mobile.android.ui.screen.ChangePasswordScreen
@@ -33,20 +31,12 @@ import com.fivucsas.mobile.android.ui.screen.QRLoginScanScreen
 import com.fivucsas.mobile.android.ui.screen.RequestMembershipScreen
 import com.fivucsas.mobile.android.ui.screen.SettingsScreen
 import com.fivucsas.mobile.android.ui.screen.UnauthorizedScreen
-import com.fivucsas.mobile.android.ui.screen.VoiceEnrollScreen
-import com.fivucsas.mobile.android.ui.screen.TotpEnrollScreen
-import com.fivucsas.mobile.android.ui.screen.LivenessScreen
-import com.fivucsas.mobile.android.ui.screen.CardDetectionScreen
-import com.fivucsas.mobile.android.ui.screen.BiometricBackupScreen
 import com.fivucsas.mobile.android.ui.viewmodel.DataExportViewModel as AndroidDataExportViewModel
 import com.fivucsas.authenticator.ui.AuthenticatorScreen
 import com.fivucsas.shared.data.local.TokenManager
 import com.fivucsas.shared.domain.repository.BiometricRepository
 import com.fivucsas.shared.domain.repository.DataExportRepository
-import com.fivucsas.shared.domain.model.ConfidenceBand
-import com.fivucsas.shared.domain.model.GuestFaceCheckOutcome
 import com.fivucsas.shared.domain.model.UserRole
-import com.fivucsas.shared.presentation.viewmodel.auth.BiometricViewModel
 import com.fivucsas.shared.presentation.viewmodel.auth.ChangePasswordViewModel
 import com.fivucsas.shared.presentation.viewmodel.auth.FingerprintViewModel
 import com.fivucsas.shared.presentation.state.FingerprintUiState
@@ -55,7 +45,6 @@ import androidx.compose.runtime.collectAsState
 import com.fivucsas.shared.ui.screen.FingerprintFailureScreen
 import com.fivucsas.shared.ui.screen.FingerprintGateScreen
 import com.fivucsas.shared.ui.screen.FingerprintSuccessScreen
-import com.fivucsas.shared.ui.screen.GuestFaceCheckResultScreen
 import com.fivucsas.shared.ui.screen.OnboardingScreen
 import com.fivucsas.shared.ui.screen.SplashScreen
 import com.fivucsas.shared.ui.navigation.NavigationPolicy
@@ -84,11 +73,6 @@ sealed class Screen(val route: String) {
     object Unauthorized : Screen("${RouteIds.UNAUTHORIZED}/{message}") {
         fun createRoute(message: String): String = "${RouteIds.UNAUTHORIZED}/${Uri.encode(message)}"
     }
-    object GuestFaceCheckCapture : Screen(RouteIds.GUEST_FACE_CHECK_CAPTURE)
-    object GuestFaceCheckResult : Screen("${RouteIds.GUEST_FACE_CHECK_RESULT}/{outcome}/{confidence}") {
-        fun createRoute(outcome: GuestFaceCheckOutcome, confidence: ConfidenceBand?) =
-            "${RouteIds.GUEST_FACE_CHECK_RESULT}/${outcome.name}/${confidence?.name ?: "NONE"}"
-    }
 
     object InviteAccept : Screen(RouteIds.INVITE_ACCEPT)
     object InviteManagement : Screen(RouteIds.INVITE_MANAGEMENT)
@@ -97,18 +81,6 @@ sealed class Screen(val route: String) {
     object CardScan : Screen(RouteIds.CARD_SCAN)
     object NfcRead : Screen(RouteIds.NFC_READ)
 
-    object VoiceAuth : Screen("${RouteIds.VOICE_AUTH}/{userId}") {
-        fun createRoute(userId: String) = "${RouteIds.VOICE_AUTH}/$userId"
-    }
-    object VoiceSearch : Screen(RouteIds.VOICE_SEARCH)
-    object TotpEnroll : Screen("${RouteIds.TOTP_ENROLL}/{userId}") {
-        fun createRoute(userId: String) = "${RouteIds.TOTP_ENROLL}/$userId"
-    }
-    object BiometricBackup : Screen("${RouteIds.BIOMETRIC_BACKUP}/{userId}") {
-        fun createRoute(userId: String) = "${RouteIds.BIOMETRIC_BACKUP}/$userId"
-    }
-    object LivenessPuzzle : Screen(RouteIds.LIVENESS_PUZZLE)
-    object CardDetection : Screen(RouteIds.CARD_DETECTION)
     object Authenticator : Screen(RouteIds.AUTHENTICATOR)
 
     object AuthFlows : Screen("${RouteIds.AUTH_FLOWS}/{tenantId}") {
@@ -121,14 +93,6 @@ sealed class Screen(val route: String) {
     }
     object EnrollmentsList : Screen("${RouteIds.ENROLLMENTS_LIST}/{userId}") {
         fun createRoute(userId: String) = "${RouteIds.ENROLLMENTS_LIST}/$userId"
-    }
-
-    object BiometricEnroll : Screen("${RouteIds.BIOMETRIC_ENROLL}/{userId}") {
-        fun createRoute(userId: String) = "${RouteIds.BIOMETRIC_ENROLL}/$userId"
-    }
-
-    object BiometricVerify : Screen("${RouteIds.BIOMETRIC_VERIFY}/{userId}") {
-        fun createRoute(userId: String) = "${RouteIds.BIOMETRIC_VERIFY}/$userId"
     }
 
     object FingerprintGate : Screen("${RouteIds.FINGERPRINT_GATE_ANDROID}/{target}") {
@@ -264,8 +228,6 @@ fun AppNavigation() {
                 currentRoute = Screen.Dashboard.route,
                 onNavigateToNotifications = { navController.navigate(Screen.Notifications.route) },
                 onNavigateToProfile = { navController.navigate(Screen.Profile.route) },
-                onNavigateToEnroll = { navController.navigate(Screen.BiometricEnroll.createRoute(tokenManager?.getUserId() ?: "me")) },
-                onNavigateToVerify = { navController.navigate(Screen.BiometricVerify.createRoute(tokenManager?.getUserId() ?: "me")) },
                 onNavigateToQrScan = { navController.navigate(Screen.QrLoginScan.route) },
                 onNavigateToHistory = { navController.navigate(Screen.ActivityHistory.route) },
                 onNavigateToInvitations = { navController.navigate(Screen.InviteAccept.route) },
@@ -366,7 +328,6 @@ fun AppNavigation() {
                 onChangePassword = { navController.navigate(Screen.ChangePassword.route) },
                 onOpenLinkedAccounts = { navController.navigate(Screen.LinkedAccounts.route) },
                 onOpenLoginRequests = { navController.navigate(Screen.ApproveLogin.route) },
-                onReEnroll = { navController.navigate(Screen.BiometricEnroll.createRoute(tokenManager?.getUserId() ?: "me")) },
                 onDeleteEnrollment = {
                     // Real delete: DELETE biometric/face/{userId} via BiometricRepository.
                     val deleteUserId = profileState.user?.id ?: tokenManager?.getUserId()
@@ -453,16 +414,12 @@ fun AppNavigation() {
                 onNavigateToChangePassword = { navController.navigate(Screen.ChangePassword.route) },
                 onNavigateToHelp = { navController.navigate(Screen.Help.route) },
                 onNavigateToAbout = { navController.navigate(Screen.About.route) },
-                onNavigateToVoiceAuth = { navController.navigate(Screen.VoiceAuth.createRoute(tokenManager?.getUserId() ?: "me")) },
-                onNavigateToVoiceSearch = { navController.navigate(Screen.VoiceSearch.route) },
-                // Email/SMS OTP, Analytics, Hardware-token and System-settings are
-                // removed from the mobile companion (native MFA reimplementations +
-                // admin surfaces — handled by the hosted page / web dashboard). The
-                // SettingsScreen callbacks default to no-ops, so they are omitted here.
-                onNavigateToTotpEnroll = { navController.navigate(Screen.TotpEnroll.createRoute(tokenManager?.getUserId() ?: "me")) },
-                onNavigateToLiveness = { navController.navigate(Screen.LivenessPuzzle.route) },
-                onNavigateToCardDetection = { navController.navigate(Screen.CardDetection.route) },
-                onNavigateToBiometricBackup = { navController.navigate(Screen.BiometricBackup.createRoute(tokenManager?.getUserId() ?: "me")) },
+                // Server-pipeline biometric surfaces (Voice enroll/search, TOTP
+                // enroll, Liveness, Card-Detection, Biometric-Backup) plus Email/SMS
+                // OTP, Analytics, Hardware-token and System-settings are removed from
+                // the mobile companion — those duplicate the hosted page / web
+                // dashboard. The SettingsScreen callbacks default to no-ops, so they
+                // are omitted here. Only the native TOTP Authenticator remains.
                 onNavigateToAuthenticator = { navController.navigate(Screen.Authenticator.route) },
                 onLogout = {
                     tokenManager?.clearTokens()
@@ -538,72 +495,6 @@ fun AppNavigation() {
                 return@composable
             }
             ApproveLoginScreen(onNavigateBack = { navController.popBackStack() })
-        }
-
-        composable(Screen.GuestFaceCheckCapture.route) {
-            val userRole = currentUserRole()
-            if (!NavigationPolicy.canAccessRoute(userRole, RouteIds.GUEST_FACE_CHECK_CAPTURE)) {
-                LaunchedEffect(Unit) {
-                    navController.navigate(Screen.Login.route) {
-                        popUpTo(0) { inclusive = true }
-                    }
-                }
-                return@composable
-            }
-            val viewModel = koinInject<BiometricViewModel>()
-            BiometricVerifyScreen(
-                userId = "guest",
-                viewModel = viewModel,
-                guestMode = true,
-                onGuestResult = { outcome, confidence ->
-                    navController.navigate(
-                        Screen.GuestFaceCheckResult.createRoute(
-                            outcome = outcome,
-                            confidence = confidence
-                        )
-                    )
-                },
-                onNavigateBack = { navController.popBackStack() }
-            )
-        }
-
-        composable(
-            route = Screen.GuestFaceCheckResult.route,
-            arguments = listOf(
-                navArgument("outcome") { type = NavType.StringType },
-                navArgument("confidence") { type = NavType.StringType }
-            )
-        ) { backStackEntry ->
-            val userRole = currentUserRole()
-            if (!NavigationPolicy.canAccessRoute(userRole, RouteIds.GUEST_FACE_CHECK_CAPTURE)) {
-                LaunchedEffect(Unit) {
-                    navController.navigate(Screen.Login.route) {
-                        popUpTo(0) { inclusive = true }
-                    }
-                }
-                return@composable
-            }
-
-            val outcomeValue = backStackEntry.arguments?.getString("outcome")
-            val confidenceValue = backStackEntry.arguments?.getString("confidence")
-            val outcome = runCatching { GuestFaceCheckOutcome.valueOf(outcomeValue ?: "") }
-                .getOrDefault(GuestFaceCheckOutcome.NOT_FOUND)
-            val confidenceBand = if (confidenceValue == null || confidenceValue == "NONE") {
-                null
-            } else {
-                runCatching { ConfidenceBand.valueOf(confidenceValue) }.getOrNull()
-            }
-
-            GuestFaceCheckResultScreen(
-                outcome = outcome,
-                confidenceBand = confidenceBand,
-                onRetry = { navController.navigate(Screen.GuestFaceCheckCapture.route) },
-                onLoginToContinue = {
-                    navController.navigate(Screen.Login.route) {
-                        popUpTo(Screen.GuestFaceCheckCapture.route) { inclusive = true }
-                    }
-                }
-            )
         }
 
         composable(Screen.InviteAccept.route) {
@@ -724,62 +615,6 @@ fun AppNavigation() {
                 return@composable
             }
             InviteManagementScreen(
-                onNavigateBack = { navController.popBackStack() }
-            )
-        }
-
-        composable(
-            route = Screen.BiometricEnroll.route,
-            arguments = listOf(navArgument("userId") { type = NavType.StringType })
-        ) { backStackEntry ->
-            if (!isAuthenticated()) {
-                LaunchedEffect(Unit) {
-                    navController.navigate(Screen.Login.route) {
-                        popUpTo(0) { inclusive = true }
-                    }
-                }
-                return@composable
-            }
-            val userRole = currentUserRole()
-            if (!NavigationPolicy.canAccessRoute(userRole, RouteIds.BIOMETRIC_ENROLL)) {
-                LaunchedEffect(Unit) {
-                    navigateUnauthorized("No permission to enroll biometric data.")
-                }
-                return@composable
-            }
-            val userId = backStackEntry.arguments?.getString("userId") ?: ""
-            val viewModel = koinInject<BiometricViewModel>()
-            BiometricEnrollScreen(
-                userId = userId,
-                viewModel = viewModel,
-                onNavigateBack = { navController.popBackStack() }
-            )
-        }
-
-        composable(
-            route = Screen.BiometricVerify.route,
-            arguments = listOf(navArgument("userId") { type = NavType.StringType })
-        ) { backStackEntry ->
-            if (!isAuthenticated()) {
-                LaunchedEffect(Unit) {
-                    navController.navigate(Screen.Login.route) {
-                        popUpTo(0) { inclusive = true }
-                    }
-                }
-                return@composable
-            }
-            val userRole = currentUserRole()
-            if (!NavigationPolicy.canAccessRoute(userRole, RouteIds.BIOMETRIC_VERIFY)) {
-                LaunchedEffect(Unit) {
-                    navigateUnauthorized("No permission to verify biometric data.")
-                }
-                return@composable
-            }
-            val userId = backStackEntry.arguments?.getString("userId") ?: ""
-            val viewModel = koinInject<BiometricViewModel>()
-            BiometricVerifyScreen(
-                userId = userId,
-                viewModel = viewModel,
                 onNavigateBack = { navController.popBackStack() }
             )
         }
@@ -976,114 +811,9 @@ fun AppNavigation() {
             )
         }
 
-        // Voice Auth screen
-        composable(
-            route = Screen.VoiceAuth.route,
-            arguments = listOf(navArgument("userId") { type = NavType.StringType })
-        ) { backStackEntry ->
-            if (!isAuthenticated()) {
-                LaunchedEffect(Unit) {
-                    navController.navigate(Screen.Login.route) { popUpTo(0) { inclusive = true } }
-                }
-                return@composable
-            }
-            val userId = backStackEntry.arguments?.getString("userId") ?: ""
-            val viewModel = koinInject<com.fivucsas.shared.presentation.viewmodel.VoiceViewModel>().disposeOnLeave()
-            VoiceEnrollScreen(
-                userId = userId,
-                viewModel = viewModel,
-                onNavigateBack = { navController.popBackStack() }
-            )
-        }
-
-        // Voice Search (1:N speaker identification) screen
-        composable(route = Screen.VoiceSearch.route) {
-            if (!isAuthenticated()) {
-                LaunchedEffect(Unit) {
-                    navController.navigate(Screen.Login.route) { popUpTo(0) { inclusive = true } }
-                }
-                return@composable
-            }
-            val viewModel = koinInject<com.fivucsas.shared.presentation.viewmodel.VoiceViewModel>().disposeOnLeave()
-            com.fivucsas.mobile.android.ui.screen.AndroidVoiceSearchScreen(
-                viewModel = viewModel,
-                onNavigateBack = { navController.popBackStack() }
-            )
-        }
-
-        // TOTP Enroll screen
-        composable(
-            route = Screen.TotpEnroll.route,
-            arguments = listOf(navArgument("userId") { type = NavType.StringType })
-        ) { backStackEntry ->
-            if (!isAuthenticated()) {
-                LaunchedEffect(Unit) {
-                    navController.navigate(Screen.Login.route) { popUpTo(0) { inclusive = true } }
-                }
-                return@composable
-            }
-            val userId = backStackEntry.arguments?.getString("userId") ?: ""
-            val viewModel = koinInject<com.fivucsas.shared.presentation.viewmodel.TotpViewModel>().disposeOnLeave()
-            TotpEnrollScreen(
-                userId = userId,
-                viewModel = viewModel,
-                onNavigateBack = { navController.popBackStack() }
-            )
-        }
-
         // Standalone TOTP Authenticator (Google/Microsoft Authenticator replacement)
         composable(Screen.Authenticator.route) {
             AuthenticatorScreen(
-                onNavigateBack = { navController.popBackStack() }
-            )
-        }
-
-        // P1-4: Liveness Puzzle screen
-        composable(Screen.LivenessPuzzle.route) {
-            if (!isAuthenticated()) {
-                LaunchedEffect(Unit) {
-                    navController.navigate(Screen.Login.route) { popUpTo(0) { inclusive = true } }
-                }
-                return@composable
-            }
-            val viewModel = koinInject<com.fivucsas.shared.presentation.viewmodel.LivenessViewModel>().disposeOnLeave()
-            LivenessScreen(
-                viewModel = viewModel,
-                onNavigateBack = { navController.popBackStack() }
-            )
-        }
-
-        // P1-5: Card Detection screen
-        composable(Screen.CardDetection.route) {
-            if (!isAuthenticated()) {
-                LaunchedEffect(Unit) {
-                    navController.navigate(Screen.Login.route) { popUpTo(0) { inclusive = true } }
-                }
-                return@composable
-            }
-            val viewModel = koinInject<com.fivucsas.shared.presentation.viewmodel.CardDetectionViewModel>().disposeOnLeave()
-            CardDetectionScreen(
-                viewModel = viewModel,
-                onNavigateBack = { navController.popBackStack() }
-            )
-        }
-
-        // P3: Biometric Backup / Data Export screen
-        composable(
-            Screen.BiometricBackup.route,
-            arguments = listOf(navArgument("userId") { type = NavType.StringType })
-        ) { backStackEntry ->
-            if (!isAuthenticated()) {
-                LaunchedEffect(Unit) {
-                    navController.navigate(Screen.Login.route) { popUpTo(0) { inclusive = true } }
-                }
-                return@composable
-            }
-            val userId = backStackEntry.arguments?.getString("userId") ?: "me"
-            val viewModel = koinInject<com.fivucsas.shared.presentation.viewmodel.BiometricBackupViewModel>().disposeOnLeave()
-            BiometricBackupScreen(
-                viewModel = viewModel,
-                userId = userId,
                 onNavigateBack = { navController.popBackStack() }
             )
         }

@@ -9,6 +9,7 @@ import android.graphics.Bitmap
 import android.nfc.NfcAdapter
 import android.nfc.NfcManager
 import android.nfc.Tag
+import android.os.Bundle
 import com.fivucsas.mobile.android.data.nfc.model.AuthenticationData
 import com.fivucsas.mobile.android.data.nfc.model.CardData
 import com.fivucsas.mobile.android.data.nfc.model.PassportData
@@ -126,12 +127,49 @@ class AndroidNfcService(
     }
 
     /**
-     * Handle an NFC intent (tag discovered).
+     * Enable NFC reader mode on the given activity. Preferred over foreground
+     * dispatch for passport/eID (MRTD) reads: FLAG_READER_SKIP_NDEF_CHECK stops
+     * the platform from probing for NDEF first, which otherwise blocks the
+     * encrypted, non-NDEF identity documents. Call from Activity.onResume().
+     *
+     * The ReaderCallback feeds the SAME read path used by [handleIntent] via
+     * [processTag], so MRZ/BAC handling is identical regardless of detection mode.
+     */
+    fun enableReaderMode(activity: Activity) {
+        val adapter = nfcAdapter ?: return
+        if (!adapter.isEnabled) return
+        val flags = NfcAdapter.FLAG_READER_NFC_A or
+            NfcAdapter.FLAG_READER_NFC_B or
+            NfcAdapter.FLAG_READER_SKIP_NDEF_CHECK
+        val options = Bundle().apply {
+            // Presence-check delay reduces "Tag was lost" mid-read on slow eID/passport reads.
+            putInt(NfcAdapter.EXTRA_READER_PRESENCE_CHECK_DELAY, 250)
+        }
+        adapter.enableReaderMode(activity, { tag -> processTag(tag) }, flags, options)
+    }
+
+    /**
+     * Disable NFC reader mode. Call from Activity.onPause().
+     */
+    fun disableReaderMode(activity: Activity) {
+        nfcAdapter?.disableReaderMode(activity)
+    }
+
+    /**
+     * Handle an NFC intent (tag discovered). Used by the foreground-dispatch path.
      * Call from Activity.onNewIntent().
      */
     fun handleIntent(intent: Intent) {
         val tag = intent.getParcelableExtra<Tag>(NfcAdapter.EXTRA_TAG) ?: return
+        processTag(tag)
+    }
 
+    /**
+     * Route a discovered [Tag] through the card-reading pipeline. Shared by both
+     * the foreground-dispatch path ([handleIntent]) and the reader-mode callback
+     * ([enableReaderMode]) so behaviour is identical regardless of detection mode.
+     */
+    private fun processTag(tag: Tag) {
         if (_scanState.value !is NfcScanState.WaitingForCard) return
 
         _scanState.value = NfcScanState.Reading()
