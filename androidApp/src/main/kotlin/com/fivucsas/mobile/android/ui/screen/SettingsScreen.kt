@@ -74,16 +74,10 @@ fun SettingsScreen(
     onNavigateToChangePassword: () -> Unit,
     onNavigateToHelp: () -> Unit,
     onNavigateToAbout: () -> Unit,
-    onNavigateToVoiceAuth: () -> Unit = {},
-    onNavigateToVoiceSearch: () -> Unit = {},
     onNavigateToEmailOtp: () -> Unit = {},
     onNavigateToSmsOtp: () -> Unit = {},
-    onNavigateToTotpEnroll: () -> Unit = {},
     onNavigateToAnalytics: () -> Unit = {},
-    onNavigateToLiveness: () -> Unit = {},
-    onNavigateToCardDetection: () -> Unit = {},
     onNavigateToHardwareToken: () -> Unit = {},
-    onNavigateToBiometricBackup: () -> Unit = {},
     onNavigateToAuthenticator: () -> Unit = {},
     /**
      * Navigates ROOT users to the real platform-level System Settings screen
@@ -307,31 +301,15 @@ fun SettingsScreen(
 
             SettingsSectionLabel(text = s(StringKey.BIOMETRIC_AUTH))
 
-            // Authentication Methods
+            // Authentication Methods — only the native TOTP Authenticator remains.
+            // Server-pipeline biometric surfaces (Voice, TOTP enroll, Liveness,
+            // Card-Detection) and the Biometric-Backup card were removed: they
+            // duplicate the hosted page / web dashboard bio backend.
             ExpandableCard(
                 title = s(StringKey.BIOMETRIC_AUTH),
                 subtitle = s(StringKey.SETTINGS_AUTH_METHODS_SUB)
             ) {
-                SettingsNavRow(text = s(StringKey.VOICE_RECOGNITION), onClick = onNavigateToVoiceAuth)
-                SettingsNavRow(text = s(StringKey.VOICE_SEARCH_TITLE), onClick = onNavigateToVoiceSearch)
-                SettingsNavRow(text = s(StringKey.TOTP), onClick = onNavigateToTotpEnroll)
                 SettingsNavRow(text = s(StringKey.AUTH_TITLE), onClick = onNavigateToAuthenticator)
-                SettingsNavRow(text = s(StringKey.LIVENESS_TITLE), onClick = onNavigateToLiveness)
-                SettingsNavRow(text = s(StringKey.CARD_DETECTION_TITLE), onClick = onNavigateToCardDetection)
-            }
-
-            // Biometric Backup / Data Privacy (P3)
-            ExpandableCard(
-                title = s(StringKey.BIOMETRIC_BACKUP_TITLE),
-                subtitle = s(StringKey.BIOMETRIC_BACKUP_GDPR_TITLE)
-            ) {
-                Text(
-                    text = s(StringKey.BIOMETRIC_BACKUP_GDPR_DESC),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = AppColors.OnSurfaceVariant
-                )
-                Spacer(modifier = Modifier.size(4.dp))
-                SettingsNavRow(text = s(StringKey.BIOMETRIC_BACKUP_TITLE), onClick = onNavigateToBiometricBackup)
             }
 
             Spacer(modifier = Modifier.height(8.dp))

@@ -25,7 +25,6 @@ import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.PersonAdd
-import androidx.compose.material.icons.filled.Security
 import androidx.compose.material.icons.automirrored.filled.TrendingUp
 import androidx.compose.material.icons.outlined.VerifiedUser
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -82,8 +81,6 @@ fun DashboardScreen(
     currentRoute: String,
     onNavigateToNotifications: () -> Unit,
     onNavigateToProfile: () -> Unit,
-    onNavigateToEnroll: () -> Unit,
-    onNavigateToVerify: () -> Unit,
     onNavigateToQrScan: () -> Unit,
     onNavigateToHistory: () -> Unit,
     onNavigateToInvitations: () -> Unit,
@@ -103,20 +100,6 @@ fun DashboardScreen(
     val canViewRecentActivity = userRole.hasPermission(Permission.HISTORY_READ_SELF)
 
     val actions = listOf(
-        QuickAction(
-            id = "enroll-face",
-            title = s(StringKey.DASH_ENROLL_FACE),
-            icon = Icons.Default.CameraAlt,
-            route = Screen.BiometricEnroll.route,
-            anyPermissions = setOf(Permission.ENROLL_SELF_CREATE)
-        ),
-        QuickAction(
-            id = "verify-identity",
-            title = s(StringKey.DASH_VERIFY_IDENTITY),
-            icon = Icons.Default.Security,
-            route = Screen.BiometricVerify.route,
-            anyPermissions = setOf(Permission.VERIFY_SELF)
-        ),
         QuickAction(
             id = "qr",
             title = s(StringKey.DASH_QR),
@@ -174,8 +157,6 @@ fun DashboardScreen(
             icon = action.icon,
             onClick = {
                 when (action.route) {
-                    Screen.BiometricEnroll.route -> onNavigateToEnroll()
-                    Screen.BiometricVerify.route -> onNavigateToVerify()
                     Screen.QrLoginScan.route -> onNavigateToQrScan()
                     Screen.ActivityHistory.route -> onNavigateToHistory()
                     Screen.InviteAccept.route -> onNavigateToInvitations()
