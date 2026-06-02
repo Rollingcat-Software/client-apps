@@ -22,9 +22,7 @@ import com.fivucsas.mobile.android.ui.screen.DashboardScreen
 import com.fivucsas.mobile.android.ui.screen.EditProfileScreen
 import com.fivucsas.mobile.android.ui.screen.HostedLoginScreen
 import com.fivucsas.mobile.android.ui.screen.InviteAcceptScreen
-import com.fivucsas.mobile.android.ui.screen.MyInvitationsScreen
 import com.fivucsas.mobile.android.ui.screen.HelpScreen
-import com.fivucsas.mobile.android.ui.screen.InviteManagementScreen
 import com.fivucsas.mobile.android.ui.screen.NotificationsScreen
 import com.fivucsas.mobile.android.ui.screen.ProfileScreen
 import com.fivucsas.mobile.android.ui.screen.QRLoginScanScreen
@@ -38,18 +36,16 @@ import com.fivucsas.shared.domain.repository.BiometricRepository
 import com.fivucsas.shared.domain.repository.DataExportRepository
 import com.fivucsas.shared.domain.model.UserRole
 import com.fivucsas.shared.presentation.viewmodel.auth.ChangePasswordViewModel
-import com.fivucsas.shared.presentation.viewmodel.auth.FingerprintViewModel
-import com.fivucsas.shared.presentation.state.FingerprintUiState
 import com.fivucsas.shared.presentation.viewmodel.UserProfileViewModel
 import androidx.compose.runtime.collectAsState
-import com.fivucsas.shared.ui.screen.FingerprintFailureScreen
-import com.fivucsas.shared.ui.screen.FingerprintGateScreen
-import com.fivucsas.shared.ui.screen.FingerprintSuccessScreen
+import androidx.compose.runtime.rememberCoroutineScope
 import com.fivucsas.shared.ui.screen.OnboardingScreen
 import com.fivucsas.shared.ui.screen.SplashScreen
 import com.fivucsas.shared.ui.navigation.NavigationPolicy
 import com.fivucsas.shared.ui.navigation.RouteIds
 import com.fivucsas.shared.ui.util.disposeOnLeave
+import com.fivucsas.shared.domain.repository.AuthRepository
+import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 
 private const val PREFS_NAME = "fivucsas_prefs"
@@ -75,37 +71,14 @@ sealed class Screen(val route: String) {
     }
 
     object InviteAccept : Screen(RouteIds.INVITE_ACCEPT)
-    object InviteManagement : Screen(RouteIds.INVITE_MANAGEMENT)
-    object MyInvitations : Screen(RouteIds.MY_INVITATIONS)
     object RequestMembership : Screen(RouteIds.REQUEST_MEMBERSHIP)
     object CardScan : Screen(RouteIds.CARD_SCAN)
     object NfcRead : Screen(RouteIds.NFC_READ)
 
     object Authenticator : Screen(RouteIds.AUTHENTICATOR)
 
-    object AuthFlows : Screen("${RouteIds.AUTH_FLOWS}/{tenantId}") {
-        fun createRoute(tenantId: String) = "${RouteIds.AUTH_FLOWS}/$tenantId"
-    }
-    object Sessions : Screen(RouteIds.SESSIONS)
+    // Linked accounts / workspace switcher — reachable from Profile.
     object LinkedAccounts : Screen(RouteIds.LINKED_ACCOUNTS)
-    object Devices : Screen("${RouteIds.DEVICES}/{userId}") {
-        fun createRoute(userId: String) = "${RouteIds.DEVICES}/$userId"
-    }
-    object EnrollmentsList : Screen("${RouteIds.ENROLLMENTS_LIST}/{userId}") {
-        fun createRoute(userId: String) = "${RouteIds.ENROLLMENTS_LIST}/$userId"
-    }
-
-    object FingerprintGate : Screen("${RouteIds.FINGERPRINT_GATE_ANDROID}/{target}") {
-        fun createRoute(target: String) = "${RouteIds.FINGERPRINT_GATE_ANDROID}/${Uri.encode(target)}"
-    }
-
-    object FingerprintSuccess : Screen("${RouteIds.FINGERPRINT_SUCCESS_ANDROID}/{target}") {
-        fun createRoute(target: String) = "${RouteIds.FINGERPRINT_SUCCESS_ANDROID}/${Uri.encode(target)}"
-    }
-
-    object FingerprintFailure : Screen("${RouteIds.FINGERPRINT_FAILURE_ANDROID}/{target}") {
-        fun createRoute(target: String) = "${RouteIds.FINGERPRINT_FAILURE_ANDROID}/${Uri.encode(target)}"
-    }
 }
 
 @Composable
@@ -116,6 +89,8 @@ fun AppNavigation() {
         context.getSharedPreferences(PREFS_NAME, android.content.Context.MODE_PRIVATE)
     }
     val tokenManager = runCatching { koinInject<TokenManager>() }.getOrNull()
+    val authRepository = runCatching { koinInject<AuthRepository>() }.getOrNull()
+    val logoutScope = rememberCoroutineScope()
     val roleValue = runCatching { tokenManager?.getRole() }
         .getOrNull()
         ?.let { UserRole.fromString(it) }
@@ -422,7 +397,14 @@ fun AppNavigation() {
                 // are omitted here. Only the native TOTP Authenticator remains.
                 onNavigateToAuthenticator = { navController.navigate(Screen.Authenticator.route) },
                 onLogout = {
-                    tokenManager?.clearTokens()
+                    // Server-side logout: revoke the session/refresh token via
+                    // AuthRepository.logout() (POST /auth/logout) and clear the
+                    // step-up token — not just the local access token. logout()
+                    // clears local tokens internally even if the API call fails.
+                    logoutScope.launch {
+                        if (authRepository != null) authRepository.logout()
+                        else tokenManager?.clearTokens()
+                    }
                     navController.navigate(Screen.Login.route) {
                         popUpTo(0) { inclusive = true }
                     }
@@ -521,27 +503,6 @@ fun AppNavigation() {
             )
         }
 
-        composable(Screen.MyInvitations.route) {
-            if (!isAuthenticated()) {
-                LaunchedEffect(Unit) {
-                    navController.navigate(Screen.Login.route) {
-                        popUpTo(0) { inclusive = true }
-                    }
-                }
-                return@composable
-            }
-            val userRole = currentUserRole()
-            if (!NavigationPolicy.canAccessRoute(userRole, RouteIds.MY_INVITATIONS)) {
-                LaunchedEffect(Unit) {
-                    navigateUnauthorized("No permission to view invitations.")
-                }
-                return@composable
-            }
-            MyInvitationsScreen(
-                onNavigateBack = { navController.popBackStack() }
-            )
-        }
-
         composable(Screen.RequestMembership.route) {
             if (!isAuthenticated()) {
                 LaunchedEffect(Unit) {
@@ -598,105 +559,6 @@ fun AppNavigation() {
             )
         }
 
-        composable(Screen.InviteManagement.route) {
-            if (!isAuthenticated()) {
-                LaunchedEffect(Unit) {
-                    navController.navigate(Screen.Login.route) {
-                        popUpTo(0) { inclusive = true }
-                    }
-                }
-                return@composable
-            }
-            val userRole = currentUserRole()
-            if (!NavigationPolicy.canAccessRoute(userRole, RouteIds.INVITE_MANAGEMENT)) {
-                LaunchedEffect(Unit) {
-                    navigateUnauthorized("No permission to manage invitations.")
-                }
-                return@composable
-            }
-            InviteManagementScreen(
-                onNavigateBack = { navController.popBackStack() }
-            )
-        }
-
-        composable(
-            route = Screen.FingerprintGate.route,
-            arguments = listOf(navArgument("target") { type = NavType.StringType })
-        ) { backStackEntry ->
-            if (!isAuthenticated()) {
-                LaunchedEffect(Unit) {
-                    navController.navigate(Screen.Login.route) {
-                        popUpTo(0) { inclusive = true }
-                    }
-                }
-                return@composable
-            }
-            val target = backStackEntry.arguments?.getString("target")?.let(Uri::decode) ?: Screen.Dashboard.route
-            val viewModel = koinInject<FingerprintViewModel>()
-            FingerprintGateScreen(
-                viewModel = viewModel,
-                onStart = { viewModel.startStepUp() },
-                onSkip = {
-                    navController.navigate(target) {
-                        popUpTo(Screen.FingerprintGate.route) { inclusive = true }
-                    }
-                },
-                onBack = { navController.popBackStack() },
-                onSuccess = { navController.navigate(Screen.FingerprintSuccess.createRoute(target)) },
-                onFailure = { navController.navigate(Screen.FingerprintFailure.createRoute(target)) }
-            )
-        }
-
-        composable(
-            route = Screen.FingerprintSuccess.route,
-            arguments = listOf(navArgument("target") { type = NavType.StringType })
-        ) { backStackEntry ->
-            if (!isAuthenticated()) {
-                LaunchedEffect(Unit) {
-                    navController.navigate(Screen.Login.route) {
-                        popUpTo(0) { inclusive = true }
-                    }
-                }
-                return@composable
-            }
-            val target = backStackEntry.arguments?.getString("target")?.let(Uri::decode) ?: Screen.Dashboard.route
-            val viewModel = koinInject<FingerprintViewModel>()
-            val stepUpToken = (viewModel.state.value as? FingerprintUiState.Success)?.stepUpToken
-            FingerprintSuccessScreen(
-                stepUpToken = stepUpToken,
-                onContinue = {
-                    navController.navigate(target) {
-                        popUpTo(Screen.Login.route) { inclusive = true }
-                    }
-                }
-            )
-        }
-
-        composable(
-            route = Screen.FingerprintFailure.route,
-            arguments = listOf(navArgument("target") { type = NavType.StringType })
-        ) { backStackEntry ->
-            if (!isAuthenticated()) {
-                LaunchedEffect(Unit) {
-                    navController.navigate(Screen.Login.route) {
-                        popUpTo(0) { inclusive = true }
-                    }
-                }
-                return@composable
-            }
-            val target = backStackEntry.arguments?.getString("target")?.let(Uri::decode) ?: Screen.Dashboard.route
-            val viewModel = koinInject<FingerprintViewModel>()
-            val failureState = viewModel.state.value as? FingerprintUiState.Error
-            FingerprintFailureScreen(
-                message = failureState?.message ?: "Fingerprint verification failed.",
-                recoverable = failureState?.recoverable ?: true,
-                onRetry = {
-                    navController.navigate(Screen.FingerprintGate.createRoute(target))
-                },
-                onBack = { navController.popBackStack() }
-            )
-        }
-
         composable(
             route = Screen.Unauthorized.route,
             arguments = listOf(navArgument("message") { type = NavType.StringType })
@@ -711,41 +573,6 @@ fun AppNavigation() {
                         }
                     }
                 }
-            )
-        }
-
-        // Auth Flows screen
-        composable(
-            route = Screen.AuthFlows.route,
-            arguments = listOf(navArgument("tenantId") { type = NavType.StringType })
-        ) { backStackEntry ->
-            if (!isAuthenticated()) {
-                LaunchedEffect(Unit) {
-                    navController.navigate(Screen.Login.route) { popUpTo(0) { inclusive = true } }
-                }
-                return@composable
-            }
-            val tenantId = backStackEntry.arguments?.getString("tenantId") ?: ""
-            val viewModel = koinInject<com.fivucsas.shared.presentation.viewmodel.AuthFlowViewModel>().disposeOnLeave()
-            com.fivucsas.shared.ui.screen.AuthFlowsScreen(
-                viewModel = viewModel,
-                tenantId = tenantId,
-                onBack = { navController.popBackStack() }
-            )
-        }
-
-        // Sessions screen
-        composable(Screen.Sessions.route) {
-            if (!isAuthenticated()) {
-                LaunchedEffect(Unit) {
-                    navController.navigate(Screen.Login.route) { popUpTo(0) { inclusive = true } }
-                }
-                return@composable
-            }
-            val viewModel = koinInject<com.fivucsas.shared.presentation.viewmodel.SessionViewModel>().disposeOnLeave()
-            com.fivucsas.shared.ui.screen.SessionsScreen(
-                viewModel = viewModel,
-                onBack = { navController.popBackStack() }
             )
         }
 
@@ -768,46 +595,6 @@ fun AppNavigation() {
                         popUpTo(0) { inclusive = true }
                     }
                 }
-            )
-        }
-
-        // Devices screen
-        composable(
-            route = Screen.Devices.route,
-            arguments = listOf(navArgument("userId") { type = NavType.StringType })
-        ) { backStackEntry ->
-            if (!isAuthenticated()) {
-                LaunchedEffect(Unit) {
-                    navController.navigate(Screen.Login.route) { popUpTo(0) { inclusive = true } }
-                }
-                return@composable
-            }
-            val userId = backStackEntry.arguments?.getString("userId") ?: ""
-            val viewModel = koinInject<com.fivucsas.shared.presentation.viewmodel.DeviceViewModel>().disposeOnLeave()
-            com.fivucsas.shared.ui.screen.DevicesScreen(
-                viewModel = viewModel,
-                userId = userId,
-                onBack = { navController.popBackStack() }
-            )
-        }
-
-        // Enrollments screen
-        composable(
-            route = Screen.EnrollmentsList.route,
-            arguments = listOf(navArgument("userId") { type = NavType.StringType })
-        ) { backStackEntry ->
-            if (!isAuthenticated()) {
-                LaunchedEffect(Unit) {
-                    navController.navigate(Screen.Login.route) { popUpTo(0) { inclusive = true } }
-                }
-                return@composable
-            }
-            val userId = backStackEntry.arguments?.getString("userId") ?: ""
-            val viewModel = koinInject<com.fivucsas.shared.presentation.viewmodel.EnrollmentViewModel>().disposeOnLeave()
-            com.fivucsas.shared.ui.screen.EnrollmentsScreen(
-                viewModel = viewModel,
-                userId = userId,
-                onBack = { navController.popBackStack() }
             )
         }
 
