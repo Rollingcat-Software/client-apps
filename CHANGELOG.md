@@ -13,6 +13,14 @@ All notable changes to the FIVUCSAS client apps (Android, iOS, Desktop).
   `InviteApiImpl.getReceivedInvites()` now returns an empty list until a backend
   listing endpoint exists, so the screen shows its proper empty state. Restore the
   call when the endpoint ships.
+- **Activity History now loads real data (#83).** The "History" tab was a hardcoded
+  empty list that never called the API. It now loads the current user's own events
+  from the existing `GET /api/v1/my/activity` (the admin `/audit-logs` endpoint 403s
+  for end users), maps each action to the All / Verifications / Enrollments chips
+  (`VERIF*` → verification, `ENROLL*` → enrollment), shows a loading state, and
+  surfaces load errors with a Retry instead of rendering an error as "empty". New
+  `ActivityHistoryViewModel` + `getMyActivity` on the audit API/repository. EN + TR
+  (`ACTHIST_LOAD_ERROR`).
 
 ### Changed
 
