@@ -4,6 +4,34 @@ All notable changes to the FIVUCSAS client apps (Android, iOS, Desktop).
 
 ## [Unreleased]
 
+### Fixed
+
+- **"My Invitations" no longer crashes.** The screen called `GET /api/v1/invites/received`,
+  which has no backend endpoint; the 404 error body was decoded as a
+  `List<ReceivedInviteDto>` and threw a raw kotlinx-serialization error
+  ("Expected start of the array '[', but had '{'") in front of the user.
+  `InviteApiImpl.getReceivedInvites()` now returns an empty list until a backend
+  listing endpoint exists, so the screen shows its proper empty state. Restore the
+  call when the endpoint ships.
+
+### Changed
+
+- **Settings: removed dead toggles and the misleading auth-methods label.** The
+  "Enable Notifications", "Biometric Authentication", and "Analytics" switches were
+  local no-ops wired to nothing (no persistence, no permission request, no feed) —
+  two of them defaulted ON, implying behaviour that didn't exist — and have been
+  removed. The authentication card is now titled "Authentication" (was "Biometric
+  Authentication") and its subtitle reads "Authenticator app (TOTP)" instead of
+  advertising "Voice, Voice Search, OTP, TOTP, Liveness, Card, Token" — six methods
+  the app no longer ships. EN + TR.
+- **"Add Card" success copy is now honest.** The front/back photos are held only in
+  local state and are never uploaded or persisted, so the screen no longer claims
+  "Card Added Successfully" — it reads "Photos Captured (preview only)" (title
+  "Photos Captured"). EN + TR.
+- **Notifications bell hidden from the dashboard.** There is no backend notifications
+  feed yet, so the screen was permanently "No notifications yet". The bell is hidden
+  (navigation left wired) until a feed endpoint exists.
+
 ## [5.3.0] - 2026-06-02
 
 > First release since 5.2.3 (production-signed APK). Bundles the full post-5.2.3

@@ -60,7 +60,13 @@ class InviteApiImpl(
     // ── Member operations ───────────────────────────────────────────────────
 
     override suspend fun getReceivedInvites(): List<ReceivedInviteDto> {
-        return client.get(RECEIVED_PATH).body()
+        // The backend exposes NO "received invitations" listing endpoint yet
+        // (only the token-based POST /api/v1/guests/accept). Hitting RECEIVED_PATH
+        // returns a 404 whose error body fails to decode as a List<ReceivedInviteDto>,
+        // crashing "My Invitations" with a raw serializer message. Until a backend
+        // listing endpoint exists, return an empty list so the screen renders its
+        // proper empty state instead. Restore the call below once the endpoint ships.
+        return emptyList()
     }
 
     override suspend fun acceptInvite(inviteId: String): ReceivedInviteDto {
