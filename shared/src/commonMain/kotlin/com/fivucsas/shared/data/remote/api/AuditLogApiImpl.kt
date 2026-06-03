@@ -23,4 +23,14 @@ class AuditLogApiImpl(
             userId?.let { parameter("userId", it) }
         }.body()
     }
+
+    override suspend fun getMyActivity(
+        page: Int,
+        size: Int
+    ): AuditLogPageDto {
+        return client.get("my/activity") {
+            parameter("page", page)
+            parameter("size", size)
+        }.body()
+    }
 }

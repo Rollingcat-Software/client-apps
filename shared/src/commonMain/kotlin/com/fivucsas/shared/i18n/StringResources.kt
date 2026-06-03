@@ -1008,6 +1008,7 @@ enum class StringKey {
     // ActivityHistoryScreen (ACTHIST_)
     ACTHIST_EXPORT_DESC,
     ACTHIST_EMPTY,
+    ACTHIST_LOAD_ERROR,
     // === end Info screens i18n ===
 
     // Approve Login (number-matching approver — Android)
@@ -2306,6 +2307,7 @@ private val enStrings = mapOf(
     StringKey.NOTIF_EMPTY to "No notifications yet",
     StringKey.ACTHIST_EXPORT_DESC to "Export History",
     StringKey.ACTHIST_EMPTY to "No activity history yet",
+    StringKey.ACTHIST_LOAD_ERROR to "Couldn't load your activity history.",
     // === end Info screens i18n ===
 
     // Approve Login (number-matching approver — Android)
@@ -3604,6 +3606,7 @@ private val trStrings = mapOf(
     StringKey.NOTIF_EMPTY to "Henüz bildirim yok",
     StringKey.ACTHIST_EXPORT_DESC to "Geçmişi Dışa Aktar",
     StringKey.ACTHIST_EMPTY to "Henüz etkinlik geçmişi yok",
+    StringKey.ACTHIST_LOAD_ERROR to "Etkinlik geçmişiniz yüklenemedi.",
     // === end Info screens i18n ===
 
     // Approve Login (number-matching approver — Android)

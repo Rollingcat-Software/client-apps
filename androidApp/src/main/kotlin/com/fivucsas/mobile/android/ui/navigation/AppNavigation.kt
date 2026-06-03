@@ -35,6 +35,7 @@ import com.fivucsas.shared.data.local.TokenManager
 import com.fivucsas.shared.domain.repository.BiometricRepository
 import com.fivucsas.shared.domain.repository.DataExportRepository
 import com.fivucsas.shared.domain.model.UserRole
+import com.fivucsas.shared.presentation.viewmodel.ActivityHistoryViewModel
 import com.fivucsas.shared.presentation.viewmodel.auth.ChangePasswordViewModel
 import com.fivucsas.shared.presentation.viewmodel.UserProfileViewModel
 import androidx.compose.runtime.collectAsState
@@ -237,6 +238,8 @@ fun AppNavigation() {
                 }
                 return@composable
             }
+            val activityVm = koinInject<ActivityHistoryViewModel>().disposeOnLeave()
+            val activityState by activityVm.uiState.collectAsState()
             ActivityHistoryScreen(
                 currentRoute = Screen.ActivityHistory.route,
                 onNavigateBottom = { route ->
@@ -245,7 +248,11 @@ fun AppNavigation() {
                         restoreState = true
                     }
                 },
-                navItems = navItemsForRole
+                navItems = navItemsForRole,
+                events = activityState.events,
+                isLoading = activityState.isLoading,
+                errorMessage = activityState.errorMessage,
+                onRetry = { activityVm.load() }
             )
         }
 

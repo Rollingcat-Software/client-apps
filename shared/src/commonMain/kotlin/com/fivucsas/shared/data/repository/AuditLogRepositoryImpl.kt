@@ -1,6 +1,7 @@
 package com.fivucsas.shared.data.repository
 
 import com.fivucsas.shared.data.remote.api.AuditLogApi
+import com.fivucsas.shared.data.remote.dto.AuditLogDto
 import com.fivucsas.shared.domain.model.AuditLog
 import com.fivucsas.shared.domain.repository.AuditLogRepository
 
@@ -14,24 +15,33 @@ class AuditLogRepositoryImpl(
         page: Int,
         size: Int
     ): Result<List<AuditLog>> = runCatching {
-        val response = auditLogApi.getAuditLogs(
+        auditLogApi.getAuditLogs(
             action = action,
             userId = userId,
             page = page,
             size = size
-        )
-        response.content.map { dto ->
-            AuditLog(
-                id = dto.id,
-                userId = dto.userId ?: "",
-                action = dto.action,
-                status = if (dto.success) "SUCCESS" else "FAILURE",
-                ipAddress = dto.ipAddress ?: "",
-                details = dto.errorMessage
-                    ?: dto.entityType?.let { "$it/${dto.entityId ?: ""}" }
-                    ?: "",
-                timestamp = dto.timestamp ?: ""
-            )
-        }
+        ).content.map { it.toDomain() }
     }
+
+    override suspend fun getMyActivity(
+        page: Int,
+        size: Int
+    ): Result<List<AuditLog>> = runCatching {
+        auditLogApi.getMyActivity(
+            page = page,
+            size = size
+        ).content.map { it.toDomain() }
+    }
+
+    private fun AuditLogDto.toDomain(): AuditLog = AuditLog(
+        id = id,
+        userId = userId ?: "",
+        action = action,
+        status = if (success) "SUCCESS" else "FAILURE",
+        ipAddress = ipAddress ?: "",
+        details = errorMessage
+            ?: entityType?.let { "$it/${entityId ?: ""}" }
+            ?: "",
+        timestamp = timestamp ?: ""
+    )
 }
