@@ -1,6 +1,7 @@
 package com.fivucsas.shared.di
 
 import com.fivucsas.shared.presentation.viewmodel.AccountLinkingViewModel
+import com.fivucsas.shared.presentation.viewmodel.ActivityHistoryViewModel
 import com.fivucsas.shared.presentation.viewmodel.AdminViewModel
 import com.fivucsas.shared.presentation.viewmodel.ApproveLoginViewModel
 import com.fivucsas.shared.presentation.viewmodel.AuthFlowViewModel
@@ -67,6 +68,7 @@ val viewModelModule = module {
     factoryOf(::MfaFlowViewModel)
     factoryOf(::DeveloperPortalViewModel)
     factoryOf(::AuditLogDashboardViewModel)
+    factoryOf(::ActivityHistoryViewModel)
     factoryOf(::DataExportViewModel)
     factoryOf(::AccountLinkingViewModel)
 

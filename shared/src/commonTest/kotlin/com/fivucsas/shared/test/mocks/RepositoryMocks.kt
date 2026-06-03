@@ -257,6 +257,12 @@ class FakeAuditLogRepository : AuditLogRepository {
             Result.success(paged)
         } else Result.failure(RuntimeException(errorMessage))
     }
+
+    override suspend fun getMyActivity(page: Int, size: Int): Result<List<AuditLog>> {
+        return if (shouldSucceed) {
+            Result.success(mockLogs.drop(page * size).take(size))
+        } else Result.failure(RuntimeException(errorMessage))
+    }
 }
 
 // ── OAuth2ClientRepository ──────────────────────────────────────────────────
