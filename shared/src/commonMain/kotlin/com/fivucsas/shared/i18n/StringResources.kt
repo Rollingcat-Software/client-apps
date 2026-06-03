@@ -476,6 +476,9 @@ enum class StringKey {
     NFC_REGISTER_CARD_BUTTON,
     NFC_REGISTER_CARD_IN_PROGRESS,
     NFC_REGISTER_CARD_SUCCESS,
+    // Shown when the server reactivated/updated an already-existing card
+    // (e.g. re-tapping the same eID, which presents a new random UID each tap).
+    NFC_REGISTER_CARD_ALREADY,
     NFC_REGISTER_CARD_ERROR,
 
     // NFC passive authentication (server-authoritative verdict)
@@ -484,6 +487,11 @@ enum class StringKey {
     NFC_AUTHENTICITY_AUTHENTIC,
     NFC_AUTHENTICITY_NOT_AUTHENTIC,
     NFC_AUTHENTICITY_PA_UNAVAILABLE,
+    // Friendly catch-all for ALL passive-auth failure reason codes
+    // (NO_TRUST_STORE, SERVICE_ERROR, NOT_AUTHENTIC, network, …) — the chip
+    // authenticity check is unavailable but the data was read correctly. Never
+    // leak a raw reason code or a scary "could not be confirmed" to the user.
+    NFC_AUTHENTICITY_CHECK_UNAVAILABLE,
 
     // Linked accounts + workspace switcher (account-linking parity)
     LINKED_ACCOUNTS_TITLE,
@@ -1788,13 +1796,15 @@ private val enStrings = mapOf(
     StringKey.NFC_STEP_AUTHENTICATE_BUTTON to "Authenticate",
     StringKey.NFC_REGISTER_CARD_BUTTON to "Register this card",
     StringKey.NFC_REGISTER_CARD_IN_PROGRESS to "Registering card…",
-    StringKey.NFC_REGISTER_CARD_SUCCESS to "Card registered successfully",
+    StringKey.NFC_REGISTER_CARD_SUCCESS to "Registered successfully",
+    StringKey.NFC_REGISTER_CARD_ALREADY to "Already registered — card recognized",
     StringKey.NFC_REGISTER_CARD_ERROR to "Could not register card. Please try again.",
     StringKey.NFC_AUTHENTICITY_VERIFY_BUTTON to "Verify authenticity",
     StringKey.NFC_AUTHENTICITY_IN_PROGRESS to "Verifying authenticity…",
     StringKey.NFC_AUTHENTICITY_AUTHENTIC to "Document is authentic",
     StringKey.NFC_AUTHENTICITY_NOT_AUTHENTIC to "Authenticity could not be confirmed",
     StringKey.NFC_AUTHENTICITY_PA_UNAVAILABLE to "Chip authenticity check unavailable — the issuer's certificate isn't configured yet. The card was read and its data is valid.",
+    StringKey.NFC_AUTHENTICITY_CHECK_UNAVAILABLE to "Chip authenticity check unavailable — the data was read correctly.",
     StringKey.LINKED_ACCOUNTS_TITLE to "Linked Accounts",
     StringKey.LINKED_ACCOUNTS_DESCRIPTION to "Verified emails and tenant memberships linked to your identity.",
     StringKey.LINKED_ACCOUNTS_EMAILS to "Emails",
@@ -3089,13 +3099,15 @@ private val trStrings = mapOf(
     StringKey.NFC_STEP_AUTHENTICATE_BUTTON to "Doğrula",
     StringKey.NFC_REGISTER_CARD_BUTTON to "Bu kartı kaydet",
     StringKey.NFC_REGISTER_CARD_IN_PROGRESS to "Kart kaydediliyor…",
-    StringKey.NFC_REGISTER_CARD_SUCCESS to "Kart başarıyla kaydedildi",
+    StringKey.NFC_REGISTER_CARD_SUCCESS to "Başarıyla kaydedildi",
+    StringKey.NFC_REGISTER_CARD_ALREADY to "Zaten kayıtlı — kart tanındı",
     StringKey.NFC_REGISTER_CARD_ERROR to "Kart kaydedilemedi. Lütfen tekrar deneyin.",
     StringKey.NFC_AUTHENTICITY_VERIFY_BUTTON to "Orijinalliği doğrula",
     StringKey.NFC_AUTHENTICITY_IN_PROGRESS to "Orijinallik doğrulanıyor…",
     StringKey.NFC_AUTHENTICITY_AUTHENTIC to "Belge orijinal",
     StringKey.NFC_AUTHENTICITY_NOT_AUTHENTIC to "Orijinallik doğrulanamadı",
     StringKey.NFC_AUTHENTICITY_PA_UNAVAILABLE to "Çip orijinallik kontrolü kullanılamıyor — veren kurumun sertifikası henüz yapılandırılmadı. Kart okundu ve verileri geçerli.",
+    StringKey.NFC_AUTHENTICITY_CHECK_UNAVAILABLE to "Çip orijinallik kontrolü kullanılamıyor — veriler doğru şekilde okundu.",
     StringKey.LINKED_ACCOUNTS_TITLE to "Bağlı Hesaplar",
     StringKey.LINKED_ACCOUNTS_DESCRIPTION to "Kimliğinize bağlı doğrulanmış e-postalar ve kiracı üyelikleri.",
     StringKey.LINKED_ACCOUNTS_EMAILS to "E-postalar",

@@ -15,18 +15,30 @@ class EnrollNfcCardUseCaseTest {
         var lastSerial: String? = null
         var lastCardType: String? = null
         var lastLabel: String? = null
+        var lastDocumentNumber: String? = null
+        var documentNumberWasPassed: Boolean = false
         var shouldSucceed: Boolean = true
+        var alreadyRegistered: Boolean = false
 
         override suspend fun enroll(
             cardSerial: String,
             cardType: String?,
-            label: String?
+            label: String?,
+            documentNumber: String?
         ): Result<NfcEnrollmentResult> {
             lastSerial = cardSerial
             lastCardType = cardType
             lastLabel = label
+            lastDocumentNumber = documentNumber
+            documentNumberWasPassed = true
             return if (shouldSucceed) {
-                Result.success(NfcEnrollmentResult(enrollmentId = "enr-1", cardSerial = cardSerial))
+                Result.success(
+                    NfcEnrollmentResult(
+                        enrollmentId = "enr-1",
+                        cardSerial = cardSerial,
+                        alreadyRegistered = alreadyRegistered
+                    )
+                )
             } else {
                 Result.failure(RuntimeException("server error"))
             }
@@ -67,5 +79,66 @@ class EnrollNfcCardUseCaseTest {
         val result = useCase(cardSerial = "DEADBEEF")
 
         assertFalse(result.isSuccess)
+    }
+
+    @Test
+    fun `eID document number is passed through verbatim (not hex-normalized)`() = runTest {
+        // A28883159 contains letters → it must NOT be stripped/normalized like a
+        // hex UID; it is the stable de-dup key the server keys (userId, docNumber) on.
+        val repo = FakeNfcEnrollmentRepository()
+        val useCase = EnrollNfcCardUseCase(repo)
+
+        val result = useCase(
+            cardSerial = "08570ECC",
+            cardType = "Turkish eID",
+            documentNumber = "A28883159"
+        )
+
+        assertTrue(result.isSuccess)
+        assertEquals("08570ECC", repo.lastSerial)
+        assertEquals("A28883159", repo.lastDocumentNumber)
+    }
+
+    @Test
+    fun `blank document number is sent as null (plain UID card de-dup preserved)`() = runTest {
+        val repo = FakeNfcEnrollmentRepository()
+        val useCase = EnrollNfcCardUseCase(repo)
+
+        useCase(cardSerial = "04A2245B", documentNumber = "   ")
+
+        assertTrue(repo.documentNumberWasPassed)
+        assertNull(repo.lastDocumentNumber)
+    }
+
+    @Test
+    fun `omitted document number defaults to null`() = runTest {
+        val repo = FakeNfcEnrollmentRepository()
+        val useCase = EnrollNfcCardUseCase(repo)
+
+        useCase(cardSerial = "04A2245B")
+
+        assertNull(repo.lastDocumentNumber)
+    }
+
+    @Test
+    fun `alreadyRegistered from the server is surfaced in the result`() = runTest {
+        val repo = FakeNfcEnrollmentRepository().apply { alreadyRegistered = true }
+        val useCase = EnrollNfcCardUseCase(repo)
+
+        val result = useCase(cardSerial = "08570ECC", documentNumber = "A28883159")
+
+        assertTrue(result.isSuccess)
+        assertTrue(result.getOrThrow().alreadyRegistered)
+    }
+
+    @Test
+    fun `newly created card reports alreadyRegistered false`() = runTest {
+        val repo = FakeNfcEnrollmentRepository().apply { alreadyRegistered = false }
+        val useCase = EnrollNfcCardUseCase(repo)
+
+        val result = useCase(cardSerial = "DEADBEEF")
+
+        assertTrue(result.isSuccess)
+        assertFalse(result.getOrThrow().alreadyRegistered)
     }
 }

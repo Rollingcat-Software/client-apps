@@ -96,15 +96,26 @@ fun NfcReadScreen(
     // Passive-authentication (server-authoritative) verdict state. Reset per scan.
     var authState by remember { mutableStateOf<AuthenticityUiState>(AuthenticityUiState.Idle) }
 
-    val onRegisterCard: (uid: String, cardType: String?) -> Unit = { uid, cardType ->
-        enrollState = EnrollUiState.InProgress
-        scope.launch {
-            enrollUseCase(cardSerial = uid, cardType = cardType).fold(
-                onSuccess = { enrollState = EnrollUiState.Success },
-                onFailure = { enrollState = EnrollUiState.Error }
-            )
+    // documentNumber is the STABLE DG1 number (BAC reads only); the server
+    // de-dups eID/passport on (userId, documentNumber) so re-taps (which emit
+    // a new random UID each time) reactivate the existing row instead of
+    // inserting a duplicate. Null for plain UID cards (MIFARE).
+    val onRegisterCard: (uid: String, cardType: String?, documentNumber: String?) -> Unit =
+        { uid, cardType, documentNumber ->
+            enrollState = EnrollUiState.InProgress
+            scope.launch {
+                enrollUseCase(
+                    cardSerial = uid,
+                    cardType = cardType,
+                    documentNumber = documentNumber
+                ).fold(
+                    onSuccess = { result ->
+                        enrollState = EnrollUiState.Success(alreadyRegistered = result.alreadyRegistered)
+                    },
+                    onFailure = { enrollState = EnrollUiState.Error }
+                )
+            }
         }
-    }
 
     val onVerifyAuthenticity: (doc: NfcIdentityDocumentData) -> Unit = { doc ->
         authState = AuthenticityUiState.InProgress
@@ -451,7 +462,7 @@ private fun ReadingSection(cardTypeName: String) {
 private fun ResultSection(
     result: NfcReadResult,
     enrollState: EnrollUiState,
-    onRegisterCard: (uid: String, cardType: String?) -> Unit,
+    onRegisterCard: (uid: String, cardType: String?, documentNumber: String?) -> Unit,
     authState: AuthenticityUiState,
     onVerifyAuthenticity: (doc: NfcIdentityDocumentData) -> Unit,
     onScanAgain: () -> Unit
@@ -514,7 +525,7 @@ private fun ResultSection(
 private fun IdentityDocumentResult(
     data: NfcIdentityDocumentData,
     enrollState: EnrollUiState,
-    onRegisterCard: (uid: String, cardType: String?) -> Unit,
+    onRegisterCard: (uid: String, cardType: String?, documentNumber: String?) -> Unit,
     authState: AuthenticityUiState,
     onVerifyAuthenticity: (doc: NfcIdentityDocumentData) -> Unit,
     onScanAgain: () -> Unit
@@ -627,7 +638,16 @@ private fun IdentityDocumentResult(
     Spacer(modifier = Modifier.height(24.dp))
     RegisterCardSection(
         enrollState = enrollState,
-        onRegisterCard = { onRegisterCard(data.uid, data.cardTypeName) }
+        // BAC reads carry a stable DG1 document number → send it so the server
+        // de-dups eID/passport re-taps (each tap has a NEW random UID). A read
+        // without BAC (e.g. MRZ-less generic scan) has a blank documentNumber →
+        // send null so the server keeps UID-based de-dup.
+        onRegisterCard = {
+            val stableDocNumber =
+                if (data.bacSuccessful && data.documentNumber.isNotBlank()) data.documentNumber
+                else null
+            onRegisterCard(data.uid, data.cardTypeName, stableDocNumber)
+        }
     )
 
     Spacer(modifier = Modifier.height(12.dp))
@@ -646,7 +666,7 @@ private fun IdentityDocumentResult(
 private fun GenericCardResult(
     data: NfcGenericCardData,
     enrollState: EnrollUiState,
-    onRegisterCard: (uid: String, cardType: String?) -> Unit,
+    onRegisterCard: (uid: String, cardType: String?, documentNumber: String?) -> Unit,
     onScanAgain: () -> Unit
 ) {
     Card(
@@ -691,7 +711,9 @@ private fun GenericCardResult(
     Spacer(modifier = Modifier.height(24.dp))
     RegisterCardSection(
         enrollState = enrollState,
-        onRegisterCard = { onRegisterCard(data.uid, data.cardTypeName) }
+        // Plain UID card (MIFARE / NDEF / DESFire): no DG1 document number →
+        // null keeps today's UID/serial-based de-dup unchanged.
+        onRegisterCard = { onRegisterCard(data.uid, data.cardTypeName, null) }
     )
 
     Spacer(modifier = Modifier.height(12.dp))
@@ -709,8 +731,17 @@ private fun GenericCardResult(
 /** Local UI state for the "Register this card" enrollment action. */
 private sealed interface EnrollUiState {
     data object Idle : EnrollUiState
+
     data object InProgress : EnrollUiState
-    data object Success : EnrollUiState
+
+    /**
+     * Enrolled. [alreadyRegistered] is true when the server reactivated/updated
+     * a pre-existing card/document (e.g. re-tapping the same eID under its
+     * stable document number) → show "Already registered" rather than
+     * "Registered successfully".
+     */
+    data class Success(val alreadyRegistered: Boolean) : EnrollUiState
+
     data object Error : EnrollUiState
 }
 
@@ -751,44 +782,30 @@ private fun VerifyAuthenticitySection(
             }
         }
         is AuthenticityUiState.NotAuthentic -> {
-            // Known "the operator hasn't loaded the CSCA trust store yet" case —
-            // the server returns 422 with reasonCode=NO_TRUST_STORE (and errorCode
-            // NFC_PA_NOT_AUTHENTIC). This is NOT a forged chip; it just means the
-            // issuer's certificate isn't configured. Show a calm, non-scary message
-            // instead of a red "could not be confirmed" + a raw reason code. We do
-            // NOT claim the chip is authentic — we only stop alarming the user.
+            // The server-side passive-auth verdict is fail-CLOSED: every
+            // non-authentic outcome lands here regardless of WHY. None of these
+            // mean a forged chip in practice — the trust store isn't loaded
+            // (NO_TRUST_STORE / NFC_PA_NOT_AUTHENTIC), the verifier errored
+            // (SERVICE_ERROR), the chain didn't validate (NOT_AUTHENTIC), or the
+            // network dropped (reasonCode == null). The chip's DG data was still
+            // read correctly. So render ONE calm, friendly message for ALL of
+            // them — never a scary red "could not be confirmed" and never a raw
+            // leaked reason code (e.g. "SERVICE_ERROR"). We do NOT claim the chip
+            // is authentic; we only state the authenticity CHECK is unavailable.
+            //
+            // The "trust store not yet loaded" subset keeps its slightly more
+            // specific copy (mentions the issuer certificate); everything else
+            // gets the generic "data was read correctly" line.
             val isTrustStoreUnavailable = authState.reasonCode == "NO_TRUST_STORE" ||
                 authState.reasonCode == "NFC_PA_NOT_AUTHENTIC"
-            if (isTrustStoreUnavailable) {
-                Text(
-                    s(StringKey.NFC_AUTHENTICITY_PA_UNAVAILABLE),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            } else {
-                Column {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(
-                            Icons.Default.Error,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.error
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            s(StringKey.NFC_AUTHENTICITY_NOT_AUTHENTIC),
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.error
-                        )
-                    }
-                    authState.reasonCode?.let {
-                        Text(
-                            it,
-                            style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                }
-            }
+            Text(
+                s(
+                    if (isTrustStoreUnavailable) StringKey.NFC_AUTHENTICITY_PA_UNAVAILABLE
+                    else StringKey.NFC_AUTHENTICITY_CHECK_UNAVAILABLE
+                ),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
         }
         else -> {
             OutlinedButton(
@@ -822,7 +839,7 @@ private fun RegisterCardSection(
     onRegisterCard: () -> Unit
 ) {
     when (enrollState) {
-        EnrollUiState.Success -> {
+        is EnrollUiState.Success -> {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
                     Icons.Default.CheckCircle,
@@ -831,7 +848,10 @@ private fun RegisterCardSection(
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    s(StringKey.NFC_REGISTER_CARD_SUCCESS),
+                    s(
+                        if (enrollState.alreadyRegistered) StringKey.NFC_REGISTER_CARD_ALREADY
+                        else StringKey.NFC_REGISTER_CARD_SUCCESS
+                    ),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.primary
                 )

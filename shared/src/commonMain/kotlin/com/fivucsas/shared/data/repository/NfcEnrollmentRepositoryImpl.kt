@@ -13,20 +13,23 @@ class NfcEnrollmentRepositoryImpl(
     override suspend fun enroll(
         cardSerial: String,
         cardType: String?,
-        label: String?
+        label: String?,
+        documentNumber: String?
     ): Result<NfcEnrollmentResult> {
         return try {
             val response = api.enroll(
                 NfcEnrollRequest(
                     cardSerial = cardSerial,
                     cardType = cardType,
-                    label = label
+                    label = label,
+                    documentNumber = documentNumber
                 )
             )
             Result.success(
                 NfcEnrollmentResult(
                     enrollmentId = response.enrollmentId,
-                    cardSerial = response.cardSerial.ifBlank { cardSerial }
+                    cardSerial = response.cardSerial.ifBlank { cardSerial },
+                    alreadyRegistered = response.alreadyRegistered
                 )
             )
         } catch (e: Exception) {
