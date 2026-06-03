@@ -751,26 +751,42 @@ private fun VerifyAuthenticitySection(
             }
         }
         is AuthenticityUiState.NotAuthentic -> {
-            Column {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        Icons.Default.Error,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.error
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        s(StringKey.NFC_AUTHENTICITY_NOT_AUTHENTIC),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.error
-                    )
-                }
-                authState.reasonCode?.let {
-                    Text(
-                        it,
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
+            // Known "the operator hasn't loaded the CSCA trust store yet" case —
+            // the server returns 422 with reasonCode=NO_TRUST_STORE (and errorCode
+            // NFC_PA_NOT_AUTHENTIC). This is NOT a forged chip; it just means the
+            // issuer's certificate isn't configured. Show a calm, non-scary message
+            // instead of a red "could not be confirmed" + a raw reason code. We do
+            // NOT claim the chip is authentic — we only stop alarming the user.
+            val isTrustStoreUnavailable = authState.reasonCode == "NO_TRUST_STORE" ||
+                authState.reasonCode == "NFC_PA_NOT_AUTHENTIC"
+            if (isTrustStoreUnavailable) {
+                Text(
+                    s(StringKey.NFC_AUTHENTICITY_PA_UNAVAILABLE),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            } else {
+                Column {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            Icons.Default.Error,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.error
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            s(StringKey.NFC_AUTHENTICITY_NOT_AUTHENTIC),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.error
+                        )
+                    }
+                    authState.reasonCode?.let {
+                        Text(
+                            it,
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
                 }
             }
         }
