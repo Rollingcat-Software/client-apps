@@ -88,6 +88,7 @@ fun DashboardScreen(
     onNavigateToRequestMembership: () -> Unit,
     onNavigateToCardScan: () -> Unit,
     onNavigateToNfcRead: () -> Unit = {},
+    onNavigateToApproveLogin: () -> Unit = {},
     onNavigateBottom: (String) -> Unit,
     sessionRepository: SessionRepository = koinInject(),
     analyticsViewModel: AnalyticsViewModel = koinInject<AnalyticsViewModel>().disposeOnLeave()
@@ -126,6 +127,13 @@ fun DashboardScreen(
             title = s(StringKey.NAV_PROFILE),
             icon = Icons.Default.Person,
             route = Screen.Profile.route,
+            anyPermissions = setOf(Permission.PROFILE_READ_SELF)
+        ),
+        QuickAction(
+            id = "login-requests",
+            title = s(StringKey.DASH_LOGIN_REQUESTS),
+            icon = Icons.Default.CheckCircle,
+            route = Screen.ApproveLogin.route,
             anyPermissions = setOf(Permission.PROFILE_READ_SELF)
         ),
         QuickAction(
@@ -171,6 +179,7 @@ fun DashboardScreen(
                     Screen.RequestMembership.route -> onNavigateToRequestMembership()
                     Screen.CardScan.route -> onNavigateToCardScan()
                     Screen.NfcRead.route -> onNavigateToNfcRead()
+                    Screen.ApproveLogin.route -> onNavigateToApproveLogin()
                 }
             }
         )

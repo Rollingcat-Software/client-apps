@@ -213,6 +213,7 @@ fun AppNavigation() {
                 onNavigateToRequestMembership = { navController.navigate(Screen.RequestMembership.route) },
                 onNavigateToCardScan = { navController.navigate(Screen.CardScan.route) },
                 onNavigateToNfcRead = { navController.navigate(Screen.NfcRead.route) },
+                onNavigateToApproveLogin = { navController.navigate(Screen.ApproveLogin.route) },
                 onNavigateBottom = { route ->
                     navController.navigate(route) {
                         launchSingleTop = true
