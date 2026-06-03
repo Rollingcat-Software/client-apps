@@ -19,9 +19,6 @@ import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Language
-import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material.icons.filled.Security
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -35,7 +32,6 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -92,10 +88,6 @@ fun SettingsScreen(
     onLogout: () -> Unit,
     themePreferences: ThemePreferences = koinInject()
 ) {
-    val notificationsEnabled = remember { mutableStateOf(true) }
-    val biometricEnabled = remember { mutableStateOf(true) }
-    val analyticsEnabled = remember { mutableStateOf(false) }
-
     Scaffold(
         topBar = {
             TopAppBar(
@@ -212,101 +204,42 @@ fun SettingsScreen(
                 }
             }
 
-            ExpandableCard(
-                title = s(StringKey.NAV_NOTIFICATIONS),
-                subtitle = s(StringKey.NOTIFICATIONS_ENABLED)
-            ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Notifications,
-                        contentDescription = null,
-                        tint = AppColors.Primary
-                    )
-                    Spacer(modifier = Modifier.size(8.dp))
-                    Text(
-                        text = s(StringKey.NOTIFICATIONS_ENABLED),
-                        style = MaterialTheme.typography.bodyMedium,
-                        modifier = Modifier.weight(1f)
-                    )
-                    Switch(
-                        checked = notificationsEnabled.value,
-                        onCheckedChange = { notificationsEnabled.value = it }
-                    )
-                }
-            }
-
+            // Security — only the wired Change Password action remains. The
+            // "Biometric Authentication" switch here was a local no-op (no
+            // BiometricPrompt/BiometricManager) defaulting ON, which misrepresented
+            // that an app biometric lock was active — removed.
             ExpandableCard(
                 title = s(StringKey.SECURITY_TITLE),
-                subtitle = s(StringKey.BIOMETRIC_AUTH)
+                subtitle = s(StringKey.CHANGE_PASSWORD)
             ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Security,
-                        contentDescription = null,
-                        tint = AppColors.Primary
-                    )
-                    Spacer(modifier = Modifier.size(8.dp))
-                    Text(
-                        text = s(StringKey.BIOMETRIC_AUTH),
-                        style = MaterialTheme.typography.bodyMedium,
-                        modifier = Modifier.weight(1f)
-                    )
-                    Switch(
-                        checked = biometricEnabled.value,
-                        onCheckedChange = { biometricEnabled.value = it }
-                    )
-                }
-
-                Spacer(modifier = Modifier.size(8.dp))
                 SettingsNavRow(
                     text = s(StringKey.CHANGE_PASSWORD),
                     onClick = onNavigateToChangePassword
                 )
             }
 
+            // Help & About. The "Enable Notifications" and "Analytics" switches that
+            // used to live here were local no-ops wired to nothing (no persistence,
+            // no permission request, no feed) — removed rather than ship dead toggles.
             ExpandableCard(
                 title = s(StringKey.NAV_SETTINGS),
                 subtitle = s(StringKey.SETTINGS_DATA_PRIVACY_SUB)
             ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Settings,
-                        contentDescription = null,
-                        tint = AppColors.Primary
-                    )
-                    Spacer(modifier = Modifier.size(8.dp))
-                    Text(
-                        text = s(StringKey.NAV_ANALYTICS),
-                        style = MaterialTheme.typography.bodyMedium,
-                        modifier = Modifier.weight(1f)
-                    )
-                    Switch(
-                        checked = analyticsEnabled.value,
-                        onCheckedChange = { analyticsEnabled.value = it }
-                    )
-                }
-                Spacer(modifier = Modifier.size(4.dp))
                 SettingsNavRow(text = s(StringKey.NAV_HELP), onClick = onNavigateToHelp)
                 SettingsNavRow(text = s(StringKey.NAV_ABOUT), onClick = onNavigateToAbout)
             }
 
-            SettingsSectionLabel(text = s(StringKey.BIOMETRIC_AUTH))
+            SettingsSectionLabel(text = s(StringKey.SETTINGS_AUTH_SECTION))
 
             // Authentication Methods — only the native TOTP Authenticator remains.
             // Server-pipeline biometric surfaces (Voice, TOTP enroll, Liveness,
             // Card-Detection) and the Biometric-Backup card were removed: they
-            // duplicate the hosted page / web dashboard bio backend.
+            // duplicate the hosted page / web dashboard bio backend. The card is
+            // titled "Authentication" (not "Biometric Authentication") and the
+            // subtitle now names the one method that's actually here (TOTP), instead
+            // of advertising 7 methods the app no longer ships.
             ExpandableCard(
-                title = s(StringKey.BIOMETRIC_AUTH),
+                title = s(StringKey.SETTINGS_AUTH_SECTION),
                 subtitle = s(StringKey.SETTINGS_AUTH_METHODS_SUB)
             ) {
                 SettingsNavRow(text = s(StringKey.AUTH_TITLE), onClick = onNavigateToAuthenticator)
