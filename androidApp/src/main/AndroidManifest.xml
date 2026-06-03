@@ -47,12 +47,24 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
-            <intent-filter>
-                <action android:name="android.nfc.action.TECH_DISCOVERED" />
-            </intent-filter>
-            <meta-data
-                android:name="android.nfc.action.TECH_DISCOVERED"
-                android:resource="@xml/nfc_tech_filter" />
+            <!--
+              NFC #7 fix (pre-demo 2026-06-03): the foreground TECH_DISCOVERED
+              intent-filter + @xml/nfc_tech_filter meta-data were REMOVED.
+
+              While the app is in the foreground we use enableReaderMode()
+              (MainActivity.onResume), which is the correct path for encrypted
+              MRTD/eID reads (FLAG_READER_SKIP_NDEF_CHECK). A foreground
+              TECH_DISCOVERED filter competes with reader mode: on some devices the
+              system tag-dispatcher wins, delivering the tag as a new Intent
+              (which only fires the OS chime/haptic) instead of routing it to the
+              reader callback — the exact "OS detects the card but the app stays
+              'ready to scan'" symptom. Reader mode already covers all the tag
+              technologies we read, so this filter is redundant.
+
+              NOTE: must still be verified on a physical device via `adb logcat`
+              (this host has no NFC hardware / emulator). Reversible: re-add the
+              <intent-filter> + <meta-data> block to restore foreground dispatch.
+            -->
         </activity>
         <!-- Firebase Cloud Messaging service for push notifications -->
         <service

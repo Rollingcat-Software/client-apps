@@ -170,7 +170,17 @@ class AndroidNfcService(
      * ([enableReaderMode]) so behaviour is identical regardless of detection mode.
      */
     private fun processTag(tag: Tag) {
-        if (_scanState.value !is NfcScanState.WaitingForCard) return
+        // NFC #7 fix (pre-demo 2026-06-03): previously this dropped a tap unless
+        // the state was EXACTLY WaitingForCard. With reader mode always active in
+        // the foreground, a card tapped while the UI was Idle/Completed/Error was
+        // silently ignored (the "OS detects card but app stays idle" symptom). We
+        // now only reject a tap while a read is already IN FLIGHT (Reading), to
+        // avoid re-entrant/concurrent reads of the same tag; any other state
+        // accepts the tap and starts a fresh read.
+        //
+        // NOTE: still needs on-device `adb logcat` verification (no NFC hardware
+        // on the build host). Reversible: restore the WaitingForCard-only guard.
+        if (_scanState.value is NfcScanState.Reading) return
 
         _scanState.value = NfcScanState.Reading()
 

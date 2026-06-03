@@ -1,6 +1,13 @@
 package com.fivucsas.shared.data.local
 
 import com.fivucsas.shared.domain.repository.AuthTokens
+import kotlin.io.encoding.Base64
+import kotlin.io.encoding.ExperimentalEncodingApi
+import kotlinx.datetime.Clock
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
+import kotlinx.serialization.json.longOrNull
 
 /**
  * Token Manager - Centralized token management
@@ -71,10 +78,59 @@ class TokenManager(
     }
 
     /**
-     * Check if user is authenticated
+     * Check if user is authenticated.
+     *
+     * Returns true when EITHER:
+     *  - a non-expired access token is present, OR
+     *  - the access token is missing/expired but a refresh token exists.
+     *
+     * The second case is what keeps a returning user signed in after the short
+     * (15-min) access-token lifetime: previously this checked token *presence*
+     * only, so the app routed to the dashboard and the first data call 401'd into
+     * a perceived logout; now the access token is allowed to be stale because the
+     * NetworkModule 401 handler transparently refreshes it and retries. We never
+     * grant access on a missing/expired access token WITHOUT a refresh token.
      */
     fun isAuthenticated(): Boolean {
-        return getAccessToken() != null
+        val accessToken = getAccessToken() ?: return getRefreshToken() != null
+        if (!isAccessTokenExpired(accessToken)) return true
+        // Access token is expired — still authenticated if we can silently refresh.
+        return getRefreshToken() != null
+    }
+
+    /**
+     * True when the access token's `exp` claim is in the past (with a small skew
+     * margin). If the token can't be parsed as a JWT we treat it as NOT expired
+     * (fail-open) so opaque/unknown token formats keep working — the server's 401
+     * remains the ultimate authority and drives the refresh path.
+     */
+    @OptIn(ExperimentalEncodingApi::class)
+    fun isAccessTokenExpired(token: String, skewSeconds: Long = 30): Boolean {
+        val expSeconds = jwtExpirySeconds(token) ?: return false
+        val nowSeconds = Clock.System.now().toEpochMilliseconds() / 1000
+        return nowSeconds >= (expSeconds - skewSeconds)
+    }
+
+    /**
+     * Decode a JWT's `exp` claim (epoch seconds) from its payload without
+     * verifying the signature — verification is the server's job; we only need
+     * the expiry to decide whether to pre-emptively refresh on startup. Returns
+     * null for non-JWT/unparseable tokens.
+     */
+    @OptIn(ExperimentalEncodingApi::class)
+    private fun jwtExpirySeconds(token: String): Long? {
+        return try {
+            val parts = token.split(".")
+            if (parts.size < 2) return null
+            // JWT payloads are base64url, normally WITHOUT padding;
+            // ABSENT_OPTIONAL tolerates either padded or unpadded input.
+            val payloadBytes = Base64.UrlSafe.withPadding(Base64.PaddingOption.ABSENT_OPTIONAL)
+                .decode(parts[1])
+            val payload = Json.parseToJsonElement(payloadBytes.decodeToString()).jsonObject
+            payload["exp"]?.jsonPrimitive?.longOrNull
+        } catch (_: Exception) {
+            null
+        }
     }
 
     /**

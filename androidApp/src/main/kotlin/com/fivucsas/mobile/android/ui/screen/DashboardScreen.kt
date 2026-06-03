@@ -19,7 +19,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Contactless
-import androidx.compose.material.icons.filled.CreditCard
+// import androidx.compose.material.icons.filled.CreditCard // #8 fix: "Add card" QuickAction hidden (see below)
 import androidx.compose.material.icons.filled.Groups
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Notifications
@@ -135,13 +135,20 @@ fun DashboardScreen(
             route = Screen.RequestMembership.route,
             anyPermissions = setOf(Permission.TENANT_MEMBERSHIP_REQUEST)
         ),
-        QuickAction(
-            id = "card-scan",
-            title = s(StringKey.DASH_ADD_CARD),
-            icon = Icons.Default.CreditCard,
-            route = Screen.CardScan.route,
-            anyPermissions = setOf(Permission.CARD_ADD_SELF)
-        ),
+        // "Add card" (#8 fix, pre-demo 2026-06-03): HIDDEN. The CardScan flow is a
+        // camera photo wizard that captures front/back images but never uploads or
+        // persists them (CardScanScreen has no API/repository call) — a misleading
+        // dead-end for a demo. The screen + nav route are left intact (CardScanScreen,
+        // Screen.CardScan, onNavigateToCardScan) so this is fully reversible: restore
+        // the QuickAction below once the OCR/upload backend is wired.
+        //
+        // QuickAction(
+        //     id = "card-scan",
+        //     title = s(StringKey.DASH_ADD_CARD),
+        //     icon = Icons.Default.CreditCard,
+        //     route = Screen.CardScan.route,
+        //     anyPermissions = setOf(Permission.CARD_ADD_SELF)
+        // ),
         QuickAction(
             id = "nfc-read",
             title = s(StringKey.DASH_NFC_READER),
