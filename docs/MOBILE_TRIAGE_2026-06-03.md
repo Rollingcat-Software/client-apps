@@ -71,6 +71,26 @@ Deploy state: **app.fivucsas.com** auto-deployed via the Hostinger workflow on m
 **verify.fivucsas.com** rebuilt + redeployed (Docker). The **mobile** fixes (scope-A +
 #83) reach the phone only after an operator **APK rebuild + reinstall**.
 
+### APK rebuilt — 2026-06-03 (pre-demo)
+
+The operator APK rebuild was done: a **release-signed** APK was built from `origin/main`
+via the CI `android-build.yml` (`build_type=release`) and downloaded — signature verified
+`CN=FIVUCSAS, O=Marmara University` (the real keystore, **not** a debug cert), so it
+**upgrades in place** over the installed v5.3.0 with no uninstall. This is what carries the
+scope-A fixes (#82) + Activity History (#83) to the device. Artifact lives in the parent
+repo at `client-apps-apk-v5.3.0-rebuild-2026-06-03.release/androidApp-release.apk`
+(versionName 5.3.0 / versionCode 12).
+
+> Signing note: the keystore password is **not on the Hetzner host** (CI secrets only), so a
+> *local* `./gradlew :androidApp:assembleRelease` falls back to debug signing and won't
+> upgrade in place. Always rebuild release APKs via
+> `gh workflow run android-build.yml -R Rollingcat-Software/client-apps -r main -f build_type=release`
+> then `gh run download <id> -n fivucsas-release-apk`.
+
+A full record of the broader 16-finding pre-demo sweep (incl. the genuinely-open NFC #7,
+mobile token-refresh #2, and backend items #11/#15) is in the parent repo:
+`USER_FINDINGS_2026-06-03.md`.
+
 ## Still deferred (need new backend endpoints)
 
 - **#4 Notifications feed** / **#1 invitations-received list** — post-demo; no backend
