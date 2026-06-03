@@ -229,6 +229,15 @@ val repositoryModule = module {
         )
     }
 
+    // Audit-log / "my activity" Repository — #9: required by ActivityHistoryViewModel and
+    // AuditLogDashboardViewModel but was never registered (companion to the AuditLogApi
+    // binding in NetworkModule). Without it, opening Activity History hard-crashes the app.
+    single<com.fivucsas.shared.domain.repository.AuditLogRepository> {
+        com.fivucsas.shared.data.repository.AuditLogRepositoryImpl(
+            auditLogApi = get<com.fivucsas.shared.data.remote.api.AuditLogApi>()
+        )
+    }
+
     // Offline Cache
     single { OfflineCache(storage = get()) }
 }
