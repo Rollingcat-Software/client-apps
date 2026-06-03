@@ -375,4 +375,12 @@ val networkModule = module {
     single<com.fivucsas.shared.data.remote.api.NfcAuthenticityApi> {
         com.fivucsas.shared.data.remote.api.NfcAuthenticityApiImpl(get(named("identityClient")))
     }
+
+    // Audit-log / "my activity" API — #9: was NEVER registered, so ActivityHistoryViewModel
+    // and AuditLogDashboardViewModel could not be created → Koin NoDefinitionFoundException
+    // (FATAL crash on opening Activity History / the audit-log dashboard). Added in #83 but
+    // its DI binding was omitted; this restores it.
+    single<com.fivucsas.shared.data.remote.api.AuditLogApi> {
+        com.fivucsas.shared.data.remote.api.AuditLogApiImpl(get(named("identityClient")))
+    }
 }
