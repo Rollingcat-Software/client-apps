@@ -37,6 +37,7 @@ import com.fivucsas.shared.data.remote.dto.OAuthTokenResponseDto
 import com.fivucsas.shared.data.remote.dto.toModel
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
+import io.ktor.client.plugins.HttpRequestRetry
 import io.ktor.client.plugins.HttpSend
 import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.plugin
@@ -222,6 +223,25 @@ val networkModule = module {
                 requestTimeoutMillis = ApiConfig.REQUEST_TIMEOUT_MS
                 connectTimeoutMillis = ApiConfig.CONNECT_TIMEOUT_MS
                 socketTimeoutMillis = ApiConfig.SOCKET_TIMEOUT_MS
+            }
+
+            // Resilience against stale-connection aborts (e.g. OkHttp reusing a
+            // half-closed HTTP/2 keep-alive connection that Traefik dropped while
+            // the app was idle → the POST body is RST mid-send → the server logs
+            // "Malformed request body: I/O error while reading input message").
+            // This is bandwidth-independent and was misdiagnosed as a slow-uplink
+            // truncation. Retry ONLY on transport/IO exceptions (NOT on 4xx/5xx),
+            // so a consumed MFA code is never resubmitted; the body is a serialized
+            // object, so it is fully replayable on retry.
+            install(HttpRequestRetry) {
+                retryOnExceptionIf(maxRetries = 2) { _, cause ->
+                    val name = cause::class.simpleName ?: ""
+                    name.contains("IOException") ||
+                        name.contains("SocketTimeout") ||
+                        name.contains("ConnectTimeout") ||
+                        name == "ClosedReceiveChannelException"
+                }
+                exponentialDelay()
             }
 
             defaultRequest {
