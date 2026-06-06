@@ -4,7 +4,27 @@ All notable changes to the FIVUCSAS client apps (Android, iOS, Desktop).
 
 ## [Unreleased]
 
+## [5.3.1] - 2026-06-06
+
+> Production-signed release over 5.3.0 (versionCode 13). Headline: the cross-device
+> **MFA reliability fix that 5.3.0 shipped without**; also formalises the post-5.3.0
+> mobile fixes (#82/#83/#86) into a tagged, signed APK. Prod cert `CN=FIVUCSAS`
+> (SHA-256 `5e403eca…`); upgrades in place over 5.3.0. Built via CI
+> `android-build.yml` (`build_type=release`).
+
 ### Fixed
+
+- **MFA/auth requests now retry on transport/IO aborts (#87).** The identity
+  `HttpClient` installs Ktor `HttpRequestRetry` (maxRetries=2, exponential backoff)
+  that retries **only** on transport/IO exceptions (`IOException` / `SocketTimeout` /
+  `ConnectTimeout` / `ClosedReceiveChannelException`) — never on 4xx/5xx, so a consumed
+  MFA code is never resubmitted and the serialized request body is fully replayable.
+  Fixes the OkHttp HTTP/2 stale-connection abort the server logged as *"Malformed
+  request body: I/O error while reading input message"* (previously misdiagnosed as a
+  slow-uplink truncation). `shared/src/commonMain/kotlin/com/fivucsas/shared/di/NetworkModule.kt`.
+- **Cross-device login & session robustness (#86).** QR / approve-login no longer
+  swallows a non-2xx response (the error surfaces instead of failing silently),
+  plus session-expiry handling, NFC fixes, and hiding the preview-only "Add card" action.
 
 - **"My Invitations" no longer crashes.** The screen called `GET /api/v1/invites/received`,
   which has no backend endpoint; the 404 error body was decoded as a
