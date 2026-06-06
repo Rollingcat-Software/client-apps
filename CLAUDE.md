@@ -34,8 +34,23 @@ real flow.
 ## Releases
 
 Signed APK published per `docs/RELEASE.md` + `docs/SIGNING.md`. Keystore in `keystore/`.
-**Latest: v5.2.3** (cert SHA-256 `5e403eca…`, versionCode 10). v5.2.x installs in place over
-prior signed releases (same cert).
+**Latest: v5.3.1** (cert SHA-256 `5e403eca…`, versionCode 13) — adds the MFA
+stale-connection retry fix over v5.3.0. Same signing cert since v5.2.x, so releases
+install in place over prior signed builds.
+**Build a signed release** (host has no keystore password → build via CI, not locally):
+`gh workflow run android-build.yml -R Rollingcat-Software/client-apps --ref main -f build_type=release`
+→ downloadable `fivucsas-release-apk` artifact, prod-signed with the GitHub keystore secrets.
+
+## v5.3.1 — MFA stale-connection retry (PR #87, 2026-06-06)
+
+`NetworkModule.kt`'s identity `HttpClient` installs Ktor `HttpRequestRetry`
+(maxRetries=2, `exponentialDelay()`) that retries **only** on transport/IO exceptions
+(IOException / SocketTimeout / ConnectTimeout / ClosedReceiveChannelException) — never on
+4xx/5xx, so a consumed MFA code is never resubmitted and the serialized body is fully
+replayable. Fixes the OkHttp HTTP/2 stale-connection abort the server logged as
+"Malformed request body: I/O error while reading input message" (previously misdiagnosed
+as slow-uplink truncation). The fix had been stranded on an unmerged branch (absent from
+v5.3.0); recovered → merged → shipped as v5.3.1 (versionCode 13).
 
 ## Login fixes (2026-05-30, v5.2.2 / v5.2.3)
 
