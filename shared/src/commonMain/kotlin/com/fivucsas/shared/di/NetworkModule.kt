@@ -204,6 +204,57 @@ internal suspend fun refreshAccessToken(
 }
 
 /**
+ * Install the shared transparent refresh-on-401 + single-retry interceptor on
+ * [httpClient].
+ *
+ * Both the identity and the biometric clients use THIS one function so every 401
+ * is funnelled through the SAME [refreshAccessToken] (and therefore the SAME
+ * module-level [refreshMutex]). That cross-client serialization is the F8 fix for
+ * refresh-token reuse-detection family-revoke: previously the biometric client had
+ * NO refresh interceptor and was outside the mutex, so a biometric 401 racing an
+ * identity refresh (or presenting a token rotated out from under it) could
+ * re-present an already-rotated refresh token → the server revokes the whole
+ * rotation family → all sessions logged out non-deterministically. Routing both
+ * through one mutexed refresh removes that race.
+ *
+ * The refresh itself always targets the IDENTITY token endpoint (absolute URLs in
+ * [refreshAccessToken]), so it is correct to drive it from the biometric client
+ * too — the absolute URL overrides that client's biometric `defaultRequest` base.
+ */
+private fun installRefreshOn401(httpClient: HttpClient, tokenManager: TokenManager) {
+    // Transparent refresh-on-401 + RETRY of the original request.
+    //
+    // We use the HttpSend plugin (part of ktor-client-core — no extra
+    // dependency; the project deliberately avoids io.ktor:ktor-client-auth,
+    // see desktopApp RefreshInterceptor) because, unlike HttpResponseValidator,
+    // its interceptor CAN re-execute the request. This closes the old TODO
+    // where the caller received the raw 401 and the session appeared to
+    // die after the ~15-min access-token lifetime: now the access token is
+    // refreshed under a mutex and the SAME request is re-fired once with the
+    // fresh bearer (defaultRequest re-reads the stored token), so the call
+    // succeeds transparently instead of surfacing a logout.
+    httpClient.plugin(HttpSend).intercept { request: HttpRequestBuilder ->
+        val originalCall = execute(request)
+        val url = originalCall.request.url.toString()
+        if (originalCall.response.status != HttpStatusCode.Unauthorized || isAuthEndpoint(url)) {
+            return@intercept originalCall
+        }
+
+        // Snapshot the access token this request carried so the refresh
+        // helper can detect a concurrent rotation and avoid double-refresh.
+        val staleAccessToken = originalCall.request.headers[HttpHeaders.Authorization]
+        val refreshed = refreshAccessToken(httpClient, tokenManager, staleAccessToken)
+        if (!refreshed) {
+            return@intercept originalCall
+        }
+
+        // Re-fire the original request once. defaultRequest stamps the
+        // freshly-stored access token onto the retry.
+        execute(request)
+    }
+}
+
+/**
  * Network module - Provides HTTP clients and API clients
  *
  * Provides two separate HTTP clients:
@@ -292,36 +343,7 @@ val networkModule = module {
             }
 
         }.also { httpClient ->
-            // Transparent refresh-on-401 + RETRY of the original request.
-            //
-            // We use the HttpSend plugin (part of ktor-client-core — no extra
-            // dependency; the project deliberately avoids io.ktor:ktor-client-auth,
-            // see desktopApp RefreshInterceptor) because, unlike HttpResponseValidator,
-            // its interceptor CAN re-execute the request. This closes the old TODO
-            // where the caller received the raw 401 and the session appeared to
-            // die after the ~15-min access-token lifetime: now the access token is
-            // refreshed under a mutex and the SAME request is re-fired once with the
-            // fresh bearer (defaultRequest re-reads the stored token), so the call
-            // succeeds transparently instead of surfacing a logout.
-            httpClient.plugin(HttpSend).intercept { request: HttpRequestBuilder ->
-                val originalCall = execute(request)
-                val url = originalCall.request.url.toString()
-                if (originalCall.response.status != HttpStatusCode.Unauthorized || isAuthEndpoint(url)) {
-                    return@intercept originalCall
-                }
-
-                // Snapshot the access token this request carried so the refresh
-                // helper can detect a concurrent rotation and avoid double-refresh.
-                val staleAccessToken = originalCall.request.headers[HttpHeaders.Authorization]
-                val refreshed = refreshAccessToken(httpClient, tokenManager, staleAccessToken)
-                if (!refreshed) {
-                    return@intercept originalCall
-                }
-
-                // Re-fire the original request once. defaultRequest stamps the
-                // freshly-stored access token onto the retry.
-                execute(request)
-            }
+            installRefreshOn401(httpClient, tokenManager)
         }
     }
 
@@ -356,6 +378,14 @@ val networkModule = module {
                     header(HttpHeaders.Authorization, "Bearer $accessToken")
                 }
             }
+        }.also { httpClient ->
+            // F8: the biometric client previously had NO refresh interceptor and
+            // sat outside [refreshMutex], so a biometric 401 could refresh out of
+            // band / re-present an already-rotated refresh token → reuse-detection
+            // family-revoke → all sessions logged out. Use the SAME shared,
+            // mutex-serialized refresh as the identity client. The refresh targets
+            // the identity token endpoint via absolute URLs, so it is correct here.
+            installRefreshOn401(httpClient, tokenManager)
         }
     }
 
