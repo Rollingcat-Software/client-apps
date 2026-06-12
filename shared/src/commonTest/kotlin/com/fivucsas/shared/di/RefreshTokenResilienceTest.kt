@@ -30,7 +30,9 @@ import kotlin.test.assertTrue
  *
  * The fix: clear tokens ONLY on a DEFINITIVE auth rejection (400/401
  * invalid_grant); on a transient failure (IOException/timeout/5xx) keep the
- * session so the next request can retry.
+ * session so the next request can retry. Plus (root cause 3): a 200 refresh
+ * that omits a new refresh token must KEEP the existing one, never overwrite
+ * it with "".
  */
 class RefreshTokenResilienceTest {
 
@@ -168,6 +170,30 @@ class RefreshTokenResilienceTest {
         assertTrue(ok)
         assertEquals("new-access", tm.getAccessToken())
         assertEquals("new-refresh", tm.getRefreshToken())
+    }
+
+    // ---- Root cause 3: a 200 omitting refresh_token must KEEP the old one ----
+
+    @Test
+    fun `oauth refresh 200 without refresh_token preserves existing refresh token`() = runTest {
+        val (tm, _) = seededManager(refresh = "original-refresh")
+        val httpClient = client {
+            respond(
+                content = "{\"access_token\":\"new-access\",\"expires_in\":900}",
+                status = HttpStatusCode.OK,
+                headers = headersOf(HttpHeaders.ContentType, "application/json"),
+            )
+        }
+
+        val ok = refreshAccessToken(httpClient, tm, "Bearer stale-access")
+
+        assertTrue(ok)
+        assertEquals("new-access", tm.getAccessToken())
+        assertEquals(
+            "original-refresh",
+            tm.getRefreshToken(),
+            "rotation-disabled refresh must not blank out the stored refresh token",
+        )
     }
 
     // ---- isDefinitiveAuthFailure classification ----

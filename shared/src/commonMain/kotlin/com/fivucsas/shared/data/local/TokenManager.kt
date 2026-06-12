@@ -55,17 +55,27 @@ class TokenManager(
     }
 
     /**
-     * Get current access token
+     * Get current access token.
+     *
+     * A blank stored value is treated as ABSENT (returns null): the DTO mappers
+     * default a missing token to "", and a "" must never look like a usable token.
      */
     fun getAccessToken(): String? {
-        return cachedTokens?.accessToken ?: tokenStorage.getToken()
+        return (cachedTokens?.accessToken ?: tokenStorage.getToken())?.takeIf { it.isNotBlank() }
     }
 
     /**
-     * Get current refresh token (from cache or persistent storage)
+     * Get current refresh token (from cache or persistent storage).
+     *
+     * A blank stored token is treated as ABSENT (returns null): the DTO mappers
+     * default a missing `refresh_token` to "", and a "" must never look like a
+     * usable token — otherwise the refresh path would POST an empty grant, the
+     * server would (rightly) reject it as `invalid_grant`, and the user would be
+     * spuriously forced to re-login. Treating blank as absent here also makes
+     * [isAuthenticated] fall back correctly.
      */
     fun getRefreshToken(): String? {
-        return cachedTokens?.refreshToken ?: tokenStorage.getRefreshToken()
+        return (cachedTokens?.refreshToken ?: tokenStorage.getRefreshToken())?.takeIf { it.isNotBlank() }
     }
 
     /**

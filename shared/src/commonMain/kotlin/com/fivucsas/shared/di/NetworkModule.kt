@@ -162,8 +162,13 @@ internal suspend fun refreshAccessToken(
                 val oauth = refreshResponse.body<OAuthTokenResponseDto>().toModel()
                 // The OAuth refresh response carries no profile fields — re-apply
                 // the cached identity so role/tenant context survives the rotation.
+                // When the server omits `refresh_token` (rotation disabled), the DTO
+                // maps it to "" — KEEP the existing refresh token instead of wiping
+                // it to blank, or the very next refresh would have no token and force
+                // a re-login.
                 tokenManager.updateTokens(
                     oauth.copy(
+                        refreshToken = oauth.refreshToken.ifBlank { refreshToken },
                         role = tokenManager.getRole() ?: oauth.role,
                         userName = tokenManager.getUserName() ?: "",
                         userEmail = tokenManager.getUserEmail() ?: "",
@@ -185,8 +190,12 @@ internal suspend fun refreshAccessToken(
                 setBody(mapOf("refreshToken" to refreshToken))
             }
             if (refreshResponse.status == HttpStatusCode.OK) {
-                val authResponse = refreshResponse.body<AuthResponseDto>()
-                tokenManager.updateTokens(authResponse.toModel())
+                val refreshed = refreshResponse.body<AuthResponseDto>().toModel()
+                // Same blank-refresh-token guard as the OAuth branch: if the server
+                // didn't rotate (omitted refreshToken → ""), preserve the current one.
+                tokenManager.updateTokens(
+                    refreshed.copy(refreshToken = refreshed.refreshToken.ifBlank { refreshToken }),
+                )
                 true
             } else {
                 // Same split as the OAuth branch: only a definitive auth rejection
