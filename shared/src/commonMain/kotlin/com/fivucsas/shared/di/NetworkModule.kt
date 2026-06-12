@@ -96,11 +96,34 @@ private fun isAuthEndpoint(url: String): Boolean =
         url.contains("/auth/logout") || url.contains("/oauth2/token")
 
 /**
+ * A definitive auth failure is one the server reports for the refresh-token grant
+ * itself: HTTP 400/401 from `/oauth2/token` (or `/auth/refresh`) means the refresh
+ * token is truly dead (expired, revoked, reuse-detection family-revoke → the OAuth
+ * `invalid_grant` family). Only these justify wiping the session and routing to
+ * login. EVERYTHING else — a socket timeout, a dropped keep-alive, a brief offline,
+ * a Traefik HTTP/2 stale-connection RST, a 5xx/502/503, a 429 — is TRANSIENT: it
+ * says nothing about whether the refresh token is still valid, so we must NOT clear
+ * the persisted session over it; only the in-flight request fails and the next
+ * attempt re-tries with the surviving tokens.
+ */
+internal fun isDefinitiveAuthFailure(status: HttpStatusCode): Boolean =
+    status == HttpStatusCode.BadRequest || status == HttpStatusCode.Unauthorized
+
+/**
  * Perform a single silent token refresh under [refreshMutex].
  *
  * Returns true if, after this call, a usable access token exists (either because
- * we refreshed it, or because a concurrent 401 handler already did). Returns
- * false if refresh was impossible/failed (tokens are then cleared → re-login).
+ * we refreshed it, or because a concurrent 401 handler already did). Returns false
+ * if the refresh did not produce a usable token.
+ *
+ * Token-clearing policy (the F8 fix): the ENTIRE persisted session is wiped ONLY on
+ * a DEFINITIVE auth failure ([isDefinitiveAuthFailure]) — the server explicitly
+ * rejecting the refresh token. On a TRANSIENT failure (an IOException/timeout/RST
+ * caught below, or a non-auth non-200 such as 5xx/429) we return false WITHOUT
+ * clearing tokens, so the session survives for the next attempt. The previous
+ * blanket `catch (_) { clearTokens() }` + clear-on-any-non-200 wiped the whole
+ * session on any flaky network event, which surfaced as the intermittent
+ * "sometimes asks for login, sometimes doesn't" forced re-login.
  *
  * [staleAccessToken] is the `Authorization` header the failed request carried; if
  * the stored access token already differs we skip the refresh (a concurrent
@@ -109,7 +132,7 @@ private fun isAuthEndpoint(url: String): Boolean =
  * it is now reusable from the HttpSend interceptor so the original request can be
  * transparently re-fired (closing the old "caller receives the 401" TODO).
  */
-private suspend fun refreshAccessToken(
+internal suspend fun refreshAccessToken(
     client: HttpClient,
     tokenManager: TokenManager,
     staleAccessToken: String?,
@@ -150,7 +173,9 @@ private suspend fun refreshAccessToken(
                 )
                 true
             } else {
-                tokenManager.clearTokens()
+                // Definitive (400/401 invalid_grant) → token is dead, wipe + relogin.
+                // Transient (5xx/429/…) → keep the session, just fail this request.
+                if (isDefinitiveAuthFailure(refreshResponse.status)) tokenManager.clearTokens()
                 false
             }
         } else {
@@ -164,13 +189,16 @@ private suspend fun refreshAccessToken(
                 tokenManager.updateTokens(authResponse.toModel())
                 true
             } else {
-                // Refresh failed — clear tokens to force re-login.
-                tokenManager.clearTokens()
+                // Same split as the OAuth branch: only a definitive auth rejection
+                // clears the session; a transient server/network error preserves it.
+                if (isDefinitiveAuthFailure(refreshResponse.status)) tokenManager.clearTokens()
                 false
             }
         }
     } catch (_: Exception) {
-        tokenManager.clearTokens()
+        // Transport/IO failure (timeout, dropped keep-alive, Traefik RST, offline).
+        // This says NOTHING about refresh-token validity — keep the session intact
+        // and let the next request retry; do NOT clear tokens here.
         false
     }
 }
