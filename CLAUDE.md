@@ -131,5 +131,5 @@ headings, Inter for body — matching `web-app/src/theme.ts`.
   (`cb6eab9`, 2026-04-18). Rotation is operator-gated. Playbook: parent
   `docs/SECURITY_INCIDENTS.md`.
 
-See `docs/TODO.md` for the integration backlog and `ROADMAP_AUTH_2026-05-30.md` (parent) for
+See the open GitHub issues for the integration backlog and `ROADMAP_AUTH_2026-05-30.md` (parent) for
 the auth program tracker.

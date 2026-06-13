@@ -19,9 +19,10 @@ Google Authenticator or Microsoft Authenticator:
   tap-to-copy, swipe-delete confirmation, manual account entry
 
 The core engine lives in `shared/src/commonMain/kotlin/com/fivucsas/authenticator/totp/`
-via KMP `expect`/`actual`, so iOS and Desktop will reuse it once their HMAC
-actuals land (tracked in `docs/TODO.md`). QR code scanning is deferred; manual
-entry is the supported flow in 5.1.0.
+via KMP `expect`/`actual`; the Android, Desktop and iOS HMAC actuals are all
+implemented, so the engine is shared across platforms. QR-code account import
+is supported on Android (`OtpQrScannerScreen` + `OtpauthUri.parse()`) alongside
+manual entry.
 
 
 ## Feature coverage matrix

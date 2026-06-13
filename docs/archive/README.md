@@ -1,6 +1,6 @@
 # Documentation Archive
 
-Historical docs preserved for git history. Content here is **not current** — see top-level `README.md`, `CHANGELOG.md`, `ROADMAP_CLIENT_APPS.md`, and `docs/` for authoritative docs.
+Historical docs preserved for git history. Content here is **not current** — see top-level `README.md`, `CHANGELOG.md`, the open GitHub issues, and `docs/` for authoritative docs.
 
 ## 2026-04-16
 
