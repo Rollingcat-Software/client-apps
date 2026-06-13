@@ -291,5 +291,4 @@ fun setup() {
 
 For detailed information, see:
 - **Full Guide**: `CAMERA_INTEGRATION_GUIDE.md`
-- **Implementation**: `CAMERA_IMPLEMENTATION_SUMMARY.md`
 - **Code**: Browse implementation files

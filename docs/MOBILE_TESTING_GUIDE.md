@@ -165,4 +165,4 @@ server **200** — always check the server verdict before assuming the API faile
 ## 8. Reference
 - `README.md`, `CLAUDE.md` — architecture & conventions.
 - `docs/RELEASE.md`, `docs/SIGNING.md` — signing & release.
-- `ROADMAP_CLIENT_APPS.md` — roadmap.
+- Open GitHub issues — current backlog / roadmap.
