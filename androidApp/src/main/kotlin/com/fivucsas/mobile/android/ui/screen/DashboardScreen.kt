@@ -225,7 +225,7 @@ fun DashboardScreen(
                     // Notifications bell hidden: there is no backend notifications
                     // feed yet, so the screen was permanently "No notifications yet".
                     // onNavigateToNotifications stays wired — restore the bell once a
-                    // feed endpoint exists (see NotificationsScreen TODO).
+                    // feed endpoint exists (see NotificationsScreen TODO(#103)).
                     IconButton(onClick = onNavigateToProfile) {
                         Icon(
                             imageVector = Icons.Default.Person,
