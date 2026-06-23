@@ -53,7 +53,7 @@ fun ExportDataRow(
     val context = LocalContext.current
     val state by viewModel.state.collectAsState()
 
-    // TODO(i18n): DATA_EXPORT_* keys in /tmp/i18n_agent_20B.txt
+    // TODO(#100)(i18n): DATA_EXPORT_* keys in /tmp/i18n_agent_20B.txt
     val titleText = "Export my data"
     val descriptionText =
         "Download a JSON copy of all personal data we store about you (GDPR Art. 20 / KVKK)."

@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 /**
  * 1:N face-search response.
  *
- * TODO(biometric-search): the Identity `/biometric/search` endpoint returns an
+ * TODO(#104)(biometric-search): the Identity `/biometric/search` endpoint returns an
  * opaque processor map ({matches:[{user_id, similarity}], ...}) rather than this
  * flat shape. All fields default so deserialization never throws on the real
  * payload; remap to the processor's `matches` array once the search UI needs

@@ -75,7 +75,7 @@ class BiometricApiImpl(
         imageBytes: ByteArray,
         imageName: String
     ): LivenessResponseDto {
-        // TODO(biometric-liveness): The Identity Core API exposes NO standalone
+        // TODO(#105)(biometric-liveness): The Identity Core API exposes NO standalone
         // liveness endpoint. Server-side passive liveness is folded into
         // /biometric/verify (LIVENESS_BACKEND=uniface, LIVENESS_MODE=passive on
         // the processor). There is therefore nothing for a client-only liveness

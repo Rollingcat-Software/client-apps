@@ -108,7 +108,7 @@ fun AuthenticatorScreen(
                 val result = viewModel.addFromUri(uri)
                 showQrScanner = false
                 if (result.isFailure) {
-                    // TODO(i18n): promote to StringKey.OTP_SCAN_UNSUPPORTED once string table is updated.
+                    // TODO(#101)(i18n): promote to StringKey.OTP_SCAN_UNSUPPORTED once string table is updated.
                     // Tracked in /tmp/i18n_agent_20E.txt (agent 20E).
                     Toast.makeText(
                         context,
