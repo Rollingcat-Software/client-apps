@@ -94,6 +94,22 @@ APPROVER side is a shared `commonMain` stack reusing the `NfcApproval*` conventi
 `matchNumber` is a zero-padded STRING** — keep it a String end-to-end (never an Int, or
 leading zeros drop). The approver SCREEN is deferred (gated on Phase 0); the stack is merged.
 
+## Attested puzzle binding — attestation layer only (2026-11-02)
+
+`shared/src/commonMain/.../attestation/` + `androidMain/.../attestation/AttestedKeyManager.kt`
+implement the client side of identity-core-api `docs/ATTESTED_PUZZLE_BINDING.md`: per puzzle
+session an AndroidKeyStore EC P-256 key attested over the server `attestation_challenge`
+(StrongBox → TEE fallback) signs the canonical (session, nonce, embedding, trace digest,
+binding frame) payload, then is deleted. The encodings are pinned by golden vectors shared
+with identity + bio (`AttestationEncodingTest`) — change all three together. **What does NOT
+exist yet:** the app has no server-session puzzle and no on-device embedding (FaceLiveness is
+a local, UI-advanced challenge list + one JPEG to passive liveness; CameraX + ML Kit only, no
+MediaPipe face mesh / Facenet / ONNX Runtime). The capture plan is in
+`attestation/AttestedPuzzleCapture.kt`. Real attestation only works on a release-signed build
+whose signing-cert SHA-256 is configured server-side
+(`APP_AUTH_ATTESTATION_ANDROID_SIGNING_CERT_SHA256`); a debug build attests with the debug cert
+and is rejected (`APP_SIGNATURE_NOT_ALLOWED`), as with WebAuthn.
+
 ## Architectural direction
 
 **Hosted-first auth** (OAuth 2.0 / OIDC, mirrors the platform direction in the parent
