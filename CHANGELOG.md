@@ -4,6 +4,18 @@ All notable changes to the FIVUCSAS client apps (Android, iOS, Desktop).
 
 ## [Unreleased]
 
+### Added
+- Attested puzzle binding layer (identity-core-api `docs/ATTESTED_PUZZLE_BINDING.md`):
+  `shared/.../attestation/` — `AttestedKeyProvider` (expect/actual; Android
+  `AttestedKeyManager` = AndroidKeyStore EC P-256 SIGN key with
+  `setAttestationChallenge`, StrongBox when available else TEE, one signature, then
+  deleted; desktop/iOS = unsupported), `AttestedBindingPayload` + `PuzzleTraceDigest`
+  (canonical encodings, golden vectors shared with identity-core-api and
+  biometric-processor), pure-Kotlin `Sha256`, `AttestedPuzzleBinder` (MFA step `data`),
+  `PuzzleSessionApi` (puzzle-session CREATE / SUBMIT / PUZZLE step). The Android puzzle
+  capture (face mesh traces + on-device Facenet512) is NOT built yet; design + TODO in
+  `AttestedPuzzleCapture.kt`.
+
 ## [5.3.1] - 2026-06-06
 
 > Production-signed release over 5.3.0 (versionCode 13). Headline: the cross-device

@@ -463,6 +463,15 @@ val networkModule = module {
         com.fivucsas.shared.data.remote.api.NfcAuthenticityApiImpl(get(named("identityClient")))
     }
 
+    // Puzzle-session MFA proxy + attested puzzle binding (identity-core-api
+    // docs/ATTESTED_PUZZLE_BINDING.md). Capture UI not built yet (AttestedPuzzleCapture.kt).
+    single { com.fivucsas.shared.data.remote.api.PuzzleSessionApi(get(named("identityClient"))) }
+    factory {
+        com.fivucsas.shared.attestation.AttestedPuzzleBinder(
+            com.fivucsas.shared.attestation.provideAttestedKeyProvider()
+        )
+    }
+
     // Audit-log / "my activity" API — #9: was NEVER registered, so ActivityHistoryViewModel
     // and AuditLogDashboardViewModel could not be created → Koin NoDefinitionFoundException
     // (FATAL crash on opening Activity History / the audit-log dashboard). Added in #83 but
