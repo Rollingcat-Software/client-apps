@@ -4,6 +4,17 @@ All notable changes to the FIVUCSAS client apps (Android, iOS, Desktop).
 
 ## [Unreleased]
 
+### 2026-11-09 - Hosted sign-in says why it ended
+
+- `HostedLoginScreen` showed the generic "Sign-in failed" for every non-token result,
+  including a closed Custom Tab: AppAuth 0.11.1 returns `RESULT_CANCELED` with a
+  `USER_CANCELED_AUTH_FLOW` intent, never a null intent. New `HostedAuthFailure`
+  classifies the result (cancelled / authorization rejected / token exchange failed /
+  network / unknown), each with its own message (`LOGIN_HOSTED_CANCELLED`,
+  `LOGIN_HOSTED_REJECTED`, `LOGIN_HOSTED_EXCHANGE_FAILED`, `ERROR_NETWORK`,
+  `LOGIN_ERROR_GENERIC`; English and Turkish), and logs the cause under the
+  `HostedLogin` tag (`adb logcat -s HostedLogin`) without the code or tokens.
+
 ### Added
 - Attested puzzle binding layer (identity-core-api `docs/ATTESTED_PUZZLE_BINDING.md`):
   `shared/.../attestation/` — `AttestedKeyProvider` (expect/actual; Android

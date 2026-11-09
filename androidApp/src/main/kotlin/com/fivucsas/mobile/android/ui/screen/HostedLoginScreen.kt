@@ -39,6 +39,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import android.util.Log
+import com.fivucsas.mobile.android.auth.HostedAuthFailure
 import com.fivucsas.mobile.android.auth.HostedAuthManager
 import com.fivucsas.shared.data.local.TokenManager
 import com.fivucsas.shared.data.remote.api.IdentityApi
@@ -47,6 +49,7 @@ import com.fivucsas.shared.i18n.StringKey
 import com.fivucsas.shared.i18n.s
 import com.fivucsas.shared.ui.theme.AppColors
 import kotlinx.coroutines.launch
+import net.openid.appauth.AuthorizationException
 import org.koin.compose.koinInject
 
 /**
@@ -76,8 +79,10 @@ fun HostedLoginScreen(
     ) { result ->
         val data = result.data
         if (data == null) {
+            // No result intent at all. AppAuth itself always attaches one (a closed
+            // tab arrives as USER_CANCELED_AUTH_FLOW and is classified below).
             loading = false
-            error = null // user dismissed the tab
+            error = null
             return@rememberLauncherForActivityResult
         }
         scope.launch {
@@ -114,7 +119,15 @@ fun HostedLoginScreen(
                 onLoginSuccess(role)
             } catch (e: Throwable) {
                 loading = false
-                error = s(StringKey.LOGIN_ERROR_GENERIC)
+                val failure = HostedAuthFailure.classify(e)
+                // Structured cause for `adb logcat -s HostedLogin`; never the code or tokens.
+                val oauth = e as? AuthorizationException
+                Log.w(
+                    LOG_TAG,
+                    "hosted sign-in failed kind=$failure type=${oauth?.type} code=${oauth?.code} " +
+                        "error=${oauth?.error} exception=${e::class.simpleName}",
+                )
+                error = s(failure.messageKey)
             }
         }
     }
@@ -268,3 +281,5 @@ fun HostedLoginScreen(
         }
     }
 }
+
+private const val LOG_TAG = "HostedLogin"
